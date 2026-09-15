@@ -14,6 +14,7 @@ import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.auth.authenticate
 import kotlinx.serialization.Serializable
@@ -47,9 +48,59 @@ data class SendMessageResponse(
 class ChatRoutes(
     private val chatEngine: ChatEngine,
     private val conversationRepository: ConversationRepository,
+    private val memoryRepository: com.pinkdreams.persistence.repositories.MemoryFactRepository? = null,
 ) {
     fun register(route: Route) {
         route.authenticate("dev-auth") {
+            get("/v1/conversations/{conversationId}/memory") {
+                val conversationId = try {
+                    java.util.UUID.fromString(call.parameters["conversationId"])
+                } catch (e: Exception) {
+                    call.respond(
+                        io.ktor.http.HttpStatusCode.BadRequest,
+                        com.pinkdreams.common.errors.ErrorResponse(com.pinkdreams.common.errors.ApiError(com.pinkdreams.common.errors.ErrorCode.VALIDATION_ERROR, "Invalid conversation ID", null)),
+                    )
+                    return@get
+                }
+
+                val principal = call.principal<io.ktor.server.auth.UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        io.ktor.http.HttpStatusCode.Unauthorized,
+                        com.pinkdreams.common.errors.ErrorResponse(com.pinkdreams.common.errors.ApiError(com.pinkdreams.common.errors.ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@get
+                }
+
+                val userId = java.util.UUID.fromString(principal.name)
+                val conversation = conversationRepository.findByIdForUser(conversationId, userId)
+                if (conversation == null) {
+                    call.respond(
+                        io.ktor.http.HttpStatusCode.NotFound,
+                        com.pinkdreams.common.errors.ErrorResponse(com.pinkdreams.common.errors.ApiError(com.pinkdreams.common.errors.ErrorCode.NOT_FOUND, "Conversation not found", null)),
+                    )
+                    return@get
+                }
+
+                if (memoryRepository == null) {
+                    call.respond(mapOf("memory" to emptyList<Any>()))
+                    return@get
+                }
+
+                val memory = memoryRepository.findForRelationship(userId, conversation.personaId)
+                call.respond(mapOf("memory" to memory.map { m ->
+                    mapOf(
+                        "id" to m.id.toString(),
+                        "fact" to m.fact,
+                        "factType" to m.factType,
+                        "criticality" to m.criticality,
+                        "tier" to m.tier,
+                        "status" to m.status,
+                        "learnedAt" to m.learnedAt.toString()
+                    )
+                }))
+            }
+
             post("/v1/conversations/{conversationId}/messages") {
                 // Authentication
                 val principal = call.principal<UserIdPrincipal>()

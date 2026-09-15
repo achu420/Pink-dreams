@@ -143,7 +143,7 @@ fun Application.module(
 
     routing {
         HealthRoutes().register(this)
-        ChatRoutes(engine, conversationRepo).register(this)
+        ChatRoutes(engine, conversationRepo, memoryFactRepo).register(this)
         ConversationHistoryRoutes(conversationRepo, messageRepo).register(this)
         AdminEngineRoutes(engineRepo, authProvider).register(this)
         AdminPersonaRoutes(personaRepo, coreVersionRepo, authProvider).register(this)
