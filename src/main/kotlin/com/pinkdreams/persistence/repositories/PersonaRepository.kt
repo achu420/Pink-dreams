@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.util.UUID
@@ -54,6 +55,11 @@ open class PersonaRepository(private val db: Database) {
         Personas.select { Personas.id eq id }
             .map(::rowToModel)
             .singleOrNull()
+    }
+
+    fun findAll(): List<Persona> = transaction(db) {
+        Personas.selectAll()
+            .map(::rowToModel)
     }
 
     fun getActiveCoreVersion(personaId: UUID): PersonaCoreVersionRepository.PersonaCoreVersion? = transaction(db) {

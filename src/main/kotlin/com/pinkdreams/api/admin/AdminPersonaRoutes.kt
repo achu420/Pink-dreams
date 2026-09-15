@@ -7,11 +7,13 @@ import com.pinkdreams.common.errors.ErrorResponse
 import com.pinkdreams.persistence.repositories.PersonaRepository
 import com.pinkdreams.persistence.repositories.PersonaCoreVersionRepository
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.ContentType
 import io.ktor.server.application.call
 import io.ktor.server.auth.UserIdPrincipal
 import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -75,6 +77,21 @@ class AdminPersonaRoutes(
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
 ) {
     fun register(route: Route) {
+        // Serve admin UI without auth (public access to QA console)
+        route.get("/admin") {
+            val resource = Thread.currentThread().contextClassLoader.getResource("admin-ui.html")
+            if (resource != null) {
+                try {
+                    val html = resource.readText()
+                    call.respondText(html, ContentType.Text.Html)
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.InternalServerError, "Failed to load admin UI")
+                }
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Admin UI not found")
+            }
+        }
+
         route.authenticate("dev-auth") {
             // POST /v1/admin/personas
             post("/v1/admin/personas") {
@@ -154,10 +171,22 @@ class AdminPersonaRoutes(
                     return@get
                 }
 
+                val personas = personaRepository.findAll()
                 call.respond(
                     HttpStatusCode.OK,
                     PersonaListResponse(
-                        personas = emptyList(),
+                        personas = personas.map { p ->
+                            PersonaResponse(
+                                id = p.id.toString(),
+                                slug = p.slug,
+                                displayName = p.displayName,
+                                gender = p.gender,
+                                orientation = p.orientation,
+                                apparentAge = p.apparentAge,
+                                status = p.status,
+                                activeCoreVersionId = p.activeCoreVersionId?.toString(),
+                            )
+                        },
                     ),
                 )
             }

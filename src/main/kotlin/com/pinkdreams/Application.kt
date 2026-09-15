@@ -9,6 +9,12 @@ import com.pinkdreams.auth.AdminAuthorizationProvider
 import com.pinkdreams.auth.DevAuthProvider
 import com.pinkdreams.chat.ChatEngine
 import com.pinkdreams.chat.PipelineChatEngine
+import com.pinkdreams.chat.context.RepositoryContextAssembler
+import com.pinkdreams.chat.memory.BestEffortMemoryExtraction
+import com.pinkdreams.chat.memory.MemoryExtractor
+import com.pinkdreams.chat.memory.MemoryService
+import com.pinkdreams.persistence.RepositoryChatExecutionCoordinator
+import com.pinkdreams.persistence.RepositoryChatPersistence
 import com.pinkdreams.common.errors.ApiError
 import com.pinkdreams.common.errors.ErrorCode
 import com.pinkdreams.common.errors.ErrorResponse
@@ -18,7 +24,15 @@ import com.pinkdreams.config.LlmConfig
 import com.pinkdreams.llm.FakeLlmClient
 import com.pinkdreams.llm.LlmGenerator
 import com.pinkdreams.persistence.database.DatabaseFactory
+import com.pinkdreams.persistence.repositories.ChatRequestExecutionRepository
 import com.pinkdreams.persistence.repositories.ConversationRepository
+import com.pinkdreams.persistence.repositories.ConversationEngineRepository
+import com.pinkdreams.persistence.repositories.MemoryFactRepository
+import com.pinkdreams.persistence.repositories.MessageRepository
+import com.pinkdreams.persistence.repositories.PersonaRepository
+import com.pinkdreams.persistence.repositories.PersonaCoreVersionRepository
+import com.pinkdreams.persistence.repositories.UserProfileRepository
+import java.util.concurrent.Executor
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
@@ -81,6 +95,14 @@ fun Application.module(
     // Initialize database and repositories if not provided
     val db = DatabaseFactory.connect(databaseConfig)
     val conversationRepo = conversationRepository ?: ConversationRepository(db)
+    val personaRepo = PersonaRepository(db)
+    val coreVersionRepo = PersonaCoreVersionRepository(db)
+    val engineRepo = ConversationEngineRepository(db)
+    val messageRepo = MessageRepository(db)
+    val userProfileRepo = UserProfileRepository(db)
+    val executionRepo = ChatRequestExecutionRepository(db)
+    val memoryFactRepo = MemoryFactRepository(db)
+    val memoryService = MemoryService(memoryFactRepo)
 
     // Initialize ChatEngine if not provided
     val engine = chatEngine ?: run {
@@ -98,20 +120,23 @@ fun Application.module(
         PipelineChatEngine(
             entitlementChecker = { com.pinkdreams.chat.EntitlementDecision.Allowed },
             inputModerator = { com.pinkdreams.chat.ModerationDecision.Allowed },
-            contextAssembler = { com.pinkdreams.chat.StageResult.Succeeded(com.pinkdreams.chat.ChatContext(listOf())) },
+            contextAssembler = RepositoryContextAssembler(
+                conversationRepository = conversationRepo,
+                messageRepository = messageRepo,
+                userProfileRepository = userProfileRepo,
+                memoryService = memoryService,
+                engineRepository = engineRepo,
+                personaRepository = personaRepo,
+            ),
             generator = llmGenerator,
             outputValidator = { _, _ -> com.pinkdreams.chat.ValidationDecision.Accepted },
-            persistence = { _, _ -> com.pinkdreams.chat.StageResult.Failed(ErrorCode.PERSIST_FAILED) },
+            persistence = RepositoryChatPersistence(db, executionRepo),
             delivery = { _, _ -> com.pinkdreams.chat.StageResult.Succeeded(Unit) },
-            executionCoordinator = com.pinkdreams.chat.NoopChatExecutionCoordinator,
+            executionCoordinator = RepositoryChatExecutionCoordinator(executionRepo, conversationRepo, messageRepo),
         )
     }
 
     val adminAuthProvider = AdminAuthorizationProvider()
-    val personaRepo = com.pinkdreams.persistence.repositories.PersonaRepository(db)
-    val coreVersionRepo = com.pinkdreams.persistence.repositories.PersonaCoreVersionRepository(db)
-    val engineRepo = com.pinkdreams.persistence.repositories.ConversationEngineRepository(db)
-    val messageRepo = com.pinkdreams.persistence.repositories.MessageRepository(db)
 
     routing {
         HealthRoutes().register(this)

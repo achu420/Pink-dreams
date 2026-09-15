@@ -66,10 +66,21 @@ class AdminEngineRoutes(
                     return@get
                 }
 
+                val engines = engineRepository.findAll()
                 call.respond(
                     HttpStatusCode.OK,
                     EngineListResponse(
-                        engines = emptyList(),
+                        engines = engines.map { e ->
+                            EngineResponse(
+                                id = e.id.toString(),
+                                version = e.version,
+                                content = e.content,
+                                status = e.status,
+                                isActive = e.isActive,
+                                changelogNote = e.changelogNote,
+                                createdBy = e.createdBy,
+                            )
+                        },
                     ),
                 )
             }

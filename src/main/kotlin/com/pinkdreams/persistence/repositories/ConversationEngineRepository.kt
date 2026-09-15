@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.util.UUID
@@ -59,6 +60,11 @@ open class ConversationEngineRepository(private val db: Database) {
         ConversationEngines.select { ConversationEngines.isActive eq true }
             .map(::rowToModel)
             .singleOrNull()
+    }
+
+    fun findAll(): List<ConversationEngine> = transaction(db) {
+        ConversationEngines.selectAll()
+            .map(::rowToModel)
     }
 
     fun publishEngine(engineId: UUID): ConversationEngine = transaction(db) {
