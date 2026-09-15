@@ -24,6 +24,7 @@ import com.pinkdreams.config.LlmConfig
 import com.pinkdreams.llm.FakeLlmClient
 import com.pinkdreams.llm.LlmGenerator
 import com.pinkdreams.persistence.database.DatabaseFactory
+import org.jetbrains.exposed.sql.Database
 import com.pinkdreams.persistence.repositories.ChatRequestExecutionRepository
 import com.pinkdreams.persistence.repositories.ConversationRepository
 import com.pinkdreams.persistence.repositories.ConversationEngineRepository
@@ -63,6 +64,8 @@ fun Application.module(
     llmConfig: LlmConfig = LlmConfig.from(AppConfig.load()),
     chatEngine: ChatEngine? = null,
     conversationRepository: ConversationRepository? = null,
+    adminAuthProvider: AdminAuthorizationProvider? = null,
+    database: Database? = null,
 ) {
     install(ContentNegotiation) {
         json(Json {
@@ -93,7 +96,7 @@ fun Application.module(
     DevAuthProvider().install(this)
 
     // Initialize database and repositories if not provided
-    val db = DatabaseFactory.connect(databaseConfig)
+    val db = database ?: DatabaseFactory.connect(databaseConfig)
     val conversationRepo = conversationRepository ?: ConversationRepository(db)
     val personaRepo = PersonaRepository(db)
     val coreVersionRepo = PersonaCoreVersionRepository(db)
@@ -136,13 +139,13 @@ fun Application.module(
         )
     }
 
-    val adminAuthProvider = AdminAuthorizationProvider()
+    val authProvider = adminAuthProvider ?: AdminAuthorizationProvider()
 
     routing {
         HealthRoutes().register(this)
         ChatRoutes(engine, conversationRepo).register(this)
         ConversationHistoryRoutes(conversationRepo, messageRepo).register(this)
-        AdminEngineRoutes(engineRepo, adminAuthProvider).register(this)
-        AdminPersonaRoutes(personaRepo, coreVersionRepo, adminAuthProvider).register(this)
+        AdminEngineRoutes(engineRepo, authProvider).register(this)
+        AdminPersonaRoutes(personaRepo, coreVersionRepo, authProvider).register(this)
     }
 }

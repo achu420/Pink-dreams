@@ -2,10 +2,10 @@ package com.pinkdreams.auth
 
 import java.util.UUID
 
-class AdminAuthorizationProvider {
+open class AdminAuthorizationProvider {
     private val adminUserIds: Set<UUID> = loadAdminUserIds()
 
-    fun isAdmin(userId: String): Boolean {
+    open fun isAdmin(userId: String): Boolean {
         return try {
             val uuid = UUID.fromString(userId)
             adminUserIds.contains(uuid)
