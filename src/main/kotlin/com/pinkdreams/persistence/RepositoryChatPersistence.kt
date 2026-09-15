@@ -70,6 +70,7 @@ class RepositoryChatPersistence(
                     it[Messages.requestId] = request.requestId
                     it[Messages.metadata] = "{}"
                     it[Messages.createdAt] = timestamp
+                    // Note: clientMessageId must NOT be set for assistant messages per schema constraint
                 }
 
                 Conversations.update({ Conversations.id eq request.conversationId }) {
@@ -86,7 +87,10 @@ class RepositoryChatPersistence(
                 }
                 PersistedResponse(assistantMessageId, response.content)
             }.let { StageResult.Succeeded(it) }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            // Print the real cause to the server console — PERSIST_FAILED alone gives no diagnostic signal.
+            System.err.println("RepositoryChatPersistence.persist failed for conversation=${request.conversationId} clientMessageId=${request.clientMessageId}: ${e.javaClass.simpleName}: ${e.message}")
+            e.printStackTrace()
             try {
                 executions.fail(request.conversationId, request.clientMessageId, ErrorCode.PERSIST_FAILED.name)
             } catch (_: Exception) {

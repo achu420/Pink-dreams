@@ -344,7 +344,7 @@
             try {
                 const res = await fetch(`${API_BASE}/conversations/${currentConvId}/messages`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Idempotency-Key': Math.random().toString(36).substr(2, 9) },
+                    headers: { 'Content-Type': 'application/json', 'Idempotency-Key': crypto.randomUUID() },
                     body: JSON.stringify({ content })
                 });
                 if (!res.ok) throw new Error('Failed to send message');

@@ -108,13 +108,23 @@ class ChatRoutes(
                 return@post
             }
 
+            val clientMessageId = try {
+                UUID.fromString(idempotencyKey)
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Idempotency-Key must be a valid UUID", null)),
+                )
+                return@post
+            }
+
             // ChatEngine integration
             val chatRequest = ChatRequest(
                 requestId = UUID.randomUUID(),
                 userId = authenticatedUserId,
                 conversationId = conversationId,
                 personaId = conversation.personaId,
-                clientMessageId = UUID.fromString(idempotencyKey),
+                clientMessageId = clientMessageId,
                 content = request.content,
             )
 

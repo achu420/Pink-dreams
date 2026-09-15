@@ -432,7 +432,7 @@ CREATE TABLE messages (
     persona_core_version_id  UUID REFERENCES persona_core_versions(id),
     client_message_id        UUID,
     request_id               UUID,
-    metadata                 JSONB NOT NULL DEFAULT '{}',
+    metadata                 TEXT NOT NULL DEFAULT '{}',
     created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
 
     CONSTRAINT chk_version_matches_role CHECK (
