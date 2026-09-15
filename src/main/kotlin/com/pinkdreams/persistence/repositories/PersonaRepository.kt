@@ -2,6 +2,11 @@ package com.pinkdreams.persistence.repositories
 
 import com.pinkdreams.persistence.database.Personas
 import com.pinkdreams.persistence.database.defaultNow
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -34,6 +39,9 @@ open class PersonaRepository(private val db: Database) {
         languageProfile: Map<String, String>,
     ): Persona = transaction(db) {
         val id = UUID.randomUUID()
+        val languageProfileJson = buildJsonObject {
+            languageProfile.forEach { (k, v) -> put(k, JsonPrimitive(v)) }
+        }.toString()
         Personas.insert {
             it[Personas.id] = id
             it[Personas.slug] = slug
@@ -42,7 +50,7 @@ open class PersonaRepository(private val db: Database) {
             it[Personas.gender] = gender
             it[Personas.orientation] = orientation
             it[Personas.apparentAge] = apparentAge
-            it[Personas.languageProfile] = languageProfile.toString()
+            it[Personas.languageProfile] = languageProfileJson
             it[Personas.activeCoreVersionId] = null
             it[Personas.personaIdentityId] = null
             it[Personas.createdAt] = defaultNow()
@@ -99,8 +107,15 @@ open class PersonaRepository(private val db: Database) {
         gender = row[Personas.gender],
         orientation = row[Personas.orientation],
         apparentAge = row[Personas.apparentAge],
-        languageProfile = emptyMap(),
+        languageProfile = parseLanguageProfile(row[Personas.languageProfile]),
         activeCoreVersionId = row[Personas.activeCoreVersionId],
         status = row[Personas.status],
     )
+
+    private fun parseLanguageProfile(raw: String): Map<String, String> = try {
+        Json.parseToJsonElement(raw).jsonObject
+            .mapValues { (_, value) -> value.jsonPrimitive.content }
+    } catch (e: Exception) {
+        emptyMap()
+    }
 }

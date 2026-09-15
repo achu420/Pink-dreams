@@ -284,7 +284,7 @@ CREATE TABLE personas (
     gender                  TEXT NOT NULL,
     orientation             TEXT NOT NULL,
     apparent_age            INTEGER NOT NULL CHECK (apparent_age >= 25),
-    language_profile        JSONB NOT NULL DEFAULT '{}',
+    language_profile        TEXT NOT NULL DEFAULT '{}',
     active_core_version_id  UUID,
     persona_identity_id     UUID REFERENCES persona_identity(id),
     created_at              TIMESTAMPTZ NOT NULL DEFAULT now(),

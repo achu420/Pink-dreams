@@ -1,13 +1,14 @@
 package com.pinkdreams.imaging.orchestration
 
 import com.pinkdreams.imaging.job.ImageJob
-import com.pinkdreams.imaging.job.ImageJobHandler
 import com.pinkdreams.imaging.job.ImageJobResult
 import com.pinkdreams.imaging.provider.GenerationRequest
 import com.pinkdreams.imaging.provider.GenerationStatus
 import com.pinkdreams.imaging.provider.ImageProvider
 import com.pinkdreams.imaging.provider.ReferenceInput
 import com.pinkdreams.persistence.repositories.ReferenceImageRepository
+import com.pinkdreams.storage.ObjectStorage
+import java.security.MessageDigest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -15,7 +16,6 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
-import java.security.MessageDigest
 
 /**
  * Handles image generation jobs submitted via IMG-8 orchestrator.
@@ -40,6 +40,8 @@ import java.security.MessageDigest
 class ImageGenerationHandler(
     private val imageProvider: ImageProvider,
     private val referenceImageRepository: ReferenceImageRepository,
+    private val objectStorage: ObjectStorage,
+    private val generatedCandidateRepository: GeneratedCandidateRepository,
 ) {
 
     private val json = Json { ignoreUnknownKeys = true }
@@ -73,19 +75,14 @@ class ImageGenerationHandler(
                 }
 
                 GenerationStatus.COMPLETED -> {
-                    // Provider returned immediate result (shouldn't normally happen)
+                    // Provider returned immediate result - persist candidates to storage
                     if (providerResult.candidates.isEmpty()) {
                         ImageJobResult.Failure(
                             errorMessage = "Provider returned no candidates",
                             retryable = false
                         )
                     } else {
-                        ImageJobResult.Success(
-                            metadata = buildMetadata(
-                                candidateCount = providerResult.candidates.size,
-                                checksums = providerResult.candidates.mapNotNull { it.checksum }
-                            )
-                        )
+                        persistCandidates(job.id, providerResult)
                     }
                 }
 
@@ -112,6 +109,66 @@ class ImageGenerationHandler(
         }
     }
 
+    private fun persistCandidates(
+        imageJobId: java.util.UUID,
+        providerResult: com.pinkdreams.imaging.provider.GenerationResult,
+    ): ImageJobResult {
+        return try {
+            val candidates = mutableListOf<String>()
+
+            providerResult.candidates.forEachIndexed { index, candidate ->
+                try {
+                    // Get image bytes from provider result
+                    val imageBytes = candidate.imageData
+                        ?: throw IllegalStateException("Provider candidate missing image data")
+
+                    // Calculate SHA-256 checksum from actual bytes
+                    val checksum = calculateChecksum(imageBytes)
+
+                    // Store image bytes via ObjectStorage
+                    val contentType = "image/png"
+                    val storageKey = "jobs/$imageJobId/candidates/$index"
+
+                    objectStorage.store(
+                        key = storageKey,
+                        content = imageBytes,
+                        contentType = contentType
+                    )
+
+                    // Create GeneratedCandidate record with durable metadata
+                    generatedCandidateRepository.create(
+                        imageJobId = imageJobId,
+                        storageKey = storageKey,
+                        contentType = contentType,
+                        fileSize = imageBytes.size.toLong(),
+                        widthPx = candidate.widthPx,
+                        heightPx = candidate.heightPx,
+                        checksum = checksum,
+                        candidateIndex = index
+                    )
+
+                    candidates.add(checksum)
+                } catch (e: Exception) {
+                    // Log but don't fail entire job if one candidate fails
+                    // (in production, would emit error event)
+                    throw e
+                }
+            }
+
+            ImageJobResult.Success(
+                metadata = buildMetadata(
+                    candidateCount = candidates.size,
+                    checksums = candidates
+                )
+            )
+        } catch (e: Exception) {
+            ImageJobResult.Failure(
+                errorMessage = "Failed to persist generated candidates: ${e.message}",
+                retryable = true
+            )
+        }
+    }
+
     private fun buildMetadata(
         providerJobHandle: String? = null,
         providerIdentifier: String? = null,
@@ -128,7 +185,7 @@ class ImageGenerationHandler(
         return "{$entries}"
     }
 
-    private suspend fun reconstructGenerationRequestWithActualRoles(payload: JsonObject): GenerationRequest {
+    suspend fun reconstructGenerationRequestWithActualRoles(payload: JsonObject): GenerationRequest {
         val prompt = payload["prompt"]?.jsonPrimitive?.content
             ?: throw IllegalStateException("Missing prompt in job payload")
 

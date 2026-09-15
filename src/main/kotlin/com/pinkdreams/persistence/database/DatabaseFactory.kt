@@ -45,6 +45,7 @@ object DatabaseFactory {
             PersonaVisualWardrobeItems,
             PersonaVisualReferenceImages,
             ImageJobs,
+            GeneratedCandidates,
             Personas,
             PersonaCoreVersions,
             UserProfiles,
@@ -152,6 +153,21 @@ object ImageJobs : Table("image_jobs") {
     init {
         uniqueIndex(personaVisualVersionId, idempotencyKey)
     }
+}
+
+object GeneratedCandidates : Table("generated_candidates") {
+    val id = uuid("id")
+    val imageJobId = uuid("image_job_id")
+    val storageKey = varchar("storage_key", 1024)
+    val contentType = varchar("content_type", 100)
+    val fileSize = long("file_size")
+    val widthPx = integer("width_px").nullable()
+    val heightPx = integer("height_px").nullable()
+    val checksum = varchar("checksum", 256)
+    val candidateIndex = integer("candidate_index")
+    val createdAt = datetime("created_at")
+
+    override val primaryKey = PrimaryKey(id)
 }
 
 object Personas : Table("personas") {
