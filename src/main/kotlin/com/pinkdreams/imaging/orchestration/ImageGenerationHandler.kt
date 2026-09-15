@@ -53,17 +53,8 @@ class ImageGenerationHandler(
             // Parse job payload
             val payload = json.parseToJsonElement(job.requestPayload).jsonObject
 
-            // Reconstruct generation request
-            val generationRequest = reconstructGenerationRequest(payload)
-
-            // Resolve reference images to ensure they exist
-            for (ref in generationRequest.references) {
-                val image = referenceImageRepository.findById(ref.referenceImageId)
-                    ?: return ImageJobResult.Failure(
-                        errorMessage = "Reference image not found: ${ref.referenceImageId}",
-                        retryable = false
-                    )
-            }
+            // Reconstruct generation request with actual reference roles
+            val generationRequest = reconstructGenerationRequestWithActualRoles(payload)
 
             // Submit to configured provider
             val providerResult = imageProvider.submit(generationRequest)
@@ -137,7 +128,7 @@ class ImageGenerationHandler(
         return "{$entries}"
     }
 
-    private fun reconstructGenerationRequest(payload: JsonObject): GenerationRequest {
+    private suspend fun reconstructGenerationRequestWithActualRoles(payload: JsonObject): GenerationRequest {
         val prompt = payload["prompt"]?.jsonPrimitive?.content
             ?: throw IllegalStateException("Missing prompt in job payload")
 
@@ -150,22 +141,26 @@ class ImageGenerationHandler(
         val heightPx = payload["heightPx"]?.jsonPrimitive?.content?.toIntOrNull()
         val aspectRatio = payload["aspectRatio"]?.jsonPrimitive?.content
 
-        // Reconstruct references with roles preserved
+        // Reconstruct references WITH ACTUAL ROLES from ReferenceImage
         val references = mutableListOf<ReferenceInput>()
-        payload["references"]?.jsonArray?.forEach { refElement ->
-            val refObj = refElement.jsonObject
-            val refId = refObj["referenceImageId"]?.jsonPrimitive?.content
-                ?.let { java.util.UUID.fromString(it) }
-                ?: throw IllegalStateException("Missing referenceImageId in reference")
+        val selectedRefIds = mutableListOf<java.util.UUID>()
 
-            val role = refObj["role"]?.jsonPrimitive?.content ?: "GENERAL_IDENTITY"
-            val weight = refObj["weight"]?.jsonPrimitive?.content?.toFloatOrNull() ?: 1.0f
+        payload["selectedReferenceIds"]?.jsonPrimitive?.content?.let {
+            // Parse the selected reference IDs
+            json.decodeFromString<List<String>>(it).forEach { refIdStr ->
+                val refId = java.util.UUID.fromString(refIdStr)
+                selectedRefIds.add(refId)
 
-            references.add(ReferenceInput(
-                referenceImageId = refId,
-                role = role,
-                weight = weight
-            ))
+                // Look up actual ReferenceImage to get its REAL role (not index-based)
+                val refImage = referenceImageRepository.findById(refId)
+                    ?: throw IllegalStateException("Reference not found: $refId")
+
+                references.add(ReferenceInput(
+                    referenceImageId = refId,
+                    role = refImage.role.name,  // Use actual role from IMG-3
+                    weight = 1.0f
+                ))
+            }
         }
 
         // Reconstruct metadata
