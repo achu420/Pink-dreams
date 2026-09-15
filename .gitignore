@@ -1,0 +1,8 @@
+*.class
+.gradle/
+build/
+.idea/
+.vscode/
+out/
+local.properties
+*.iml

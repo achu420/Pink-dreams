@@ -1,0 +1,10 @@
+-- Development/test prerequisite only. Replace with the partner-owned users schema before production use.
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY
+);
+
+INSERT INTO users (id) VALUES
+    ('00000000-0000-0000-0000-000000000001'),
+    ('00000000-0000-0000-0000-000000000002'),
+    ('00000000-0000-0000-0000-000000000003')
+ON CONFLICT (id) DO NOTHING;

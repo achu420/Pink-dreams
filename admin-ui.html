@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pink Dreams — Admin Test UI</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --border: #2a2f3a; --text: #e6e8eb;
+    --muted: #8b93a1; --accent: #6ea8fe; --ok: #3fb950; --err: #f85149; --warn: #d29922;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; background: var(--bg); color: var(--text); font-family: -apple-system, Segoe UI, Roboto, sans-serif; font-size: 14px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .panel h2 { font-size: 14px; margin: 0 0 12px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em; }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 4px; }
+  input, textarea, select { width: 100%; background: #0b0d12; border: 1px solid var(--border); color: var(--text); border-radius: 6px; padding: 7px 9px; font-family: inherit; font-size: 13px; }
+  textarea { min-height: 70px; resize: vertical; font-family: ui-monospace, Consolas, monospace; }
+  .row { display: flex; gap: 8px; align-items: flex-end; }
+  .row > div { flex: 1; }
+  button { background: var(--accent); color: #0b0d12; border: none; border-radius: 6px; padding: 8px 12px; font-weight: 600; cursor: pointer; margin-top: 10px; margin-right: 6px; font-size: 13px; }
+  button:hover { opacity: 0.9; }
+  button.secondary { background: #2a2f3a; color: var(--text); }
+  button.danger { background: var(--err); color: white; }
+  .status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-left: 8px; }
+  .status.ok { background: rgba(63,185,80,0.15); color: var(--ok); }
+  .status.err { background: rgba(248,81,73,0.15); color: var(--err); }
+  pre { background: #0b0d12; border: 1px solid var(--border); border-radius: 6px; padding: 10px; margin: 8px 0 0; overflow-x: auto; white-space: pre-wrap; word-break: break-all; font-size: 12px; max-height: 220px; overflow-y: auto; }
+  .conn { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; align-items: end; }
+  .full { grid-column: 1 / -1; }
+  #log { max-height: 320px; overflow-y: auto; }
+  .logline { border-bottom: 1px solid var(--border); padding: 6px 0; font-family: ui-monospace, monospace; font-size: 11px; }
+  .logline .meta { color: var(--muted); }
+  .hint { color: var(--warn); font-size: 12px; margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<h1>Pink Dreams — Admin / Chat Test UI</h1>
+<div class="sub">Talks directly to your locally running Ktor server. Open this file from disk — no build step. If requests fail with a network error (not a JSON error from the server), the server likely isn't running, or CORS is blocking it (see note at the bottom).</div>
+
+<div class="panel">
+  <h2>Connection</h2>
+  <div class="conn">
+    <div><label>Base URL</label><input id="baseUrl" value="http://localhost:8080"></div>
+    <div><label>Username (must be a UUID)</label><input id="authUser" value="00000000-0000-0000-0000-000000000001"></div>
+    <div><label>Password (any non-blank)</label><input id="authPass" value="x"></div>
+    <div><button onclick="doHealth()">Test /health</button></div>
+  </div>
+  <div id="healthResult"></div>
+</div>
+
+<div class="grid">
+
+  <div>
+    <div class="panel">
+      <h2>Conversation Engines</h2>
+      <label>Version (int)</label><input id="eng_version" value="1">
+      <label>Content</label><textarea id="eng_content">You are a warm, natural conversational partner...</textarea>
+      <label>Changelog note</label><input id="eng_note" value="initial">
+      <button onclick="createEngine()">Create draft</button>
+
+      <div class="row full" style="margin-top:14px;">
+        <div><label>Engine ID</label><input id="eng_id" placeholder="paste id from create response"></div>
+      </div>
+      <button class="secondary" onclick="engineAction('publish')">Publish</button>
+      <button class="secondary" onclick="engineAction('activate')">Activate</button>
+      <button class="secondary" onclick="engineAction('archive')">Archive</button>
+      <button class="secondary" onclick="getEngine()">Get by ID</button>
+      <div id="engineResult"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Persona Core Versions</h2>
+      <div class="hint">There is currently no endpoint to create a persona itself — only to version its core content. You'll need a persona ID that already exists in the database (insert directly via SQL for now) before this section works.</div>
+      <label>Persona ID</label><input id="persona_id" placeholder="existing persona UUID">
+      <label>Version (int)</label><input id="core_version" value="1">
+      <label>Content</label><textarea id="core_content">PERSONA CORE — ...</textarea>
+      <label>Changelog note</label><input id="core_note" value="initial">
+      <button onclick="createCoreVersion()">Create draft version</button>
+
+      <div class="row full" style="margin-top:14px;">
+        <div><label>Core Version ID</label><input id="core_id" placeholder="paste id from create response"></div>
+      </div>
+      <button class="secondary" onclick="coreAction('publish')">Publish</button>
+      <button class="secondary" onclick="activateCore()">Activate (needs Persona ID above)</button>
+      <button class="secondary" onclick="coreAction('archive')">Archive</button>
+      <button class="secondary" onclick="listCoreVersions()">List versions for persona</button>
+      <div id="coreResult"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel">
+      <h2>Conversations (read-only)</h2>
+      <div class="hint">There is currently no endpoint to create a conversation. These calls will only work once one exists in the database.</div>
+      <button onclick="listConversations()">List my conversations</button>
+      <div class="row full" style="margin-top:10px;">
+        <div><label>Conversation ID</label><input id="conv_id" placeholder="conversation UUID"></div>
+      </div>
+      <button class="secondary" onclick="getConversation()">Get conversation</button>
+      <button class="secondary" onclick="getMessages()">Get messages</button>
+      <div id="convResult"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Send Chat Message</h2>
+      <label>Conversation ID</label><input id="chat_conv_id" placeholder="conversation UUID">
+      <label>Message content</label><textarea id="chat_content">Hey, how's your day going?</textarea>
+      <label>Idempotency-Key (any UUID — generate a new one per distinct message)</label>
+      <div class="row">
+        <div><input id="chat_idem" placeholder="auto-generated"></div>
+        <div style="flex:0;"><button class="secondary" onclick="genIdem()">New key</button></div>
+      </div>
+      <button onclick="sendChatMessage()">Send</button>
+      <div id="chatResult"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="panel">
+  <h2>Request Log</h2>
+  <button class="secondary" onclick="document.getElementById('log').innerHTML=''">Clear</button>
+  <div id="log"></div>
+</div>
+
+<div class="hint" style="margin-top:8px;">
+  If every call fails with a generic network/CORS error (not a JSON body from the server): this Ktor app has no CORS plugin installed, so a page opened via <code>file://</code> or a different origin may be blocked by the browser. Easiest fix: ask Claude Code to install Ktor's CORS plugin (allow localhost, allow Authorization header) or to serve this file as a static route from the same app so it's same-origin.
+</div>
+
+<script>
+function baseUrl() { return document.getElementById('baseUrl').value.replace(/\/$/, ''); }
+function authHeader() {
+  const u = document.getElementById('authUser').value;
+  const p = document.getElementById('authPass').value;
+  return 'Basic ' + btoa(u + ':' + p);
+}
+function genIdem() {
+  document.getElementById('chat_idem').value = crypto.randomUUID();
+}
+genIdem();
+
+function logLine(method, url, status, ok) {
+  const div = document.getElementById('log');
+  const line = document.createElement('div');
+  line.className = 'logline';
+  const cls = ok ? 'ok' : 'err';
+  line.innerHTML = `<span class="meta">${new Date().toLocaleTimeString()}</span> &nbsp; <b>${method}</b> ${url} &nbsp; <span class="status ${cls}">${status}</span>`;
+  div.prepend(line);
+}
+
+async function call(method, path, body, resultElId) {
+  const url = baseUrl() + path;
+  const opts = {
+    method,
+    headers: {
+      'Authorization': authHeader(),
+      'Content-Type': 'application/json',
+    },
+  };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+
+  const resultEl = resultElId ? document.getElementById(resultElId) : null;
+  try {
+    const res = await fetch(url, opts);
+    const text = await res.text();
+    let pretty = text;
+    try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch (_) {}
+    logLine(method, path, res.status, res.ok);
+    if (resultEl) {
+      resultEl.innerHTML = `<span class="status ${res.ok ? 'ok' : 'err'}">${res.status}</span><pre>${escapeHtml(pretty || '(empty body)')}</pre>`;
+    }
+    return { ok: res.ok, status: res.status, body: text };
+  } catch (e) {
+    logLine(method, path, 'NETWORK ERROR', false);
+    if (resultEl) {
+      resultEl.innerHTML = `<span class="status err">NETWORK ERROR</span><pre>${escapeHtml(String(e))}\n\nLikely CORS or the server isn't running.</pre>`;
+    }
+    return { ok: false, status: 0, body: String(e) };
+  }
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function doHealth() { call('GET', '/health', undefined, 'healthResult'); }
+
+// Engines
+async function createEngine() {
+  const body = {
+    version: parseInt(document.getElementById('eng_version').value, 10),
+    content: document.getElementById('eng_content').value,
+    changelogNote: document.getElementById('eng_note').value || null,
+  };
+  const r = await call('POST', '/v1/admin/engines', body, 'engineResult');
+  try { document.getElementById('eng_id').value = JSON.parse(r.body).id; } catch (_) {}
+}
+function engineAction(action) {
+  const id = document.getElementById('eng_id').value;
+  call('POST', `/v1/admin/engines/${id}/${action}`, undefined, 'engineResult');
+}
+function getEngine() {
+  const id = document.getElementById('eng_id').value;
+  call('GET', `/v1/admin/engines/${id}`, undefined, 'engineResult');
+}
+
+// Persona core versions
+async function createCoreVersion() {
+  const personaId = document.getElementById('persona_id').value;
+  const body = {
+    version: parseInt(document.getElementById('core_version').value, 10),
+    content: document.getElementById('core_content').value,
+    changelogNote: document.getElementById('core_note').value || null,
+  };
+  const r = await call('POST', `/v1/admin/personas/${personaId}/core-versions`, body, 'coreResult');
+  try { document.getElementById('core_id').value = JSON.parse(r.body).id; } catch (_) {}
+}
+function coreAction(action) {
+  const personaId = document.getElementById('persona_id').value;
+  const versionId = document.getElementById('core_id').value;
+  call('POST', `/v1/admin/personas/${personaId}/core-versions/${versionId}/${action}`, undefined, 'coreResult');
+}
+function activateCore() {
+  const personaId = document.getElementById('persona_id').value;
+  const versionId = document.getElementById('core_id').value;
+  call('POST', `/v1/admin/personas/${personaId}/core-versions/${versionId}/activate`, undefined, 'coreResult');
+}
+function listCoreVersions() {
+  const personaId = document.getElementById('persona_id').value;
+  call('GET', `/v1/admin/personas/${personaId}/core-versions`, undefined, 'coreResult');
+}
+
+// Conversations
+function listConversations() { call('GET', '/v1/conversations', undefined, 'convResult'); }
+function getConversation() {
+  const id = document.getElementById('conv_id').value;
+  call('GET', `/v1/conversations/${id}`, undefined, 'convResult');
+}
+function getMessages() {
+  const id = document.getElementById('conv_id').value;
+  call('GET', `/v1/conversations/${id}/messages`, undefined, 'convResult');
+}
+
+// Chat
+async function sendChatMessage() {
+  const convId = document.getElementById('chat_conv_id').value;
+  const body = { content: document.getElementById('chat_content').value };
+  const url = baseUrl() + `/v1/conversations/${convId}/messages`;
+  const resultEl = document.getElementById('chatResult');
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': authHeader(),
+        'Content-Type': 'application/json',
+        'Idempotency-Key': document.getElementById('chat_idem').value,
+      },
+      body: JSON.stringify(body),
+    });
+    const text = await res.text();
+    let pretty = text;
+    try { pretty = JSON.stringify(JSON.parse(text), null, 2); } catch (_) {}
+    logLine('POST', `/v1/conversations/${convId}/messages`, res.status, res.ok);
+    resultEl.innerHTML = `<span class="status ${res.ok ? 'ok' : 'err'}">${res.status}</span><pre>${escapeHtml(pretty || '(empty body)')}</pre>`;
+  } catch (e) {
+    logLine('POST', `/v1/conversations/${convId}/messages`, 'NETWORK ERROR', false);
+    resultEl.innerHTML = `<span class="status err">NETWORK ERROR</span><pre>${escapeHtml(String(e))}</pre>`;
+  }
+}
+</script>
+
+</body>
+</html>

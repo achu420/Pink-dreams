@@ -1,0 +1,841 @@
+﻿> Task :checkKotlinGradlePluginConfigurationErrors
+> Task :processResources UP-TO-DATE
+> Task :processTestResources NO-SOURCE
+
+> Task :compileKotlin
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationEngineRepository.kt:47:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationEngineRepository.kt:53:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationEngineRepository.kt:59:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaCoreVersionRepository.kt:48:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaCoreVersionRepository.kt:54:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaCoreVersionRepository.kt:74:14 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaRepository.kt:54:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaRepository.kt:81:13 Variable 'persona' is never used
+
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :compileTestKotlin
+> Task :compileTestJava NO-SOURCE
+> Task :testClasses UP-TO-DATE
+2026-09-14 14:29:06.476 [DefaultDispatcher-worker-1 @request#2] INFO  ktor.test - 200 OK: GET - /health in 309ms
+2026-09-14 14:29:06.515 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@20137765
+2026-09-14 14:29:06.515 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@20137765
+2026-09-14 14:29:06.523 [DefaultDispatcher-worker-1 @call-context#11] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.527 [DefaultDispatcher-worker-1 @call-context#11] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:06.536 [DefaultDispatcher-worker-1 @call-context#11] INFO  Exposed - Executing create tables statements took 8ms
+2026-09-14 14:29:06.538 [DefaultDispatcher-worker-1 @call-context#11] INFO  Exposed - Extracting table columns took 2ms
+2026-09-14 14:29:06.538 [DefaultDispatcher-worker-1 @call-context#11] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.539 [DefaultDispatcher-worker-1 @call-context#11] INFO  Exposed - Extracting column constraints took 1ms
+2026-09-14 14:29:06.539 [DefaultDispatcher-worker-1 @call-context#11] INFO  Exposed - Preparing alter table statements took 3ms
+2026-09-14 14:29:06.539 [DefaultDispatcher-worker-1 @call-context#11] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.540 [DefaultDispatcher-worker-1 @call-context#11] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.541 [DefaultDispatcher-worker-1 @call-context#11] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.542 [DefaultDispatcher-worker-1 @call-context#11] INFO  Exposed - Checking mapping consistence took 3ms
+2026-09-14 14:29:06.544 [DefaultDispatcher-worker-1 @call-context#11] INFO  ktor.test - Application started in 0.021 seconds.
+2026-09-14 14:29:06.544 [DefaultDispatcher-worker-1 @call-context#11] INFO  ktor.test - Application started: io.ktor.server.application.Application@9d3043c
+2026-09-14 14:29:06.544 [DefaultDispatcher-worker-3 @coroutine#13] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.544 [DefaultDispatcher-worker-3 @coroutine#13] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.555 [DefaultDispatcher-worker-1 @request#11] INFO  ktor.test - 401 Unauthorized: POST - /v1/admin/engines in 10ms
+2026-09-14 14:29:06.556 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@9d3043c
+2026-09-14 14:29:06.557 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@9d3043c
+2026-09-14 14:29:06.565 [DefaultDispatcher-worker-1 @call-context#17] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.568 [DefaultDispatcher-worker-1 @call-context#17] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:06.573 [DefaultDispatcher-worker-1 @call-context#17] INFO  Exposed - Executing create tables statements took 4ms
+2026-09-14 14:29:06.575 [DefaultDispatcher-worker-1 @call-context#17] INFO  Exposed - Extracting table columns took 2ms
+2026-09-14 14:29:06.575 [DefaultDispatcher-worker-1 @call-context#17] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.575 [DefaultDispatcher-worker-1 @call-context#17] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.575 [DefaultDispatcher-worker-1 @call-context#17] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:06.575 [DefaultDispatcher-worker-1 @call-context#17] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.576 [DefaultDispatcher-worker-1 @call-context#17] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.576 [DefaultDispatcher-worker-1 @call-context#17] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.576 [DefaultDispatcher-worker-1 @call-context#17] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.578 [DefaultDispatcher-worker-1 @call-context#17] INFO  ktor.test - Application started in 0.014 seconds.
+2026-09-14 14:29:06.579 [DefaultDispatcher-worker-1 @call-context#17] INFO  ktor.test - Application started: io.ktor.server.application.Application@6aca459f
+2026-09-14 14:29:06.579 [DefaultDispatcher-worker-3 @coroutine#19] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.579 [DefaultDispatcher-worker-3 @coroutine#19] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.594 [DefaultDispatcher-worker-1 @request#17] INFO  ktor.test - 403 Forbidden: POST - /v1/admin/engines in 15ms
+2026-09-14 14:29:06.595 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@6aca459f
+2026-09-14 14:29:06.596 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@6aca459f
+2026-09-14 14:29:06.603 [DefaultDispatcher-worker-2 @call-context#26] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.607 [DefaultDispatcher-worker-2 @call-context#26] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:06.612 [DefaultDispatcher-worker-2 @call-context#26] INFO  Exposed - Executing create tables statements took 5ms
+2026-09-14 14:29:06.613 [DefaultDispatcher-worker-2 @call-context#26] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.613 [DefaultDispatcher-worker-2 @call-context#26] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.614 [DefaultDispatcher-worker-2 @call-context#26] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.614 [DefaultDispatcher-worker-2 @call-context#26] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:06.614 [DefaultDispatcher-worker-2 @call-context#26] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.615 [DefaultDispatcher-worker-2 @call-context#26] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.615 [DefaultDispatcher-worker-2 @call-context#26] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.615 [DefaultDispatcher-worker-2 @call-context#26] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.616 [DefaultDispatcher-worker-2 @call-context#26] INFO  ktor.test - Application started in 0.014 seconds.
+2026-09-14 14:29:06.617 [DefaultDispatcher-worker-2 @call-context#26] INFO  ktor.test - Application started: io.ktor.server.application.Application@62d3882a
+2026-09-14 14:29:06.617 [DefaultDispatcher-worker-4 @coroutine#28] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.617 [DefaultDispatcher-worker-4 @coroutine#28] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.651 [DefaultDispatcher-worker-2 @request#26] INFO  ktor.test - 200 OK: POST - /v1/conversations/f40d179e-1bea-4552-a96c-7624662ff7cf/messages in 34ms
+2026-09-14 14:29:06.653 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@62d3882a
+2026-09-14 14:29:06.653 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@62d3882a
+2026-09-14 14:29:06.660 [DefaultDispatcher-worker-2 @call-context#35] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.663 [DefaultDispatcher-worker-2 @call-context#35] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:06.668 [DefaultDispatcher-worker-2 @call-context#35] INFO  Exposed - Executing create tables statements took 5ms
+2026-09-14 14:29:06.669 [DefaultDispatcher-worker-2 @call-context#35] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.669 [DefaultDispatcher-worker-2 @call-context#35] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.669 [DefaultDispatcher-worker-2 @call-context#35] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.669 [DefaultDispatcher-worker-2 @call-context#35] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.670 [DefaultDispatcher-worker-2 @call-context#35] INFO  Exposed - Executing alter table statements took 1ms
+2026-09-14 14:29:06.671 [DefaultDispatcher-worker-2 @call-context#35] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.671 [DefaultDispatcher-worker-2 @call-context#35] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.671 [DefaultDispatcher-worker-2 @call-context#35] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.673 [DefaultDispatcher-worker-2 @call-context#35] INFO  ktor.test - Application started in 0.014 seconds.
+2026-09-14 14:29:06.673 [DefaultDispatcher-worker-2 @call-context#35] INFO  ktor.test - Application started: io.ktor.server.application.Application@681bd3a7
+2026-09-14 14:29:06.673 [DefaultDispatcher-worker-4 @coroutine#37] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.673 [DefaultDispatcher-worker-4 @coroutine#37] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.674 [DefaultDispatcher-worker-2 @request#35] INFO  ktor.test - 401 Unauthorized: POST - /v1/conversations/748f5f8a-9039-44ca-af68-08afd8600a5b/messages in 1ms
+2026-09-14 14:29:06.675 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@681bd3a7
+2026-09-14 14:29:06.675 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@681bd3a7
+2026-09-14 14:29:06.683 [DefaultDispatcher-worker-3 @call-context#41] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.687 [DefaultDispatcher-worker-3 @call-context#41] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:06.694 [DefaultDispatcher-worker-3 @call-context#41] INFO  Exposed - Executing create tables statements took 7ms
+2026-09-14 14:29:06.695 [DefaultDispatcher-worker-3 @call-context#41] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.695 [DefaultDispatcher-worker-3 @call-context#41] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.696 [DefaultDispatcher-worker-3 @call-context#41] INFO  Exposed - Extracting column constraints took 1ms
+2026-09-14 14:29:06.696 [DefaultDispatcher-worker-3 @call-context#41] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:06.696 [DefaultDispatcher-worker-3 @call-context#41] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.697 [DefaultDispatcher-worker-3 @call-context#41] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.697 [DefaultDispatcher-worker-3 @call-context#41] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.697 [DefaultDispatcher-worker-3 @call-context#41] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.699 [DefaultDispatcher-worker-3 @call-context#41] INFO  ktor.test - Application started in 0.017 seconds.
+2026-09-14 14:29:06.699 [DefaultDispatcher-worker-3 @call-context#41] INFO  ktor.test - Application started: io.ktor.server.application.Application@5c59543c
+2026-09-14 14:29:06.699 [DefaultDispatcher-worker-4 @coroutine#43] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.700 [DefaultDispatcher-worker-4 @coroutine#43] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.702 [DefaultDispatcher-worker-3 @request#41] INFO  ktor.test - 200 OK: POST - /v1/conversations/09c0d034-7209-47d6-96d0-5cf98bb6d056/messages in 1ms
+2026-09-14 14:29:06.703 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@5c59543c
+2026-09-14 14:29:06.704 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@5c59543c
+2026-09-14 14:29:06.710 [DefaultDispatcher-worker-5 @call-context#50] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.714 [DefaultDispatcher-worker-5 @call-context#50] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:06.720 [DefaultDispatcher-worker-5 @call-context#50] INFO  Exposed - Executing create tables statements took 6ms
+2026-09-14 14:29:06.720 [DefaultDispatcher-worker-5 @call-context#50] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:06.720 [DefaultDispatcher-worker-5 @call-context#50] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.721 [DefaultDispatcher-worker-5 @call-context#50] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.721 [DefaultDispatcher-worker-5 @call-context#50] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.721 [DefaultDispatcher-worker-5 @call-context#50] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.722 [DefaultDispatcher-worker-5 @call-context#50] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.722 [DefaultDispatcher-worker-5 @call-context#50] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.722 [DefaultDispatcher-worker-5 @call-context#50] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.723 [DefaultDispatcher-worker-5 @call-context#50] INFO  ktor.test - Application started in 0.013 seconds.
+2026-09-14 14:29:06.723 [DefaultDispatcher-worker-5 @call-context#50] INFO  ktor.test - Application started: io.ktor.server.application.Application@219d8b45
+2026-09-14 14:29:06.723 [DefaultDispatcher-worker-1 @coroutine#52] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.723 [DefaultDispatcher-worker-1 @coroutine#52] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.728 [DefaultDispatcher-worker-5 @request#50] INFO  ktor.test - 502 Bad Gateway: POST - /v1/conversations/bfcb52d7-9330-46f8-8dd8-db4cfb5050b3/messages in 4ms
+2026-09-14 14:29:06.729 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@219d8b45
+2026-09-14 14:29:06.730 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@219d8b45
+2026-09-14 14:29:06.735 [DefaultDispatcher-worker-6 @call-context#59] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.739 [DefaultDispatcher-worker-6 @call-context#59] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:06.744 [DefaultDispatcher-worker-6 @call-context#59] INFO  Exposed - Executing create tables statements took 5ms
+2026-09-14 14:29:06.744 [DefaultDispatcher-worker-6 @call-context#59] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:06.744 [DefaultDispatcher-worker-6 @call-context#59] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.745 [DefaultDispatcher-worker-6 @call-context#59] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.745 [DefaultDispatcher-worker-6 @call-context#59] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.745 [DefaultDispatcher-worker-6 @call-context#59] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.746 [DefaultDispatcher-worker-6 @call-context#59] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.746 [DefaultDispatcher-worker-6 @call-context#59] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.747 [DefaultDispatcher-worker-6 @call-context#59] INFO  Exposed - Checking mapping consistence took 2ms
+2026-09-14 14:29:06.748 [DefaultDispatcher-worker-6 @call-context#59] INFO  ktor.test - Application started in 0.013 seconds.
+2026-09-14 14:29:06.749 [DefaultDispatcher-worker-6 @call-context#59] INFO  ktor.test - Application started: io.ktor.server.application.Application@22a313b7
+2026-09-14 14:29:06.749 [DefaultDispatcher-worker-1 @coroutine#61] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.749 [DefaultDispatcher-worker-1 @coroutine#61] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.751 [DefaultDispatcher-worker-6 @request#59] INFO  ktor.test - 400 Bad Request: POST - /v1/conversations/50bdcaec-a809-4edd-8e53-c3eee6d63eaf/messages in 2ms
+2026-09-14 14:29:06.753 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@22a313b7
+2026-09-14 14:29:06.753 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@22a313b7
+2026-09-14 14:29:06.760 [DefaultDispatcher-worker-4 @call-context#68] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.763 [DefaultDispatcher-worker-4 @call-context#68] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:06.766 [DefaultDispatcher-worker-4 @call-context#68] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:06.767 [DefaultDispatcher-worker-4 @call-context#68] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.767 [DefaultDispatcher-worker-4 @call-context#68] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.767 [DefaultDispatcher-worker-4 @call-context#68] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.768 [DefaultDispatcher-worker-4 @call-context#68] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:06.768 [DefaultDispatcher-worker-4 @call-context#68] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.768 [DefaultDispatcher-worker-4 @call-context#68] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.768 [DefaultDispatcher-worker-4 @call-context#68] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.769 [DefaultDispatcher-worker-4 @call-context#68] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.770 [DefaultDispatcher-worker-4 @call-context#68] INFO  ktor.test - Application started in 0.011 seconds.
+2026-09-14 14:29:06.770 [DefaultDispatcher-worker-4 @call-context#68] INFO  ktor.test - Application started: io.ktor.server.application.Application@2a806cc7
+2026-09-14 14:29:06.770 [DefaultDispatcher-worker-5 @coroutine#70] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.770 [DefaultDispatcher-worker-5 @coroutine#70] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.773 [DefaultDispatcher-worker-4 @request#68] INFO  ktor.test - 400 Bad Request: POST - /v1/conversations/4c6dcac5-ce35-44bd-a50a-6bf9e8ce42a1/messages in 3ms
+2026-09-14 14:29:06.774 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@2a806cc7
+2026-09-14 14:29:06.774 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@2a806cc7
+2026-09-14 14:29:06.781 [DefaultDispatcher-worker-5 @call-context#74] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.786 [DefaultDispatcher-worker-5 @call-context#74] INFO  Exposed - Preparing create tables statements took 3ms
+2026-09-14 14:29:06.791 [DefaultDispatcher-worker-5 @call-context#74] INFO  Exposed - Executing create tables statements took 5ms
+2026-09-14 14:29:06.792 [DefaultDispatcher-worker-5 @call-context#74] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.792 [DefaultDispatcher-worker-5 @call-context#74] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.793 [DefaultDispatcher-worker-5 @call-context#74] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.793 [DefaultDispatcher-worker-5 @call-context#74] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:06.793 [DefaultDispatcher-worker-5 @call-context#74] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.794 [DefaultDispatcher-worker-5 @call-context#74] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.794 [DefaultDispatcher-worker-5 @call-context#74] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.794 [DefaultDispatcher-worker-5 @call-context#74] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.796 [DefaultDispatcher-worker-5 @call-context#74] INFO  ktor.test - Application started in 0.016 seconds.
+2026-09-14 14:29:06.796 [DefaultDispatcher-worker-5 @call-context#74] INFO  ktor.test - Application started: io.ktor.server.application.Application@2bb025f8
+2026-09-14 14:29:06.797 [DefaultDispatcher-worker-4 @coroutine#76] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.797 [DefaultDispatcher-worker-4 @coroutine#76] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.801 [DefaultDispatcher-worker-5 @request#74] INFO  ktor.test - 400 Bad Request: POST - /v1/conversations/invalid-id/messages in 4ms
+2026-09-14 14:29:06.803 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@2bb025f8
+2026-09-14 14:29:06.803 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@2bb025f8
+2026-09-14 14:29:06.809 [DefaultDispatcher-worker-5 @call-context#83] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.812 [DefaultDispatcher-worker-5 @call-context#83] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:06.815 [DefaultDispatcher-worker-5 @call-context#83] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:06.816 [DefaultDispatcher-worker-5 @call-context#83] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.816 [DefaultDispatcher-worker-5 @call-context#83] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.816 [DefaultDispatcher-worker-5 @call-context#83] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.816 [DefaultDispatcher-worker-5 @call-context#83] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.816 [DefaultDispatcher-worker-5 @call-context#83] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.817 [DefaultDispatcher-worker-5 @call-context#83] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.817 [DefaultDispatcher-worker-5 @call-context#83] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.818 [DefaultDispatcher-worker-5 @call-context#83] INFO  Exposed - Checking mapping consistence took 2ms
+2026-09-14 14:29:06.819 [DefaultDispatcher-worker-5 @call-context#83] INFO  ktor.test - Application started in 0.01 seconds.
+2026-09-14 14:29:06.819 [DefaultDispatcher-worker-5 @call-context#83] INFO  ktor.test - Application started: io.ktor.server.application.Application@5e242995
+2026-09-14 14:29:06.819 [DefaultDispatcher-worker-2 @coroutine#85] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.819 [DefaultDispatcher-worker-2 @coroutine#85] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.821 [DefaultDispatcher-worker-5 @request#83] INFO  ktor.test - 404 Not Found: POST - /v1/conversations/dfac754b-8bc7-40ab-a300-2c3ae2076452/messages in 1ms
+2026-09-14 14:29:06.822 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@5e242995
+2026-09-14 14:29:06.822 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@5e242995
+2026-09-14 14:29:06.827 [DefaultDispatcher-worker-6 @call-context#92] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.829 [DefaultDispatcher-worker-6 @call-context#92] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:06.833 [DefaultDispatcher-worker-6 @call-context#92] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:06.834 [DefaultDispatcher-worker-6 @call-context#92] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.834 [DefaultDispatcher-worker-6 @call-context#92] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.834 [DefaultDispatcher-worker-6 @call-context#92] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.834 [DefaultDispatcher-worker-6 @call-context#92] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.835 [DefaultDispatcher-worker-6 @call-context#92] INFO  Exposed - Executing alter table statements took 1ms
+2026-09-14 14:29:06.835 [DefaultDispatcher-worker-6 @call-context#92] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.836 [DefaultDispatcher-worker-6 @call-context#92] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.836 [DefaultDispatcher-worker-6 @call-context#92] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.837 [DefaultDispatcher-worker-6 @call-context#92] INFO  ktor.test - Application started in 0.011 seconds.
+2026-09-14 14:29:06.837 [DefaultDispatcher-worker-6 @call-context#92] INFO  ktor.test - Application started: io.ktor.server.application.Application@5339e444
+2026-09-14 14:29:06.837 [DefaultDispatcher-worker-1 @coroutine#94] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.837 [DefaultDispatcher-worker-1 @coroutine#94] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.838 [DefaultDispatcher-worker-6 @request#92] INFO  ktor.test - 401 Unauthorized: POST - /v1/conversations/ac9beefc-5191-42f7-a0b2-7288e3ce5fa0/messages in 0ms
+2026-09-14 14:29:06.839 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@5339e444
+2026-09-14 14:29:06.839 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@5339e444
+2026-09-14 14:29:06.844 [DefaultDispatcher-worker-6 @call-context#98] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.847 [DefaultDispatcher-worker-6 @call-context#98] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:06.851 [DefaultDispatcher-worker-6 @call-context#98] INFO  Exposed - Executing create tables statements took 4ms
+2026-09-14 14:29:06.851 [DefaultDispatcher-worker-6 @call-context#98] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:06.851 [DefaultDispatcher-worker-6 @call-context#98] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.852 [DefaultDispatcher-worker-6 @call-context#98] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.852 [DefaultDispatcher-worker-6 @call-context#98] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.852 [DefaultDispatcher-worker-6 @call-context#98] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.852 [DefaultDispatcher-worker-6 @call-context#98] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.853 [DefaultDispatcher-worker-6 @call-context#98] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.853 [DefaultDispatcher-worker-6 @call-context#98] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.854 [DefaultDispatcher-worker-6 @call-context#98] INFO  ktor.test - Application started in 0.01 seconds.
+2026-09-14 14:29:06.854 [DefaultDispatcher-worker-6 @call-context#98] INFO  ktor.test - Application started: io.ktor.server.application.Application@4909da70
+2026-09-14 14:29:06.854 [DefaultDispatcher-worker-1 @coroutine#100] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.854 [DefaultDispatcher-worker-1 @coroutine#100] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.856 [DefaultDispatcher-worker-6 @request#98] INFO  ktor.test - 200 OK: GET - /health in 2ms
+2026-09-14 14:29:06.857 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@4909da70
+2026-09-14 14:29:06.857 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@4909da70
+2026-09-14 14:29:06.866 [DefaultDispatcher-worker-4 @call-context#107] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.869 [DefaultDispatcher-worker-4 @call-context#107] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:06.873 [DefaultDispatcher-worker-4 @call-context#107] INFO  Exposed - Executing create tables statements took 4ms
+2026-09-14 14:29:06.874 [DefaultDispatcher-worker-4 @call-context#107] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:06.874 [DefaultDispatcher-worker-4 @call-context#107] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.874 [DefaultDispatcher-worker-4 @call-context#107] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.874 [DefaultDispatcher-worker-4 @call-context#107] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.875 [DefaultDispatcher-worker-4 @call-context#107] INFO  Exposed - Executing alter table statements took 1ms
+2026-09-14 14:29:06.875 [DefaultDispatcher-worker-4 @call-context#107] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.875 [DefaultDispatcher-worker-4 @call-context#107] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.875 [DefaultDispatcher-worker-4 @call-context#107] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:06.876 [DefaultDispatcher-worker-4 @call-context#107] INFO  ktor.test - Application started in 0.011 seconds.
+2026-09-14 14:29:06.876 [DefaultDispatcher-worker-4 @call-context#107] INFO  ktor.test - Application started: io.ktor.server.application.Application@62ee4d5d
+2026-09-14 14:29:06.877 [DefaultDispatcher-worker-7 @coroutine#109] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.877 [DefaultDispatcher-worker-7 @coroutine#109] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.878 [DefaultDispatcher-worker-4 @request#107] INFO  ktor.test - 400 Bad Request: GET - /v1/conversations/1316f725-f1ac-4290-98af-46d52019665d/messages in 1ms
+2026-09-14 14:29:06.880 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@62ee4d5d
+2026-09-14 14:29:06.880 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@62ee4d5d
+2026-09-14 14:29:06.885 [DefaultDispatcher-worker-3 @call-context#116] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.889 [DefaultDispatcher-worker-3 @call-context#116] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:06.892 [DefaultDispatcher-worker-3 @call-context#116] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:06.893 [DefaultDispatcher-worker-3 @call-context#116] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.893 [DefaultDispatcher-worker-3 @call-context#116] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.893 [DefaultDispatcher-worker-3 @call-context#116] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.893 [DefaultDispatcher-worker-3 @call-context#116] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.893 [DefaultDispatcher-worker-3 @call-context#116] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.894 [DefaultDispatcher-worker-3 @call-context#116] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.894 [DefaultDispatcher-worker-3 @call-context#116] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.894 [DefaultDispatcher-worker-3 @call-context#116] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.895 [DefaultDispatcher-worker-3 @call-context#116] INFO  ktor.test - Application started in 0.01 seconds.
+2026-09-14 14:29:06.895 [DefaultDispatcher-worker-3 @call-context#116] INFO  ktor.test - Application started: io.ktor.server.application.Application@784fa8a0
+2026-09-14 14:29:06.895 [DefaultDispatcher-worker-2 @coroutine#118] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.895 [DefaultDispatcher-worker-2 @coroutine#118] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.897 [DefaultDispatcher-worker-3 @request#116] INFO  ktor.test - 404 Not Found: GET - /v1/conversations/763d81d4-3074-4eee-bb60-f3e5beec5140 in 1ms
+2026-09-14 14:29:06.899 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@784fa8a0
+2026-09-14 14:29:06.899 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@784fa8a0
+2026-09-14 14:29:06.905 [DefaultDispatcher-worker-3 @call-context#125] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.908 [DefaultDispatcher-worker-3 @call-context#125] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:06.911 [DefaultDispatcher-worker-3 @call-context#125] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:06.912 [DefaultDispatcher-worker-3 @call-context#125] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.912 [DefaultDispatcher-worker-3 @call-context#125] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.912 [DefaultDispatcher-worker-3 @call-context#125] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.912 [DefaultDispatcher-worker-3 @call-context#125] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.913 [DefaultDispatcher-worker-3 @call-context#125] INFO  Exposed - Executing alter table statements took 1ms
+2026-09-14 14:29:06.913 [DefaultDispatcher-worker-3 @call-context#125] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.913 [DefaultDispatcher-worker-3 @call-context#125] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.913 [DefaultDispatcher-worker-3 @call-context#125] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:06.915 [DefaultDispatcher-worker-3 @call-context#125] INFO  ktor.test - Application started in 0.01 seconds.
+2026-09-14 14:29:06.915 [DefaultDispatcher-worker-3 @call-context#125] INFO  ktor.test - Application started: io.ktor.server.application.Application@7694ca23
+2026-09-14 14:29:06.915 [DefaultDispatcher-worker-5 @coroutine#127] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.915 [DefaultDispatcher-worker-5 @coroutine#127] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.916 [DefaultDispatcher-worker-3 @request#125] INFO  ktor.test - 400 Bad Request: GET - /v1/conversations/invalid-id in 1ms
+2026-09-14 14:29:06.917 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@7694ca23
+2026-09-14 14:29:06.917 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@7694ca23
+2026-09-14 14:29:06.923 [DefaultDispatcher-worker-4 @call-context#134] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.926 [DefaultDispatcher-worker-4 @call-context#134] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:06.931 [DefaultDispatcher-worker-4 @call-context#134] INFO  Exposed - Executing create tables statements took 5ms
+2026-09-14 14:29:06.932 [DefaultDispatcher-worker-4 @call-context#134] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.932 [DefaultDispatcher-worker-4 @call-context#134] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.933 [DefaultDispatcher-worker-4 @call-context#134] INFO  Exposed - Extracting column constraints took 1ms
+2026-09-14 14:29:06.933 [DefaultDispatcher-worker-4 @call-context#134] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:06.933 [DefaultDispatcher-worker-4 @call-context#134] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.933 [DefaultDispatcher-worker-4 @call-context#134] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.933 [DefaultDispatcher-worker-4 @call-context#134] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.933 [DefaultDispatcher-worker-4 @call-context#134] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:06.934 [DefaultDispatcher-worker-4 @call-context#134] INFO  ktor.test - Application started in 0.011 seconds.
+2026-09-14 14:29:06.934 [DefaultDispatcher-worker-4 @call-context#134] INFO  ktor.test - Application started: io.ktor.server.application.Application@658ac080
+2026-09-14 14:29:06.935 [DefaultDispatcher-worker-7 @coroutine#136] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.935 [DefaultDispatcher-worker-7 @coroutine#136] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.936 [DefaultDispatcher-worker-4 @request#134] INFO  ktor.test - 400 Bad Request: GET - /v1/conversations in 1ms
+2026-09-14 14:29:06.938 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@658ac080
+2026-09-14 14:29:06.938 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@658ac080
+2026-09-14 14:29:06.944 [DefaultDispatcher-worker-6 @call-context#143] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.948 [DefaultDispatcher-worker-6 @call-context#143] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:06.951 [DefaultDispatcher-worker-6 @call-context#143] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:06.952 [DefaultDispatcher-worker-6 @call-context#143] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.952 [DefaultDispatcher-worker-6 @call-context#143] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.952 [DefaultDispatcher-worker-6 @call-context#143] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.952 [DefaultDispatcher-worker-6 @call-context#143] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.953 [DefaultDispatcher-worker-6 @call-context#143] INFO  Exposed - Executing alter table statements took 1ms
+2026-09-14 14:29:06.953 [DefaultDispatcher-worker-6 @call-context#143] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.953 [DefaultDispatcher-worker-6 @call-context#143] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.954 [DefaultDispatcher-worker-6 @call-context#143] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.955 [DefaultDispatcher-worker-6 @call-context#143] INFO  ktor.test - Application started in 0.012 seconds.
+2026-09-14 14:29:06.955 [DefaultDispatcher-worker-6 @call-context#143] INFO  ktor.test - Application started: io.ktor.server.application.Application@7879d4ce
+2026-09-14 14:29:06.955 [DefaultDispatcher-worker-5 @coroutine#145] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.955 [DefaultDispatcher-worker-5 @coroutine#145] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.962 [DefaultDispatcher-worker-6 @request#143] INFO  ktor.test - 200 OK: GET - /v1/conversations/2a60d738-da9c-4b5d-b7d2-9952dcaea891 in 7ms
+2026-09-14 14:29:06.964 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@7879d4ce
+2026-09-14 14:29:06.964 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@7879d4ce
+2026-09-14 14:29:06.970 [DefaultDispatcher-worker-3 @call-context#152] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.974 [DefaultDispatcher-worker-3 @call-context#152] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:06.978 [DefaultDispatcher-worker-3 @call-context#152] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:06.979 [DefaultDispatcher-worker-3 @call-context#152] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:06.979 [DefaultDispatcher-worker-3 @call-context#152] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.980 [DefaultDispatcher-worker-3 @call-context#152] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.980 [DefaultDispatcher-worker-3 @call-context#152] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:06.980 [DefaultDispatcher-worker-3 @call-context#152] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.981 [DefaultDispatcher-worker-3 @call-context#152] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.981 [DefaultDispatcher-worker-3 @call-context#152] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.981 [DefaultDispatcher-worker-3 @call-context#152] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:06.982 [DefaultDispatcher-worker-3 @call-context#152] INFO  ktor.test - Application started in 0.012 seconds.
+2026-09-14 14:29:06.982 [DefaultDispatcher-worker-3 @call-context#152] INFO  ktor.test - Application started: io.ktor.server.application.Application@ce4afba
+2026-09-14 14:29:06.982 [DefaultDispatcher-worker-5 @coroutine#154] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:06.983 [DefaultDispatcher-worker-5 @coroutine#154] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:06.983 [DefaultDispatcher-worker-3 @request#152] INFO  ktor.test - 401 Unauthorized: GET - /v1/conversations in 0ms
+2026-09-14 14:29:06.985 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@ce4afba
+2026-09-14 14:29:06.985 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@ce4afba
+2026-09-14 14:29:06.991 [DefaultDispatcher-worker-3 @call-context#158] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:06.993 [DefaultDispatcher-worker-3 @call-context#158] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:06.997 [DefaultDispatcher-worker-3 @call-context#158] INFO  Exposed - Executing create tables statements took 4ms
+2026-09-14 14:29:06.997 [DefaultDispatcher-worker-3 @call-context#158] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:06.997 [DefaultDispatcher-worker-3 @call-context#158] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:06.998 [DefaultDispatcher-worker-3 @call-context#158] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:06.998 [DefaultDispatcher-worker-3 @call-context#158] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:06.998 [DefaultDispatcher-worker-3 @call-context#158] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:06.999 [DefaultDispatcher-worker-3 @call-context#158] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:06.999 [DefaultDispatcher-worker-3 @call-context#158] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:06.999 [DefaultDispatcher-worker-3 @call-context#158] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.000 [DefaultDispatcher-worker-3 @call-context#158] INFO  ktor.test - Application started in 0.01 seconds.
+2026-09-14 14:29:07.000 [DefaultDispatcher-worker-3 @call-context#158] INFO  ktor.test - Application started: io.ktor.server.application.Application@479c5ddc
+2026-09-14 14:29:07.001 [DefaultDispatcher-worker-5 @coroutine#160] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:07.001 [DefaultDispatcher-worker-5 @coroutine#160] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:07.002 [DefaultDispatcher-worker-3 @request#158] INFO  ktor.test - 401 Unauthorized: GET - /v1/conversations/154d8dab-2b61-420d-85d1-23d8499b7830/messages in 1ms
+2026-09-14 14:29:07.003 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@479c5ddc
+2026-09-14 14:29:07.003 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@479c5ddc
+2026-09-14 14:29:07.009 [DefaultDispatcher-worker-7 @call-context#164] INFO  ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-09-14 14:29:07.017 [DefaultDispatcher-worker-7 @call-context#164] INFO  Exposed - Preparing create tables statements took 3ms
+2026-09-14 14:29:07.021 [DefaultDispatcher-worker-7 @call-context#164] INFO  Exposed - Executing create tables statements took 4ms
+2026-09-14 14:29:07.021 [DefaultDispatcher-worker-7 @call-context#164] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.021 [DefaultDispatcher-worker-7 @call-context#164] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.022 [DefaultDispatcher-worker-7 @call-context#164] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.022 [DefaultDispatcher-worker-7 @call-context#164] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.022 [DefaultDispatcher-worker-7 @call-context#164] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.023 [DefaultDispatcher-worker-7 @call-context#164] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db CONVERSATION_ENGINES_VERSION_UNIQUE_INDEX_5 -> in mapping CONVERSATION_ENGINES_VERSION_UNIQUE
+2026-09-14 14:29:07.023 [DefaultDispatcher-worker-7 @call-context#164] INFO  Exposed - Index on table 'personas' differs only in name: in db PERSONAS_SLUG_UNIQUE_INDEX_4 -> in mapping PERSONAS_SLUG_UNIQUE
+2026-09-14 14:29:07.023 [DefaultDispatcher-worker-7 @call-context#164] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.024 [DefaultDispatcher-worker-7 @call-context#164] INFO  ktor.test - Application started in 0.015 seconds.
+2026-09-14 14:29:07.024 [DefaultDispatcher-worker-7 @call-context#164] INFO  ktor.test - Application started: io.ktor.server.application.Application@1a9440d6
+2026-09-14 14:29:07.024 [DefaultDispatcher-worker-5 @coroutine#166] INFO  ktor.test - Responding at http://localhost:80
+2026-09-14 14:29:07.024 [DefaultDispatcher-worker-5 @coroutine#166] INFO  ktor.test - Responding at https://localhost:443
+2026-09-14 14:29:07.026 [DefaultDispatcher-worker-7 @request#164] INFO  ktor.test - 404 Not Found: GET - /v1/conversations/07403cf9-9dce-41c7-b992-30449c120bf9/messages in 1ms
+2026-09-14 14:29:07.027 [Test worker] INFO  ktor.test - Application stopping: io.ktor.server.application.Application@1a9440d6
+2026-09-14 14:29:07.028 [Test worker] INFO  ktor.test - Application stopped: io.ktor.server.application.Application@1a9440d6
+2026-09-14 14:29:07.034 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:07.038 [Test worker] INFO  Exposed - Executing create tables statements took 4ms
+2026-09-14 14:29:07.039 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:07.039 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.039 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.040 [Test worker] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:07.040 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.040 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.040 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.041 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.080 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.083 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:07.084 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.084 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.085 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.085 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.085 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.086 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.086 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.086 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.099 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.102 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.102 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.102 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.103 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.103 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.103 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.103 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.103 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.103 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:07.165 [Test worker] INFO  Exposed - Preparing create tables statements took 3ms
+2026-09-14 14:29:07.168 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.168 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.168 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.169 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.169 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.169 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.170 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.170 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.170 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.283 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:07.286 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.287 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:07.287 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.287 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.287 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.287 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.288 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.288 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.288 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.306 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:07.309 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.310 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:07.310 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.310 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.311 [Test worker] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:07.311 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.311 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.311 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.311 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:07.376 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.380 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.380 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.380 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.381 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.381 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.381 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.381 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.381 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.382 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.401 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:07.404 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.405 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:07.405 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.405 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.405 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.405 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.406 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.406 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.406 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.460 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.465 [Test worker] INFO  Exposed - Executing create tables statements took 5ms
+2026-09-14 14:29:07.466 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.466 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.467 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.467 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.467 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.467 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.467 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.468 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.491 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:07.494 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.494 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.494 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.495 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.495 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.495 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.496 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.496 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.496 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.532 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:07.534 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:07.535 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.535 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.536 [Test worker] INFO  Exposed - Extracting column constraints took 1ms
+2026-09-14 14:29:07.536 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.536 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.536 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.536 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.536 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:07.552 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.559 [Test worker] INFO  Exposed - Executing create tables statements took 7ms
+2026-09-14 14:29:07.560 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:07.560 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.561 [Test worker] INFO  Exposed - Extracting column constraints took 1ms
+2026-09-14 14:29:07.561 [Test worker] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:07.561 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.561 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.561 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.561 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:07.587 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.589 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:07.589 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.589 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.589 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.590 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.590 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.590 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.590 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.590 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:07.603 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.605 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:07.606 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.606 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.606 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.606 [Test worker] INFO  Exposed - Preparing alter table statements took 0ms
+2026-09-14 14:29:07.607 [Test worker] INFO  Exposed - Executing alter table statements took 1ms
+2026-09-14 14:29:07.607 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.607 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.607 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:07.623 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.625 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:07.626 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:07.626 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.626 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.626 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.627 [Test worker] INFO  Exposed - Executing alter table statements took 1ms
+2026-09-14 14:29:07.627 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.627 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.627 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:07.646 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.648 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:07.648 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.648 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.649 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.649 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.649 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.649 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.649 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.650 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.679 [Test worker] INFO  Exposed - Preparing create tables statements took 3ms
+2026-09-14 14:29:07.682 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.682 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.682 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.683 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.683 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.683 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.683 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.683 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.683 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:07.694 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.697 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.697 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.697 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.698 [Test worker] INFO  Exposed - Extracting column constraints took 1ms
+2026-09-14 14:29:07.698 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.698 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.698 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.698 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.698 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:07.727 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:07.729 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:07.730 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.730 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.730 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.730 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.730 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.731 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.731 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.731 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.753 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.756 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.757 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:07.757 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.757 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.757 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.757 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.758 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.758 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.758 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.780 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:07.782 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:07.783 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:07.783 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.783 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.783 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.783 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.784 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.784 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.784 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.953 [Test worker] INFO  Exposed - Preparing create tables statements took 6ms
+2026-09-14 14:29:07.957 [Test worker] INFO  Exposed - Executing create tables statements took 4ms
+2026-09-14 14:29:07.958 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:07.958 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.959 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.959 [Test worker] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:07.959 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.960 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.960 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.960 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.967 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:07.970 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.970 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.970 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.971 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.971 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.971 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.971 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.972 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.972 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:07.979 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:07.981 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:07.981 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.981 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.982 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:07.982 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.982 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.984 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.984 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.984 [Test worker] INFO  Exposed - Checking mapping consistence took 2ms
+2026-09-14 14:29:07.993 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:07.996 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:07.996 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:07.996 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:07.997 [Test worker] INFO  Exposed - Extracting column constraints took 1ms
+2026-09-14 14:29:07.997 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:07.997 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:07.997 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:07.997 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:07.997 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:08.012 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:08.015 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:08.015 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.015 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.015 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.015 [Test worker] INFO  Exposed - Preparing alter table statements took 0ms
+2026-09-14 14:29:08.015 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.016 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.016 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.016 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:08.024 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:08.026 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:08.027 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:08.027 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.027 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.027 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.028 [Test worker] INFO  Exposed - Executing alter table statements took 1ms
+2026-09-14 14:29:08.028 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.028 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.028 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:08.039 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:08.045 [Test worker] INFO  Exposed - Executing create tables statements took 6ms
+2026-09-14 14:29:08.045 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.045 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.046 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.046 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.046 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.047 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.047 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.047 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+
+> Task :test
+
+Phase3PersonaEngineLifecycleTest > draft persona core stays draft and cannot be activated directly() FAILED
+    org.opentest4j.AssertionFailedError at Phase3PersonaEngineLifecycleTest.kt:40
+        Caused by: java.lang.IllegalStateException at Phase3PersonaEngineLifecycleTest.kt:41
+
+2026-09-14 14:29:08.059 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:08.062 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:08.062 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.063 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.063 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.063 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.063 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.064 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.064 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.064 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:08.075 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:08.078 [Test worker] INFO  Exposed - Executing create tables statements took 3ms
+2026-09-14 14:29:08.079 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:08.079 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.079 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.079 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.080 [Test worker] INFO  Exposed - Executing alter table statements took 1ms
+2026-09-14 14:29:08.080 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.080 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.080 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:08.091 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:08.099 [Test worker] INFO  Exposed - Executing create tables statements took 7ms
+2026-09-14 14:29:08.099 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.100 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.100 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.100 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.100 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.101 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.101 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.101 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:08.111 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:08.113 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:08.113 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.113 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.113 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.113 [Test worker] INFO  Exposed - Preparing alter table statements took 0ms
+2026-09-14 14:29:08.113 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.114 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.114 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.114 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:08.119 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:08.121 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:08.121 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.121 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.121 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.122 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.122 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.122 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.122 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.122 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:08.132 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:08.134 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:08.134 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.134 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.135 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.135 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.135 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.135 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.135 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.136 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:08.141 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:08.142 [Test worker] INFO  Exposed - Executing create tables statements took 1ms
+2026-09-14 14:29:08.142 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.142 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.143 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.143 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.143 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.143 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.143 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.143 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:08.148 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:08.150 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:08.150 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.150 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.150 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.150 [Test worker] INFO  Exposed - Preparing alter table statements took 0ms
+2026-09-14 14:29:08.150 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.151 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.151 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.151 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:08.164 [Test worker] INFO  Exposed - Preparing create tables statements took 3ms
+2026-09-14 14:29:08.166 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:08.167 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:08.167 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.167 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.167 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.167 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.168 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.168 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.168 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:08.177 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:08.179 [Test worker] INFO  Exposed - Executing create tables statements took 2ms
+2026-09-14 14:29:08.179 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.179 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.179 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.179 [Test worker] INFO  Exposed - Preparing alter table statements took 0ms
+2026-09-14 14:29:08.180 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.180 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.180 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.180 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+2026-09-14 14:29:08.202 [Test worker] INFO  Exposed - Preparing create tables statements took 2ms
+2026-09-14 14:29:08.203 [Test worker] INFO  Exposed - Executing create tables statements took 1ms
+2026-09-14 14:29:08.203 [Test worker] INFO  Exposed - Extracting table columns took 0ms
+2026-09-14 14:29:08.203 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.204 [Test worker] INFO  Exposed - Extracting column constraints took 1ms
+2026-09-14 14:29:08.204 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.204 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.205 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.205 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.205 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:08.212 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:08.213 [Test worker] INFO  Exposed - Executing create tables statements took 1ms
+2026-09-14 14:29:08.214 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:08.214 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.214 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.214 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.214 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.214 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.215 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.215 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:08.227 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:08.228 [Test worker] INFO  Exposed - Executing create tables statements took 1ms
+2026-09-14 14:29:08.229 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:08.229 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.229 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.229 [Test worker] INFO  Exposed - Preparing alter table statements took 1ms
+2026-09-14 14:29:08.229 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.230 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.230 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.230 [Test worker] INFO  Exposed - Checking mapping consistence took 1ms
+2026-09-14 14:29:08.238 [Test worker] INFO  Exposed - Preparing create tables statements took 1ms
+2026-09-14 14:29:08.239 [Test worker] INFO  Exposed - Executing create tables statements took 1ms
+2026-09-14 14:29:08.240 [Test worker] INFO  Exposed - Extracting table columns took 1ms
+2026-09-14 14:29:08.240 [Test worker] INFO  Exposed - Extracting primary keys took 0ms
+2026-09-14 14:29:08.241 [Test worker] INFO  Exposed - Extracting column constraints took 0ms
+2026-09-14 14:29:08.241 [Test worker] INFO  Exposed - Preparing alter table statements took 2ms
+2026-09-14 14:29:08.241 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-14 14:29:08.241 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_unique_INDEX_9 -> in mapping conversation_engines_version_unique
+2026-09-14 14:29:08.241 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_unique_INDEX_1 -> in mapping personas_slug_unique
+2026-09-14 14:29:08.241 [Test worker] INFO  Exposed - Checking mapping consistence took 0ms
+
+> Task :test FAILED
+
+Phase3PersonaEngineLifecycleTest > published persona core can be activated and active versions resist archive() FAILED
+    org.opentest4j.AssertionFailedError at Phase3PersonaEngineLifecycleTest.kt:78
+        Caused by: java.lang.IllegalStateException at Phase3PersonaEngineLifecycleTest.kt:79
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+gradle.bat : 
+At line:3 char:1
++ & "C:\gradle\gradle-8.7\bin\gradle.bat" test --no-build-cache 2>&1 |  ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+100 tests completed, 2 failed
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///E:/Projects/Pink%20dreams/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights.
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.7/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+5 actionable tasks: 4 executed, 1 up-to-date
+BUILD FAILED in 7s
