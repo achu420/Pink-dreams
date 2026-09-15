@@ -37,6 +37,7 @@ data class ConversationDetailResponse(
     val state: String,
     val createdAt: String,
     val updatedAt: String,
+    val messages: List<MessageListItemResponse> = emptyList(),
 )
 
 @Serializable
@@ -197,11 +198,27 @@ class ConversationHistoryRoutes(
                     return@get
                 }
 
+                val messages = try {
+                    messageRepository.findForConversation(conversationId)
+                        .filter { it.role != "system" }
+                        .map { msg ->
+                            MessageListItemResponse(
+                                id = msg.id.toString(),
+                                role = msg.role,
+                                content = msg.content,
+                                createdAt = msg.createdAt.toString(),
+                            )
+                        }
+                } catch (e: Exception) {
+                    emptyList()
+                }
+
                 val response = ConversationDetailResponse(
                     id = conversation.id.toString(),
                     state = conversation.state,
                     createdAt = conversation.createdAt.toString(),
                     updatedAt = conversation.lastMessageAt?.toString() ?: conversation.createdAt.toString(),
+                    messages = messages,
                 )
                 call.respond(HttpStatusCode.OK, response)
             }

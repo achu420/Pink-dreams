@@ -124,10 +124,17 @@
                 <button onclick="createConversation()">New Conversation</button>
                 <div id="conversationDisplay" style="margin-top: 20px; display: none;">
                     <p><strong>Conversation ID:</strong> <span id="currentConvId"></span></p>
-                    <div id="messagesDisplay" style="max-height: 400px; overflow-y: auto; margin: 20px 0; padding: 10px; background: #f9f9f9; border-radius: 4px;"></div>
-                    <h3 style="margin-top: 30px; margin-bottom: 15px;">Memory Facts</h3>
-                    <div id="memoryDisplay" style="overflow-x: auto; margin-bottom: 20px;">
-                        <p style="color: #999; text-align: center; padding: 20px;">Loading memory facts...</p>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div>
+                            <h3 style="margin-bottom: 10px;">Messages</h3>
+                            <div id="messagesDisplay" style="max-height: 400px; overflow-y: auto; padding: 10px; background: #f9f9f9; border-radius: 4px;"></div>
+                        </div>
+                        <div>
+                            <h3 style="margin-bottom: 10px;">Memory Facts</h3>
+                            <div id="memoryDisplay" style="max-height: 400px; overflow-y: auto; overflow-x: auto; padding: 10px; background: #f9f9f9; border-radius: 4px;">
+                                <p style="color: #999; text-align: center; font-size: 12px;">Loading...</p>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter') sendMessage()">
@@ -356,29 +363,20 @@
                 const memoryDisplay = document.getElementById('memoryDisplay');
                 const memory = data.memory || [];
                 if (memory.length === 0) {
-                    memoryDisplay.innerHTML = '<p style="color: #999; text-align: center;">No memory facts yet</p>';
+                    memoryDisplay.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; font-size: 12px;">No memory facts yet</p>';
                 } else {
-                    const headerRow = `
-                        <tr>
-                            <th>Fact Type</th>
-                            <th>Fact</th>
-                            <th>Criticality</th>
-                            <th>Tier</th>
-                            <th>Status</th>
-                            <th>Learned At</th>
-                        </tr>
-                    `;
-                    const rows = memory.map(m => `
-                        <tr>
-                            <td>${m.factType}</td>
-                            <td>${m.fact}</td>
-                            <td>${m.criticality}</td>
-                            <td>${m.tier}</td>
-                            <td>${m.status}</td>
-                            <td>${m.learnedAt}</td>
-                        </tr>
-                    `).join('');
-                    memoryDisplay.innerHTML = `<table>${headerRow}${rows}</table>`;
+                    let html = '<div style="font-size: 12px;">';
+                    memory.forEach((m, idx) => {
+                        html += `<div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                            <div style="font-weight: 600; color: #333;">${m.factType}</div>
+                            <div style="color: #666; margin: 2px 0; word-wrap: break-word;">${m.fact}</div>
+                            <div style="color: #999; font-size: 11px; margin-top: 4px;">
+                                <span>📌 ${m.tier}</span> • <span>${m.criticality}</span> • <span>${m.status}</span>
+                            </div>
+                        </div>`;
+                    });
+                    html += '</div>';
+                    memoryDisplay.innerHTML = html;
                 }
             } catch (e) {
                 showError('chatError', e.message);
