@@ -9,7 +9,6 @@ import com.pinkdreams.auth.AdminAuthorizationProvider
 import com.pinkdreams.auth.DevAuthProvider
 import com.pinkdreams.chat.ChatEngine
 import com.pinkdreams.chat.PipelineChatEngine
-import com.pinkdreams.chat.NoopChatExecutionCoordinator
 import com.pinkdreams.common.errors.ApiError
 import com.pinkdreams.common.errors.ErrorCode
 import com.pinkdreams.common.errors.ErrorResponse
@@ -32,6 +31,7 @@ import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.request.path
 import io.ktor.server.response.respond
 import io.ktor.server.routing.routing
+import io.ktor.server.routing.get
 import kotlinx.serialization.json.Json
 
 fun main() {
@@ -103,7 +103,7 @@ fun Application.module(
             outputValidator = { _, _ -> com.pinkdreams.chat.ValidationDecision.Accepted },
             persistence = { _, _ -> com.pinkdreams.chat.StageResult.Failed(ErrorCode.PERSIST_FAILED) },
             delivery = { _, _ -> com.pinkdreams.chat.StageResult.Succeeded(Unit) },
-            executionCoordinator = NoopChatExecutionCoordinator,
+            executionCoordinator = com.pinkdreams.chat.NoopChatExecutionCoordinator,
         )
     }
 

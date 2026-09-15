@@ -66,7 +66,12 @@ class AdminEngineRoutes(
                     return@get
                 }
 
-                call.respond(HttpStatusCode.OK, EngineListResponse(emptyList()))
+                call.respond(
+                    HttpStatusCode.OK,
+                    EngineListResponse(
+                        engines = emptyList(),
+                    ),
+                )
             }
 
             // GET /v1/admin/engines/{engineId}

@@ -12,7 +12,9 @@ import io.ktor.server.auth.principal
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.auth.authenticate
+import io.ktor.server.request.receive
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
@@ -50,6 +52,18 @@ data class MessageListResponse(
     val messages: List<MessageListItemResponse>,
 )
 
+@Serializable
+data class CreateConversationRequest(
+    val personaId: String,
+)
+
+@Serializable
+data class CreateConversationResponse(
+    val id: String,
+    val state: String,
+    val createdAt: String,
+)
+
 class ConversationHistoryRoutes(
     private val conversationRepository: ConversationRepository,
     private val messageRepository: MessageRepository,
@@ -61,6 +75,60 @@ class ConversationHistoryRoutes(
 
     fun register(route: Route) {
         route.authenticate("dev-auth") {
+            // POST /v1/conversations
+            post("/v1/conversations") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@post
+                }
+
+                val authenticatedUserId = UUID.fromString(principal.name)
+                val request = try {
+                    call.receive<CreateConversationRequest>()
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid request format", null)),
+                    )
+                    return@post
+                }
+
+                val personaId = try {
+                    UUID.fromString(request.personaId)
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid persona ID format", null)),
+                    )
+                    return@post
+                }
+
+                try {
+                    val conversation = conversationRepository.create(
+                        userId = authenticatedUserId,
+                        personaId = personaId,
+                        state = "active",
+                    )
+                    call.respond(
+                        HttpStatusCode.Created,
+                        CreateConversationResponse(
+                            id = conversation.id.toString(),
+                            state = conversation.state,
+                            createdAt = conversation.createdAt.toString(),
+                        ),
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        ErrorResponse(ApiError(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to create conversation", null)),
+                    )
+                }
+            }
+
             // GET /v1/conversations
             get("/v1/conversations") {
                 val principal = call.principal<UserIdPrincipal>()

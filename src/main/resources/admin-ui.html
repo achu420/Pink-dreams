@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pink Dreams QA Console</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { color: #333; margin-bottom: 30px; }
+        h2 { color: #555; margin-top: 30px; margin-bottom: 15px; font-size: 18px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        .section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 500; margin-bottom: 5px; color: #333; }
+        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; }
+        textarea { resize: vertical; min-height: 100px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        button:hover { background: #0056b3; }
+        button.secondary { background: #6c757d; }
+        button.secondary:hover { background: #5a6268; }
+        .error { color: #d32f2f; padding: 10px; background: #ffebee; border-radius: 4px; margin-bottom: 15px; }
+        .success { color: #388e3c; padding: 10px; background: #e8f5e9; border-radius: 4px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f0f0f0; font-weight: 600; }
+        tr:hover { background: #f9f9f9; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .message { padding: 10px; margin: 5px 0; border-radius: 4px; border-left: 4px solid #007bff; }
+        .message.user { background: #e3f2fd; border-left-color: #007bff; }
+        .message.assistant { background: #f3e5f5; border-left-color: #9c27b0; }
+        .tabs { display: flex; gap: 0; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+        .tab-button { padding: 10px 20px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; color: #666; }
+        .tab-button.active { border-bottom-color: #007bff; color: #007bff; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎭 Pink Dreams QA Console</h1>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('setup')">Setup</button>
+            <button class="tab-button" onclick="switchTab('chat')">Chat</button>
+        </div>
+
+        <div id="setup" class="tab-content active">
+            <div class="section">
+                <h2>1. Create Persona</h2>
+                <div id="createPersonaError"></div>
+                <div class="form-group">
+                    <label>Slug:</label>
+                    <input type="text" id="personaSlug" placeholder="e.g., alice">
+                </div>
+                <div class="form-group">
+                    <label>Display Name:</label>
+                    <input type="text" id="personaName" placeholder="e.g., Alice">
+                </div>
+                <div class="form-group">
+                    <label>Gender:</label>
+                    <input type="text" id="personaGender" placeholder="e.g., female">
+                </div>
+                <div class="form-group">
+                    <label>Orientation:</label>
+                    <input type="text" id="personaOrientation" placeholder="e.g., straight">
+                </div>
+                <div class="form-group">
+                    <label>Apparent Age:</label>
+                    <input type="number" id="personaAge" placeholder="25" min="18" max="100">
+                </div>
+                <button onclick="createPersona()">Create Persona</button>
+                <button class="secondary" onclick="loadPersonas()">Refresh List</button>
+                <table id="personasTable" style="margin-top: 20px;">
+                    <thead><tr><th>Name</th><th>Slug</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>2. Create & Activate Core Version</h2>
+                <div id="versionError"></div>
+                <div class="form-group">
+                    <label>Select Persona:</label>
+                    <select id="personaSelect"></select>
+                </div>
+                <div class="form-group">
+                    <label>Version Number:</label>
+                    <input type="number" id="versionNum" placeholder="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Content (JSON):</label>
+                    <textarea id="versionContent" placeholder='{"description": "A persona", "traits": []}'></textarea>
+                </div>
+                <button onclick="createVersion()">Create Draft</button>
+                <table id="versionsTable" style="margin-top: 20px;">
+                    <thead><tr><th>Version</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>3. Select Engine</h2>
+                <button onclick="loadEngines()">Refresh Engines</button>
+                <table id="enginesTable" style="margin-top: 20px;">
+                    <thead><tr><th>Version</th><th>Status</th><th>Active</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="chat" class="tab-content">
+            <div class="section">
+                <h2>Chat Interface</h2>
+                <div id="chatError"></div>
+                <div class="form-group">
+                    <label>User ID (UUID):</label>
+                    <input type="text" id="chatUserId" placeholder="00000000-0000-0000-0000-000000000000">
+                </div>
+                <div class="form-group">
+                    <label>Persona:</label>
+                    <select id="chatPersonaSelect"></select>
+                </div>
+                <button onclick="createConversation()">New Conversation</button>
+                <div id="conversationDisplay" style="margin-top: 20px; display: none;">
+                    <p><strong>Conversation ID:</strong> <span id="currentConvId"></span></p>
+                    <div id="messagesDisplay" style="max-height: 400px; overflow-y: auto; margin: 20px 0; padding: 10px; background: #f9f9f9; border-radius: 4px;"></div>
+                    <div class="form-group">
+                        <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter') sendMessage()">
+                    </div>
+                    <button onclick="sendMessage()">Send Message</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/v1';
+        const ADMIN_BASE = '/v1/admin';
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showError(elementId, msg) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `<div class="error">${msg}</div>`;
+            setTimeout(() => { el.innerHTML = ''; }, 5000);
+        }
+
+        function showSuccess(elementId, msg) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = `<div class="success">${msg}</div>`;
+            setTimeout(() => { el.innerHTML = ''; }, 3000);
+        }
+
+        async function createPersona() {
+            const slug = document.getElementById('personaSlug').value.trim();
+            const name = document.getElementById('personaName').value.trim();
+            const gender = document.getElementById('personaGender').value.trim();
+            const orientation = document.getElementById('personaOrientation').value.trim();
+            const age = parseInt(document.getElementById('personaAge').value);
+
+            if (!slug || !name || !gender || !orientation || !age) {
+                showError('createPersonaError', 'All fields required');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slug, displayName: name, gender, orientation, apparentAge: age })
+                });
+                if (!res.ok) throw new Error('Failed to create persona');
+                showSuccess('createPersonaError', 'Persona created!');
+                document.getElementById('personaSlug').value = '';
+                document.getElementById('personaName').value = '';
+                loadPersonas();
+            } catch (e) {
+                showError('createPersonaError', e.message);
+            }
+        }
+
+        async function loadPersonas() {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas`);
+                if (!res.ok) throw new Error('Failed to load personas');
+                const data = await res.json();
+                const table = document.querySelector('#personasTable tbody');
+                table.innerHTML = data.personas.map(p => `
+                    <tr>
+                        <td>${p.displayName}</td>
+                        <td>${p.slug}</td>
+                        <td>${p.status}</td>
+                        <td><button onclick="selectPersona('${p.id}', '${p.displayName}')" class="secondary">Select</button></td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showError('createPersonaError', e.message);
+            }
+        }
+
+        let selectedPersonaId = '';
+        function selectPersona(id, name) {
+            selectedPersonaId = id;
+            document.getElementById('personaSelect').value = id;
+            document.getElementById('personaSelect').innerHTML = `<option value="${id}">${name}</option>`;
+            loadVersions();
+        }
+
+        async function createVersion() {
+            if (!selectedPersonaId) {
+                showError('versionError', 'Select a persona first');
+                return;
+            }
+            const version = parseInt(document.getElementById('versionNum').value);
+            const content = document.getElementById('versionContent').value.trim();
+            if (!version || !content) {
+                showError('versionError', 'All fields required');
+                return;
+            }
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${selectedPersonaId}/core-versions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ version, content })
+                });
+                if (!res.ok) throw new Error('Failed to create version');
+                showSuccess('versionError', 'Version created!');
+                document.getElementById('versionContent').value = '';
+                loadVersions();
+            } catch (e) {
+                showError('versionError', e.message);
+            }
+        }
+
+        async function loadVersions() {
+            if (!selectedPersonaId) return;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${selectedPersonaId}/core-versions`);
+                if (!res.ok) throw new Error('Failed to load versions');
+                const data = await res.json();
+                const table = document.querySelector('#versionsTable tbody');
+                table.innerHTML = data.versions.map(v => `
+                    <tr>
+                        <td>v${v.version}</td>
+                        <td>${v.status}</td>
+                        <td>
+                            ${v.status === 'draft' ? `<button onclick="publishVersion('${selectedPersonaId}', '${v.id}')" class="secondary">Publish</button>` : ''}
+                            ${v.status === 'published' ? `<button onclick="activateVersion('${selectedPersonaId}', '${v.id}')" class="secondary">Activate</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showError('versionError', e.message);
+            }
+        }
+
+        async function publishVersion(personaId, versionId) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${personaId}/core-versions/${versionId}/publish`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to publish');
+                loadVersions();
+            } catch (e) {
+                showError('versionError', e.message);
+            }
+        }
+
+        async function activateVersion(personaId, versionId) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${personaId}/core-versions/${versionId}/activate`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to activate');
+                loadVersions();
+            } catch (e) {
+                showError('versionError', e.message);
+            }
+        }
+
+        async function loadEngines() {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/engines`);
+                if (!res.ok) throw new Error('Failed to load engines');
+                const data = await res.json();
+                const table = document.querySelector('#enginesTable tbody');
+                table.innerHTML = data.engines.map(e => `<tr><td>v${e.version}</td><td>${e.status}</td><td>${e.isActive ? '✓' : ''}</td></tr>`).join('');
+            } catch (e) {
+                showError('versionError', e.message);
+            }
+        }
+
+        async function createConversation() {
+            const userId = document.getElementById('chatUserId').value.trim();
+            const select = document.getElementById('chatPersonaSelect');
+            const personaId = select.value;
+
+            if (!userId || !personaId) {
+                showError('chatError', 'Enter user ID and select persona');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/conversations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ personaId })
+                });
+                if (!res.ok) throw new Error('Failed to create conversation');
+                const data = await res.json();
+                currentConvId = data.id;
+                document.getElementById('currentConvId').textContent = currentConvId;
+                document.getElementById('conversationDisplay').style.display = 'block';
+                document.getElementById('messagesDisplay').innerHTML = '';
+                loadConversation();
+            } catch (e) {
+                showError('chatError', e.message);
+            }
+        }
+
+        let currentConvId = '';
+        async function loadConversation() {
+            if (!currentConvId) return;
+            try {
+                const res = await fetch(`${API_BASE}/conversations/${currentConvId}`);
+                if (!res.ok) throw new Error('Failed to load conversation');
+                const data = await res.json();
+                const display = document.getElementById('messagesDisplay');
+                display.innerHTML = data.messages.map(m => `
+                    <div class="message ${m.role}">${m.role.toUpperCase()}: ${m.content}</div>
+                `).join('');
+                display.scrollTop = display.scrollHeight;
+            } catch (e) {
+                showError('chatError', e.message);
+            }
+        }
+
+        async function sendMessage() {
+            const content = document.getElementById('messageInput').value.trim();
+            if (!content || !currentConvId) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/conversations/${currentConvId}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Idempotency-Key': Math.random().toString(36).substr(2, 9) },
+                    body: JSON.stringify({ content })
+                });
+                if (!res.ok) throw new Error('Failed to send message');
+                document.getElementById('messageInput').value = '';
+                loadConversation();
+            } catch (e) {
+                showError('chatError', e.message);
+            }
+        }
+
+        // Initial load
+        loadPersonas();
+        loadEngines();
+        (async () => {
+            const res = await fetch(`${ADMIN_BASE}/personas`);
+            if (res.ok) {
+                const data = await res.json();
+                const select = document.getElementById('chatPersonaSelect');
+                select.innerHTML = '<option value="">-- Select Persona --</option>' + data.personas.map(p => `<option value="${p.id}">${p.displayName}</option>`).join('');
+            }
+        })();
+    </script>
+</body>
+</html>

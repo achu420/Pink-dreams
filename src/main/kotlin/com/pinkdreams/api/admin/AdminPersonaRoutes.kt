@@ -76,6 +76,65 @@ class AdminPersonaRoutes(
 ) {
     fun register(route: Route) {
         route.authenticate("dev-auth") {
+            // POST /v1/admin/personas
+            post("/v1/admin/personas") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@post
+                }
+
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@post
+                }
+
+                val request = try {
+                    call.receive<CreatePersonaRequest>()
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid request format", null)),
+                    )
+                    return@post
+                }
+
+                try {
+                    val persona = personaRepository.create(
+                        slug = request.slug,
+                        displayName = request.displayName,
+                        gender = request.gender,
+                        orientation = request.orientation,
+                        apparentAge = request.apparentAge,
+                        languageProfile = request.languageProfile,
+                    )
+                    call.respond(
+                        HttpStatusCode.Created,
+                        PersonaResponse(
+                            id = persona.id.toString(),
+                            slug = persona.slug,
+                            displayName = persona.displayName,
+                            gender = persona.gender,
+                            orientation = persona.orientation,
+                            apparentAge = persona.apparentAge,
+                            status = persona.status,
+                            activeCoreVersionId = persona.activeCoreVersionId?.toString(),
+                        ),
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        ErrorResponse(ApiError(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to create persona", null)),
+                    )
+                }
+            }
+
             // GET /v1/admin/personas
             get("/v1/admin/personas") {
                 val principal = call.principal<UserIdPrincipal>()
@@ -95,7 +154,12 @@ class AdminPersonaRoutes(
                     return@get
                 }
 
-                call.respond(HttpStatusCode.OK, PersonaListResponse(emptyList()))
+                call.respond(
+                    HttpStatusCode.OK,
+                    PersonaListResponse(
+                        personas = emptyList(),
+                    ),
+                )
             }
 
             // GET /v1/admin/personas/{personaId}/core-versions
