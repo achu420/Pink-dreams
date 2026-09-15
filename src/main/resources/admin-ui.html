@@ -328,9 +328,14 @@
                 if (!res.ok) throw new Error('Failed to load conversation');
                 const data = await res.json();
                 const display = document.getElementById('messagesDisplay');
-                display.innerHTML = data.messages.map(m => `
-                    <div class="message ${m.role}">${m.role.toUpperCase()}: ${m.content}</div>
-                `).join('');
+                const messages = data.messages || [];
+                if (messages.length === 0) {
+                    display.innerHTML = '<p style="color: #999; text-align: center;">No messages yet</p>';
+                } else {
+                    display.innerHTML = messages.map(m => `
+                        <div class="message ${m.role}">${m.role.toUpperCase()}: ${m.content}</div>
+                    `).join('');
+                }
                 display.scrollTop = display.scrollHeight;
             } catch (e) {
                 showError('chatError', e.message);
