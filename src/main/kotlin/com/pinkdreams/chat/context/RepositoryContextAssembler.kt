@@ -26,13 +26,22 @@ class RepositoryContextAssembler(
 ) : ContextAssembler {
     override fun assemble(request: ChatRequest): StageResult<ChatContext> {
         val conversation = conversationRepository.findByIdForUser(request.conversationId, request.userId)
-            ?: return StageResult.Failed(com.pinkdreams.common.errors.ErrorCode.PERSIST_FAILED)
+            ?: run {
+                System.err.println("CONTEXT_ASSEMBLY: Conversation not found for conversationId=${request.conversationId} userId=${request.userId}")
+                return StageResult.Failed(com.pinkdreams.common.errors.ErrorCode.VALIDATION_FAILED)
+            }
         require(conversation.personaId == request.personaId) { "Conversation persona mismatch" }
 
         val engine = engineRepository.getActiveEngine()
-            ?: return StageResult.Failed(com.pinkdreams.common.errors.ErrorCode.PERSIST_FAILED)
+            ?: run {
+                System.err.println("CONTEXT_ASSEMBLY: No active engine found")
+                return StageResult.Failed(com.pinkdreams.common.errors.ErrorCode.VALIDATION_FAILED)
+            }
         val core = personaRepository.getActiveCoreVersion(request.personaId)
-            ?: return StageResult.Failed(com.pinkdreams.common.errors.ErrorCode.PERSIST_FAILED)
+            ?: run {
+                System.err.println("CONTEXT_ASSEMBLY: No active core version found for personaId=${request.personaId}")
+                return StageResult.Failed(com.pinkdreams.common.errors.ErrorCode.VALIDATION_FAILED)
+            }
         val profile = userProfileRepository.findByUserId(request.userId)
         val memories = memoryService.selectForContext(request.userId, request.personaId, memoryLimit)
         val messages = messageRepository.findForConversation(request.conversationId).takeLast(messageLimit)
