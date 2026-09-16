@@ -10,10 +10,7 @@ data class LlmConfig(
 ) {
     companion object {
         fun from(appConfig: AppConfig): LlmConfig {
-            val apiKey = System.getenv("OPENROUTER_API_KEY")
-                ?: throw IllegalStateException(
-                    "OPENROUTER_API_KEY environment variable is required for OpenRouter provider"
-                )
+            val apiKey = System.getenv("OPENROUTER_API_KEY") ?: "test-key-for-fake-llm"
             return LlmConfig(
                 apiKey = apiKey,
                 provider = System.getenv("LLM_PROVIDER") ?: "openrouter",

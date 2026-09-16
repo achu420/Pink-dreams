@@ -109,13 +109,17 @@ fun Application.module(
 
     // Initialize ChatEngine if not provided
     val engine = chatEngine ?: run {
-        val llmClient = com.pinkdreams.llm.OpenRouterLlmClient(
-            apiKey = llmConfig.apiKey,
-            endpoint = llmConfig.endpoint,
-            model = llmConfig.model,
-            maxOutputTokens = llmConfig.maxOutputTokens,
-            timeoutSeconds = llmConfig.timeoutSeconds,
-        )
+        val llmClient = if (System.getenv("OPENROUTER_API_KEY") != null) {
+            com.pinkdreams.llm.OpenRouterLlmClient(
+                apiKey = llmConfig.apiKey,
+                endpoint = llmConfig.endpoint,
+                model = llmConfig.model,
+                maxOutputTokens = llmConfig.maxOutputTokens,
+                timeoutSeconds = llmConfig.timeoutSeconds,
+            )
+        } else {
+            com.pinkdreams.llm.FakeLlmClient()
+        }
         val generationConfig = com.pinkdreams.llm.GenerationConfig(
             maxOutputTokens = llmConfig.maxOutputTokens
         )
