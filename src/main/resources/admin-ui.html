@@ -122,17 +122,22 @@
                     <select id="chatPersonaSelect"></select>
                 </div>
                 <button onclick="createConversation()">New Conversation</button>
+                <div class="form-group">
+                    <label>Or Load Existing Conversation:</label>
+                    <input type="text" id="conversationIdInput" placeholder="Paste conversation ID here">
+                    <button onclick="loadConversationById()" class="secondary">Load</button>
+                </div>
                 <div id="conversationDisplay" style="margin-top: 20px; display: none;">
-                    <p><strong>Conversation ID:</strong> <span id="currentConvId"></span></p>
+                    <p><strong>Conversation ID:</strong> <span id="currentConvId" style="font-family: monospace; font-size: 12px;"></span></p>
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
                         <div>
                             <h3 style="margin-bottom: 10px;">Messages</h3>
-                            <div id="messagesDisplay" style="max-height: 400px; overflow-y: auto; padding: 10px; background: #f9f9f9; border-radius: 4px;"></div>
+                            <div id="messagesDisplay" style="max-height: 500px; overflow-y: auto; padding: 10px; background: #f9f9f9; border-radius: 4px; border: 1px solid #ddd;"></div>
                         </div>
                         <div>
                             <h3 style="margin-bottom: 10px;">Memory Facts</h3>
-                            <div id="memoryDisplay" style="max-height: 400px; overflow-y: auto; overflow-x: auto; padding: 10px; background: #f9f9f9; border-radius: 4px;">
-                                <p style="color: #999; text-align: center; font-size: 12px;">Loading...</p>
+                            <div id="memoryDisplay" style="max-height: 500px; overflow-y: auto; overflow-x: auto; padding: 10px; background: #f9f9f9; border-radius: 4px; border: 1px solid #ddd;">
+                                <p style="color: #999; text-align: center; font-size: 12px;">No memory facts yet</p>
                             </div>
                         </div>
                     </div>
@@ -140,6 +145,21 @@
                         <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter') sendMessage()">
                     </div>
                     <button onclick="sendMessage()">Send Message</button>
+                    <button class="secondary" onclick="toggleDebugPanel()" style="margin-left: 10px;">🔍 Debug</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="debugPanel" style="display: none; margin-top: 20px;">
+            <div class="section">
+                <h2>🔍 API Debug Panel</h2>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: 600; display: block; margin-bottom: 10px;">Last API Call:</label>
+                    <textarea id="debugLastCall" readonly style="width: 100%; height: 150px; background: #1e1e1e; color: #00ff00; font-family: monospace; font-size: 11px; padding: 10px; border-radius: 4px;"></textarea>
+                </div>
+                <div>
+                    <label style="font-weight: 600; display: block; margin-bottom: 10px;">Last Response:</label>
+                    <textarea id="debugLastResponse" readonly style="width: 100%; height: 150px; background: #1e1e1e; color: #00ff00; font-family: monospace; font-size: 11px; padding: 10px; border-radius: 4px;"></textarea>
                 </div>
             </div>
         </div>
@@ -332,49 +352,121 @@
         }
 
         let currentConvId = '';
+        let debugLastCall = '';
+        let debugLastResponse = '';
+
+        function logApiCall(method, endpoint, body) {
+            debugLastCall = `${method} ${endpoint}\n\n${body ? JSON.stringify(JSON.parse(body), null, 2) : ''}`;
+            document.getElementById('debugLastCall').value = debugLastCall;
+        }
+
+        function logApiResponse(response) {
+            debugLastResponse = JSON.stringify(response, null, 2);
+            document.getElementById('debugLastResponse').value = debugLastResponse;
+        }
+
+        function toggleDebugPanel() {
+            const panel = document.getElementById('debugPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function loadConversationById() {
+            const convId = document.getElementById('conversationIdInput').value.trim();
+            if (!convId) {
+                showError('chatError', 'Enter a conversation ID');
+                return;
+            }
+            currentConvId = convId;
+            document.getElementById('currentConvId').textContent = currentConvId;
+            document.getElementById('conversationDisplay').style.display = 'block';
+            await loadConversation();
+        }
+
         async function loadConversation() {
             if (!currentConvId) return;
             try {
-                const res = await fetch(`${API_BASE}/conversations/${currentConvId}`);
+                const endpoint = `${API_BASE}/conversations/${currentConvId}`;
+                logApiCall('GET', endpoint, '');
+
+                const res = await fetch(endpoint);
                 if (!res.ok) throw new Error('Failed to load conversation');
                 const data = await res.json();
+                logApiResponse(data);
+
                 const display = document.getElementById('messagesDisplay');
                 const messages = data.messages || [];
                 if (messages.length === 0) {
                     display.innerHTML = '<p style="color: #999; text-align: center;">No messages yet</p>';
                 } else {
-                    display.innerHTML = messages.map(m => `
-                        <div class="message ${m.role}">${m.role.toUpperCase()}: ${m.content}</div>
-                    `).join('');
+                    display.innerHTML = messages.map(m => {
+                        const msgClass = m.role === 'user' ? 'user' : m.role === 'assistant' ? 'assistant' : 'system';
+                        const roleLabel = m.role === 'user' ? '👤 USER' : m.role === 'assistant' ? '🤖 ASSISTANT' : '⚙️ SYSTEM';
+                        return `<div class="message ${msgClass}" style="cursor: pointer;" onclick="showMessageDebug('${m.role}', '${m.content.replace(/'/g, "\\'")}', this)">${roleLabel}: ${m.content}</div>`;
+                    }).join('');
                 }
                 display.scrollTop = display.scrollHeight;
-                loadMemoryFacts();
+                await loadMemoryFacts();
             } catch (e) {
                 showError('chatError', e.message);
             }
         }
 
+        function showMessageDebug(role, content, element) {
+            element.style.backgroundColor = element.style.backgroundColor === 'rgb(200, 150, 200)' ? '' : 'rgb(200, 150, 200)';
+        }
+
         async function loadMemoryFacts() {
             if (!currentConvId) return;
             try {
-                const res = await fetch(`${API_BASE}/conversations/${currentConvId}/memory`);
+                const endpoint = `${API_BASE}/conversations/${currentConvId}/memory`;
+                logApiCall('GET', endpoint, '');
+
+                const res = await fetch(endpoint);
                 if (!res.ok) throw new Error('Failed to load memory');
                 const data = await res.json();
+                logApiResponse(data);
+
                 const memoryDisplay = document.getElementById('memoryDisplay');
                 const memory = data.memory || [];
                 if (memory.length === 0) {
                     memoryDisplay.innerHTML = '<p style="color: #999; text-align: center; padding: 20px; font-size: 12px;">No memory facts yet</p>';
                 } else {
+                    // Group memories by source
+                    const llmExtracted = memory.filter(m => (m.source || 'llm_extracted') === 'llm_extracted');
+                    const manual = memory.filter(m => (m.source || 'llm_extracted') !== 'llm_extracted');
+
                     let html = '<div style="font-size: 12px;">';
-                    memory.forEach((m, idx) => {
-                        html += `<div style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
-                            <div style="font-weight: 600; color: #333;">${m.factType}</div>
-                            <div style="color: #666; margin: 2px 0; word-wrap: break-word;">${m.fact}</div>
-                            <div style="color: #999; font-size: 11px; margin-top: 4px;">
-                                <span>📌 ${m.tier}</span> • <span>${m.criticality}</span> • <span>${m.status}</span>
-                            </div>
-                        </div>`;
-                    });
+
+                    // LLM Extracted Memories
+                    if (llmExtracted.length > 0) {
+                        html += '<div style="margin-bottom: 15px;"><div style="font-weight: 700; color: #0056b3; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 2px solid #0056b3;">🤖 LLM EXTRACTED</div>';
+                        llmExtracted.forEach(m => {
+                            html += `<div style="margin-bottom: 8px; padding: 8px; background: #e3f2fd; border-left: 3px solid #0056b3; cursor: pointer; border-radius: 3px;" onclick="this.style.backgroundColor = this.style.backgroundColor === 'rgb(200, 200, 255)' ? '#e3f2fd' : 'rgb(200, 200, 255)'">
+                                <div style="font-weight: 600; color: #0056b3;">${m.factType || 'Unknown'}</div>
+                                <div style="color: #333; margin: 3px 0; word-wrap: break-word; font-size: 11px;">${m.fact || m.content || ''}</div>
+                                <div style="color: #666; font-size: 10px; margin-top: 3px;">
+                                    <span>📌 ${m.tier || 'hot'}</span> • <span>⚡ ${m.criticality || 'medium'}</span> • <span>📂 ${m.status || 'open'}</span>
+                                </div>
+                            </div>`;
+                        });
+                        html += '</div>';
+                    }
+
+                    // Manual/User-Provided Memories
+                    if (manual.length > 0) {
+                        html += '<div><div style="font-weight: 700; color: #27ae60; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 2px solid #27ae60;">✏️ MANUAL</div>';
+                        manual.forEach(m => {
+                            html += `<div style="margin-bottom: 8px; padding: 8px; background: #d4edda; border-left: 3px solid #27ae60; cursor: pointer; border-radius: 3px;" onclick="this.style.backgroundColor = this.style.backgroundColor === 'rgb(150, 255, 150)' ? '#d4edda' : 'rgb(150, 255, 150)'">
+                                <div style="font-weight: 600; color: #27ae60;">${m.factType || 'Unknown'}</div>
+                                <div style="color: #333; margin: 3px 0; word-wrap: break-word; font-size: 11px;">${m.fact || m.content || ''}</div>
+                                <div style="color: #666; font-size: 10px; margin-top: 3px;">
+                                    <span>📌 ${m.tier || 'hot'}</span> • <span>⚡ ${m.criticality || 'medium'}</span> • <span>📂 ${m.status || 'open'}</span>
+                                </div>
+                            </div>`;
+                        });
+                        html += '</div>';
+                    }
+
                     html += '</div>';
                     memoryDisplay.innerHTML = html;
                 }
@@ -387,16 +479,23 @@
             const content = document.getElementById('messageInput').value.trim();
             if (!content || !currentConvId) return;
 
+            const messageBody = JSON.stringify({ content });
             try {
-                const res = await fetch(`${API_BASE}/conversations/${currentConvId}/messages`, {
+                const endpoint = `${API_BASE}/conversations/${currentConvId}/messages`;
+                logApiCall('POST', endpoint, messageBody);
+
+                const res = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Idempotency-Key': crypto.randomUUID() },
-                    body: JSON.stringify({ content })
+                    body: messageBody
                 });
                 if (!res.ok) throw new Error('Failed to send message');
+                const data = await res.json();
+                logApiResponse(data);
+
                 document.getElementById('messageInput').value = '';
-                loadConversation();
-                loadMemoryFacts();
+                await loadConversation();
+                await loadMemoryFacts();
             } catch (e) {
                 showError('chatError', e.message);
             }
