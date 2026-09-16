@@ -15,6 +15,17 @@ class LlmGenerator(
         return try {
             val generationRequest = GenerationRequest.from(request, context, config)
             val response = client.generate(generationRequest)
+
+            val diagnostics = com.pinkdreams.chat.LlmExecutionDiagnostics(
+                contextBlocks = context.blocks,
+                generationConfig = mapOf(
+                    "model" to (config.model ?: "default"),
+                    "temperature" to (config.temperature?.toString() ?: "default"),
+                    "maxOutputTokens" to (config.maxOutputTokens?.toString() ?: "default"),
+                ),
+                llmResponseMetadata = response.metadata,
+            )
+
             StageResult.Succeeded(
                 GenerationResponse(
                     content = response.content,
@@ -25,6 +36,7 @@ class LlmGenerator(
                         response.model?.let { put("model", it) }
                         putAll(response.metadata)
                     },
+                    executionDiagnostics = diagnostics,
                 ),
             )
         } catch (_: Exception) {

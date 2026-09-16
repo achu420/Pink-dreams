@@ -495,46 +495,78 @@
             // Show debug panel
             document.getElementById('debugPanel').style.display = 'block';
 
-            // Reconstruct the OpenRouter request and response from metadata
-            const metadata = message.metadata || {};
+            // Parse actual metadata captured during execution
+            let metadata = {};
+            try {
+                if (message.metadata && message.metadata !== '{}') {
+                    metadata = JSON.parse(message.metadata);
+                }
+            } catch (e) {
+                console.error('Failed to parse message metadata:', e);
+            }
 
-            // Build a simulated OpenRouter request (what was sent to Claude)
-            const llmRequest = {
-                model: metadata.model || "deepseek/deepseek-v4.1-flash",
-                messages: [
-                    // Context would be the conversation history
-                    {role: "user", content: "Previous message content would be here"}
-                ],
-                max_tokens: metadata.max_tokens || 1024,
-                stream: false
-            };
+            // Build request from captured context blocks
+            let llmRequest = { messages: [] };
+            let tokenUsageText = 'No token usage captured';
 
-            // Build the OpenRouter response (what Claude returned)
+            // Extract context blocks if available
+            if (metadata.lvm_context_blocks) {
+                try {
+                    const blocksObj = JSON.parse(metadata.lvm_context_blocks);
+                    Object.entries(blocksObj).forEach(([role, content]) => {
+                        llmRequest.messages.push({ role: 'system', content: String(content) });
+                    });
+                } catch (e) {
+                    console.error('Failed to parse context blocks:', e);
+                }
+            }
+
+            // Extract generation config
+            if (metadata.lvm_config) {
+                try {
+                    const config = JSON.parse(metadata.lvm_config);
+                    llmRequest.model = config.model || 'unknown';
+                    llmRequest.max_tokens = config.maxOutputTokens || 1024;
+                    llmRequest.stream = false;
+                } catch (e) {
+                    console.error('Failed to parse generation config:', e);
+                }
+            }
+
+            // Ensure we have at least the model
+            if (!llmRequest.model) llmRequest.model = 'unknown';
+            if (!llmRequest.max_tokens) llmRequest.max_tokens = 1024;
+            llmRequest.stream = false;
+
+            // Extract token usage
+            if (metadata.lvm_response_metadata) {
+                try {
+                    const respMeta = JSON.parse(metadata.lvm_response_metadata);
+                    const promptTokens = respMeta.prompt_tokens || 'unavailable';
+                    const completionTokens = respMeta.completion_tokens || 'unavailable';
+                    const totalTokens = respMeta.total_tokens || 'unavailable';
+                    tokenUsageText = `Prompt Tokens: ${promptTokens}\nCompletion Tokens: ${completionTokens}\nTotal Tokens: ${totalTokens}`;
+                } catch (e) {
+                    console.error('Failed to parse response metadata:', e);
+                }
+            }
+
+            // Build response representation
             const llmResponse = {
-                id: message.id,
-                model: metadata.model || "deepseek/deepseek-v4.1-flash",
+                model: llmRequest.model,
                 choices: [{
-                    finish_reason: metadata.finish_reason || "stop",
+                    finish_reason: 'stop',
                     message: {
-                        role: "assistant",
+                        role: 'assistant',
                         content: message.content
                     }
-                }],
-                usage: {
-                    prompt_tokens: parseInt(metadata.prompt_tokens || 0),
-                    completion_tokens: parseInt(metadata.completion_tokens || 0),
-                    total_tokens: parseInt(metadata.total_tokens || 0)
-                }
+                }]
             };
 
-            // Display in debug panels
+            // Display actual captured data
             document.getElementById('debugOpenRouterRequest').value = JSON.stringify(llmRequest, null, 2);
             document.getElementById('debugOpenRouterResponse').value = JSON.stringify(llmResponse, null, 2);
-
-            const tokenUsage = `Prompt Tokens: ${metadata.prompt_tokens || 0}
-Completion Tokens: ${metadata.completion_tokens || 0}
-Total Tokens: ${metadata.total_tokens || 0}`;
-            document.getElementById('debugTokenUsage').value = tokenUsage;
+            document.getElementById('debugTokenUsage').value = tokenUsageText;
         }
 
         async function loadMemoryFacts() {

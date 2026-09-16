@@ -61,11 +61,18 @@ data class ChatContext(
 
 data class ContextBlock(val role: String, val content: String)
 
+data class LlmExecutionDiagnostics(
+    val contextBlocks: List<ContextBlock>?,
+    val generationConfig: Map<String, String>?,
+    val llmResponseMetadata: Map<String, String>?,
+)
+
 data class GenerationResponse(
     val content: String,
     val engineVersionId: UUID? = null,
     val personaCoreVersionId: UUID? = null,
     val providerMetadata: Map<String, String> = emptyMap(),
+    val executionDiagnostics: LlmExecutionDiagnostics? = null,
 )
 
 data class PersistedResponse(

@@ -1,5 +1,6 @@
 package com.pinkdreams.api.conversation
 
+import com.pinkdreams.auth.AdminAuthorizationProvider
 import com.pinkdreams.common.errors.ApiError
 import com.pinkdreams.common.errors.ErrorCode
 import com.pinkdreams.common.errors.ErrorResponse
@@ -46,6 +47,7 @@ data class MessageListItemResponse(
     val role: String,
     val content: String,
     val createdAt: String,
+    val metadata: String? = null,
 )
 
 @Serializable
@@ -68,6 +70,7 @@ data class CreateConversationResponse(
 class ConversationHistoryRoutes(
     private val conversationRepository: ConversationRepository,
     private val messageRepository: MessageRepository,
+    private val adminAuth: AdminAuthorizationProvider = AdminAuthorizationProvider(),
 ) {
     companion object {
         private const val DEFAULT_LIMIT = 20
@@ -179,6 +182,7 @@ class ConversationHistoryRoutes(
                 }
 
                 val authenticatedUserId = UUID.fromString(principal.name)
+                val isAdmin = adminAuth.isAdmin(principal.name)
                 val conversationId = try {
                     UUID.fromString(call.parameters["conversationId"])
                 } catch (e: Exception) {
@@ -207,6 +211,7 @@ class ConversationHistoryRoutes(
                                 role = msg.role,
                                 content = msg.content,
                                 createdAt = msg.createdAt.toString(),
+                                metadata = if (isAdmin) msg.metadata else null,
                             )
                         }
                 } catch (e: Exception) {
@@ -235,6 +240,7 @@ class ConversationHistoryRoutes(
                 }
 
                 val authenticatedUserId = UUID.fromString(principal.name)
+                val isAdmin = adminAuth.isAdmin(principal.name)
                 val conversationId = try {
                     UUID.fromString(call.parameters["conversationId"])
                 } catch (e: Exception) {
@@ -275,6 +281,7 @@ class ConversationHistoryRoutes(
                                 role = msg.role,
                                 content = msg.content,
                                 createdAt = msg.createdAt.toString(),
+                                metadata = if (isAdmin) msg.metadata else null,
                             )
                         },
                 )
