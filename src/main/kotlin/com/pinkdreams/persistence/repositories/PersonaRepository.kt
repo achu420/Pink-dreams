@@ -91,6 +91,24 @@ open class PersonaRepository(private val db: Database) {
         }
     }
 
+    fun update(
+        id: UUID,
+        displayName: String? = null,
+        gender: String? = null,
+        orientation: String? = null,
+        apparentAge: Int? = null,
+    ): Persona = transaction(db) {
+        val persona = findById(id) ?: throw IllegalArgumentException("Persona not found: $id")
+        Personas.update({ Personas.id eq id }) {
+            if (displayName != null) it[Personas.displayName] = displayName
+            if (gender != null) it[Personas.gender] = gender
+            if (orientation != null) it[Personas.orientation] = orientation
+            if (apparentAge != null) it[Personas.apparentAge] = apparentAge
+            it[Personas.updatedAt] = defaultNow()
+        }
+        findById(id) ?: throw IllegalStateException("Failed to reload persona $id")
+    }
+
     fun retirePersona(personaId: UUID): Persona = transaction(db) {
         val persona = findById(personaId) ?: throw IllegalArgumentException("Persona not found: $personaId")
         Personas.update({ Personas.id eq personaId }) {

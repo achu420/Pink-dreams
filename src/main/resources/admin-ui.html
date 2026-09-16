@@ -72,9 +72,31 @@
                 <button onclick="createPersona()">Create Persona</button>
                 <button class="secondary" onclick="loadPersonas()">Refresh List</button>
                 <table id="personasTable" style="margin-top: 20px;">
-                    <thead><tr><th>Name</th><th>Slug</th><th>Status</th><th>Action</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Slug</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table>
+
+                <div id="editPersonaModal" style="display: none; margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 4px;">
+                    <h3>Edit Persona</h3>
+                    <div class="form-group">
+                        <label>Display Name:</label>
+                        <input type="text" id="editPersonaName" placeholder="e.g., Alice">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender:</label>
+                        <input type="text" id="editPersonaGender" placeholder="e.g., female">
+                    </div>
+                    <div class="form-group">
+                        <label>Orientation:</label>
+                        <input type="text" id="editPersonaOrientation" placeholder="e.g., straight">
+                    </div>
+                    <div class="form-group">
+                        <label>Apparent Age:</label>
+                        <input type="number" id="editPersonaAge" placeholder="25" min="18" max="100">
+                    </div>
+                    <button onclick="savePersona()">Save Changes</button>
+                    <button class="secondary" onclick="closeEditPersona()">Cancel</button>
+                </div>
             </div>
 
             <div class="section">
@@ -227,7 +249,10 @@
                         <td>${p.displayName}</td>
                         <td>${p.slug}</td>
                         <td>${p.status}</td>
-                        <td><button onclick="selectPersona('${p.id}', '${p.displayName}')" class="secondary">Select</button></td>
+                        <td>
+                            <button onclick="selectPersona('${p.id}', '${p.displayName}')" class="secondary">Select</button>
+                            <button onclick="editPersona('${p.id}', '${p.displayName}', '${p.gender}', '${p.orientation}', ${p.apparentAge})" class="secondary">✎ Edit</button>
+                        </td>
                     </tr>
                 `).join('');
             } catch (e) {
@@ -236,11 +261,54 @@
         }
 
         let selectedPersonaId = '';
+        let editingPersonaId = '';
+
         function selectPersona(id, name) {
             selectedPersonaId = id;
             document.getElementById('personaSelect').value = id;
             document.getElementById('personaSelect').innerHTML = `<option value="${id}">${name}</option>`;
             loadVersions();
+        }
+
+        function editPersona(id, name, gender, orientation, age) {
+            editingPersonaId = id;
+            document.getElementById('editPersonaName').value = name;
+            document.getElementById('editPersonaGender').value = gender;
+            document.getElementById('editPersonaOrientation').value = orientation;
+            document.getElementById('editPersonaAge').value = age;
+            document.getElementById('editPersonaModal').style.display = 'block';
+        }
+
+        function closeEditPersona() {
+            editingPersonaId = '';
+            document.getElementById('editPersonaModal').style.display = 'none';
+        }
+
+        async function savePersona() {
+            if (!editingPersonaId) return;
+            const displayName = document.getElementById('editPersonaName').value.trim();
+            const gender = document.getElementById('editPersonaGender').value.trim();
+            const orientation = document.getElementById('editPersonaOrientation').value.trim();
+            const apparentAge = parseInt(document.getElementById('editPersonaAge').value);
+
+            if (!displayName || !gender || !orientation || !apparentAge) {
+                showError('createPersonaError', 'All fields required');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${editingPersonaId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ displayName, gender, orientation, apparentAge })
+                });
+                if (!res.ok) throw new Error('Failed to update persona');
+                showSuccess('createPersonaError', 'Persona updated!');
+                closeEditPersona();
+                loadPersonas();
+            } catch (e) {
+                showError('createPersonaError', e.message);
+            }
         }
 
         async function createVersion() {

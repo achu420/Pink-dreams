@@ -17,6 +17,7 @@ import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.patch
 import io.ktor.server.auth.authenticate
 import kotlinx.serialization.Serializable
 import java.util.UUID
@@ -29,6 +30,15 @@ data class CreatePersonaRequest(
     val orientation: String,
     val apparentAge: Int,
     val languageProfile: Map<String, String> = emptyMap(),
+)
+
+@Serializable
+data class UpdatePersonaRequest(
+    val displayName: String? = null,
+    val gender: String? = null,
+    val orientation: String? = null,
+    val apparentAge: Int? = null,
+    val languageProfile: Map<String, String>? = null,
 )
 
 @Serializable
@@ -189,6 +199,74 @@ class AdminPersonaRoutes(
                         },
                     ),
                 )
+            }
+
+            // PATCH /v1/admin/personas/{personaId}
+            patch("/v1/admin/personas/{personaId}") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@patch
+                }
+
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@patch
+                }
+
+                val personaId = try {
+                    UUID.fromString(call.parameters["personaId"])
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid persona ID format", null)),
+                    )
+                    return@patch
+                }
+
+                val request = try {
+                    call.receive<UpdatePersonaRequest>()
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid request format", null)),
+                    )
+                    return@patch
+                }
+
+                try {
+                    val persona = personaRepository.update(
+                        id = personaId,
+                        displayName = request.displayName,
+                        gender = request.gender,
+                        orientation = request.orientation,
+                        apparentAge = request.apparentAge,
+                    )
+                    call.respond(
+                        HttpStatusCode.OK,
+                        PersonaResponse(
+                            id = persona.id.toString(),
+                            slug = persona.slug,
+                            displayName = persona.displayName,
+                            gender = persona.gender,
+                            orientation = persona.orientation,
+                            apparentAge = persona.apparentAge,
+                            status = persona.status,
+                            activeCoreVersionId = persona.activeCoreVersionId?.toString(),
+                        ),
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        ErrorResponse(ApiError(ErrorCode.INTERNAL_SERVER_ERROR, "Failed to update persona", null)),
+                    )
+                }
             }
 
             // GET /v1/admin/personas/{personaId}/core-versions
