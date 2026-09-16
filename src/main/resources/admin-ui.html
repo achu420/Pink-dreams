@@ -429,12 +429,10 @@
 
         function logApiCall(method, endpoint, body) {
             debugLastCall = `${method} ${endpoint}\n\n${body ? JSON.stringify(JSON.parse(body), null, 2) : ''}`;
-            document.getElementById('debugLastCall').value = debugLastCall;
         }
 
         function logApiResponse(response) {
             debugLastResponse = JSON.stringify(response, null, 2);
-            document.getElementById('debugLastResponse').value = debugLastResponse;
         }
 
         function toggleDebugPanel() {
