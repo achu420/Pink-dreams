@@ -109,7 +109,7 @@ class ImageGenerationHandler(
         }
     }
 
-    private fun persistCandidates(
+    internal fun persistCandidates(
         imageJobId: java.util.UUID,
         providerResult: com.pinkdreams.imaging.provider.GenerationResult,
     ): ImageJobResult {
@@ -185,7 +185,7 @@ class ImageGenerationHandler(
         return "{$entries}"
     }
 
-    suspend fun reconstructGenerationRequestWithActualRoles(payload: JsonObject): GenerationRequest {
+    internal suspend fun reconstructGenerationRequestWithActualRoles(payload: JsonObject): GenerationRequest {
         val prompt = payload["prompt"]?.jsonPrimitive?.content
             ?: throw IllegalStateException("Missing prompt in job payload")
 
@@ -238,7 +238,7 @@ class ImageGenerationHandler(
         )
     }
 
-    private fun calculateChecksum(data: ByteArray): String {
+    internal fun calculateChecksum(data: ByteArray): String {
         val digest = MessageDigest.getInstance("SHA-256")
         val hash = digest.digest(data)
         return hash.joinToString("") { "%02x".format(it) }
