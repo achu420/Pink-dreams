@@ -88,20 +88,57 @@ object IntentEngineDefaultContent {
         friendship              = the user is intentionally interacting within a friend-like relationship
         emotional_support       = the user primarily needs emotional listening/support
         general_chat            = ordinary conversation without a more specific interaction mode
-        flirting                = playful attraction or romantic tension
+        flirting                = playful attraction or romantic tension the user actually wants right now
+        flirting_practice       = the user explicitly wants a simulated space to practice flirting, not to flirt for its own sake
         romantic_conversation   = conversation centered on romantic feelings or attraction
-        relationship_building   = developing or deepening an ongoing relationship
-        relationship_discussion = talking about the relationship itself
-        dating                  = dating-oriented interaction
-        playful_teasing         = lighthearted teasing and banter
-        romantic_intimacy       = adult romantic closeness and intimacy
-        foreplay                = adult intimate interaction where the conversation has clearly entered that mode
+        relationship_building   = developing or deepening an established ongoing relationship
+        relationship_discussion = the relationship itself is explicitly the topic (e.g. "what are we?")
+        relationship_guidance   = the user wants help navigating a relationship situation involving someone OTHER than the persona
+        dating                  = real-world dating guidance or discussion
+        dating_practice         = the user explicitly wants a simulated date to practice, not advice
+        breakup_support         = the user's primary situation is a breakup or romantic loss and they need support
+        playful_teasing         = lighthearted teasing and banter as the primary interaction
+        romantic_intimacy       = emotionally intimate, affectionate, sensual romantic closeness
+        foreplay                = adult sensual/sexual interaction specifically oriented around foreplay
+        sexual_stimulation      = the user's primary purpose is adult sexual arousal/stimulation, not relationship development
+        social_practice         = the user explicitly wants to practice general social interaction
+        conversation_practice   = the user explicitly wants to practice keeping a conversation going or expanding short answers
+        confidence_building     = the user's explicit goal is rebuilding or developing confidence, often after a setback
+        encouragement           = the user primarily wants motivation, reassurance, or celebration around a goal
+        advice                  = the user wants an opinion or direction and no more specific skill applies
+        problem_solving         = the user wants help solving a concrete problem or making a plan
+        learning                = the user's primary goal is learning or understanding a subject
+        entertainment           = the user primarily wants fun: games, jokes, stories, debates, media discussion, or roleplay for its own sake
 
         DO NOT OVER-ESCALATE
-        Do not select flirting, romantic_conversation, romantic_intimacy, or foreplay
-        merely because the user is friendly, affectionate, complimentary, or uses an
-        emoji. Likewise, do not select friendship simply because the user has a
-        friendly tone. Use the conversation's actual intent.
+        Do not select flirting, romantic_conversation, romantic_intimacy, foreplay, or
+        sexual_stimulation merely because the user is friendly, affectionate,
+        complimentary, or uses an emoji. Likewise, do not select friendship simply
+        because the user has a friendly tone. Use the conversation's actual intent.
+
+        DISTINGUISHING A REAL INTERACTION FROM A REQUEST TO PRACTICE IT
+        Several skills exist in both a "live" and a "practice" form:
+        flirting vs flirting_practice, dating vs dating_practice, and companionship/
+        friendship/emotional_support vs social_practice/conversation_practice. Select
+        the practice variant ONLY when the user has explicitly asked to practice,
+        rehearse, roleplay, or simulate — never merely because the live interaction
+        happens to resemble what practicing it would look like.
+
+        OTHER COMMON DISAMBIGUATION
+        - romantic_intimacy vs foreplay: romantic_intimacy is affectionate/sensual
+          closeness; foreplay is explicitly, specifically foreplay-oriented. Do not
+          select foreplay merely because the interaction is romantic or affectionate.
+        - foreplay vs sexual_stimulation: foreplay is specifically foreplay-oriented;
+          sexual_stimulation is the broader adult-arousal intent when foreplay is not
+          specifically what is being asked for.
+        - relationship_discussion vs relationship_guidance: relationship_discussion is
+          about the relationship between the user and THIS persona; relationship_guidance
+          is about the user's relationship with someone ELSE.
+        - confidence_building vs emotional_support: use confidence_building when the
+          user's explicit goal is building confidence going forward; use
+          emotional_support when the immediate need is being heard right now.
+        - encouragement vs emotional_support: use encouragement when the user wants
+          motivation/celebration around a goal, not comfort for a difficulty.
 
         OUTPUT
         Return only:

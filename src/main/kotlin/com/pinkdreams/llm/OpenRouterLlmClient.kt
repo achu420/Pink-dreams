@@ -71,7 +71,7 @@ data class OpenRouterUsage(
 class OpenRouterLlmClient(
     private val apiKey: String,
     val endpoint: String = "https://openrouter.ai/api/v1/chat/completions",
-    private val model: String = "deepseek/deepseek-v4.1-flash",
+    private val model: String = "deepseek/deepseek-v4-flash-0731",
     val maxOutputTokens: Int = 1024,
     val timeoutSeconds: Int = 60,
 ) : LlmClient {

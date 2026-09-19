@@ -47,20 +47,16 @@ class BaselineSeederTest {
         assertEquals(BaselineConfiguration.RELEVANT_MEMORY_TARGET, activeMemoryEngine.relevantMemoryTarget)
     }
 
-    // --- Part G/P: all 12 skills seeded, as draft and inactive ---
+    // --- Part G/P: every canonical skill seeded, as draft and inactive ---
     @Test
-    fun `all twelve canonical skills are seeded as draft and inactive`() {
+    fun `every canonical skill is seeded as draft and inactive`() {
         val f = fixture()
 
         f.seeder.seedIfMissing()
 
-        val expectedKeys = listOf(
-            "companionship", "friendship", "emotional_support", "general_chat",
-            "flirting", "romantic_conversation", "relationship_building", "relationship_discussion",
-            "dating", "playful_teasing", "romantic_intimacy", "foreplay",
-        )
+        val expectedKeys = BaselineConfiguration.SKILLS.map { it.key }
         val all = f.skills.findAll()
-        assertEquals(12, all.size)
+        assertEquals(expectedKeys.size, all.size)
         assertEquals(expectedKeys.toSet(), all.map { it.key }.toSet())
         assertTrue(all.all { it.status == "draft" }, "Skills must seed as draft — activation is an explicit configuration action")
         assertTrue(all.none { it.isActive }, "No skill may be auto-activated by seeding")
@@ -92,7 +88,7 @@ class BaselineSeederTest {
 
         assertEquals(afterFirst, Snapshot(f), "A second startup must not create a single new row")
         assertTrue(secondReport.skillsCreated.isEmpty())
-        assertEquals(12, secondReport.skillsAlreadyPresent.size)
+        assertEquals(BaselineConfiguration.SKILLS.size, secondReport.skillsAlreadyPresent.size)
     }
 
     @Test
@@ -102,7 +98,7 @@ class BaselineSeederTest {
 
         assertEquals(1, f.engines.findAll().size)
         assertEquals(1, f.memoryEngines.findAll().size)
-        assertEquals(12, f.skills.findAll().size)
+        assertEquals(BaselineConfiguration.SKILLS.size, f.skills.findAll().size)
         assertEquals(1, f.personas.findAll().count { it.slug == BaselineConfiguration.SIMRAN_SLUG })
     }
 

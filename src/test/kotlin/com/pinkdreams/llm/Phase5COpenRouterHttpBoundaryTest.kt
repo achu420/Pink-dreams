@@ -71,7 +71,7 @@ class Phase5COpenRouterHttpBoundaryTest {
             }
 
             assertTrue(!capturedBody.isNullOrEmpty())
-            assertTrue(capturedBody!!.contains("\"model\":\"deepseek/deepseek-v4.1-flash\""))
+            assertTrue(capturedBody!!.contains("\"model\":\"deepseek/deepseek-v4-flash-0731\""))
             assertTrue(capturedBody!!.contains("\"stream\":false"))
             assertTrue(capturedBody!!.contains("\"max_tokens\":1024"))
         } finally {
