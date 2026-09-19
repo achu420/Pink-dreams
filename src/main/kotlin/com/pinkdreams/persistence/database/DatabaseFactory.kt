@@ -24,8 +24,14 @@ object DatabaseFactory {
         try {
             initializeSchema(db)
         } catch (e: Exception) {
-            // Schema might already exist or initialization might have failed
-            // Continue anyway as the application will fail later if tables don't exist
+            // Schema might already exist or initialization might have failed.
+            // Continue anyway (the application will fail later if tables/columns
+            // are actually missing), but this must never fail silently — an
+            // exception here means the running schema can now diverge from what
+            // the code expects (e.g. a new column silently never gets added),
+            // which otherwise only surfaces later as a confusing, unrelated 500.
+            System.err.println("DATABASE_SCHEMA_INIT: createMissingTablesAndColumns failed, continuing with existing schema: ${e.message}")
+            e.printStackTrace()
         }
         return db
     }
@@ -39,7 +45,12 @@ object DatabaseFactory {
 
     fun initializeSchema(db: Database) = transaction(db) {
         SchemaUtils.createMissingTablesAndColumns(
+            Users,
             ConversationEngines,
+            Skills,
+            MemoryEngines,
+            IntentEngines,
+            AiSettings,
             PersonaIdentity,
             PersonaVisualVersions,
             PersonaVisualWardrobeItems,
@@ -50,12 +61,25 @@ object DatabaseFactory {
             PersonaCoreVersions,
             UserProfiles,
             MemoryFacts,
+            SensitivePreferences,
             Entitlements,
             Conversations,
             Messages,
             ChatRequestExecutions,
         )
     }
+}
+
+// Owned by the partner's auth system in production (see CLAUDE.md); this is a
+// read-only reference to the existing table (id UUID PRIMARY KEY), used only to
+// check whether an authenticated user id is real before creating a conversation
+// for it. No FK constraint is added elsewhere in this schema for that column —
+// doing so would require every existing test/fixture across the codebase to
+// pre-register a user row, which is out of scope for this fix.
+object Users : Table("users") {
+    val id = uuid("id")
+
+    override val primaryKey = PrimaryKey(id)
 }
 
 object ConversationEngines : Table("conversation_engines") {
@@ -69,6 +93,92 @@ object ConversationEngines : Table("conversation_engines") {
     val createdAt = datetime("created_at")
 
     override val primaryKey = PrimaryKey(id)
+}
+
+// Phase D — Memory Engine: an independently-versioned prompt/configuration
+// controlling memory-maintenance LLM behavior, structurally identical to
+// ConversationEngines (single global active row) — a different concern
+// (memory maintenance vs. universal conversational rules), never merged.
+object MemoryEngines : Table("memory_engines") {
+    val id = uuid("id")
+    val version = integer("version").uniqueIndex()
+    val content = text("content")
+    val status = text("status").default("draft")
+    val isActive = bool("is_active").default(false)
+    val changelogNote = text("changelog_note").nullable()
+    val createdBy = text("created_by").nullable()
+    val createdAt = datetime("created_at")
+    // Operational configuration travels WITH the versioned engine rather than
+    // living in free-form prompt text or as scattered constants: activating a
+    // Memory Engine version activates its batch/target settings atomically.
+    // Defaults match the documented baseline (10 / 20). RELEVANT_MEMORY_TARGET
+    // is a target the engine aims for, never a hard cap enforced in SQL.
+    val batchSize = integer("batch_size").default(10)
+    val relevantMemoryTarget = integer("relevant_memory_target").default(20)
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+// Phase ADMIN-2 — Intent Engine: the versioned prompt/configuration that
+// governs how the current interaction intent is identified (which Skill is
+// selected). Structurally identical to MemoryEngines/ConversationEngines
+// (single global active row). It is a CONTROL-PLANE prompt: it is never
+// injected into response generation, and it never contains the skill
+// catalogue — the active candidate keys are supplied by the runtime.
+object IntentEngines : Table("intent_engines") {
+    val id = uuid("id")
+    val version = integer("version").uniqueIndex()
+    val content = text("content")
+    val status = text("status").default("draft")
+    val isActive = bool("is_active").default(false)
+    val changelogNote = text("changelog_note").nullable()
+    val createdBy = text("created_by").nullable()
+    val createdAt = datetime("created_at")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+// Phase ADMIN-2 — AI runtime settings. Deliberately a SINGLE-ROW table
+// (SINGLETON_ID) rather than a versioned entity: unlike the engines, these are
+// not reviewed-and-promoted prompt content but live operational knobs, and the
+// existing lifecycle (draft/publish/activate) would add ceremony without
+// meaning. Every column is NULLABLE on purpose — null means "not configured
+// here", which falls through to the environment variable and then the
+// application default, so an empty table reproduces today's behavior exactly.
+object AiSettings : Table("ai_settings") {
+    val id = uuid("id")
+    val model = text("model").nullable()
+    val temperature = double("temperature").nullable()
+    val maxOutputTokens = integer("max_output_tokens").nullable()
+    val updatedAt = datetime("updated_at")
+    val updatedBy = text("updated_by").nullable()
+
+    override val primaryKey = PrimaryKey(id)
+
+    /** The one and only row. Fixed so the table can never grow a second. */
+    val SINGLETON_ID: UUID = UUID.fromString("00000000-0000-0000-0000-00000000a151")
+}
+
+// Phase B — Skill Foundation. Unlike ConversationEngines (one global active
+// row), Skills are versioned PER KEY: multiple distinct keys (e.g. "flirting",
+// "friendship") can each independently have their own active version at the
+// same time. Uniqueness is therefore (key, version), not version alone.
+object Skills : Table("skills") {
+    val id = uuid("id")
+    val key = text("key")
+    val version = integer("version")
+    val content = text("content")
+    val status = text("status").default("draft")
+    val isActive = bool("is_active").default(false)
+    val changelogNote = text("changelog_note").nullable()
+    val author = text("author").nullable()
+    val createdAt = datetime("created_at")
+
+    override val primaryKey = PrimaryKey(id)
+
+    init {
+        uniqueIndex(key, version)
+    }
 }
 
 object PersonaIdentity : Table("persona_identity") {
@@ -179,6 +289,19 @@ object Personas : Table("personas") {
     val orientation = varchar("orientation", 50)
     val apparentAge = integer("apparent_age")
     val languageProfile = text("language_profile").default("{}")
+    // Phase ADMIN-2 — persona PROFILE metadata: descriptive information about
+    // the persona, deliberately separate from the Persona Core (which defines
+    // who the character is and how she behaves) and never injected as prompt
+    // text by these columns alone. gender/orientation/apparentAge already exist
+    // above and are NOT duplicated here.
+    val bio = text("bio").nullable()
+    val city = varchar("city", 255).nullable()
+    val occupation = varchar("occupation", 255).nullable()
+    val interests = text("interests").nullable()
+    // Stored as a JSON array of strings in one column rather than a join table:
+    // tags are a small, display-oriented, wholly-replaced list, and a linked
+    // table would add a repository and lifecycle for no query we actually make.
+    val tags = text("tags").default("[]")
     val activeCoreVersionId = uuid("active_core_version_id").nullable()
     val personaIdentityId = uuid("persona_identity_id").nullable()
     val createdAt = datetime("created_at")
@@ -198,6 +321,14 @@ object PersonaCoreVersions : Table("persona_core_versions") {
     val createdAt = datetime("created_at")
 
     override val primaryKey = PrimaryKey(id)
+
+    init {
+        // Server-computed version numbers (PersonaCoreVersionRepository.createNextVersion)
+        // rely on this as the safety net under concurrent creation — see that method's
+        // retry-on-conflict handling. Mirrors the existing composite-unique pattern
+        // already used by ImageJobs (personaVisualVersionId, idempotencyKey).
+        uniqueIndex(personaId, version)
+    }
 }
 
 object UserProfiles : Table("user_profiles") {
@@ -205,6 +336,12 @@ object UserProfiles : Table("user_profiles") {
     val displayName = varchar("display_name", 255).nullable()
     val preferredLanguage = varchar("preferred_language", 50).nullable()
     val communicationStyle = varchar("communication_style", 255).nullable()
+    // Added for Admin Console Phase 2A (test-user creation). Free text.
+    val gender = varchar("gender", 50).nullable()
+    // Attraction/preference, NOT gender. Closed set enforced in UserProfileRepository: male/female/both.
+    val interest = varchar("interest", 10).nullable()
+    val city = varchar("city", 255).nullable()
+    val age = integer("age").nullable()
     val updatedAt = datetime("updated_at")
 
     override val primaryKey = PrimaryKey(userId)
@@ -215,15 +352,73 @@ object MemoryFacts : Table("memory_facts") {
     val userId = uuid("user_id")
     val personaId = uuid("persona_id")
     val fact = text("fact")
-    val factType = varchar("fact_type", 30)
-    val criticality = varchar("criticality", 20).default("medium")
-    val criticalityRank = short("criticality_rank").nullable()
-    val tier = varchar("tier", 10).default("hot")
-    val status = varchar("status", 20).default("open")
-    val factSource = varchar("source", 20).default("llm_extracted")
+    // These five columns are TEXT (not VARCHAR) in the real production schema —
+    // deliberately matched exactly here, not merely "close enough". A VARCHAR(N)
+    // declaration that doesn't match the live column's actual type makes Exposed's
+    // schema-diff believe a migration is needed and issue `ALTER COLUMN ... TYPE
+    // VARCHAR(N)` on every startup. For `criticality` specifically this ALTER
+    // fails outright — Postgres refuses to retype a column that a GENERATED
+    // column (`criticality_rank`, computed from `criticality`) depends on — and
+    // because the entire createMissingTablesAndColumns() call runs inside one
+    // transaction, that single failure rolled back every other pending schema
+    // change in the same run (including, historically, the UserProfiles
+    // gender/interest/city/age columns never actually landing in production).
+    val factType = text("fact_type")
+    val criticality = text("criticality").default("medium")
+    // Deliberately NOT declared here: `criticality_rank` is a Postgres
+    // GENERATED ALWAYS AS (...) STORED column in production, computed from
+    // `criticality`. Exposed has no concept of generated columns — declaring it
+    // as a normal nullable column makes the schema-diff issue a plain `ALTER
+    // COLUMN ... TYPE / DROP DEFAULT`, which Postgres always rejects for a
+    // generated column. The app never needs to manage this column: it's
+    // read-only, MemoryFactRepository never writes it, and MemoryService.rank()
+    // already computes the identical mapping in Kotlin whenever it's absent.
+    val tier = text("tier").default("hot")
+    // "open" | "resolved" | "superseded" | "removed" — no enforced DB constraint
+    // (there never was one for this column); "superseded"/"removed" are new
+    // values introduced for Phase D's Memory Engine write path, additive only.
+    val status = text("status").default("open")
+    val factSource = text("source").default("llm_extracted")
     val learnedAt = datetime("learned_at")
     val lastReferencedAt = datetime("last_referenced_at").nullable()
     val evictedAt = datetime("evicted_at").nullable()
+    // Phase D additions — all TEXT/nullable-with-default so an existing
+    // production memory_facts table (which predates this column set, see the
+    // criticality/criticality_rank note above) gets these ADDED via a plain
+    // ADD COLUMN, never an ALTER COLUMN TYPE that could hit the same
+    // generated-column class of failure.
+    // "USER" | "PERSONA" — see MemoryService.OWNERS. Defaults to "USER" so
+    // every pre-Phase-D row is unambiguously owned by the user, unchanged.
+    val owner = text("owner").default("USER")
+    val supersedesId = uuid("supersedes_id").nullable()
+    val updatedAt = datetime("updated_at").nullable()
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+// Deliberately separate from MemoryFacts: sensitive/intimacy preferences need a
+// clear semantic boundary (explicit-only writes, preference-vs-boundary-vs-history
+// typing, easy selective/relevance-gated retrieval) that would otherwise mean
+// overloading MemoryFacts' generic fact_type/tier machinery for a category of
+// data that must never be silently inferred or mixed into ordinary memory.
+object SensitivePreferences : Table("sensitive_preferences") {
+    val id = uuid("id")
+    val userId = uuid("user_id")
+    val personaId = uuid("persona_id")
+    // "romantic" | "intimacy" | "sexual" — see SensitivePreferenceRepository.CATEGORIES.
+    val category = varchar("category", 20)
+    // "preference" | "boundary" | "history" — see SensitivePreferenceRepository.TYPES.
+    val preferenceType = varchar("preference_type", 20)
+    val content = text("content")
+    // "explicit" | "inferred" — see SensitivePreferenceRepository.PROVENANCES. Only
+    // "explicit" is ever written by any current code path (see Phase 4B report).
+    val provenance = varchar("provenance", 10)
+    val preferenceSource = varchar("source", 20).default("user_stated")
+    // "active" | "superseded" | "deleted"
+    val status = varchar("status", 20).default("active")
+    val supersedesId = uuid("supersedes_id").nullable()
+    val createdAt = datetime("created_at")
+    val updatedAt = datetime("updated_at")
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -246,6 +441,48 @@ object Conversations : Table("conversations") {
     val state = varchar("state", 20).default("active")
     val lastMessageAt = datetime("last_message_at").nullable()
     val createdAt = datetime("created_at")
+    // Compact, bounded rolling summary of conversation content that has scrolled
+    // outside the active recent-message window (see RepositoryContextAssembler's
+    // message limit). Null/blank until a conversation actually exceeds that window.
+    val continuitySummary = text("continuity_summary").nullable()
+    // Count of messages (from the start of the conversation, chronological) already
+    // folded into continuitySummary — lets continuity generation pick up exactly
+    // where it left off instead of re-processing or duplicating prior content.
+    val continuitySummaryCoveredCount = integer("continuity_summary_covered_count").default(0)
+    // Phase D — Memory Engine batch cursor. Count of messages (from the start
+    // of the conversation, chronological) already included in a completed
+    // Memory Engine maintenance batch. Mirrors continuitySummaryCoveredCount's
+    // exact pattern/purpose but is an independent cursor — the chat context's
+    // "last 10 messages" and the Memory Engine's "next unprocessed batch" are
+    // different concepts and must not share a cursor.
+    val memoryEngineProcessedCount = integer("memory_engine_processed_count").default(0)
+
+    // Phase ADMIN-3 — Test/Production execution mode + configuration snapshot.
+    // "PRODUCTION" (the default, so every pre-existing row and every row created
+    // by the normal /v1/conversations API is unaffected) or "TEST". A TEST
+    // conversation carries its own immutable snapshot of exactly which versions
+    // were used, so it keeps working identically even after production activates
+    // different versions later. All snapshot columns are nullable and meaningful
+    // ONLY when executionMode == "TEST" — a PRODUCTION conversation always
+    // resolves the currently active version of everything, exactly as before
+    // this phase.
+    val executionMode = varchar("execution_mode", 20).default("PRODUCTION")
+    val snapshotConversationEngineVersion = integer("snapshot_conversation_engine_version").nullable()
+    val snapshotPersonaCoreVersion = integer("snapshot_persona_core_version").nullable()
+    val snapshotIntentEngineVersion = integer("snapshot_intent_engine_version").nullable()
+    val snapshotMemoryEngineVersion = integer("snapshot_memory_engine_version").nullable()
+    // JSON object: skill key -> version, e.g. {"friendship":2,"flirting":4}. Only
+    // the skills named here are candidates for the test conversation's Intent
+    // Engine — never the full historical catalogue.
+    val snapshotSkillVersionsJson = text("snapshot_skill_versions_json").nullable()
+    // A real, hidden Personas row created for this TEST conversation alone —
+    // required because memory_facts.persona_id carries a real foreign key to
+    // personas(id) on PostgreSQL; a merely-derived UUID fails that constraint.
+    // See MemoryScopeResolver.TestMemoryScope.
+    val snapshotMemoryScopePersonaId = uuid("snapshot_memory_scope_persona_id").nullable()
+    val snapshotModel = text("snapshot_model").nullable()
+    val snapshotTemperature = double("snapshot_temperature").nullable()
+    val snapshotMaxOutputTokens = integer("snapshot_max_output_tokens").nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

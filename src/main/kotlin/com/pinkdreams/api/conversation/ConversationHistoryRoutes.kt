@@ -6,6 +6,7 @@ import com.pinkdreams.common.errors.ErrorCode
 import com.pinkdreams.common.errors.ErrorResponse
 import com.pinkdreams.persistence.repositories.ConversationRepository
 import com.pinkdreams.persistence.repositories.MessageRepository
+import com.pinkdreams.persistence.repositories.UserRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.auth.UserIdPrincipal
@@ -71,6 +72,7 @@ class ConversationHistoryRoutes(
     private val conversationRepository: ConversationRepository,
     private val messageRepository: MessageRepository,
     private val adminAuth: AdminAuthorizationProvider = AdminAuthorizationProvider(),
+    private val userRepository: UserRepository? = null,
 ) {
     companion object {
         private const val DEFAULT_LIMIT = 20
@@ -107,6 +109,14 @@ class ConversationHistoryRoutes(
                     call.respond(
                         HttpStatusCode.BadRequest,
                         ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid persona ID format", null)),
+                    )
+                    return@post
+                }
+
+                if (userRepository != null && !userRepository.exists(authenticatedUserId)) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, "Authenticated user does not exist", null)),
                     )
                     return@post
                 }
@@ -156,7 +166,24 @@ class ConversationHistoryRoutes(
                     return@get
                 }
 
-                val conversations = conversationRepository.findAllForUser(authenticatedUserId, limit, offset)
+                // Optional filter so a caller (e.g. the admin console, authenticated
+                // directly as the selected test user — see AdminAuthorizationProvider
+                // conventions) can find an existing user+persona conversation before
+                // deciding whether to create a new one. Always scoped to the
+                // authenticated principal; never a client-supplied user ID.
+                val personaId = call.request.queryParameters["personaId"]?.let {
+                    try {
+                        UUID.fromString(it)
+                    } catch (e: Exception) {
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid persona ID format", null)),
+                        )
+                        return@get
+                    }
+                }
+
+                val conversations = conversationRepository.findAllForUser(authenticatedUserId, limit, offset, personaId)
                 val response = ConversationListResponse(
                     conversations = conversations.map { conv ->
                         ConversationListItemResponse(

@@ -58,7 +58,7 @@ class Phase7BSecurityAuditTest {
     fun `GET conversations list - unauthenticated request returns 401`() = testApplication {
         val db = DatabaseFactory.connectInMemory()
         val mockConversationRepo = object : ConversationRepository(db) {
-            override fun findAllForUser(userId: UUID, limit: Int, offset: Int): List<Conversation> = emptyList()
+            override fun findAllForUser(userId: UUID, limit: Int, offset: Int, personaId: UUID?): List<Conversation> = emptyList()
         }
 
         application {
@@ -210,7 +210,7 @@ class Phase7BSecurityAuditTest {
         val db = DatabaseFactory.connectInMemory()
 
         val mockConversationRepo = object : ConversationRepository(db) {
-            override fun findAllForUser(userId: UUID, limit: Int, offset: Int): List<Conversation> {
+            override fun findAllForUser(userId: UUID, limit: Int, offset: Int, personaId: UUID?): List<Conversation> {
                 return if (userId == userA) {
                     listOf(Conversation(convA, userA, UUID.randomUUID(), "active", null, now))
                 } else if (userId == userB) {

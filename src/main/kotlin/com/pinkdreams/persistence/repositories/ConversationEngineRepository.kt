@@ -2,6 +2,7 @@ package com.pinkdreams.persistence.repositories
 
 import com.pinkdreams.persistence.database.ConversationEngines
 import com.pinkdreams.persistence.database.defaultNow
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -44,6 +45,35 @@ open class ConversationEngineRepository(private val db: Database) {
         findById(id)!!
     }
 
+    // Version number is always server-computed (global current max version + 1)
+    // — the client cannot supply or influence it. There is no separate "engine
+    // identity" column: each row is itself a complete versioned engine, so the
+    // next version is the global maximum across all rows, not scoped per parent.
+    fun createNextVersion(
+        content: String,
+        status: String = "draft",
+        changelogNote: String? = null,
+        createdBy: String? = null,
+        maxRetries: Int = 5,
+    ): ConversationEngine {
+        var attempt = 0
+        while (true) {
+            attempt++
+            val nextVersion = nextVersionNumber()
+            try {
+                return create(version = nextVersion, content = content, status = status, changelogNote = changelogNote, createdBy = createdBy)
+            } catch (e: ExposedSQLException) {
+                if (attempt >= maxRetries) {
+                    throw IllegalStateException("Failed to allocate a unique engine version number after $maxRetries attempts", e)
+                }
+            }
+        }
+    }
+
+    private fun nextVersionNumber(): Int = transaction(db) {
+        (ConversationEngines.selectAll().maxOfOrNull { it[ConversationEngines.version] } ?: 0) + 1
+    }
+
     fun findById(id: UUID): ConversationEngine? = transaction(db) {
         ConversationEngines.select { ConversationEngines.id eq id }
             .map(::rowToModel)
@@ -56,7 +86,7 @@ open class ConversationEngineRepository(private val db: Database) {
             .singleOrNull()
     }
 
-    fun getActiveEngine(): ConversationEngine? = transaction(db) {
+    open fun getActiveEngine(): ConversationEngine? = transaction(db) {
         ConversationEngines.select { ConversationEngines.isActive eq true }
             .map(::rowToModel)
             .singleOrNull()

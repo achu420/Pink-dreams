@@ -3,8 +3,10 @@ package com.pinkdreams.persistence.repositories
 import com.pinkdreams.persistence.database.Personas
 import com.pinkdreams.persistence.database.defaultNow
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.jetbrains.exposed.sql.Database
@@ -28,6 +30,13 @@ open class PersonaRepository(private val db: Database) {
         val languageProfile: Map<String, String>,
         val activeCoreVersionId: UUID?,
         val status: String,
+        // Phase ADMIN-2 — PROFILE metadata (what describes this persona),
+        // distinct from the Persona Core (who she is and how she behaves).
+        val bio: String? = null,
+        val city: String? = null,
+        val occupation: String? = null,
+        val interests: String? = null,
+        val tags: List<String> = emptyList(),
     )
 
     fun create(
@@ -70,7 +79,7 @@ open class PersonaRepository(private val db: Database) {
             .map(::rowToModel)
     }
 
-    fun getActiveCoreVersion(personaId: UUID): PersonaCoreVersionRepository.PersonaCoreVersion? = transaction(db) {
+    open fun getActiveCoreVersion(personaId: UUID): PersonaCoreVersionRepository.PersonaCoreVersion? = transaction(db) {
         val persona = findById(personaId) ?: throw IllegalArgumentException("Persona not found: $personaId")
         val activeVersionId = persona.activeCoreVersionId ?: return@transaction null
         val versionRepo = PersonaCoreVersionRepository(db)
@@ -91,19 +100,35 @@ open class PersonaRepository(private val db: Database) {
         }
     }
 
+    /**
+     * Partial update: a null argument means "leave unchanged", matching the
+     * pre-existing behavior of this method. To CLEAR a profile field, pass an
+     * empty string (or an empty list for tags) — that is stored as null, which
+     * keeps "unchanged" and "cleared" distinguishable over a PATCH API.
+     */
     fun update(
         id: UUID,
         displayName: String? = null,
         gender: String? = null,
         orientation: String? = null,
         apparentAge: Int? = null,
+        bio: String? = null,
+        city: String? = null,
+        occupation: String? = null,
+        interests: String? = null,
+        tags: List<String>? = null,
     ): Persona = transaction(db) {
-        val persona = findById(id) ?: throw IllegalArgumentException("Persona not found: $id")
+        findById(id) ?: throw IllegalArgumentException("Persona not found: $id")
         Personas.update({ Personas.id eq id }) {
             if (displayName != null) it[Personas.displayName] = displayName
             if (gender != null) it[Personas.gender] = gender
             if (orientation != null) it[Personas.orientation] = orientation
             if (apparentAge != null) it[Personas.apparentAge] = apparentAge
+            if (bio != null) it[Personas.bio] = bio.ifBlank { null }
+            if (city != null) it[Personas.city] = city.ifBlank { null }
+            if (occupation != null) it[Personas.occupation] = occupation.ifBlank { null }
+            if (interests != null) it[Personas.interests] = interests.ifBlank { null }
+            if (tags != null) it[Personas.tags] = encodeTags(tags)
             it[Personas.updatedAt] = defaultNow()
         }
         findById(id) ?: throw IllegalStateException("Failed to reload persona $id")
@@ -128,7 +153,24 @@ open class PersonaRepository(private val db: Database) {
         languageProfile = parseLanguageProfile(row[Personas.languageProfile]),
         activeCoreVersionId = row[Personas.activeCoreVersionId],
         status = row[Personas.status],
+        bio = row[Personas.bio],
+        city = row[Personas.city],
+        occupation = row[Personas.occupation],
+        interests = row[Personas.interests],
+        tags = parseTags(row[Personas.tags]),
     )
+
+    private fun encodeTags(tags: List<String>): String = JsonArray(
+        tags.map { it.trim() }.filter { it.isNotEmpty() }.distinct().map(::JsonPrimitive),
+    ).toString()
+
+    private fun parseTags(raw: String): List<String> = try {
+        Json.parseToJsonElement(raw).jsonArray.map { it.jsonPrimitive.content }
+    } catch (e: Exception) {
+        // Same tolerance as parseLanguageProfile: malformed stored JSON degrades
+        // to "no tags" rather than breaking every persona read.
+        emptyList()
+    }
 
     private fun parseLanguageProfile(raw: String): Map<String, String> = try {
         Json.parseToJsonElement(raw).jsonObject

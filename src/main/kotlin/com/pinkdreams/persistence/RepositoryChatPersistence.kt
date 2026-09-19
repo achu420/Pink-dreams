@@ -43,6 +43,9 @@ class RepositoryChatPersistence(
                 put("lvm_response_metadata", buildJsonObject {
                     diag.llmResponseMetadata?.forEach { (k, v) -> put(k, v) }
                 }.toString())
+                put("lvm_provider_exchange", buildJsonObject {
+                    diag.providerExchange?.forEach { (k, v) -> put(k, v) }
+                }.toString())
             }
         }.toString()
     }
@@ -79,7 +82,14 @@ class RepositoryChatPersistence(
                     throw e
                 }
 
-                val timestamp = defaultNow()
+                // The user message must sort strictly before its assistant reply when
+                // retrieved later (findForConversation orders by createdAt then id, and
+                // id is a random UUID — sharing one timestamp between the two rows would
+                // make their relative order a coin flip on the UUID tiebreak). Giving the
+                // assistant row a timestamp a moment later guarantees deterministic,
+                // causally-correct ordering regardless of UUID value.
+                val userTimestamp = defaultNow()
+                val assistantTimestamp = userTimestamp.plusNanos(1000)
                 val userMessageId = UUID.randomUUID()
                 try {
                     Messages.insert {
@@ -90,7 +100,7 @@ class RepositoryChatPersistence(
                         it[Messages.clientMessageId] = request.clientMessageId
                         it[Messages.requestId] = request.requestId
                         it[Messages.metadata] = "{}"
-                        it[Messages.createdAt] = timestamp
+                        it[Messages.createdAt] = userTimestamp
                     }
                 } catch (e: Exception) {
                     System.err.println("PERSIST: User message insert failed: ${e.message}")
@@ -109,7 +119,7 @@ class RepositoryChatPersistence(
                         it[Messages.personaCoreVersionId] = personaCoreVersionId
                         it[Messages.requestId] = request.requestId
                         it[Messages.metadata] = metadataJson
-                        it[Messages.createdAt] = timestamp
+                        it[Messages.createdAt] = assistantTimestamp
                         // Note: clientMessageId must NOT be set for assistant messages per schema constraint
                     }
                 } catch (e: Exception) {
@@ -119,7 +129,7 @@ class RepositoryChatPersistence(
 
                 try {
                     Conversations.update({ Conversations.id eq request.conversationId }) {
-                        it[Conversations.lastMessageAt] = timestamp
+                        it[Conversations.lastMessageAt] = assistantTimestamp
                     }
                 } catch (e: Exception) {
                     System.err.println("PERSIST: Conversation update failed: ${e.message}")
@@ -133,7 +143,7 @@ class RepositoryChatPersistence(
                     }) {
                         it[ChatRequestExecutions.status] = "completed"
                         it[ChatRequestExecutions.assistantMessageId] = assistantMessageId
-                        it[ChatRequestExecutions.completedAt] = timestamp
+                        it[ChatRequestExecutions.completedAt] = assistantTimestamp
                         it[ChatRequestExecutions.errorCode] = null
                     }
                 } catch (e: Exception) {

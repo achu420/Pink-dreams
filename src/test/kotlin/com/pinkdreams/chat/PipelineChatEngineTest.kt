@@ -51,6 +51,7 @@ class PipelineChatEngineTest {
                 PipelineStage.ENTITLEMENT_CHECK,
                 PipelineStage.INPUT_MODERATION,
                 PipelineStage.CONTEXT_ASSEMBLY,
+                PipelineStage.SKILL_SELECTION,
                 PipelineStage.GENERATION,
                 PipelineStage.OUTPUT_VALIDATION,
                 PipelineStage.PERSIST,

@@ -18,13 +18,30 @@ class MemoryService(private val repository: MemoryFactRepository) {
         const val DEFAULT_SELECTION_LIMIT = 10
         const val MAX_FACT_LENGTH = 240
 
-        val FACT_TYPES = setOf(
+        // Original (pre-Phase-D) taxonomy, unchanged — used for USER-owned
+        // memory extracted from ordinary conversation. "preference"-shaped
+        // content maps onto the existing "interest" type per the extraction
+        // prompt's own established convention; it is NOT a new type.
+        val USER_FACT_TYPES = setOf(
             "past_event", "future_event", "mindset", "weakness", "aspiration",
             "desire", "habit", "want", "interest",
         )
+        // Phase D additions — PERSONA-owned memory has no equivalent in the
+        // original taxonomy (it was never designed to represent what the
+        // persona itself said/promised), so these four are genuinely new.
+        val PERSONA_FACT_TYPES = setOf("relationship", "commitment", "promise", "interaction_context")
+        // Superset accepted by validation — additive only; every value ever
+        // valid before Phase D remains valid.
+        val FACT_TYPES = USER_FACT_TYPES + PERSONA_FACT_TYPES
         val CRITICALITIES = setOf("low", "medium", "high")
-        val SOURCES = setOf("llm_extracted", "manual")
+        val SOURCES = setOf("llm_extracted", "manual", "memory_engine")
         val TIERS = setOf("hot", "cold")
+        // "USER" | "PERSONA" — see MemoryFactRepository.MemoryFact.owner.
+        val OWNERS = setOf("USER", "PERSONA")
+        // Statuses that must never be selectable into any context — superseded
+        // history and removed facts remain in the table (never deleted) but are
+        // dead for retrieval purposes.
+        private val INACTIVE_STATUSES = setOf("superseded", "removed")
     }
 
     fun record(userId: UUID, personaId: UUID, candidates: List<MemoryCandidate>): List<MemoryFactRepository.MemoryFact> {
@@ -60,7 +77,28 @@ class MemoryService(private val repository: MemoryFactRepository) {
     ): List<MemoryFactRepository.MemoryFact> {
         require(limit >= 0) { "Selection limit cannot be negative" }
         return repository.findForRelationship(userId, personaId)
-            .filter { it.tier == "hot" }
+            .filter { it.tier == "hot" && it.status !in INACTIVE_STATUSES }
+            .sortedWith(selectionComparator())
+            .take(limit)
+    }
+
+    /**
+     * The Memory Engine's own "current working memory" input for a single
+     * owner (USER or PERSONA) — the same hot/active fact pool selectForContext
+     * draws from, filtered to one owner. This is a DERIVED view, not a
+     * separately persisted working-memory table (see Phase D completion
+     * report section on working-memory storage): tier="hot" + status not in
+     * {superseded, removed} already IS the working set.
+     */
+    fun selectWorkingSet(
+        userId: UUID,
+        personaId: UUID,
+        owner: String,
+        limit: Int = DEFAULT_SELECTION_LIMIT,
+    ): List<MemoryFactRepository.MemoryFact> {
+        require(owner in OWNERS) { "Invalid memory owner: $owner" }
+        return repository.findForRelationship(userId, personaId)
+            .filter { it.tier == "hot" && it.status !in INACTIVE_STATUSES && it.owner == owner }
             .sortedWith(selectionComparator())
             .take(limit)
     }

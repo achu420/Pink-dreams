@@ -20,7 +20,6 @@ import java.util.UUID
 
 @Serializable
 data class CreateEngineRequest(
-    val version: Int,
     val content: String,
     val changelogNote: String? = null,
 )
@@ -167,8 +166,9 @@ class AdminEngineRoutes(
                 }
 
                 try {
-                    val engine = engineRepository.create(
-                        version = request.version,
+                    // Version number is always server-computed (current global max
+                    // version + 1) — the client cannot supply or influence it.
+                    val engine = engineRepository.createNextVersion(
                         content = request.content,
                         changelogNote = request.changelogNote,
                         createdBy = principal.name,

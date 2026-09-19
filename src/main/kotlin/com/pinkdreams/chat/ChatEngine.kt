@@ -4,6 +4,11 @@ import com.pinkdreams.common.errors.ErrorCode
 import com.pinkdreams.chat.memory.CompletedTurn
 import com.pinkdreams.chat.memory.NoopPostDeliveryMemoryExtraction
 import com.pinkdreams.chat.memory.PostDeliveryMemoryExtraction
+import com.pinkdreams.chat.memory.SkillAwareMemoryEnricher
+import com.pinkdreams.chat.skill.IntentDiscovery
+import com.pinkdreams.chat.skill.NoopIntentDiscovery
+import com.pinkdreams.chat.skill.SkillContextEnricher
+import com.pinkdreams.chat.skill.SkillSelection
 import java.util.UUID
 
 data class ChatRequest(
@@ -20,6 +25,7 @@ enum class PipelineStage {
     ENTITLEMENT_CHECK,
     INPUT_MODERATION,
     CONTEXT_ASSEMBLY,
+    SKILL_SELECTION,
     GENERATION,
     OUTPUT_VALIDATION,
     REGENERATE,
@@ -65,6 +71,12 @@ data class LlmExecutionDiagnostics(
     val contextBlocks: List<ContextBlock>?,
     val generationConfig: Map<String, String>?,
     val llmResponseMetadata: Map<String, String>?,
+    // Flattened, provider-agnostic view of the actual HTTP exchange with the LLM
+    // provider (method/endpoint/model/headers/body for request and response).
+    // Populated by the LlmClient implementation via LlmResponse.providerExchange;
+    // this type deliberately stays a plain Map so the chat core never depends on
+    // any provider-specific (e.g. OpenRouter) type.
+    val providerExchange: Map<String, String>? = null,
 )
 
 data class GenerationResponse(
@@ -167,6 +179,16 @@ class PipelineChatEngine(
     private val delivery: ChatDelivery,
     private val executionCoordinator: ChatExecutionCoordinator = NoopChatExecutionCoordinator,
     private val postDeliveryMemoryExtraction: PostDeliveryMemoryExtraction = NoopPostDeliveryMemoryExtraction,
+    // Phase B — Skill Foundation. Both default to no-ops so every pre-existing
+    // caller/test is unaffected: with the defaults, skill selection always
+    // resolves to None and the context passed to generation is byte-identical
+    // to before this stage existed.
+    private val intentDiscovery: IntentDiscovery = NoopIntentDiscovery,
+    private val skillContextEnricher: SkillContextEnricher? = null,
+    // Phase C — Memory + Skill Integration. Null by default so every pre-Phase-C
+    // caller/test is unaffected: with no enricher configured, the memory block
+    // stays exactly what RepositoryContextAssembler already built.
+    private val memoryContextEnricher: SkillAwareMemoryEnricher? = null,
 ) : ChatEngine {
     override fun process(request: ChatRequest): ChatResult {
         val state = PipelineState(PipelineStage.RECEIVED, listOf(PipelineStage.RECEIVED))
@@ -196,11 +218,64 @@ class PipelineChatEngine(
         }
         val afterContext = afterModeration.advance(PipelineStage.CONTEXT_ASSEMBLY)
 
-        val generated = when (val result = generator.generate(request, context)) {
-            is StageResult.Failed -> return failure(request, result.code, afterContext, PipelineStage.GENERATION)
+        // Skill selection is a distinct, best-effort stage: any failure here
+        // (LLM timeout/exception, invalid output, unknown/inactive key, repository
+        // failure) must never block or alter normal chat delivery — it degrades to
+        // "no skill selected" and generation proceeds against the assembled
+        // context unchanged.
+        val skillSelection = try {
+            val selection = intentDiscovery.selectSkill(request, context)
+            when (selection) {
+                is SkillSelection.Selected ->
+                    System.err.println("SKILL_SELECTION: selected='${selection.skillKey}' conversation=${request.conversationId} requestId=${request.requestId}")
+                SkillSelection.None ->
+                    System.err.println("SKILL_SELECTION: none conversation=${request.conversationId} requestId=${request.requestId}")
+            }
+            selection
+        } catch (e: Exception) {
+            // Never log message/skill content here — only that a failure occurred.
+            System.err.println("SKILL_SELECTION: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
+            SkillSelection.None
+        }
+
+        // Phase C — skill-aware memory context selection runs strictly after skill
+        // selection (it uses the selected skill as one relevance signal) and
+        // strictly before skill context injection. Failure here is independent of
+        // skill-selection failure/success: memory selection must work even when
+        // skill selection failed or returned None (Phase C section 18/19), and it
+        // must never turn into a hard dependency for successful generation — any
+        // exception here silently keeps the context UNCHANGED, i.e. the
+        // assembler's own already-correct, skill-agnostic top-N memory block,
+        // which is the existing/original MemoryService selection.
+        val memoryEnrichedContext = try {
+            val enriched = memoryContextEnricher?.enrich(context, request, skillSelection) ?: context
+            System.err.println(
+                "MEMORY_CONTEXT_SELECTION: ${if (memoryContextEnricher != null) "applied" else "skipped (not configured)"} " +
+                    "conversation=${request.conversationId} requestId=${request.requestId}",
+            )
+            enriched
+        } catch (e: Exception) {
+            System.err.println("MEMORY_CONTEXT_SELECTION: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
+            context
+        }
+
+        val skillEnrichedContext = try {
+            if (skillSelection is SkillSelection.Selected && skillContextEnricher != null) {
+                skillContextEnricher.enrich(memoryEnrichedContext, skillSelection)
+            } else {
+                memoryEnrichedContext
+            }
+        } catch (e: Exception) {
+            System.err.println("SKILL_CONTEXT_ENRICHMENT: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
+            memoryEnrichedContext
+        }
+        val afterSkillSelection = afterContext.advance(PipelineStage.SKILL_SELECTION)
+
+        val generated = when (val result = generator.generate(request, skillEnrichedContext)) {
+            is StageResult.Failed -> return failure(request, result.code, afterSkillSelection, PipelineStage.GENERATION)
             is StageResult.Succeeded -> result.value
         }
-        val afterGeneration = afterContext.advance(PipelineStage.GENERATION)
+        val afterGeneration = afterSkillSelection.advance(PipelineStage.GENERATION)
 
         val firstValidation = try {
             outputValidator.validate(request, generated)
@@ -214,7 +289,7 @@ class PipelineChatEngine(
             is ValidationDecision.Rejected -> {
                 val afterRegeneration = afterValidation.advance(PipelineStage.REGENERATE)
                 val afterRegenerationGeneration = afterRegeneration.advance(PipelineStage.GENERATION)
-                val regenerated = when (val result = generator.generate(request, context)) {
+                val regenerated = when (val result = generator.generate(request, skillEnrichedContext)) {
                     is StageResult.Failed -> return failure(request, result.code, afterRegeneration, PipelineStage.GENERATION)
                     is StageResult.Succeeded -> result.value
                 }

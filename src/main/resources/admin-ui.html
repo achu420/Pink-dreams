@@ -43,6 +43,7 @@
         <div class="tabs">
             <button class="tab-button active" onclick="switchTab('setup')">Setup</button>
             <button class="tab-button" onclick="switchTab('chat')">Chat</button>
+            <button class="tab-button" onclick="switchTab('testchat')">Test Chat</button>
         </div>
 
         <div id="setup" class="tab-content active">
@@ -107,25 +108,195 @@
                     <select id="personaSelect"></select>
                 </div>
                 <div class="form-group">
-                    <label>Version Number:</label>
-                    <input type="number" id="versionNum" placeholder="1" min="1">
-                </div>
-                <div class="form-group">
                     <label>Content (JSON):</label>
                     <textarea id="versionContent" placeholder='{"description": "A persona", "traits": []}'></textarea>
                 </div>
+                <div class="form-group">
+                    <label>Changelog Note (optional):</label>
+                    <input type="text" id="versionChangelogNote" placeholder="e.g., adjusted tone">
+                </div>
                 <button onclick="createVersion()">Create Draft</button>
+                <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server.</div>
                 <table id="versionsTable" style="margin-top: 20px;">
-                    <thead><tr><th>Version</th><th>Status</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Version</th><th>Status</th><th>Active</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
 
             <div class="section">
-                <h2>3. Select Engine</h2>
-                <button onclick="loadEngines()">Refresh Engines</button>
+                <h2>3. Create & Activate Conversation Engine Version</h2>
+                <div id="engineError"></div>
+                <div class="form-group">
+                    <label>Content:</label>
+                    <textarea id="engineContent" placeholder="Universal conversation engine rules..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Changelog Note (optional):</label>
+                    <input type="text" id="engineChangelogNote" placeholder="e.g., clarified boundary handling">
+                </div>
+                <button onclick="createEngineVersion()">Create Draft</button>
+                <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server.</div>
+                <button class="secondary" onclick="loadEngines()" style="margin-top: 10px;">Refresh Engines</button>
                 <table id="enginesTable" style="margin-top: 20px;">
-                    <thead><tr><th>Version</th><th>Status</th><th>Active</th></tr></thead>
+                    <thead><tr><th>Version</th><th>Status</th><th>Active</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>4. Skills</h2>
+                <div id="skillError"></div>
+                <div class="form-group">
+                    <label>Key (e.g. "flirting", "friendship"):</label>
+                    <input type="text" id="skillKey" placeholder="skill_key">
+                </div>
+                <div class="form-group">
+                    <label>Content:</label>
+                    <textarea id="skillContent" placeholder="PURPOSE:\n...\n\nBEHAVIOR:\n...\n\nDO NOT:\n..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Changelog Note (optional):</label>
+                    <input type="text" id="skillChangelogNote" placeholder="e.g., softened tone">
+                </div>
+                <button onclick="createSkillVersion()">Create Draft</button>
+                <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server, per key. Multiple keys can each have their own active version.</div>
+                <button class="secondary" onclick="loadSkills()" style="margin-top: 10px;">Refresh Skills</button>
+                <table id="skillsTable" style="margin-top: 20px;">
+                    <thead><tr><th>Key</th><th>Version</th><th>Status</th><th>Active</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>5. Memory Engine</h2>
+                <div id="memoryEngineError"></div>
+                <div class="form-group">
+                    <label>Memory Engine Prompt:</label>
+                    <textarea id="memoryEngineContent" placeholder="MEMORY ENGINE — UNIVERSAL MEMORY MAINTENANCE RULES..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Changelog Note (optional):</label>
+                    <input type="text" id="memoryEngineChangelogNote" placeholder="e.g., clarified persona-memory rules">
+                </div>
+                <div class="form-group">
+                    <label>Batch Size (messages per maintenance run):</label>
+                    <input type="number" id="memoryEngineBatchSize" value="10" min="1" max="100">
+                </div>
+                <div class="form-group">
+                    <label>Relevant-Memory Target (a target, not a hard cap):</label>
+                    <input type="number" id="memoryEngineRelevantTarget" value="20" min="1" max="200">
+                </div>
+                <button onclick="createMemoryEngineVersion()">Create Draft</button>
+                <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server.</div>
+                <button class="secondary" onclick="loadMemoryEngines()" style="margin-top: 10px;">Refresh Memory Engines</button>
+                <table id="memoryEnginesTable" style="margin-top: 20px;">
+                    <thead><tr><th>Version</th><th>Status</th><th>Active</th><th>Batch</th><th>Target</th><th>Author</th><th>Changelog</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>6. Intent Engine</h2>
+                <div id="intentEngineError"></div>
+                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                    Decides which Skill represents the user's current intent. It never generates a
+                    response and never selects memories. The candidate skill keys are supplied by the
+                    runtime from the currently active Skills — use
+                    <code>{{ACTIVE_SKILL_KEYS}}</code> in the prompt to place them.
+                </div>
+                <div class="form-group">
+                    <label>Currently selectable skill keys (from active Skills):</label>
+                    <div id="intentEngineCandidates" style="font-size: 12px; color: #333;">—</div>
+                </div>
+                <div class="form-group">
+                    <label>Intent Engine Prompt:</label>
+                    <textarea id="intentEngineContent" placeholder="You are the Intent Discovery component..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Changelog Note (optional):</label>
+                    <input type="text" id="intentEngineChangelogNote" placeholder="e.g., clarified overlap handling">
+                </div>
+                <button onclick="createIntentEngineVersion()">Create Draft</button>
+                <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server.</div>
+                <button class="secondary" onclick="loadIntentEngines()" style="margin-top: 10px;">Refresh Intent Engines</button>
+                <table id="intentEnginesTable" style="margin-top: 20px;">
+                    <thead><tr><th>Version</th><th>Status</th><th>Active</th><th>Author</th><th>Changelog</th><th>Actions</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>7. AI Runtime Settings</h2>
+                <div id="aiSettingsError"></div>
+                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                    Precedence: <b>database setting → environment variable → application default</b>.
+                    Leave a field blank to clear the override and fall back. These settings affect
+                    <b>every</b> generation, so applying them requires confirmation.
+                    Side-channel calls (memory extraction, intent discovery, memory maintenance) follow
+                    the model but keep their own measured token budgets.
+                </div>
+                <table id="aiSettingsCurrentTable">
+                    <thead><tr><th>Setting</th><th>Current value</th><th>Source</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+                <div style="font-size: 12px; color: #666; margin: 8px 0;" id="aiSettingsAudit"></div>
+                <div class="form-group">
+                    <label>Model (blank = use environment):</label>
+                    <input type="text" id="aiSettingsModel" placeholder="e.g. deepseek/deepseek-v4.1-flash">
+                </div>
+                <div class="form-group">
+                    <label>Temperature 0–2 (blank = provider default):</label>
+                    <input type="number" id="aiSettingsTemperature" step="0.1" min="0" max="2" placeholder="blank">
+                </div>
+                <div class="form-group">
+                    <label>Max Output Tokens (blank = use environment):</label>
+                    <input type="number" id="aiSettingsMaxTokens" min="1" max="32000" placeholder="blank">
+                </div>
+                <button onclick="saveAiSettings()">Apply to All Generation…</button>
+                <button class="secondary" onclick="loadAiSettings()" style="margin-left: 8px;">Refresh</button>
+            </div>
+
+            <div class="section">
+                <h2>8. AI Configuration Overview</h2>
+                <div id="aiOverviewError"></div>
+                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                    Exactly which AI configuration is currently running.
+                </div>
+                <button class="secondary" onclick="loadAiConfiguration()">Refresh Overview</button>
+                <div id="aiConfigurationOverview" style="margin-top: 12px;"></div>
+            </div>
+
+            <div class="section">
+                <h2>9. Create Test User</h2>
+                <div id="createUserError"></div>
+                <div class="form-group">
+                    <label>Display Name: *</label>
+                    <input type="text" id="newUserDisplayName" placeholder="e.g., Test Tara">
+                </div>
+                <div class="form-group">
+                    <label>Gender:</label>
+                    <input type="text" id="newUserGender" placeholder="e.g., female">
+                </div>
+                <div class="form-group">
+                    <label>Interest (attraction — male / female / both):</label>
+                    <select id="newUserInterest">
+                        <option value="">-- Not set --</option>
+                        <option value="male">male</option>
+                        <option value="female">female</option>
+                        <option value="both">both</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>City:</label>
+                    <input type="text" id="newUserCity" placeholder="e.g., Delhi">
+                </div>
+                <div class="form-group">
+                    <label>Age (18-120):</label>
+                    <input type="number" id="newUserAge" placeholder="28" min="18" max="120">
+                </div>
+                <button onclick="createTestUser()">Create User</button>
+                <table id="usersTable" style="margin-top: 20px;">
+                    <thead><tr><th>Display Name</th><th>Gender</th><th>Interest</th><th>City</th><th>Age</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -136,28 +307,51 @@
                 <h2>Chat Interface</h2>
                 <div id="chatError"></div>
                 <div class="form-group">
-                    <label>User ID (UUID):</label>
-                    <input type="text" id="chatUserId" placeholder="00000000-0000-0000-0000-000000000000">
+                    <label>User:</label>
+                    <select id="chatUserSelect" onchange="onChatUserSelected()">
+                        <option value="">-- Select User --</option>
+                    </select>
+                    <div id="noUsersHint" style="display: none; font-size: 12px; color: #666; margin-top: 6px;">
+                        No test users yet. Create one in the <a href="#" onclick="document.querySelector('.tab-button').click(); return false;">Setup tab</a> (section 6).
+                    </div>
                 </div>
+                <details style="margin-bottom: 15px;">
+                    <summary style="cursor: pointer; color: #666; font-size: 12px;">Advanced: enter raw user UUID</summary>
+                    <div class="form-group" style="margin-top: 8px;">
+                        <input type="text" id="chatUserIdRaw" placeholder="00000000-0000-0000-0000-000000000000" onchange="onRawUserIdEntered()">
+                    </div>
+                </details>
+
+                <div id="userProfilePanel" style="display: none; font-size: 12px; color: #444; background: #f0f0f0; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                    <strong id="profileDisplayName"></strong>
+                    &nbsp;·&nbsp;Gender: <span id="profileGender">—</span>
+                    &nbsp;·&nbsp;Interest: <span id="profileInterest">—</span>
+                    &nbsp;·&nbsp;City: <span id="profileCity">—</span>
+                    &nbsp;·&nbsp;Age: <span id="profileAge">—</span>
+                </div>
+
                 <div class="form-group">
                     <label>Persona:</label>
-                    <select id="chatPersonaSelect"></select>
+                    <select id="chatPersonaSelect" onchange="onChatPersonaSelected()"></select>
                 </div>
-                <button onclick="createConversation()">New Conversation</button>
-                <div class="form-group">
-                    <label>Or Load Existing Conversation:</label>
-                    <input type="text" id="conversationIdInput" placeholder="Paste conversation ID here">
-                    <button onclick="loadConversationById()" class="secondary">Load</button>
-                </div>
-                <div id="conversationDisplay" style="margin-top: 20px; display: none;">
-                    <p><strong>Conversation ID:</strong> <span id="currentConvId" style="font-family: monospace; font-size: 12px;"></span></p>
+
+                <div id="chatStatus" style="font-size: 12px; color: #666; margin-bottom: 10px;"></div>
+
+                <div id="conversationDisplay" style="margin-top: 10px; display: none;">
+                    <p>
+                        <strong>Conversation ID:</strong> <span id="currentConvId" style="font-family: monospace; font-size: 12px;"></span>
+                        <span id="multipleConvsHint" style="display: none; font-size: 11px; color: #b8860b; margin-left: 10px;">⚠ multiple conversations exist for this user+persona — showing the most recently active one</span>
+                    </p>
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
                         <div>
                             <h3 style="margin-bottom: 10px;">Messages</h3>
                             <div id="messagesDisplay" style="max-height: 500px; overflow-y: auto; padding: 10px; background: #f9f9f9; border-radius: 4px; border: 1px solid #ddd;"></div>
                         </div>
                         <div>
-                            <h3 style="margin-bottom: 10px;">Memory Facts</h3>
+                            <h3 style="margin-bottom: 10px;">
+                                Memory Facts
+                                <button class="secondary" style="margin: 0 0 0 8px; padding: 2px 8px; font-size: 11px;" onclick="loadMemoryFacts(selectionToken)">Refresh</button>
+                            </h3>
                             <div id="memoryDisplay" style="max-height: 500px; overflow-y: auto; overflow-x: auto; padding: 10px; background: #f9f9f9; border-radius: 4px; border: 1px solid #ddd;">
                                 <p style="color: #999; text-align: center; font-size: 12px;">No memory facts yet</p>
                             </div>
@@ -166,8 +360,71 @@
                     <div class="form-group">
                         <input type="text" id="messageInput" placeholder="Type your message..." onkeypress="if(event.key==='Enter') sendMessage()">
                     </div>
-                    <button onclick="sendMessage()">Send Message</button>
+                    <button id="sendMessageBtn" onclick="sendMessage()">Send Message</button>
                     <button class="secondary" onclick="toggleDebugPanel()" style="margin-left: 10px;">🔍 Debug</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="testchat" class="tab-content">
+            <div class="section">
+                <h2>Test Chat</h2>
+                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                    Runs the real pipeline against a controlled, immutable configuration
+                    snapshot. Testing a version here never changes what production users
+                    receive — activation stays a separate, explicit admin action.
+                </div>
+                <div id="tcCreateError"></div>
+
+                <div id="tcCreatePanel">
+                    <div class="form-group">
+                        <label>Persona:</label>
+                        <select id="tcPersonaSelect"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Test User:</label>
+                        <select id="tcUserSelect"></select>
+                    </div>
+                    <details>
+                        <summary style="cursor: pointer; color: #666; font-size: 12px;">Advanced: pin specific versions (optional — leave blank to use the Testing default)</summary>
+                        <div class="form-group" style="margin-top: 8px;">
+                            <label>Conversation Engine version:</label>
+                            <select id="tcEngineVersion"><option value="">(Testing default)</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Persona Core version:</label>
+                            <select id="tcCoreVersion"><option value="">(Testing default)</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Intent Engine version:</label>
+                            <select id="tcIntentVersion"><option value="">(Testing default)</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Memory Engine version:</label>
+                            <select id="tcMemoryVersion"><option value="">(Testing default)</option></select>
+                        </div>
+                    </details>
+                    <button onclick="createTestChat()" style="margin-top: 10px;">Create Test Chat</button>
+                    <button class="secondary" onclick="loadTestChatOptions()" style="margin-top: 10px;">Refresh Options</button>
+                </div>
+
+                <div id="tcActivePanel" style="display: none; margin-top: 20px;">
+                    <div style="background: #fff3cd; border: 1px solid #ffe69c; border-radius: 4px; padding: 10px; margin-bottom: 12px;">
+                        <b>Mode: TEST</b> — configuration snapshot (read-only):
+                        <table style="margin-top: 6px;">
+                            <tbody id="tcSnapshotTable"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="tcMessages" style="border: 1px solid #ddd; border-radius: 4px; padding: 10px; min-height: 120px; margin-bottom: 10px;"></div>
+
+                    <div class="form-group">
+                        <input type="text" id="tcMessageInput" placeholder="Type a test message..." onkeypress="if(event.key==='Enter') sendTestChatMessage()">
+                    </div>
+                    <button onclick="sendTestChatMessage()">Send Test Message</button>
+                    <button class="secondary" onclick="startNewTestChat()" style="margin-left: 10px;">New Test Chat</button>
+
+                    <div id="tcInspector" style="margin-top: 16px;"></div>
                 </div>
             </div>
         </div>
@@ -176,16 +433,34 @@
             <div class="section">
                 <h2>🔍 Debug Panel - Click a message to see LLM request/response</h2>
                 <div style="margin-bottom: 15px;">
-                    <label style="font-weight: 600; display: block; margin-bottom: 10px;">📤 OpenRouter Request (sent to Claude):</label>
+                    <label style="font-weight: 600; display: block; margin-bottom: 10px;">🧩 Internal GenerationRequest (our ChatContext, before provider serialization):</label>
                     <textarea id="debugOpenRouterRequest" readonly style="width: 100%; height: 200px; background: #1e1e1e; color: #00ff00; font-family: monospace; font-size: 11px; padding: 10px; border-radius: 4px; border: 2px solid #0056b3;"></textarea>
                 </div>
                 <div style="margin-bottom: 15px;">
-                    <label style="font-weight: 600; display: block; margin-bottom: 10px;">📥 OpenRouter Response (from Claude):</label>
+                    <label style="font-weight: 600; display: block; margin-bottom: 10px;">📥 Provider Response (parsed):</label>
                     <textarea id="debugOpenRouterResponse" readonly style="width: 100%; height: 200px; background: #1e1e1e; color: #00ff00; font-family: monospace; font-size: 11px; padding: 10px; border-radius: 4px; border: 2px solid #27ae60;"></textarea>
                 </div>
-                <div>
+                <div style="margin-bottom: 15px;">
                     <label style="font-weight: 600; display: block; margin-bottom: 10px;">📊 Token Usage:</label>
                     <textarea id="debugTokenUsage" readonly style="width: 100%; height: 80px; background: #1e1e1e; color: #ffd700; font-family: monospace; font-size: 11px; padding: 10px; border-radius: 4px; border: 2px solid #ffd700;"></textarea>
+                </div>
+
+                <hr style="margin: 20px 0; border-color: #444;">
+                <h3 style="margin-bottom: 10px;">🔒 Provider Debug (ADMIN-ONLY) — exact bytes captured at the HTTP boundary</h3>
+                <div id="providerDebugUnavailable" style="display: none; color: #999; font-style: italic; margin-bottom: 15px;">
+                    No provider exchange captured for this message (e.g. it was served by a non-HTTP LlmClient, or predates this capture feature).
+                </div>
+                <div id="providerDebugSections">
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 10px;">🌐 Actual OpenRouter HTTP Request (exact bytes sent):</label>
+                        <div id="debugProviderRequestSummary" style="font-family: monospace; font-size: 11px; color: #ccc; margin-bottom: 6px;"></div>
+                        <textarea id="debugProviderRequestBody" readonly style="width: 100%; height: 200px; background: #1e1e1e; color: #ff9d00; font-family: monospace; font-size: 11px; padding: 10px; border-radius: 4px; border: 2px solid #ff9d00;"></textarea>
+                    </div>
+                    <div>
+                        <label style="font-weight: 600; display: block; margin-bottom: 10px;">📡 Actual OpenRouter HTTP Response (exact bytes received):</label>
+                        <div id="debugProviderResponseSummary" style="font-family: monospace; font-size: 11px; color: #ccc; margin-bottom: 6px;"></div>
+                        <textarea id="debugProviderResponseBody" readonly style="width: 100%; height: 200px; background: #1e1e1e; color: #ff9d00; font-family: monospace; font-size: 11px; padding: 10px; border-radius: 4px; border: 2px solid #ff9d00;"></textarea>
+                    </div>
                 </div>
             </div>
         </div>
@@ -194,6 +469,16 @@
     <script>
         const API_BASE = '/v1';
         const ADMIN_BASE = '/v1/admin';
+
+        // Chat-scoped requests (/v1/conversations...) must be authenticated AS THE
+        // SELECTED TEST USER, per the existing DevAuthProvider Basic-Auth convention
+        // (the same one AdminQAConsoleAPITest already uses server-side) — never a
+        // separate "act as" header or a client-supplied ownership parameter. The
+        // admin's own identity (used for /v1/admin/* calls) is left to the browser's
+        // native Basic-Auth prompt, unchanged from before this phase.
+        function authHeaderFor(userId) {
+            return 'Basic ' + btoa(`${userId}:admin-console`);
+        }
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -320,21 +605,25 @@
                 showError('versionError', 'Select a persona first');
                 return;
             }
-            const version = parseInt(document.getElementById('versionNum').value);
             const content = document.getElementById('versionContent').value.trim();
-            if (!version || !content) {
-                showError('versionError', 'All fields required');
+            const changelogNote = document.getElementById('versionChangelogNote').value.trim();
+            if (!content) {
+                showError('versionError', 'Content is required');
                 return;
             }
             try {
+                // Version number is never sent — the server always computes it as
+                // (current max version for this persona) + 1.
                 const res = await fetch(`${ADMIN_BASE}/personas/${selectedPersonaId}/core-versions`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ version, content })
+                    body: JSON.stringify({ content, changelogNote: changelogNote || null })
                 });
                 if (!res.ok) throw new Error('Failed to create version');
-                showSuccess('versionError', 'Version created!');
+                const created = await res.json();
+                showSuccess('versionError', `Version created: v${created.version}`);
                 document.getElementById('versionContent').value = '';
+                document.getElementById('versionChangelogNote').value = '';
                 loadVersions();
             } catch (e) {
                 showError('versionError', e.message);
@@ -352,9 +641,10 @@
                     <tr>
                         <td>v${v.version}</td>
                         <td>${v.status}</td>
+                        <td>${v.isActive ? '✓' : ''}</td>
                         <td>
                             ${v.status === 'draft' ? `<button onclick="publishVersion('${selectedPersonaId}', '${v.id}')" class="secondary">Publish</button>` : ''}
-                            ${v.status === 'published' ? `<button onclick="activateVersion('${selectedPersonaId}', '${v.id}')" class="secondary">Activate</button>` : ''}
+                            ${v.status === 'published' && !v.isActive ? `<button onclick="activateVersion('${selectedPersonaId}', '${v.id}')" class="secondary">Activate</button>` : ''}
                         </td>
                     </tr>
                 `).join('');
@@ -383,49 +673,582 @@
             }
         }
 
+        async function createEngineVersion() {
+            const content = document.getElementById('engineContent').value.trim();
+            const changelogNote = document.getElementById('engineChangelogNote').value.trim();
+            if (!content) {
+                showError('engineError', 'Content is required');
+                return;
+            }
+            try {
+                // Version number is never sent — the server always computes it as
+                // (current global max engine version) + 1.
+                const res = await fetch(`${ADMIN_BASE}/engines`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, changelogNote: changelogNote || null })
+                });
+                if (!res.ok) throw new Error('Failed to create engine version');
+                const created = await res.json();
+                showSuccess('engineError', `Engine version created: v${created.version}`);
+                document.getElementById('engineContent').value = '';
+                document.getElementById('engineChangelogNote').value = '';
+                loadEngines();
+            } catch (e) {
+                showError('engineError', e.message);
+            }
+        }
+
         async function loadEngines() {
             try {
                 const res = await fetch(`${ADMIN_BASE}/engines`);
                 if (!res.ok) throw new Error('Failed to load engines');
                 const data = await res.json();
                 const table = document.querySelector('#enginesTable tbody');
-                table.innerHTML = data.engines.map(e => `<tr><td>v${e.version}</td><td>${e.status}</td><td>${e.isActive ? '✓' : ''}</td></tr>`).join('');
+                table.innerHTML = data.engines.map(e => `
+                    <tr>
+                        <td>v${e.version}</td>
+                        <td>${e.status}</td>
+                        <td>${e.isActive ? '✓' : ''}</td>
+                        <td>
+                            ${e.status === 'draft' ? `<button onclick="publishEngineVersion('${e.id}')" class="secondary">Publish</button>` : ''}
+                            ${e.status === 'published' && !e.isActive ? `<button onclick="activateEngineVersion('${e.id}')" class="secondary">Activate</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
             } catch (e) {
-                showError('versionError', e.message);
+                showError('engineError', e.message);
             }
         }
 
-        async function createConversation() {
-            const userId = document.getElementById('chatUserId').value.trim();
-            const select = document.getElementById('chatPersonaSelect');
-            const personaId = select.value;
+        async function publishEngineVersion(engineId) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/engines/${engineId}/publish`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to publish');
+                loadEngines();
+            } catch (e) {
+                showError('engineError', e.message);
+            }
+        }
 
-            if (!userId || !personaId) {
-                showError('chatError', 'Enter user ID and select persona');
+        async function activateEngineVersion(engineId) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/engines/${engineId}/activate`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to activate');
+                loadEngines();
+            } catch (e) {
+                showError('engineError', e.message);
+            }
+        }
+
+        async function createSkillVersion() {
+            const key = document.getElementById('skillKey').value.trim();
+            const content = document.getElementById('skillContent').value.trim();
+            const changelogNote = document.getElementById('skillChangelogNote').value.trim();
+            if (!key || !content) {
+                showError('skillError', 'Key and content are required');
                 return;
             }
-
             try {
-                const res = await fetch(`${API_BASE}/conversations`, {
+                // Version number is never sent — the server always computes it as
+                // (current max version for this key) + 1.
+                const res = await fetch(`${ADMIN_BASE}/skills`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ personaId })
+                    body: JSON.stringify({ key, content, changelogNote: changelogNote || null })
                 });
-                if (!res.ok) throw new Error('Failed to create conversation');
-                const data = await res.json();
-                currentConvId = data.id;
-                document.getElementById('currentConvId').textContent = currentConvId;
-                document.getElementById('conversationDisplay').style.display = 'block';
-                document.getElementById('messagesDisplay').innerHTML = '';
-                loadConversation();
+                if (!res.ok) throw new Error('Failed to create skill version');
+                const created = await res.json();
+                showSuccess('skillError', `Version created: v${created.version}`);
+                document.getElementById('skillContent').value = '';
+                document.getElementById('skillChangelogNote').value = '';
+                loadSkills();
             } catch (e) {
-                showError('chatError', e.message);
+                showError('skillError', e.message);
             }
         }
 
+        async function loadSkills() {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/skills`);
+                if (!res.ok) throw new Error('Failed to load skills');
+                const data = await res.json();
+                const table = document.querySelector('#skillsTable tbody');
+                const sorted = data.skills.slice().sort((a, b) => a.key.localeCompare(b.key) || a.version - b.version);
+                table.innerHTML = sorted.map(s => `
+                    <tr>
+                        <td>${s.key}</td>
+                        <td>v${s.version}</td>
+                        <td>${s.status}</td>
+                        <td>${s.isActive ? '✓' : ''}</td>
+                        <td>
+                            ${s.status === 'draft' ? `<button onclick="publishSkillVersion('${s.id}')" class="secondary">Publish</button>` : ''}
+                            ${s.status === 'published' && !s.isActive ? `<button onclick="activateSkillVersion('${s.id}')" class="secondary">Activate</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showError('skillError', e.message);
+            }
+        }
+
+        async function publishSkillVersion(skillId) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/skills/${skillId}/publish`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to publish');
+                loadSkills();
+            } catch (e) {
+                showError('skillError', e.message);
+            }
+        }
+
+        async function activateSkillVersion(skillId) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/skills/${skillId}/activate`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to activate');
+                loadSkills();
+            } catch (e) {
+                showError('skillError', e.message);
+            }
+        }
+
+        async function createMemoryEngineVersion() {
+            const content = document.getElementById('memoryEngineContent').value.trim();
+            const changelogNote = document.getElementById('memoryEngineChangelogNote').value.trim();
+            if (!content) {
+                showError('memoryEngineError', 'Content is required');
+                return;
+            }
+            try {
+                // Version number is never sent — the server always computes it as
+                // (current global max memory engine version) + 1.
+                const res = await fetch(`${ADMIN_BASE}/memory-engines`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content,
+                        changelogNote: changelogNote || null,
+                        batchSize: parseInt(document.getElementById('memoryEngineBatchSize').value, 10) || 10,
+                        relevantMemoryTarget: parseInt(document.getElementById('memoryEngineRelevantTarget').value, 10) || 20
+                    })
+                });
+                if (!res.ok) throw new Error('Failed to create memory engine version');
+                const created = await res.json();
+                showSuccess('memoryEngineError', `Memory Engine version created: v${created.version}`);
+                document.getElementById('memoryEngineContent').value = '';
+                document.getElementById('memoryEngineChangelogNote').value = '';
+                loadMemoryEngines();
+            } catch (e) {
+                showError('memoryEngineError', e.message);
+            }
+        }
+
+        async function loadMemoryEngines() {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/memory-engines`);
+                if (!res.ok) throw new Error('Failed to load memory engines');
+                const data = await res.json();
+                const table = document.querySelector('#memoryEnginesTable tbody');
+                table.innerHTML = data.memoryEngines.map(e => `
+                    <tr>
+                        <td>v${e.version}</td>
+                        <td>${e.status}</td>
+                        <td>${e.isActive ? '✓' : ''}</td>
+                        <td>${e.batchSize}</td>
+                        <td>${e.relevantMemoryTarget}</td>
+                        <td>${e.createdBy || ''}</td>
+                        <td>${e.changelogNote || ''}</td>
+                        <td>
+                            ${e.status === 'draft' ? `<button onclick="publishMemoryEngineVersion('${e.id}')" class="secondary">Publish</button>` : ''}
+                            ${e.status === 'published' && !e.isActive ? `<button onclick="activateMemoryEngineVersion('${e.id}')" class="secondary">Activate</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showError('memoryEngineError', e.message);
+            }
+        }
+
+        async function publishMemoryEngineVersion(id) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/memory-engines/${id}/publish`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to publish');
+                loadMemoryEngines();
+            } catch (e) {
+                showError('memoryEngineError', e.message);
+            }
+        }
+
+        async function activateMemoryEngineVersion(id) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/memory-engines/${id}/activate`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to activate');
+                loadMemoryEngines();
+            } catch (e) {
+                showError('memoryEngineError', e.message);
+            }
+        }
+
+        // ---------------- Intent Engine (Phase ADMIN-2) ----------------
+
+        async function createIntentEngineVersion() {
+            const content = document.getElementById('intentEngineContent').value.trim();
+            const changelogNote = document.getElementById('intentEngineChangelogNote').value.trim();
+            if (!content) {
+                showError('intentEngineError', 'Intent Engine prompt is required');
+                return;
+            }
+            try {
+                // Version number is never sent — the server always computes it.
+                const res = await fetch(`${ADMIN_BASE}/intent-engines`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content, changelogNote: changelogNote || null })
+                });
+                if (!res.ok) throw new Error('Failed to create intent engine version');
+                const created = await res.json();
+                showSuccess('intentEngineError', `Intent Engine version created: v${created.version} (draft — publish and activate to use it)`);
+                document.getElementById('intentEngineContent').value = '';
+                document.getElementById('intentEngineChangelogNote').value = '';
+                loadIntentEngines();
+            } catch (e) {
+                showError('intentEngineError', e.message);
+            }
+        }
+
+        async function loadIntentEngines() {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/intent-engines`);
+                if (!res.ok) throw new Error('Failed to load intent engines');
+                const data = await res.json();
+                const candidates = data.activeSkillCandidates || [];
+                document.getElementById('intentEngineCandidates').textContent =
+                    candidates.length ? candidates.join(', ') : 'none — no skills are active, so no skill can be selected';
+                const table = document.querySelector('#intentEnginesTable tbody');
+                table.innerHTML = (data.intentEngines || []).map(e => `
+                    <tr>
+                        <td>v${e.version}</td>
+                        <td>${e.status}</td>
+                        <td>${e.isActive ? '✓' : ''}</td>
+                        <td>${e.createdBy || ''}</td>
+                        <td>${e.changelogNote || ''}</td>
+                        <td>
+                            ${e.status === 'draft' ? `<button onclick="publishIntentEngineVersion('${e.id}')" class="secondary">Publish</button>` : ''}
+                            ${e.status === 'published' && !e.isActive ? `<button onclick="activateIntentEngineVersion('${e.id}', ${e.version})" class="secondary">Activate</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                showError('intentEngineError', e.message);
+            }
+        }
+
+        async function publishIntentEngineVersion(id) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/intent-engines/${id}/publish`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to publish');
+                loadIntentEngines();
+            } catch (e) {
+                showError('intentEngineError', e.message);
+            }
+        }
+
+        async function activateIntentEngineVersion(id, version) {
+            // Section 30: show current vs new before confirming an activation.
+            let current = 'none';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/intent-engines`);
+                if (res.ok) {
+                    const active = ((await res.json()).intentEngines || []).find(e => e.isActive);
+                    if (active) current = 'v' + active.version;
+                }
+            } catch (e) { /* fall through with 'none' */ }
+            if (!confirm(`Activate Intent Engine?\n\nCurrent: ${current}\nNew:     v${version}\n\nThis changes skill selection for all conversations.`)) return;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/intent-engines/${id}/activate`, { method: 'POST' });
+                if (!res.ok) throw new Error('Failed to activate');
+                loadIntentEngines();
+                loadAiConfiguration();
+            } catch (e) {
+                showError('intentEngineError', e.message);
+            }
+        }
+
+        // ---------------- AI Runtime Settings (Phase ADMIN-2) ----------------
+
+        async function loadAiSettings() {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/ai-settings`);
+                if (!res.ok) throw new Error('Failed to load AI settings');
+                const s = await res.json();
+                const label = src => src === 'DATABASE' ? 'admin setting' : 'environment / default';
+                document.querySelector('#aiSettingsCurrentTable tbody').innerHTML = `
+                    <tr><td>Model</td><td>${s.model}</td><td>${label(s.modelSource)}</td></tr>
+                    <tr><td>Temperature</td><td>${s.temperature === null || s.temperature === undefined ? 'provider default' : s.temperature}</td><td>${label(s.temperatureSource)}</td></tr>
+                    <tr><td>Max output tokens</td><td>${s.maxOutputTokens}</td><td>${label(s.maxOutputTokensSource)}</td></tr>
+                `;
+                document.getElementById('aiSettingsAudit').textContent = s.updatedAt
+                    ? `Last changed ${s.updatedAt} by ${s.updatedBy || 'unknown'}`
+                    : 'No admin override stored — running entirely on environment / defaults.';
+                // Pre-fill only with STORED overrides, so a blank field keeps meaning
+                // "no override" rather than silently pinning the resolved value.
+                document.getElementById('aiSettingsModel').value = s.storedModel || '';
+                document.getElementById('aiSettingsTemperature').value =
+                    (s.storedTemperature === null || s.storedTemperature === undefined) ? '' : s.storedTemperature;
+                document.getElementById('aiSettingsMaxTokens').value =
+                    (s.storedMaxOutputTokens === null || s.storedMaxOutputTokens === undefined) ? '' : s.storedMaxOutputTokens;
+            } catch (e) {
+                showError('aiSettingsError', e.message);
+            }
+        }
+
+        async function saveAiSettings() {
+            const modelRaw = document.getElementById('aiSettingsModel').value.trim();
+            const tempRaw = document.getElementById('aiSettingsTemperature').value.trim();
+            const tokensRaw = document.getElementById('aiSettingsMaxTokens').value.trim();
+            const model = modelRaw || null;
+            const temperature = tempRaw === '' ? null : parseFloat(tempRaw);
+            const maxOutputTokens = tokensRaw === '' ? null : parseInt(tokensRaw, 10);
+
+            const summary =
+                `Model: ${model || '(fall back to environment)'}\n` +
+                `Temperature: ${temperature === null ? '(provider default)' : temperature}\n` +
+                `Max output tokens: ${maxOutputTokens === null ? '(fall back to environment)' : maxOutputTokens}`;
+            if (!confirm(`Apply these settings to ALL generation?\n\n${summary}`)) return;
+
+            try {
+                const res = await fetch(`${ADMIN_BASE}/ai-settings`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model, temperature, maxOutputTokens, confirm: true })
+                });
+                if (!res.ok) {
+                    const body = await res.json().catch(() => null);
+                    throw new Error((body && body.error && body.error.message) || 'Failed to save AI settings');
+                }
+                showSuccess('aiSettingsError', 'AI runtime settings applied.');
+                loadAiSettings();
+                loadAiConfiguration();
+            } catch (e) {
+                showError('aiSettingsError', e.message);
+            }
+        }
+
+        // ---------------- AI Configuration Overview (Phase ADMIN-2) ----------------
+
+        async function loadAiConfiguration() {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/ai-configuration`);
+                if (!res.ok) throw new Error('Failed to load AI configuration');
+                const c = await res.json();
+                const ver = v => (v && v.version != null) ? ('v' + v.version) : 'none active';
+                const personas = (c.personaCores || []).map(p =>
+                    `<tr><td>Persona Core — ${p.displayName} (${p.slug})</td><td>${p.activeCoreVersion != null ? 'v' + p.activeCoreVersion : 'none active'}</td><td>${p.personaStatus}</td></tr>`
+                ).join('');
+                document.getElementById('aiConfigurationOverview').innerHTML = `
+                    <table>
+                        <thead><tr><th>Component</th><th>Running</th><th>Detail</th></tr></thead>
+                        <tbody>
+                            <tr><td>Conversation Engine</td><td>${ver(c.conversationEngine)}</td><td>${(c.conversationEngine && c.conversationEngine.changelogNote) || ''}</td></tr>
+                            <tr><td>Intent Engine</td><td>${ver(c.intentEngine)}</td><td>${(c.intentEngine && c.intentEngine.changelogNote) || ''}</td></tr>
+                            <tr><td>Memory Engine</td><td>${ver(c.memoryEngine)}</td><td>batch ${c.memoryBatchSize != null ? c.memoryBatchSize : '—'}, relevant-memory target ${c.relevantMemoryTarget != null ? c.relevantMemoryTarget : '—'}</td></tr>
+                            ${personas}
+                            <tr><td>Skills</td><td>${c.activeSkillCount} active</td><td>${(c.activeSkillKeys || []).join(', ')}</td></tr>
+                            <tr><td>AI Runtime</td><td>${c.runtime.model}</td><td>temperature ${c.runtime.temperature == null ? 'provider default' : c.runtime.temperature}, max tokens ${c.runtime.maxOutputTokens}</td></tr>
+                        </tbody>
+                    </table>`;
+            } catch (e) {
+                showError('aiOverviewError', e.message);
+            }
+        }
+
+        // ---------------- Test Chat (Phase ADMIN-3) ----------------
+
+        let tcConversationId = null;
+        let tcPersonasCache = [];
+        let tcUsersCache = [];
+
+        async function loadTestChatOptions() {
+            try {
+                const [personasRes, usersRes, enginesRes, intentRes, memoryRes] = await Promise.all([
+                    fetch(`${ADMIN_BASE}/personas`),
+                    fetch(`${ADMIN_BASE}/users`),
+                    fetch(`${ADMIN_BASE}/engines`),
+                    fetch(`${ADMIN_BASE}/intent-engines`),
+                    fetch(`${ADMIN_BASE}/memory-engines`),
+                ]);
+                tcPersonasCache = personasRes.ok ? (await personasRes.json()).personas || [] : [];
+                tcUsersCache = usersRes.ok ? (await usersRes.json()).users || [] : [];
+
+                document.getElementById('tcPersonaSelect').innerHTML = tcPersonasCache.map(p =>
+                    `<option value="${p.id}">${p.displayName} (${p.slug})</option>`).join('') || '<option value="">No personas yet</option>';
+                document.getElementById('tcUserSelect').innerHTML = tcUsersCache.map(u =>
+                    `<option value="${u.userId}">${u.displayName || u.userId}</option>`).join('') || '<option value="">No test users yet — create one in Setup</option>';
+
+                const versionOptions = (list, labelActive) => (list || []).map(v =>
+                    `<option value="${v.version}">v${v.version} — ${v.isActive ? labelActive : v.status.toUpperCase()}</option>`).join('');
+                if (enginesRes.ok) {
+                    const engines = (await enginesRes.json()).engines || [];
+                    document.getElementById('tcEngineVersion').innerHTML = '<option value="">(Testing default)</option>' + versionOptions(engines, 'PRODUCTION');
+                }
+                if (intentRes.ok) {
+                    const intents = (await intentRes.json()).intentEngines || [];
+                    document.getElementById('tcIntentVersion').innerHTML = '<option value="">(Testing default)</option>' + versionOptions(intents, 'PRODUCTION');
+                }
+                if (memoryRes.ok) {
+                    const mems = (await memoryRes.json()).memoryEngines || [];
+                    document.getElementById('tcMemoryVersion').innerHTML = '<option value="">(Testing default)</option>' + versionOptions(mems, 'PRODUCTION');
+                }
+                await loadTestChatCoreVersions();
+            } catch (e) {
+                showError('tcCreateError', e.message);
+            }
+        }
+
+        async function loadTestChatCoreVersions() {
+            const personaId = document.getElementById('tcPersonaSelect').value;
+            const select = document.getElementById('tcCoreVersion');
+            if (!personaId) { select.innerHTML = '<option value="">(Testing default)</option>'; return; }
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${personaId}/core-versions`);
+                if (!res.ok) return;
+                const versions = (await res.json()).versions || [];
+                select.innerHTML = '<option value="">(Testing default)</option>' + versions.map(v =>
+                    `<option value="${v.version}">v${v.version} — ${v.isActive ? 'PRODUCTION' : v.status.toUpperCase()}</option>`).join('');
+            } catch (e) { /* leave default option */ }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const sel = document.getElementById('tcPersonaSelect');
+            if (sel) sel.addEventListener('change', loadTestChatCoreVersions);
+        });
+
+        async function createTestChat() {
+            const personaId = document.getElementById('tcPersonaSelect').value;
+            const testUserId = document.getElementById('tcUserSelect').value;
+            if (!personaId || !testUserId) {
+                showError('tcCreateError', 'Select a persona and a test user');
+                return;
+            }
+            const num = id => { const v = document.getElementById(id).value.trim(); return v === '' ? null : parseInt(v, 10); };
+            const body = {
+                personaId, testUserId,
+                conversationEngineVersion: num('tcEngineVersion'),
+                personaCoreVersion: num('tcCoreVersion'),
+                intentEngineVersion: num('tcIntentVersion'),
+                memoryEngineVersion: num('tcMemoryVersion'),
+            };
+            try {
+                const res = await fetch(`${ADMIN_BASE}/test-chat/conversations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => null);
+                    throw new Error((err && err.error && err.error.message) || 'Failed to create test chat');
+                }
+                const created = await res.json();
+                tcConversationId = created.conversationId;
+                document.getElementById('tcCreatePanel').style.display = 'none';
+                document.getElementById('tcActivePanel').style.display = 'block';
+                renderTcSnapshot(created.configuration);
+                document.getElementById('tcMessages').innerHTML = '';
+                document.getElementById('tcInspector').innerHTML = '';
+            } catch (e) {
+                showError('tcCreateError', e.message);
+            }
+        }
+
+        function renderTcSnapshot(config) {
+            document.getElementById('tcSnapshotTable').innerHTML = `
+                <tr><td>Conversation Engine</td><td>v${config.conversationEngineVersion}</td></tr>
+                <tr><td>Persona Core</td><td>v${config.personaCoreVersion}</td></tr>
+                <tr><td>Intent Engine</td><td>v${config.intentEngineVersion}</td></tr>
+                <tr><td>Memory Engine</td><td>v${config.memoryEngineVersion}</td></tr>
+                <tr><td>Skills</td><td>${Object.entries(config.skillVersions || {}).map(([k, v]) => `${k} v${v}`).join(', ')}</td></tr>
+                <tr><td>Model</td><td>${config.model || '(testing default runtime settings)'}</td></tr>
+                <tr><td>Temperature</td><td>${config.temperature == null ? '—' : config.temperature}</td></tr>
+                <tr><td>Max Output Tokens</td><td>${config.maxOutputTokens == null ? '—' : config.maxOutputTokens}</td></tr>
+            `;
+        }
+
+        function startNewTestChat() {
+            tcConversationId = null;
+            document.getElementById('tcCreatePanel').style.display = 'block';
+            document.getElementById('tcActivePanel').style.display = 'none';
+        }
+
+        async function sendTestChatMessage() {
+            const input = document.getElementById('tcMessageInput');
+            const content = input.value.trim();
+            if (!content || !tcConversationId) return;
+            input.value = '';
+            const messagesEl = document.getElementById('tcMessages');
+            messagesEl.innerHTML += `<div><b>You:</b> ${content}</div>`;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/test-chat/conversations/${tcConversationId}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content }),
+                });
+                if (!res.ok) {
+                    const err = await res.json().catch(() => null);
+                    throw new Error((err && err.error && err.error.message) || 'Test chat message failed');
+                }
+                const result = await res.json();
+                messagesEl.innerHTML += `<div><b>Assistant</b> (skill: ${result.selectedSkill || 'none'}): ${result.content}</div>`;
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+                await loadTestChatInspector(result.messageId);
+            } catch (e) {
+                showError('tcCreateError', e.message);
+            }
+        }
+
+        async function loadTestChatInspector(messageId) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/test-chat/conversations/${tcConversationId}`);
+                if (!res.ok) return;
+                const detail = await res.json();
+                const message = (detail.messages || []).find(m => m.id === messageId);
+                if (!message) return;
+                const blocks = message.contextBlocks || {};
+                const config = message.generationConfig || {};
+                const provider = message.providerExchange || {};
+                document.getElementById('tcInspector').innerHTML = `
+                    <details open>
+                        <summary style="cursor: pointer; font-weight: 600;">🔍 Debug: this message's actual generation (section 20/21)</summary>
+                        <div style="margin-top: 8px;">
+                            <b>Actual context sent to the model:</b>
+                            <pre style="background: #1e1e1e; color: #9cdcfe; padding: 8px; border-radius: 4px; max-height: 200px; overflow: auto; font-size: 11px;">${Object.entries(blocks).map(([k, v]) => `[${k.split('_')[0]}] ${v}`).join('\\n\\n')}</pre>
+                            <b>LLM request configuration:</b>
+                            <pre style="background: #1e1e1e; color: #dcdcaa; padding: 8px; border-radius: 4px; font-size: 11px;">${JSON.stringify(config, null, 2)}</pre>
+                            <b>Provider response metadata:</b>
+                            <pre style="background: #1e1e1e; color: #ce9178; padding: 8px; border-radius: 4px; font-size: 11px;">${JSON.stringify(message.responseMetadata || {}, null, 2)}</pre>
+                            <b>Full provider exchange (secrets already redacted upstream):</b>
+                            <pre style="background: #1e1e1e; color: #ff9d00; padding: 8px; border-radius: 4px; max-height: 200px; overflow: auto; font-size: 11px;">${JSON.stringify(provider, null, 2)}</pre>
+                        </div>
+                    </details>`;
+            } catch (e) { /* inspector is best-effort — never block sending */ }
+        }
+
+        // --- User selection state (Chat tab) ---
+        let adminUsers = [];           // last fetched GET /v1/admin/users result
+        let selectedUserId = '';
+        let selectedUserProfile = null;
+        let chatSelectedPersonaId = '';
+        let selectedPersonaName = '';
         let currentConvId = '';
         let debugLastCall = '';
         let debugLastResponse = '';
+        // Incremented on every user/persona change. Every async step below
+        // re-checks its captured token against this before touching the DOM,
+        // so a slow response for an old selection can never overwrite what's
+        // on screen for a newer one (instruction section 13 / criterion 12).
+        let selectionToken = 0;
+        // Client-side only — response time for THIS session's own sends.
+        // Never persisted, never available for messages loaded from history.
+        const assistantDurations = {};
+        let sendInFlight = false;
 
         function logApiCall(method, endpoint, body) {
             debugLastCall = `${method} ${endpoint}\n\n${body ? JSON.stringify(JSON.parse(body), null, 2) : ''}`;
@@ -440,48 +1263,250 @@
             panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
         }
 
-        async function loadConversationById() {
-            const convId = document.getElementById('conversationIdInput').value.trim();
-            if (!convId) {
-                showError('chatError', 'Enter a conversation ID');
-                return;
+        async function loadAdminUsers(preferredUserId) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/users`);
+                if (!res.ok) throw new Error('Failed to load users');
+                const data = await res.json();
+                adminUsers = data.users || [];
+
+                const table = document.querySelector('#usersTable tbody');
+                table.innerHTML = adminUsers.map(u => `
+                    <tr>
+                        <td>${u.displayName || '(unnamed)'}</td>
+                        <td>${u.gender || '—'}</td>
+                        <td>${u.interest || '—'}</td>
+                        <td>${u.city || '—'}</td>
+                        <td>${u.age != null ? u.age : '—'}</td>
+                    </tr>
+                `).join('');
+
+                const select = document.getElementById('chatUserSelect');
+                const previousValue = preferredUserId || select.value;
+                select.innerHTML = '<option value="">-- Select User --</option>' +
+                    adminUsers.map(u => `<option value="${u.userId}">${u.displayName || u.userId}</option>`).join('');
+                document.getElementById('noUsersHint').style.display = adminUsers.length === 0 ? 'block' : 'none';
+
+                if (previousValue && adminUsers.some(u => u.userId === previousValue)) {
+                    select.value = previousValue;
+                    onChatUserSelected();
+                }
+            } catch (e) {
+                showError('chatError', e.message);
             }
-            currentConvId = convId;
-            document.getElementById('currentConvId').textContent = currentConvId;
-            document.getElementById('conversationDisplay').style.display = 'block';
-            await loadConversation();
         }
 
-        async function loadConversation() {
+        async function createTestUser() {
+            const displayName = document.getElementById('newUserDisplayName').value.trim();
+            const gender = document.getElementById('newUserGender').value.trim();
+            const interest = document.getElementById('newUserInterest').value;
+            const city = document.getElementById('newUserCity').value.trim();
+            const ageRaw = document.getElementById('newUserAge').value;
+
+            if (!displayName) {
+                showError('createUserError', 'Display name is required');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${ADMIN_BASE}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        displayName,
+                        gender: gender || null,
+                        interest: interest || null,
+                        city: city || null,
+                        age: ageRaw ? parseInt(ageRaw) : null,
+                    })
+                });
+                if (!res.ok) {
+                    const errBody = await res.json().catch(() => null);
+                    throw new Error((errBody && errBody.error && errBody.error.message) || 'Failed to create user');
+                }
+                const created = await res.json();
+                showSuccess('createUserError', 'User created!');
+                document.getElementById('newUserDisplayName').value = '';
+                document.getElementById('newUserGender').value = '';
+                document.getElementById('newUserInterest').value = '';
+                document.getElementById('newUserCity').value = '';
+                document.getElementById('newUserAge').value = '';
+                // Refresh the Chat-tab dropdown and select the newly-created user
+                // automatically — no page reload required (criterion 6).
+                await loadAdminUsers(created.userId);
+            } catch (e) {
+                showError('createUserError', e.message);
+            }
+        }
+
+        function renderProfilePanel(profile) {
+            const panel = document.getElementById('userProfilePanel');
+            if (!profile) {
+                panel.style.display = 'none';
+                return;
+            }
+            panel.style.display = 'block';
+            document.getElementById('profileDisplayName').textContent = profile.displayName || '(unnamed)';
+            document.getElementById('profileGender').textContent = profile.gender || '—';
+            document.getElementById('profileInterest').textContent = profile.interest || '—';
+            document.getElementById('profileCity').textContent = profile.city || '—';
+            document.getElementById('profileAge').textContent = profile.age != null ? profile.age : '—';
+        }
+
+        function onChatUserSelected() {
+            const select = document.getElementById('chatUserSelect');
+            selectedUserId = select.value;
+            document.getElementById('chatUserIdRaw').value = '';
+            selectedUserProfile = adminUsers.find(u => u.userId === selectedUserId) || null;
+            renderProfilePanel(selectedUserProfile);
+            handleUserOrPersonaChange();
+        }
+
+        function onRawUserIdEntered() {
+            const raw = document.getElementById('chatUserIdRaw').value.trim();
+            if (!raw) return;
+            selectedUserId = raw;
+            // Raw entry bypasses the admin user list, so profile data may not be
+            // available — the panel is hidden rather than showing wrong data.
+            selectedUserProfile = adminUsers.find(u => u.userId === raw) || null;
+            document.getElementById('chatUserSelect').value = adminUsers.some(u => u.userId === raw) ? raw : '';
+            renderProfilePanel(selectedUserProfile);
+            handleUserOrPersonaChange();
+        }
+
+        function onChatPersonaSelected() {
+            const select = document.getElementById('chatPersonaSelect');
+            chatSelectedPersonaId = select.value;
+            selectedPersonaName = (select.selectedOptions[0] && select.selectedOptions[0].textContent) || 'Assistant';
+            handleUserOrPersonaChange();
+        }
+
+        function clearChatState() {
+            currentConvId = '';
+            document.getElementById('conversationDisplay').style.display = 'none';
+            document.getElementById('messagesDisplay').innerHTML = '';
+            document.getElementById('memoryDisplay').innerHTML = '<p style="color: #999; text-align: center; font-size: 12px;">No memory facts yet</p>';
+            document.getElementById('multipleConvsHint').style.display = 'none';
+            document.getElementById('debugPanel').style.display = 'none';
+        }
+
+        function setChatStatus(text) {
+            document.getElementById('chatStatus').textContent = text;
+        }
+
+        /**
+         * Core Phase 2B behavior: whenever the selected user or persona changes,
+         * clear stale conversation state, then either find and load the existing
+         * user+persona conversation or create exactly one new conversation.
+         *
+         * Conversation selection rule when multiple exist for the same user+
+         * persona pair (the schema does not enforce uniqueness): pick the one
+         * with the most recent `updatedAt` as returned by GET /v1/conversations
+         * (the backend already derives this as lastMessageAt, falling back to
+         * createdAt for a conversation that was created but never messaged in)
+         * — i.e. the most recently ACTIVE conversation, not merely the most
+         * recently created one. Older conversations are never modified.
+         */
+        async function handleUserOrPersonaChange() {
+            const myToken = ++selectionToken;
+            clearChatState();
+
+            if (!selectedUserId || !chatSelectedPersonaId) {
+                setChatStatus(!selectedUserId && !chatSelectedPersonaId
+                    ? 'Select a user and a persona to begin.'
+                    : (!selectedUserId ? 'Select a user to continue.' : 'Select a persona to continue.'));
+                return;
+            }
+
+            setChatStatus('Looking for an existing conversation…');
+            try {
+                const res = await fetch(`${API_BASE}/conversations?personaId=${chatSelectedPersonaId}`, {
+                    headers: { 'Authorization': authHeaderFor(selectedUserId) }
+                });
+                if (myToken !== selectionToken) return; // a newer selection has since started
+                if (!res.ok) throw new Error('Failed to look up existing conversations');
+                const data = await res.json();
+                const conversations = data.conversations || [];
+
+                let conversationId;
+                if (conversations.length > 0) {
+                    const mostRecent = conversations.slice().sort(
+                        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+                    )[0];
+                    conversationId = mostRecent.id;
+                    document.getElementById('multipleConvsHint').style.display = conversations.length > 1 ? 'inline' : 'none';
+                    setChatStatus('Existing conversation found — loading history…');
+                } else {
+                    setChatStatus('No existing conversation — creating one…');
+                    const createRes = await fetch(`${API_BASE}/conversations`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': authHeaderFor(selectedUserId),
+                        },
+                        body: JSON.stringify({ personaId: chatSelectedPersonaId })
+                    });
+                    if (myToken !== selectionToken) return;
+                    if (!createRes.ok) throw new Error('Failed to create conversation');
+                    const created = await createRes.json();
+                    conversationId = created.id;
+                }
+
+                if (myToken !== selectionToken) return;
+                currentConvId = conversationId;
+                document.getElementById('currentConvId').textContent = currentConvId;
+                document.getElementById('conversationDisplay').style.display = 'block';
+                setChatStatus('');
+                await loadConversation(myToken);
+            } catch (e) {
+                if (myToken !== selectionToken) return;
+                setChatStatus('');
+                showError('chatError', e.message);
+            }
+        }
+
+        async function loadConversation(expectedToken) {
             if (!currentConvId) return;
+            const myToken = expectedToken !== undefined ? expectedToken : selectionToken;
             try {
                 const endpoint = `${API_BASE}/conversations/${currentConvId}`;
                 logApiCall('GET', endpoint, '');
 
-                const res = await fetch(endpoint);
+                const res = await fetch(endpoint, {
+                    headers: { 'Authorization': authHeaderFor(selectedUserId) }
+                });
+                if (myToken !== selectionToken) return; // a newer selection has since started
                 if (!res.ok) throw new Error('Failed to load conversation');
                 const data = await res.json();
                 logApiResponse(data);
 
                 const display = document.getElementById('messagesDisplay');
+                // Ordering/roles come directly from the persisted-order API response —
+                // never re-derived from timestamps or from Provider Debug data.
                 const messages = data.messages || [];
                 if (messages.length === 0) {
                     display.innerHTML = '<p style="color: #999; text-align: center;">No messages yet</p>';
                 } else {
                     display.innerHTML = messages.map((m, idx) => {
                         const msgClass = m.role === 'user' ? 'user' : m.role === 'assistant' ? 'assistant' : 'system';
-                        const roleLabel = m.role === 'user' ? '👤 USER' : m.role === 'assistant' ? '🤖 ASSISTANT' : '⚙️ SYSTEM';
-                        const metadata = m.metadata ? JSON.stringify(m.metadata, null, 2) : 'No metadata';
+                        const roleLabel = m.role === 'user' ? 'User' : m.role === 'assistant' ? (selectedPersonaName || 'Assistant') : 'System';
+                        const seq = `#${idx + 1}`;
+                        // Client-side-only timing: only present for a message this
+                        // session actually sent and timed; never invented for history.
+                        const duration = (m.role === 'assistant' && assistantDurations[m.id])
+                            ? ` <span style="color:#999; font-size: 10px;">(${assistantDurations[m.id]})</span>`
+                            : '';
                         return `<div class="message ${msgClass}" style="cursor: pointer; position: relative;"
                             onclick="showLLMDebug(${JSON.stringify(m).replace(/"/g, '&quot;')})">
-                            ${roleLabel}: ${m.content}
+                            <span style="font-family: monospace; font-size: 10px; color: #888;">${seq}</span> <strong>${roleLabel}</strong>${duration}: ${m.content}
                             ${m.role === 'assistant' ? '<div style="font-size: 9px; color: #999; margin-top: 4px;">💡 click for LLM data</div>' : ''}
                         </div>`;
                     }).join('');
                 }
                 display.scrollTop = display.scrollHeight;
-                await loadMemoryFacts();
+                await loadMemoryFacts(myToken);
             } catch (e) {
+                if (myToken !== selectionToken) return;
                 showError('chatError', e.message);
             }
         }
@@ -513,8 +1538,13 @@
             if (metadata.lvm_context_blocks) {
                 try {
                     const blocksObj = JSON.parse(metadata.lvm_context_blocks);
-                    Object.entries(blocksObj).forEach(([role, content]) => {
-                        llmRequest.messages.push({ role: 'system', content: String(content) });
+                    // Each key is encoded as "<role>_<identityHash>" by RepositoryChatPersistence
+                    // (see buildMessageMetadata). The role prefix reflects the ACTUAL ContextBlock
+                    // role captured at generation time and must be used as-is, not hardcoded.
+                    Object.entries(blocksObj).forEach(([key, content]) => {
+                        const separatorIndex = key.indexOf('_');
+                        const actualRole = separatorIndex > 0 ? key.substring(0, separatorIndex) : 'system';
+                        llmRequest.messages.push({ role: actualRole, content: String(content) });
                     });
                 } catch (e) {
                     console.error('Failed to parse context blocks:', e);
@@ -567,15 +1597,62 @@
             document.getElementById('debugOpenRouterRequest').value = JSON.stringify(llmRequest, null, 2);
             document.getElementById('debugOpenRouterResponse').value = JSON.stringify(llmResponse, null, 2);
             document.getElementById('debugTokenUsage').value = tokenUsageText;
+
+            // --- Provider Debug: exact bytes captured at the OpenRouterLlmClient HTTP boundary ---
+            // Read from metadata.lvm_provider_exchange, which is populated only when a real
+            // HTTP-based LlmClient (e.g. OpenRouterLlmClient) executed the request. Never
+            // reconstructed here — this is the literal request/response text captured by the
+            // client immediately before/after the HTTP call.
+            let providerExchange = null;
+            if (metadata.lvm_provider_exchange) {
+                try {
+                    const raw = JSON.parse(metadata.lvm_provider_exchange);
+                    if (raw && Object.keys(raw).length > 0) providerExchange = raw;
+                } catch (e) {
+                    console.error('Failed to parse provider exchange:', e);
+                }
+            }
+
+            const unavailableEl = document.getElementById('providerDebugUnavailable');
+            const sectionsEl = document.getElementById('providerDebugSections');
+            if (!providerExchange) {
+                unavailableEl.style.display = 'block';
+                sectionsEl.style.display = 'none';
+            } else {
+                unavailableEl.style.display = 'none';
+                sectionsEl.style.display = 'block';
+
+                document.getElementById('debugProviderRequestSummary').textContent =
+                    `${providerExchange.httpMethod || 'POST'} ${providerExchange.endpoint || ''}  |  model: ${providerExchange.model || 'unknown'}  |  headers: ${providerExchange.requestHeaders || '(none captured)'}`;
+                document.getElementById('debugProviderRequestBody').value = formatMaybeJson(providerExchange.requestBody);
+
+                const isError = providerExchange.isError === 'true';
+                document.getElementById('debugProviderResponseSummary').textContent =
+                    `HTTP ${providerExchange.responseStatusCode || 'unknown'}${isError ? ' (ERROR)' : ''}  |  provider request id: ${providerExchange.providerRequestId || '(none)'}`;
+                document.getElementById('debugProviderResponseBody').value = formatMaybeJson(providerExchange.responseBody);
+            }
         }
 
-        async function loadMemoryFacts() {
+        function formatMaybeJson(text) {
+            if (!text) return '(empty)';
+            try {
+                return JSON.stringify(JSON.parse(text), null, 2);
+            } catch (e) {
+                return text;
+            }
+        }
+
+        async function loadMemoryFacts(expectedToken) {
             if (!currentConvId) return;
+            const myToken = expectedToken !== undefined ? expectedToken : selectionToken;
             try {
                 const endpoint = `${API_BASE}/conversations/${currentConvId}/memory`;
                 logApiCall('GET', endpoint, '');
 
-                const res = await fetch(endpoint);
+                const res = await fetch(endpoint, {
+                    headers: { 'Authorization': authHeaderFor(selectedUserId) }
+                });
+                if (myToken !== selectionToken) return;
                 if (!res.ok) throw new Error('Failed to load memory');
                 const data = await res.json();
                 logApiResponse(data);
@@ -625,14 +1702,27 @@
                     memoryDisplay.innerHTML = html;
                 }
             } catch (e) {
+                if (myToken !== selectionToken) return;
                 showError('chatError', e.message);
             }
         }
 
         async function sendMessage() {
+            if (sendInFlight) return; // prevent duplicate submission while a send is in flight
             const content = document.getElementById('messageInput').value.trim();
-            if (!content || !currentConvId) return;
+            if (!content || !currentConvId || !selectedUserId) return;
 
+            // Captured so that if the user switches user/persona while this send
+            // is still in flight, the eventual history refresh below is skipped
+            // rather than populating a now-stale selection.
+            const myToken = selectionToken;
+            const sendBtn = document.getElementById('sendMessageBtn');
+            sendInFlight = true;
+            sendBtn.disabled = true;
+            const originalLabel = sendBtn.textContent;
+            sendBtn.textContent = 'Sending...';
+
+            const startTime = performance.now();
             const messageBody = JSON.stringify({ content });
             try {
                 const endpoint = `${API_BASE}/conversations/${currentConvId}/messages`;
@@ -640,24 +1730,59 @@
 
                 const res = await fetch(endpoint, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Idempotency-Key': crypto.randomUUID() },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Idempotency-Key': crypto.randomUUID(),
+                        'Authorization': authHeaderFor(selectedUserId),
+                    },
                     body: messageBody
                 });
                 if (!res.ok) throw new Error('Failed to send message');
                 const data = await res.json();
                 logApiResponse(data);
 
-                document.getElementById('messageInput').value = '';
-                await loadConversation();
-                await loadMemoryFacts();
+                // Client-side response duration — never a backend/provider metric,
+                // and never invented for messages that weren't sent this session.
+                const elapsedSeconds = ((performance.now() - startTime) / 1000).toFixed(1);
+                if (data.message && data.message.id) {
+                    assistantDurations[data.message.id] = `${elapsedSeconds}s`;
+                }
+
+                if (myToken === selectionToken) {
+                    document.getElementById('messageInput').value = '';
+                    await loadConversation(myToken);
+                    // Memory extraction runs asynchronously AFTER this response is
+                    // returned (a separate LLM call on the server), so the fetch
+                    // loadConversation() just did almost always races ahead of it —
+                    // it shows the pre-extraction state, not "no memory recorded".
+                    // Re-check once extraction has had time to finish; the token
+                    // guard inside loadMemoryFacts skips this if the selection has
+                    // since changed. The "Refresh" button covers slower cases.
+                    setTimeout(() => loadMemoryFacts(myToken), 4000);
+                }
             } catch (e) {
-                showError('chatError', e.message);
+                if (myToken === selectionToken) {
+                    showError('chatError', e.message);
+                }
+            } finally {
+                // Always restored, regardless of success, HTTP error, or thrown
+                // exception (criterion 1/2).
+                sendInFlight = false;
+                sendBtn.disabled = false;
+                sendBtn.textContent = originalLabel;
             }
         }
 
         // Initial load
         loadPersonas();
+        loadAdminUsers();
         loadEngines();
+        loadSkills();
+        loadMemoryEngines();
+        loadIntentEngines();
+        loadAiSettings();
+        loadAiConfiguration();
+        loadTestChatOptions();
         (async () => {
             const res = await fetch(`${ADMIN_BASE}/personas`);
             if (res.ok) {

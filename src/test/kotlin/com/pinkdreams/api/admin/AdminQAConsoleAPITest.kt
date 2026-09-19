@@ -139,6 +139,7 @@ class AdminQAConsoleAPITest {
         val personaRepo = PersonaRepository(db)
         val persona = personaRepo.create("alice", "Alice", "female", "straight", 30, emptyMap())
         val conversationRepo = ConversationRepository(db)
+        com.pinkdreams.persistence.repositories.UserRepository(db).create(testUserId)
 
         application {
             module(
@@ -171,6 +172,7 @@ class AdminQAConsoleAPITest {
         val personaRepo = PersonaRepository(db)
         val persona = personaRepo.create("alice", "Alice", "female", "straight", 30, emptyMap())
         val conversationRepo = ConversationRepository(db)
+        com.pinkdreams.persistence.repositories.UserRepository(db).create(testUserId)
 
         application {
             module(
@@ -194,6 +196,37 @@ class AdminQAConsoleAPITest {
         val otherUserId = UUID.randomUUID()
         val otherConversations = conversationRepo.findAllForUser(otherUserId, 10, 0)
         assertEquals(0, otherConversations.size)
+    }
+
+    @Test
+    fun `POST conversations returns 404 for an authenticated user that does not exist`() = testApplication {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+        val personaRepo = PersonaRepository(db)
+        val persona = personaRepo.create("alice-unknown-user-test", "Alice", "female", "straight", 30, emptyMap())
+        val conversationRepo = ConversationRepository(db)
+        val unknownUserId = UUID.randomUUID() // deliberately never registered via UserRepository
+
+        application {
+            module(
+                databaseConfig = DatabaseConfig(jdbcUrl = "jdbc:h2:mem:test", username = "sa", password = ""),
+                llmConfig = LlmConfig(apiKey = "test-key"),
+                chatEngine = null,
+                conversationRepository = conversationRepo,
+                database = db,
+            )
+        }
+
+        val response = client.post("/v1/conversations") {
+            basicAuth(unknownUserId.toString(), "password")
+            contentType(ContentType.Application.Json)
+            setBody("""{"personaId":"${persona.id}"}""")
+        }
+
+        assertEquals(HttpStatusCode.NotFound, response.status)
+
+        // No conversation must have been created for the unknown user
+        assertEquals(0, conversationRepo.findAllForUser(unknownUserId, 10, 0).size)
     }
 
     @Test

@@ -55,7 +55,7 @@ class Phase5COpenRouterTest {
     fun `openrouter choice extracts finish reason correctly`() {
         val choice = OpenRouterChoice(
             finishReason = "stop",
-            message = OpenRouterMessage("assistant", "response")
+            message = OpenRouterResponseMessage("assistant", "response")
         )
 
         assertEquals("stop", choice.finishReason)

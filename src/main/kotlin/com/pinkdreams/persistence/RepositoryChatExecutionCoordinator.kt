@@ -39,7 +39,8 @@ class RepositoryChatExecutionCoordinator(
                     }
                 }
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            System.err.println("EXECUTION_CLAIM: Claim failed for conversation=${request.conversationId} clientMessageId=${request.clientMessageId}: ${e.javaClass.simpleName}: ${e.message}")
             StageResult.Failed(ErrorCode.PERSIST_FAILED)
         }
     }
@@ -47,8 +48,9 @@ class RepositoryChatExecutionCoordinator(
     override fun fail(request: ChatRequest, code: ErrorCode) {
         try {
             executions.fail(request.conversationId, request.clientMessageId, code.name)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
             // Preserve the original pipeline failure; the persistence layer remains authoritative.
+            System.err.println("EXECUTION_FAIL: Marking execution failed did not persist for conversation=${request.conversationId} clientMessageId=${request.clientMessageId} originalCode=${code.name}: ${e.javaClass.simpleName}: ${e.message}")
         }
     }
 }

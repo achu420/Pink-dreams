@@ -45,6 +45,7 @@ data class LlmResponse(
     val provider: String? = null,
     val model: String? = null,
     val metadata: Map<String, String> = emptyMap(),
+    val providerExchange: ProviderExchange? = null,
 )
 
 fun interface LlmClient {

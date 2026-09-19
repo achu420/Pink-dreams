@@ -28,6 +28,9 @@ class MemoryFactRepository(private val db: Database) {
         val learnedAt: LocalDateTime,
         val lastReferencedAt: LocalDateTime?,
         val evictedAt: LocalDateTime?,
+        val owner: String = "USER",
+        val supersedesId: UUID? = null,
+        val updatedAt: LocalDateTime? = null,
     )
 
     fun create(
@@ -40,6 +43,8 @@ class MemoryFactRepository(private val db: Database) {
         status: String = "open",
         source: String = "llm_extracted",
         learnedAt: LocalDateTime = defaultNow(),
+        owner: String = "USER",
+        supersedesId: UUID? = null,
     ): MemoryFact = transaction(db) {
         val id = UUID.randomUUID()
         MemoryFacts.insert {
@@ -55,8 +60,70 @@ class MemoryFactRepository(private val db: Database) {
             it[MemoryFacts.learnedAt] = learnedAt
             it[MemoryFacts.lastReferencedAt] = null
             it[MemoryFacts.evictedAt] = null
+            it[MemoryFacts.owner] = owner
+            it[MemoryFacts.supersedesId] = supersedesId
+            it[MemoryFacts.updatedAt] = null
         }
         findById(id)!!
+    }
+
+    /**
+     * In-place content refinement (Memory Engine UPDATE action) — the same
+     * durable fact, restated more precisely. Not for contradictions; see
+     * [supersede] for that.
+     */
+    fun updateContent(factId: UUID, newContent: String, updatedAt: LocalDateTime = defaultNow()): MemoryFact = transaction(db) {
+        val updated = MemoryFacts.update({ MemoryFacts.id eq factId }) {
+            it[MemoryFacts.fact] = newContent
+            it[MemoryFacts.updatedAt] = updatedAt
+        }
+        require(updated == 1) { "Memory fact not found: $factId" }
+        findById(factId)!!
+    }
+
+    /**
+     * Memory Engine SUPERSEDE action: the existing fact is marked
+     * status="superseded" (never deleted — history is preserved, matching
+     * the same non-destructive convention as SensitivePreferenceRepository's
+     * own supersession), and a new row is created linked via supersedesId.
+     */
+    fun supersede(
+        factId: UUID,
+        newContent: String,
+        factType: String? = null,
+        criticality: String? = null,
+        owner: String? = null,
+    ): MemoryFact = transaction(db) {
+        val existing = findById(factId) ?: throw IllegalArgumentException("Memory fact not found: $factId")
+        val now = defaultNow()
+        MemoryFacts.update({ MemoryFacts.id eq factId }) {
+            it[MemoryFacts.status] = "superseded"
+            it[MemoryFacts.updatedAt] = now
+        }
+        create(
+            userId = existing.userId,
+            personaId = existing.personaId,
+            fact = newContent,
+            factType = factType ?: existing.factType,
+            criticality = criticality ?: existing.criticality,
+            tier = existing.tier,
+            owner = owner ?: existing.owner,
+            supersedesId = factId,
+        )
+    }
+
+    /**
+     * Memory Engine REMOVE action: a soft, auditable state change
+     * (status="removed") — never a SQL DELETE. Distinct from context-selection
+     * "not selected this turn," which never touches the database at all.
+     */
+    fun remove(factId: UUID, removedAt: LocalDateTime = defaultNow()): MemoryFact = transaction(db) {
+        val updated = MemoryFacts.update({ MemoryFacts.id eq factId }) {
+            it[MemoryFacts.status] = "removed"
+            it[MemoryFacts.updatedAt] = removedAt
+        }
+        require(updated == 1) { "Memory fact not found: $factId" }
+        findById(factId)!!
     }
 
     fun findById(id: UUID): MemoryFact? = transaction(db) {
@@ -110,12 +177,18 @@ class MemoryFactRepository(private val db: Database) {
         fact = row[MemoryFacts.fact],
         factType = row[MemoryFacts.factType],
         criticality = row[MemoryFacts.criticality],
-        criticalityRank = row[MemoryFacts.criticalityRank],
+        // Not sourced from Exposed (see DatabaseFactory.MemoryFacts) — the real
+        // column is a Postgres-side GENERATED value; MemoryService.rank()
+        // computes the same mapping from `criticality` whenever this is null.
+        criticalityRank = null,
         tier = row[MemoryFacts.tier],
         status = row[MemoryFacts.status],
         source = row[MemoryFacts.factSource],
         learnedAt = row[MemoryFacts.learnedAt],
         lastReferencedAt = row[MemoryFacts.lastReferencedAt],
         evictedAt = row[MemoryFacts.evictedAt],
+        owner = row[MemoryFacts.owner],
+        supersedesId = row[MemoryFacts.supersedesId],
+        updatedAt = row[MemoryFacts.updatedAt],
     )
 }

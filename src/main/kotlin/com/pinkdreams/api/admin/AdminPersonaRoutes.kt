@@ -39,8 +39,20 @@ data class UpdatePersonaRequest(
     val orientation: String? = null,
     val apparentAge: Int? = null,
     val languageProfile: Map<String, String>? = null,
+    // PROFILE metadata. Omitted => unchanged; empty string / empty list => cleared.
+    val bio: String? = null,
+    val city: String? = null,
+    val occupation: String? = null,
+    val interests: String? = null,
+    val tags: List<String>? = null,
 )
 
+/**
+ * IDENTITY (slug, displayName, gender, orientation, apparentAge, status) and
+ * PROFILE (bio, city, occupation, interests, tags) in one payload but as
+ * clearly distinct groups. Neither is the Persona Core — that is versioned
+ * separately and fetched through the versions endpoints.
+ */
 @Serializable
 data class PersonaResponse(
     val id: String,
@@ -51,6 +63,28 @@ data class PersonaResponse(
     val apparentAge: Int,
     val status: String,
     val activeCoreVersionId: String?,
+    val bio: String? = null,
+    val city: String? = null,
+    val occupation: String? = null,
+    val interests: String? = null,
+    val tags: List<String> = emptyList(),
+)
+
+/** Single mapping point, so a new profile field cannot be forgotten on one route. */
+internal fun personaResponse(p: PersonaRepository.Persona) = PersonaResponse(
+    id = p.id.toString(),
+    slug = p.slug,
+    displayName = p.displayName,
+    gender = p.gender,
+    orientation = p.orientation,
+    apparentAge = p.apparentAge,
+    status = p.status,
+    activeCoreVersionId = p.activeCoreVersionId?.toString(),
+    bio = p.bio,
+    city = p.city,
+    occupation = p.occupation,
+    interests = p.interests,
+    tags = p.tags,
 )
 
 @Serializable
@@ -60,7 +94,6 @@ data class PersonaListResponse(
 
 @Serializable
 data class CreateCoreVersionRequest(
-    val version: Int,
     val content: String,
     val changelogNote: String? = null,
 )
@@ -74,6 +107,7 @@ data class CoreVersionResponse(
     val status: String,
     val changelogNote: String?,
     val author: String?,
+    val isActive: Boolean,
 )
 
 @Serializable
@@ -86,6 +120,13 @@ class AdminPersonaRoutes(
     private val coreVersionRepository: PersonaCoreVersionRepository,
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
 ) {
+    // Persona core versions have no isActive column of their own (unlike
+    // ConversationEngines) — "active" is a pointer (Personas.active_core_version_id)
+    // on the parent persona row, so every response must look it up explicitly
+    // rather than reading a field off the version itself.
+    private fun isActiveVersion(personaId: UUID, versionId: UUID): Boolean =
+        personaRepository.findById(personaId)?.activeCoreVersionId == versionId
+
     fun register(route: Route) {
         // Serve admin UI without auth (public access to QA console)
         route.get("/admin") {
@@ -143,16 +184,7 @@ class AdminPersonaRoutes(
                     )
                     call.respond(
                         HttpStatusCode.Created,
-                        PersonaResponse(
-                            id = persona.id.toString(),
-                            slug = persona.slug,
-                            displayName = persona.displayName,
-                            gender = persona.gender,
-                            orientation = persona.orientation,
-                            apparentAge = persona.apparentAge,
-                            status = persona.status,
-                            activeCoreVersionId = persona.activeCoreVersionId?.toString(),
-                        ),
+                        personaResponse(persona),
                     )
                 } catch (e: Exception) {
                     call.respond(
@@ -181,21 +213,15 @@ class AdminPersonaRoutes(
                     return@get
                 }
 
-                val personas = personaRepository.findAll()
+                // Phase ADMIN-3: hidden memory-scope personas created for Test
+                // Chat conversations (see TestChatService) are internal
+                // bookkeeping, never a persona an admin can select or edit.
+                val personas = personaRepository.findAll().filterNot { it.slug.startsWith("__test_memory_scope__") }
                 call.respond(
                     HttpStatusCode.OK,
                     PersonaListResponse(
                         personas = personas.map { p ->
-                            PersonaResponse(
-                                id = p.id.toString(),
-                                slug = p.slug,
-                                displayName = p.displayName,
-                                gender = p.gender,
-                                orientation = p.orientation,
-                                apparentAge = p.apparentAge,
-                                status = p.status,
-                                activeCoreVersionId = p.activeCoreVersionId?.toString(),
-                            )
+                            personaResponse(p)
                         },
                     ),
                 )
@@ -247,19 +273,20 @@ class AdminPersonaRoutes(
                         gender = request.gender,
                         orientation = request.orientation,
                         apparentAge = request.apparentAge,
+                        bio = request.bio,
+                        city = request.city,
+                        occupation = request.occupation,
+                        interests = request.interests,
+                        tags = request.tags,
                     )
                     call.respond(
                         HttpStatusCode.OK,
-                        PersonaResponse(
-                            id = persona.id.toString(),
-                            slug = persona.slug,
-                            displayName = persona.displayName,
-                            gender = persona.gender,
-                            orientation = persona.orientation,
-                            apparentAge = persona.apparentAge,
-                            status = persona.status,
-                            activeCoreVersionId = persona.activeCoreVersionId?.toString(),
-                        ),
+                        personaResponse(persona),
+                    )
+                } catch (e: IllegalArgumentException) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, e.message ?: "Persona not found", null)),
                     )
                 } catch (e: Exception) {
                     call.respond(
@@ -299,6 +326,7 @@ class AdminPersonaRoutes(
                 }
 
                 val versions = coreVersionRepository.findForPersona(personaId)
+                val activeCoreVersionId = personaRepository.findById(personaId)?.activeCoreVersionId
                 call.respond(
                     HttpStatusCode.OK,
                     CoreVersionListResponse(
@@ -311,6 +339,7 @@ class AdminPersonaRoutes(
                                 status = v.status,
                                 changelogNote = v.changelogNote,
                                 author = v.author,
+                                isActive = v.id == activeCoreVersionId,
                             )
                         },
                     ),
@@ -358,9 +387,10 @@ class AdminPersonaRoutes(
                 }
 
                 try {
-                    val version = coreVersionRepository.create(
+                    // Version number is always server-computed (persona's current
+                    // max version + 1) — the client cannot supply or influence it.
+                    val version = coreVersionRepository.createNextVersion(
                         personaId = personaId,
-                        version = request.version,
                         content = request.content,
                         changelogNote = request.changelogNote,
                         author = principal.name,
@@ -375,6 +405,7 @@ class AdminPersonaRoutes(
                             status = version.status,
                             changelogNote = version.changelogNote,
                             author = version.author,
+                            isActive = false,
                         ),
                     )
                 } catch (e: Exception) {
@@ -426,6 +457,7 @@ class AdminPersonaRoutes(
                             status = version.status,
                             changelogNote = version.changelogNote,
                             author = version.author,
+                            isActive = false,
                         ),
                     )
                 } catch (e: IllegalArgumentException) {
@@ -494,6 +526,7 @@ class AdminPersonaRoutes(
                                 status = version.status,
                                 changelogNote = version.changelogNote,
                                 author = version.author,
+                                isActive = true,
                             ),
                         )
                     } else {
@@ -556,6 +589,7 @@ class AdminPersonaRoutes(
                             status = version.status,
                             changelogNote = version.changelogNote,
                             author = version.author,
+                            isActive = false,
                         ),
                     )
                 } catch (e: IllegalArgumentException) {

@@ -33,6 +33,7 @@ import com.pinkdreams.persistence.repositories.MessageRepository
 import com.pinkdreams.persistence.repositories.PersonaRepository
 import com.pinkdreams.persistence.repositories.PersonaCoreVersionRepository
 import com.pinkdreams.persistence.repositories.UserProfileRepository
+import com.pinkdreams.persistence.repositories.UserRepository
 import java.util.concurrent.Executor
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
@@ -103,53 +104,129 @@ fun Application.module(
     val engineRepo = ConversationEngineRepository(db)
     val messageRepo = MessageRepository(db)
     val userProfileRepo = UserProfileRepository(db)
+    val userRepo = UserRepository(db)
     val executionRepo = ChatRequestExecutionRepository(db)
     val memoryFactRepo = MemoryFactRepository(db)
     val memoryService = MemoryService(memoryFactRepo)
+    val sensitivePreferenceRepo = com.pinkdreams.persistence.repositories.SensitivePreferenceRepository(db)
+    val sensitivePreferenceService = com.pinkdreams.chat.sensitive.SensitivePreferenceService(sensitivePreferenceRepo)
+    val skillRepo = com.pinkdreams.persistence.repositories.SkillRepository(db)
+    val memoryEngineRepo = com.pinkdreams.persistence.repositories.MemoryEngineRepository(db)
+    val intentEngineRepo = com.pinkdreams.persistence.repositories.IntentEngineRepository(db)
+    val aiSettingsRepo = com.pinkdreams.persistence.repositories.AiSettingsRepository(db)
+    // Phase ADMIN-2 — one authoritative resolution of AI runtime settings:
+    // DB setting → environment variable → application default. With no row in
+    // ai_settings this yields exactly the previous values, so adding this layer
+    // cannot change a running deployment's behavior. Constructed once here and
+    // shared by generation and the admin routes, so both report the same thing.
+    val aiRuntimeSettings = com.pinkdreams.config.AiRuntimeSettings(llmConfig, aiSettingsRepo)
+    // Only seed for a genuine application startup (no database explicitly
+    // injected) — never for tests, which pass their own isolated `database`
+    // and must see empty configuration tables unless they seed them themselves.
+    if (database == null) try {
+        val report = com.pinkdreams.baseline.BaselineSeeder(
+            conversationEngineRepository = engineRepo,
+            personaRepository = personaRepo,
+            personaCoreVersionRepository = coreVersionRepo,
+            skillRepository = skillRepo,
+            memoryEngineRepository = memoryEngineRepo,
+            intentEngineRepository = intentEngineRepo,
+        ).seedIfMissing()
+        System.err.println(
+            "BASELINE_SEED: conversationEngine=${report.conversationEngine} persona=${report.persona} " +
+                "personaCore=${report.personaCore} memoryEngine=${report.memoryEngine} " +
+                "intentEngine=${report.intentEngine} " +
+                "skillsCreated=${report.skillsCreated.size} skillsAlreadyPresent=${report.skillsAlreadyPresent.size}",
+        )
+    } catch (e: Exception) {
+        // Seeding is a startup convenience only — never block application startup.
+        System.err.println("BASELINE_SEED: failed, continuing without seeding: ${e.javaClass.simpleName}: ${e.message}")
+    }
+
+    val llmClient = if (System.getenv("OPENROUTER_API_KEY") != null) {
+        com.pinkdreams.llm.OpenRouterLlmClient(
+            apiKey = llmConfig.apiKey,
+            endpoint = llmConfig.endpoint,
+            model = llmConfig.model,
+            maxOutputTokens = llmConfig.maxOutputTokens,
+            timeoutSeconds = llmConfig.timeoutSeconds,
+        )
+    } else {
+        com.pinkdreams.llm.FakeLlmClient()
+    }
+    // Phase ADMIN-3: production and every Test Chat engine now share one
+    // construction path (ChatEngineFactory) — see its doc comment. This
+    // Dependencies bundle IS the production configuration; Test Chat builds its
+    // own per-conversation engine by copying this bundle and swapping in
+    // "Pinned" repositories (testchat/PinnedRepositories.kt) plus a
+    // TestMemoryScope, never by duplicating this wiring.
+    val chatEngineDependencies = com.pinkdreams.chat.ChatEngineFactory.Dependencies(
+        llmClient = llmClient,
+        llmConfig = llmConfig,
+        db = db,
+        conversationRepository = conversationRepo,
+        messageRepository = messageRepo,
+        userProfileRepository = userProfileRepo,
+        memoryService = memoryService,
+        memoryFactRepository = memoryFactRepo,
+        engineRepository = engineRepo,
+        personaRepository = personaRepo,
+        skillRepository = skillRepo,
+        memoryEngineRepository = memoryEngineRepo,
+        intentEngineRepository = intentEngineRepo,
+        executionRepository = executionRepo,
+        aiRuntimeSettings = aiRuntimeSettings,
+        sensitivePreferenceService = sensitivePreferenceService,
+    )
 
     // Initialize ChatEngine if not provided
-    val engine = chatEngine ?: run {
-        val llmClient = if (System.getenv("OPENROUTER_API_KEY") != null) {
-            com.pinkdreams.llm.OpenRouterLlmClient(
-                apiKey = llmConfig.apiKey,
-                endpoint = llmConfig.endpoint,
-                model = llmConfig.model,
-                maxOutputTokens = llmConfig.maxOutputTokens,
-                timeoutSeconds = llmConfig.timeoutSeconds,
-            )
-        } else {
-            com.pinkdreams.llm.FakeLlmClient()
-        }
-        val generationConfig = com.pinkdreams.llm.GenerationConfig(
-            maxOutputTokens = llmConfig.maxOutputTokens
-        )
-        val llmGenerator = LlmGenerator(llmClient, config = generationConfig)
-        PipelineChatEngine(
-            entitlementChecker = { com.pinkdreams.chat.EntitlementDecision.Allowed },
-            inputModerator = { com.pinkdreams.chat.ModerationDecision.Allowed },
-            contextAssembler = RepositoryContextAssembler(
-                conversationRepository = conversationRepo,
-                messageRepository = messageRepo,
-                userProfileRepository = userProfileRepo,
-                memoryService = memoryService,
-                engineRepository = engineRepo,
-                personaRepository = personaRepo,
-            ),
-            generator = llmGenerator,
-            outputValidator = { _, _ -> com.pinkdreams.chat.ValidationDecision.Accepted },
-            persistence = RepositoryChatPersistence(db, executionRepo),
-            delivery = { _, _ -> com.pinkdreams.chat.StageResult.Succeeded(Unit) },
-            executionCoordinator = RepositoryChatExecutionCoordinator(executionRepo, conversationRepo, messageRepo),
-        )
-    }
+    val engine = chatEngine ?: com.pinkdreams.chat.ChatEngineFactory.build(chatEngineDependencies)
+
+    // Phase ADMIN-3 — Test Chat. Shares `chatEngineDependencies` (the same
+    // production configuration) and builds its own per-conversation engine
+    // from it per message — see TestChatService.
+    val testChatService = com.pinkdreams.testchat.TestChatService(
+        productionDependencies = chatEngineDependencies,
+        conversationRepository = conversationRepo,
+        personaRepository = personaRepo,
+        personaCoreVersionRepository = coreVersionRepo,
+        skillRepository = skillRepo,
+        userRepository = userRepo,
+    )
 
     val authProvider = adminAuthProvider ?: AdminAuthorizationProvider()
 
     routing {
         HealthRoutes().register(this)
         ChatRoutes(engine, conversationRepo, memoryFactRepo).register(this)
-        ConversationHistoryRoutes(conversationRepo, messageRepo).register(this)
+        ConversationHistoryRoutes(conversationRepo, messageRepo, userRepository = userRepo).register(this)
         AdminEngineRoutes(engineRepo, authProvider).register(this)
         AdminPersonaRoutes(personaRepo, coreVersionRepo, authProvider).register(this)
+        com.pinkdreams.api.admin.AdminSkillRoutes(skillRepo, authProvider).register(this)
+        com.pinkdreams.api.admin.AdminMemoryEngineRoutes(memoryEngineRepo, authProvider).register(this)
+        com.pinkdreams.api.admin.AdminIntentEngineRoutes(intentEngineRepo, skillRepo, authProvider).register(this)
+        com.pinkdreams.api.admin.AdminAiSettingsRoutes(
+            aiSettingsRepository = aiSettingsRepo,
+            aiRuntimeSettings = aiRuntimeSettings,
+            conversationEngineRepository = engineRepo,
+            intentEngineRepository = intentEngineRepo,
+            memoryEngineRepository = memoryEngineRepo,
+            skillRepository = skillRepo,
+            personaRepository = personaRepo,
+            personaCoreVersionRepository = coreVersionRepo,
+            adminAuthorizationProvider = authProvider,
+        ).register(this)
+        com.pinkdreams.api.admin.AdminUserRoutes(
+            userRepository = userRepo,
+            userProfileRepository = userProfileRepo,
+            provisioning = com.pinkdreams.persistence.AdminUserProvisioning(db, userRepo, userProfileRepo),
+            adminAuthorizationProvider = authProvider,
+        ).register(this)
+        com.pinkdreams.api.admin.AdminTestChatRoutes(
+            testChatService = testChatService,
+            conversationRepository = conversationRepo,
+            messageRepository = messageRepo,
+            adminAuthorizationProvider = authProvider,
+        ).register(this)
     }
 }

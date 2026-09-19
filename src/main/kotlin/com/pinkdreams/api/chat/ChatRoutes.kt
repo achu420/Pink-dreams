@@ -132,6 +132,18 @@ class ChatRoutes(
                 )
                 return@post
             }
+            // Phase ADMIN-3 section 14: a normal client request must never be able
+            // to reach a TEST configuration snapshot. Test conversations are only
+            // ever created and driven through /v1/admin/test-chat/*; this is a
+            // defensive second layer, not the primary boundary (the primary
+            // boundary is simply that this route never looks at any snapshot).
+            if (conversation.isTest) {
+                call.respond(
+                    HttpStatusCode.NotFound,
+                    ErrorResponse(ApiError(ErrorCode.NOT_FOUND, "Conversation not found", null)),
+                )
+                return@post
+            }
 
             // Request parsing
             val request = try {

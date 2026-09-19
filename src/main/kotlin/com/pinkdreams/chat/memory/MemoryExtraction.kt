@@ -36,25 +36,40 @@ class BestEffortMemoryExtraction(
     private val extractor: MemoryExtractor,
     private val memoryService: MemoryService,
     private val executor: Executor = ForkJoinPool.commonPool(),
+    // Phase ADMIN-3: see MemoryScopeResolver. Default preserves pre-ADMIN-3
+    // behavior exactly for every existing caller.
+    private val memoryScopeResolver: MemoryScopeResolver = ProductionMemoryScope,
 ) : PostDeliveryMemoryExtraction {
     override fun dispatch(turn: CompletedTurn) {
         CompletableFuture.runAsync({
             try {
+                val scopedPersonaId = memoryScopeResolver.resolve(turn.request.userId, turn.request.personaId, turn.request.conversationId)
                 val result = extractor.extract(turn)
                 val candidates = result.newFacts.map {
                     it.copy(source = "llm_extracted", tier = "hot")
                 }
-                memoryService.record(turn.request.userId, turn.request.personaId, candidates)
+                val accepted = memoryService.record(turn.request.userId, scopedPersonaId, candidates)
+                // Log the success path too, not only failures: "extracted nothing"
+                // and "the hook never ran" are indistinguishable otherwise, which
+                // makes a silently empty memory store impossible to diagnose.
+                System.err.println(
+                    "MEMORY_EXTRACTION: conversation=${turn.request.conversationId} " +
+                        "requestId=${turn.request.requestId} proposed=${candidates.size} accepted=${accepted.size}",
+                )
                 if (result.referencedFactIds.isNotEmpty()) {
                     memoryService.markReferenced(
                         turn.request.userId,
-                        turn.request.personaId,
+                        scopedPersonaId,
                         result.referencedFactIds,
                         LocalDateTime.now(),
                     )
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
                 // Extraction is best effort and must not affect the completed chat turn.
+                System.err.println(
+                    "MEMORY_EXTRACTION: Extraction failed for conversation=${turn.request.conversationId} " +
+                        "requestId=${turn.request.requestId}: ${e.javaClass.simpleName}: ${e.message}",
+                )
             }
         }, executor)
     }
