@@ -5,18 +5,23 @@ import com.pinkdreams.common.errors.ApiError
 import com.pinkdreams.common.errors.ErrorCode
 import com.pinkdreams.common.errors.ErrorResponse
 import com.pinkdreams.persistence.AdminUserProvisioning
+import com.pinkdreams.persistence.repositories.AdminStatsRepository
 import com.pinkdreams.persistence.repositories.ConversationRepository
 import com.pinkdreams.persistence.repositories.MemoryFactRepository
 import com.pinkdreams.persistence.repositories.PersonaRepository
 import com.pinkdreams.persistence.repositories.UserProfileRepository
 import com.pinkdreams.persistence.repositories.UserRepository
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.auth.UserIdPrincipal
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
 import io.ktor.server.request.receive
+import io.ktor.server.response.header
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -101,6 +106,10 @@ class AdminUserRoutes(
     private val conversationRepository: ConversationRepository? = null,
     private val memoryFactRepository: MemoryFactRepository? = null,
     private val personaRepository: PersonaRepository? = null,
+    // Optional: supplies per-user conversation count / last-activity columns
+    // to the CSV export, via ONE grouped query for the whole list. Absent, the
+    // export simply reports 0/blank for those two columns rather than failing.
+    private val statsRepository: AdminStatsRepository? = null,
 ) {
     fun register(route: Route) {
         route.authenticate("session-auth", "dev-auth") {
@@ -207,6 +216,81 @@ class AdminUserRoutes(
                 call.respond(HttpStatusCode.OK, AdminUserListResponse(users))
             }
 
+            // GET /v1/admin/users/export.csv — the Users list as CSV.
+            //
+            // Registered as a LITERAL path segment, so Ktor's routing always
+            // prefers it over the `{userId}` route below (constant segments
+            // outrank parameters); "export.csv" is not a UUID anyway.
+            //
+            // The same filters the Users list UI already offers (free-text
+            // search, gender, interest, city, min/max age) are accepted as
+            // optional query parameters and applied here, so "Export" exports
+            // exactly what the admin is looking at rather than silently
+            // dumping everyone. Omitting them all exports the full list.
+            get("/v1/admin/users/export.csv") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@get
+                }
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@get
+                }
+
+                val params = call.request.queryParameters
+                val search = params["search"]?.trim()?.lowercase()?.takeIf { it.isNotEmpty() }
+                val gender = params["gender"]?.takeIf { it.isNotBlank() }
+                val interest = params["interest"]?.takeIf { it.isNotBlank() }
+                val city = params["city"]?.takeIf { it.isNotBlank() }
+                val minAge = params["minAge"]?.toIntOrNull()
+                val maxAge = params["maxAge"]?.toIntOrNull()
+
+                val activity = statsRepository?.activityByUser() ?: emptyMap()
+                val rows = userRepository.findAll()
+                    .map { userId -> userId to userProfileRepository.findByUserId(userId) }
+                    .filter { (userId, profile) ->
+                        if (gender != null && (profile?.gender ?: "") != gender) return@filter false
+                        if (interest != null && (profile?.interest ?: "") != interest) return@filter false
+                        if (city != null && (profile?.city ?: "") != city) return@filter false
+                        // An unknown age is excluded only when a bound is
+                        // actually set — never coerced to 0. Mirrors the UI.
+                        val age = profile?.age
+                        if (minAge != null && (age == null || age < minAge)) return@filter false
+                        if (maxAge != null && (age == null || age > maxAge)) return@filter false
+                        if (search == null) return@filter true
+                        listOf(profile?.displayName, profile?.city, userId.toString(), profile?.gender, profile?.interest)
+                            .any { (it ?: "").lowercase().contains(search) }
+                    }
+                    .sortedWith(compareBy({ it.second?.displayName ?: "" }, { it.first.toString() }))
+                    .map { (userId, profile) ->
+                        val stats = activity[userId]
+                        listOf(
+                            userId.toString(),
+                            profile?.displayName ?: "",
+                            profile?.gender ?: "",
+                            profile?.interest ?: "",
+                            profile?.city ?: "",
+                            profile?.age ?: "",
+                            stats?.conversations ?: 0L,
+                            stats?.lastActiveAt?.toString() ?: "",
+                        )
+                    }
+
+                val csv = AdminCsv.document(
+                    header = listOf("userId", "displayName", "gender", "interest", "city", "age", "conversations", "lastActiveAt"),
+                    rows = rows,
+                )
+                call.response.header(HttpHeaders.ContentDisposition, "attachment; filename=\"users.csv\"")
+                call.respondText(csv, ContentType.Text.CSV)
+            }
+
             // GET /v1/admin/users/{userId}
             get("/v1/admin/users/{userId}") {
                 val principal = call.principal<UserIdPrincipal>()
@@ -304,6 +388,74 @@ class AdminUserRoutes(
                         )
                     }
                 call.respond(HttpStatusCode.OK, AdminUserConversationListResponse(rows))
+            }
+
+            // GET /v1/admin/users/{userId}/memory/export.csv — the SAME facts
+            // the Memory tab lists, as a downloadable CSV. Every field goes
+            // through AdminCsv.escape, so a fact containing a comma, a quote
+            // or a newline (all of which real, LLM-extracted facts do contain)
+            // cannot corrupt the file's column structure.
+            get("/v1/admin/users/{userId}/memory/export.csv") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@get
+                }
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@get
+                }
+
+                val userId = parseUserId(call.parameters["userId"])
+                if (userId == null) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid user ID format", null)),
+                    )
+                    return@get
+                }
+                val memory = memoryFactRepository
+                if (memory == null) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        ErrorResponse(ApiError(ErrorCode.INTERNAL_SERVER_ERROR, "Memory lookup is not configured", null)),
+                    )
+                    return@get
+                }
+
+                val personaNames = personaRepository?.findAll()?.associate { it.id.toString() to it.displayName } ?: emptyMap()
+                val rows = memory.findAllForUser(userId)
+                    .sortedByDescending { it.learnedAt }
+                    .map { f ->
+                        listOf(
+                            f.id.toString(),
+                            f.personaId.toString(),
+                            personaNames[f.personaId.toString()] ?: "",
+                            f.fact,
+                            f.factType,
+                            f.criticality,
+                            f.tier,
+                            f.status,
+                            f.owner,
+                            f.source,
+                            f.learnedAt.toString(),
+                        )
+                    }
+                val csv = AdminCsv.document(
+                    header = listOf(
+                        "factId", "personaId", "personaDisplayName", "fact", "factType",
+                        "criticality", "tier", "status", "owner", "source", "learnedAt",
+                    ),
+                    rows = rows,
+                )
+                call.response.header(HttpHeaders.ContentDisposition, "attachment; filename=\"memory-facts-$userId.csv\"")
+                call.respondText(csv, ContentType.Text.CSV)
             }
 
             // GET /v1/admin/users/{userId}/memory — every memory fact for this

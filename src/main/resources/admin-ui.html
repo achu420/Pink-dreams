@@ -484,7 +484,7 @@
                 </div>
 
                 <div class="table-wrap"><table id="personasTable">
-                    <thead><tr><th></th><th>Persona</th><th>Slug</th><th>Status</th><th>Production</th><th>Testing</th><th>Actions</th></tr></thead>
+                    <thead><tr><th></th><th>Persona</th><th>Slug</th><th>Status</th><th>Production</th><th>Testing</th><th>Conversations</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table></div>
 
@@ -936,12 +936,13 @@
                     </div>
                     <div>
                         <button class="secondary" onclick="resetUserFilters()">↺ Reset</button>
+                        <button class="secondary" onclick="downloadUsersCsv()" title="Download the filtered list as CSV">⬇ Export</button>
                     </div>
                     <div class="filter-count" id="userFilterCount"></div>
                 </div>
 
                 <div class="table-wrap"><table id="usersTable">
-                    <thead><tr><th>Display Name</th><th>Gender</th><th>Interest</th><th>City</th><th>Age</th><th>User ID</th></tr></thead>
+                    <thead><tr><th>Display Name</th><th>Gender</th><th>Interest</th><th>City</th><th>Age</th><th>Conversations</th><th>Last active</th><th>User ID</th></tr></thead>
                     <tbody></tbody>
                 </table></div>
             </div>
@@ -1085,6 +1086,9 @@
                     <div class="ci-pane ci-transcript">
                         <div class="ci-pane-head">
                             <h3 style="margin:0;" id="ciTranscriptTitle">Select a conversation</h3>
+                            <button class="secondary" id="ciExportBtn" disabled
+                                    onclick="ciExportTranscript()" style="margin:0; padding: 5px 10px; font-size: 11px;"
+                                    title="Download this conversation's full transcript as JSON">⬇ Export</button>
                         </div>
                         <div id="ciDetailError" class="error" style="display:none; margin: 10px 12px;"></div>
                         <div id="ciTranscript" class="ci-transcript-body">
@@ -1542,6 +1546,19 @@
                 // Every number below is read from a real endpoint. A metric
                 // whose backing data is unavailable renders "—" rather than a
                 // fabricated value — no card here is a placeholder.
+                // The busiest persona's NAME is resolved client-side from the
+                // persona list already fetched above — the stats endpoint
+                // returns only its id, so no server-side join is introduced.
+                let topPersonaLabel = '—';
+                let topPersonaNote = '';
+                if (stats && stats.topPersonaId) {
+                    const match = (personas?.personas || []).find(p => p.id === stats.topPersonaId);
+                    topPersonaLabel = escapeHtml(match ? match.displayName : String(stats.topPersonaId).slice(0, 8) + '…');
+                    topPersonaNote = `${stats.topPersonaConversations} conversation(s)`;
+                } else if (stats) {
+                    topPersonaNote = 'no conversations yet';
+                }
+
                 const card = (label, value, note) => `
                     <div class="stat-card">
                         <div class="stat-label">${escapeHtml(label)}</div>
@@ -1561,7 +1578,13 @@
                     card('Recorded Exchanges', overall ? overall.count : '—', 'LLM calls captured') +
                     card('p95 Latency', overall ? fmtMs(overall.p95) : '—', 'on recorded exchanges') +
                     card('≤10s (SLA)', sla ? sla.within10sRatePercent.toFixed(1) + '%' : '—', 'measurement point') +
-                    card('Error Rate', err ? err.failureRatePercent.toFixed(1) + '%' : '—', 'failed exchanges');
+                    card('Error Rate', err ? err.failureRatePercent.toFixed(1) + '%' : '—', 'failed exchanges') +
+                    card('Total Messages', stats ? stats.totalMessages : '—', 'all time, all roles') +
+                    card('Memory Facts', stats ? stats.totalMemoryFacts : '—',
+                         stats ? `${stats.openMemoryFacts} open` : '') +
+                    card('Skills in Testing', stats ? stats.skillsInTesting : '—',
+                         stats ? `${stats.skillsInProduction} in production, ${stats.skillsInDraft} draft` : '') +
+                    card('Busiest Persona', topPersonaLabel, topPersonaNote);
 
                 const kv = (k, v) => `<div class="kv-line"><span class="kv-k">${escapeHtml(k)}</span><span class="kv-v">${v}</span></div>`;
                 document.getElementById('dashboardAiSummary').innerHTML = config ? (
@@ -1680,6 +1703,10 @@
             return `<span class="badge draft">${escapeHtml(String(status || 'draft')).toUpperCase()}</span>`;
         }
 
+        // personaId -> conversation count, from GET /v1/admin/stats/personas.
+        // null means "not currently available" and renders as "—".
+        let personaConversationCounts = null;
+
         async function loadPersonas() {
             try {
                 const res = await fetch(`${ADMIN_BASE}/personas`);
@@ -1698,6 +1725,17 @@
                         personaVersionsCache[p.id] = null; // unknown, never guessed
                     }
                 }));
+
+                // ONE grouped query server-side covering every persona — not
+                // a per-row request. Unavailable renders "—", never a fake 0.
+                try {
+                    const sres = await fetch(`${ADMIN_BASE}/stats/personas`);
+                    personaConversationCounts = sres.ok
+                        ? Object.fromEntries(((await sres.json()).personas || []).map(p => [p.personaId, p.conversations]))
+                        : null;
+                } catch (e) {
+                    personaConversationCounts = null;
+                }
                 renderPersonas();
             } catch (e) {
                 showError('createPersonaError', e.message);
@@ -1734,6 +1772,7 @@
                         <td>${statusBadge(p.status, false)}</td>
                         <td>${known ? stageBadge('production', production ? production.version : null) : '<span class="badge muted">unavailable</span>'}</td>
                         <td>${known ? stageBadge('testing', testing ? testing.version : null) : '<span class="badge muted">unavailable</span>'}</td>
+                        <td>${personaConversationCounts ? escapeHtml(personaConversationCounts[p.id] || 0) : '—'}</td>
                         <td class="row-actions">
                             <button onclick="openPersonaDetail('${escAttr(p.id)}')" class="secondary">Open →</button>
                             <button onclick="selectPersona('${escAttr(p.id)}', '${escAttr(p.displayName)}')" class="secondary">Versions →</button>
@@ -1741,9 +1780,9 @@
                         </td>
                     </tr>
                     <tr class="vh-detail" id="personaVersions-${escAttr(p.id)}" style="display:${open ? '' : 'none'};">
-                        <td colspan="7"><div class="vh-inner">${personaVersionHistoryHtml(p.id)}</div></td>
+                        <td colspan="8"><div class="vh-inner">${personaVersionHistoryHtml(p.id)}</div></td>
                     </tr>`;
-            }).join('') : emptyRow(7, personasCache.length ? 'No personas match these filters.' : 'No personas found.');
+            }).join('') : emptyRow(8, personasCache.length ? 'No personas match these filters.' : 'No personas found.');
         }
 
         function personaVersionHistoryHtml(personaId) {
@@ -3068,6 +3107,18 @@
                 const data = await res.json();
                 adminUsers = data.users || [];
 
+                // ONE extra request for the WHOLE list (a single grouped
+                // query server-side), never one per user row. If it fails the
+                // two activity columns render "—" rather than a fake 0.
+                try {
+                    const sres = await fetch(`${ADMIN_BASE}/stats/users`);
+                    userActivity = sres.ok
+                        ? Object.fromEntries(((await sres.json()).users || []).map(u => [u.userId, u]))
+                        : null;
+                } catch (e) {
+                    userActivity = null;
+                }
+
                 refreshUserFilterOptions();
                 renderUsers();
 
@@ -3096,6 +3147,34 @@
          * AdminUserRoutes / UserProfileRepository), so any such split would be
          * an invented distinction rather than a real one.
          */
+        // userId -> { conversations, lastActiveAt }, from GET /v1/admin/stats/users.
+        // null means "not currently available" and renders as "—", never 0.
+        let userActivity = null;
+
+        /** Current Users-list filters, as the query string the CSV export takes. */
+        function userFilterParams() {
+            const params = new URLSearchParams();
+            const put = (key, id) => {
+                const el = document.getElementById(id);
+                const v = el && (el.value || '').trim();
+                if (v) params.set(key, v);
+            };
+            put('search', 'userSearch');
+            put('gender', 'userGenderFilter');
+            put('interest', 'userInterestFilter');
+            put('city', 'userCityFilter');
+            put('minAge', 'userMinAge');
+            put('maxAge', 'userMaxAge');
+            return params;
+        }
+
+        // Opens the export URL directly so the browser handles the download
+        // with the session cookie already attached — the same approach the
+        // Observability exports use.
+        function downloadUsersCsv() {
+            window.open(`${ADMIN_BASE}/users/export.csv?${userFilterParams().toString()}`, '_blank');
+        }
+
         function distinctValues(field) {
             return Array.from(new Set(
                 adminUsers.map(u => (u[field] || '').trim()).filter(v => v !== '')
@@ -3143,7 +3222,9 @@
             document.getElementById('userFilterCount').textContent =
                 `${rows.length} of ${adminUsers.length} users`;
 
-            table.innerHTML = rows.length ? rows.map(u => `
+            table.innerHTML = rows.length ? rows.map(u => {
+                const act = userActivity ? (userActivity[u.userId] || { conversations: 0, lastActiveAt: null }) : null;
+                return `
                 <tr>
                     <td><a href="#user-detail" onclick="openUserDetail('${escAttr(u.userId)}'); return false;"
                            style="color:var(--soft-rose);text-decoration:none;font-weight:600;">${escapeHtml(u.displayName) || '(unnamed)'}</a></td>
@@ -3151,9 +3232,11 @@
                     <td>${escapeHtml(u.interest) || '—'}</td>
                     <td>${escapeHtml(u.city) || '—'}</td>
                     <td>${u.age != null ? escapeHtml(u.age) : '—'}</td>
+                    <td>${act ? escapeHtml(act.conversations) : '—'}</td>
+                    <td class="mono">${act && act.lastActiveAt ? escapeHtml(act.lastActiveAt) : '—'}</td>
                     <td class="mono" title="${escAttr(u.userId)}">${escapeHtml(String(u.userId).slice(0, 8))}…</td>
-                </tr>
-            `).join('') : emptyRow(6, adminUsers.length ? 'No users match these filters.' : 'No users found.');
+                </tr>`;
+            }).join('') : emptyRow(8, adminUsers.length ? 'No users match these filters.' : 'No users found.');
         }
 
         /* ---------------------------------------------------------------
@@ -3176,6 +3259,14 @@
             const nav = document.querySelector('.nav-item[data-anchor="sec-users"]');
             if (nav) navigate(nav, 'setup', 'sec-users');
             else showView('setup');
+        }
+
+        function downloadConversationTranscript(conversationId) {
+            window.open(`${ADMIN_BASE}/conversations/${encodeURIComponent(conversationId)}/export.json`, '_blank');
+        }
+
+        function downloadUserMemoryCsv(userId) {
+            window.open(`${ADMIN_BASE}/users/${encodeURIComponent(userId)}/memory/export.csv`, '_blank');
         }
 
         async function openUserDetail(userId) {
@@ -3216,7 +3307,7 @@
                 const rows = (await res.json()).conversations || [];
                 document.getElementById('udPanel-conversations').innerHTML = rows.length ? `
                     <div class="table-wrap"><table>
-                        <thead><tr><th>Persona</th><th>State</th><th>Mode</th><th>Last message</th><th>Created</th><th>Conversation ID</th></tr></thead>
+                        <thead><tr><th>Persona</th><th>State</th><th>Mode</th><th>Last message</th><th>Created</th><th>Conversation ID</th><th></th></tr></thead>
                         <tbody>${rows.map(c => `<tr>
                             <td>${escapeHtml(c.personaDisplayName) || '<span class="filter-count">unknown persona</span>'}</td>
                             <td>${escapeHtml(c.state)}</td>
@@ -3224,6 +3315,9 @@
                             <td class="mono">${escapeHtml(c.lastMessageAt) || '—'}</td>
                             <td class="mono">${escapeHtml(c.createdAt)}</td>
                             <td class="mono" title="${escAttr(c.id)}">${escapeHtml(String(c.id).slice(0, 8))}…</td>
+                            <td class="row-actions"><button class="secondary"
+                                onclick="downloadConversationTranscript('${escAttr(c.id)}')"
+                                title="Download this conversation's transcript as JSON">⬇ Transcript</button></td>
                         </tr>`).join('')}</tbody>
                     </table></div>`
                     : '<div class="empty-state" style="padding:20px;">This user has no conversations.</div>';
@@ -3239,7 +3333,9 @@
                 const facts = (await res.json()).memoryFacts || [];
                 document.getElementById('udPanel-memory').innerHTML = `
                     <div class="section-sub">Memory is always scoped to a user+persona relationship — this
-                    view simply lists every relationship's facts for this user. ${facts.length} fact(s).</div>` +
+                    view simply lists every relationship's facts for this user. ${facts.length} fact(s).
+                    <button class="secondary" style="margin-left:10px;padding:4px 12px;"
+                            onclick="downloadUserMemoryCsv('${escAttr(userId)}')">⬇ Export CSV</button></div>` +
                     (facts.length ? `
                     <div class="table-wrap"><table>
                         <thead><tr><th>Persona</th><th>Fact</th><th>Type</th><th>Criticality</th><th>Tier</th><th>Status</th><th>Owner</th><th>Source</th><th>Learned</th></tr></thead>
@@ -4447,9 +4543,22 @@
             }
         }
 
+        /**
+         * Downloads the selected conversation's full transcript (conversation
+         * header + every message with role, content, versions and timestamps)
+         * as JSON. Same direct-navigation approach as the Observability
+         * exports, so the session cookie is attached by the browser.
+         */
+        function ciExportTranscript() {
+            if (!ciSelectedConversationId) return;
+            window.open(`${ADMIN_BASE}/conversations/${encodeURIComponent(ciSelectedConversationId)}/export.json`, '_blank');
+        }
+
         async function ciSelectConversation(conversationId) {
             ciSelectedConversationId = conversationId;
             ciSelectedMessageId = null;
+            const exportBtn = document.getElementById('ciExportBtn');
+            if (exportBtn) exportBtn.disabled = false;
             document.querySelectorAll('.ci-conv-item').forEach(el => el.classList.remove('active'));
             document.getElementById('ciInspector').innerHTML = '<div class="ci-empty">Select a message to inspect its LLM execution.</div>';
 

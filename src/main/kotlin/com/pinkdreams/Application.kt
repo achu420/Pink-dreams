@@ -361,6 +361,9 @@ fun Application.module(
             conversationRepository = conversationRepo,
             memoryFactRepository = memoryFactRepo,
             personaRepository = personaRepo,
+            // Supplies the users CSV export's conversation-count /
+            // last-active columns via one grouped query (never per row).
+            statsRepository = com.pinkdreams.persistence.repositories.AdminStatsRepository(db),
         ).register(this)
         com.pinkdreams.api.admin.AdminTestChatRoutes(
             testChatService = testChatService,

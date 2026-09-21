@@ -17,7 +17,9 @@ import io.ktor.server.application.call
 import io.ktor.server.auth.UserIdPrincipal
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.principal
+import io.ktor.server.response.header
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import kotlinx.serialization.Serializable
@@ -116,6 +118,20 @@ data class AdminMessageExecutionResponse(
 )
 
 /**
+ * A single conversation's full transcript, as a downloadable JSON document.
+ * Deliberately excludes memory facts and LLM raw payloads: a transcript export
+ * is the conversation itself (who said what, when, under which versions), and
+ * the raw request/response bodies stay behind the per-exchange inspector for
+ * the same sensitivity reason the observability CSV export already documents.
+ */
+@Serializable
+data class AdminConversationTranscriptExport(
+    val exportedAt: String,
+    val conversation: AdminConversationSummaryResponse,
+    val messages: List<AdminMessageResponse>,
+)
+
+/**
  * Module 07 — Conversations Inspector (admin), backend routes.
  *
  * Deliberately thin: every read goes through the existing repositories
@@ -137,6 +153,9 @@ class AdminConversationRoutes(
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
 ) {
     private val timestampFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+
+    /** Pretty-printed purely because a transcript export is meant to be read by a human. */
+    private val exportJson = kotlinx.serialization.json.Json { prettyPrint = true }
 
     fun register(route: Route) {
         route.authenticate("session-auth", "dev-auth") {
@@ -181,6 +200,41 @@ class AdminConversationRoutes(
                         messages = messages,
                         memoryFacts = memoryFacts,
                     ),
+                )
+            }
+
+            // Transcript export. JSON rather than CSV deliberately: a
+            // transcript is a nested document (conversation header + an
+            // ordered array of messages whose `content` is multi-line free
+            // text), and flattening that to CSV would be less honest and far
+            // harder to read back. Response headers mirror the existing
+            // observability export exactly — an explicit
+            // `Content-Disposition: attachment` plus a correct content type —
+            // so the browser downloads a file instead of rendering it.
+            get("/v1/admin/conversations/{conversationId}/export.json") {
+                if (requirePrincipal() == null) return@get
+                val conversationId = call.parameters["conversationId"]?.let { parseUuidOrNull(it) }
+                if (conversationId == null) {
+                    call.respond(HttpStatusCode.BadRequest, ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid conversationId", null)))
+                    return@get
+                }
+                val conversation = conversationRepository.findById(conversationId)
+                if (conversation == null) {
+                    call.respond(HttpStatusCode.NotFound, ErrorResponse(ApiError(ErrorCode.NOT_FOUND, "Conversation not found", null)))
+                    return@get
+                }
+                val transcript = AdminConversationTranscriptExport(
+                    exportedAt = java.time.LocalDateTime.now().format(timestampFormatter),
+                    conversation = conversation.toSummary(),
+                    messages = messageRepository.findForConversation(conversationId).map { it.toResponse() },
+                )
+                call.response.header(
+                    io.ktor.http.HttpHeaders.ContentDisposition,
+                    "attachment; filename=\"conversation-$conversationId.json\"",
+                )
+                call.respondText(
+                    exportJson.encodeToString(AdminConversationTranscriptExport.serializer(), transcript),
+                    io.ktor.http.ContentType.Application.Json,
                 )
             }
 
