@@ -43,7 +43,7 @@ class AdminStatsRoutes(
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
 ) {
     fun register(route: Route) {
-        route.authenticate("dev-auth") {
+        route.authenticate("session-auth", "dev-auth") {
             // GET /v1/admin/stats/activity
             get("/v1/admin/stats/activity") {
                 val principal = call.principal<UserIdPrincipal>()

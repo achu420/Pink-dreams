@@ -117,7 +117,7 @@ class AdminAiSettingsRoutes(
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
 ) {
     fun register(route: Route) {
-        route.authenticate("dev-auth") {
+        route.authenticate("session-auth", "dev-auth") {
             get("/v1/admin/ai-settings") {
                 if (requirePrincipal() == null) return@get
                 call.respond(HttpStatusCode.OK, settingsResponse())

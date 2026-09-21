@@ -54,7 +54,7 @@ class AdminIntentEngineRoutes(
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
 ) {
     fun register(route: Route) {
-        route.authenticate("dev-auth") {
+        route.authenticate("session-auth", "dev-auth") {
             get("/v1/admin/intent-engines") {
                 if (!authorize()) return@get
                 call.respond(

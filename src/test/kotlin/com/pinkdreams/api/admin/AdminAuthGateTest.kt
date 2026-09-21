@@ -36,7 +36,12 @@ class AdminAuthGateTest {
     private val adminId = UUID.fromString("00000000-0000-0000-0000-0000000000c1")
 
     private class TestAdminAuthProvider(private val adminId: UUID) : com.pinkdreams.auth.AdminAuthorizationProvider() {
-        override fun isAdmin(userId: String): Boolean = userId == adminId.toString()
+        // Delegates to the base class so the session-cookie sentinel identity
+        // (AdminSessionAuth.SESSION_PRINCIPAL_NAME) is still recognized as
+        // admin — this test class specifically exercises the session-cookie
+        // auth path, unlike other admin route tests' TestAdminAuthProvider
+        // overrides which only ever authenticate via basicAuth(adminId, ...).
+        override fun isAdmin(userId: String): Boolean = userId == adminId.toString() || super.isAdmin(userId)
     }
 
     private fun io.ktor.server.testing.ApplicationTestBuilder.setup() {
@@ -116,6 +121,49 @@ class AdminAuthGateTest {
             header("Cookie", cookiePair)
         }
         assertEquals(HttpStatusCode.OK, response.status)
+    }
+
+    @Test
+    fun `a valid session cookie alone grants access to an admin API route with no browser auth challenge`() = testApplication {
+        // Regression test: a browser session established via the login page must
+        // never also trip Ktor's Basic-auth ("dev-auth") challenge on an actual
+        // admin API route — that WWW-Authenticate response is exactly what makes
+        // the browser pop up its own native login dialog on top of ours. Before
+        // SessionCookieAuthProvider existed, every admin-ui.html fetch() (which
+        // carries only the session cookie, never an Authorization header) fell
+        // through "dev-auth" and got exactly that challenge.
+        setup()
+        val loginResponse = client.post("/v1/admin/auth/login") {
+            contentType(ContentType.Application.Json)
+            setBody("""{"username":"achal","password":"Iamachal"}""")
+        }
+        val cookiePair = loginResponse.headers["Set-Cookie"]!!.substringBefore(";")
+
+        val response = client.get("/v1/admin/conversations") {
+            header("Cookie", cookiePair)
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertTrue(
+            response.headers["WWW-Authenticate"] == null,
+            "a session-cookie-authenticated request must never receive a Basic-auth challenge header",
+        )
+    }
+
+    @Test
+    fun `an unauthenticated admin API call gets a plain 401 with no WWW-Authenticate challenge`() = testApplication {
+        // Companion to the above: with neither a session cookie nor an
+        // Authorization header, the response must still be a plain JSON 401 —
+        // not a Basic-auth challenge — so a browser never shows its native
+        // login popup even for a request that ends up rejected.
+        setup()
+        val response = client.get("/v1/admin/conversations")
+
+        assertEquals(HttpStatusCode.Unauthorized, response.status)
+        assertTrue(
+            response.headers["WWW-Authenticate"] == null,
+            "an unauthenticated request must never receive a Basic-auth challenge header",
+        )
     }
 
     @Test

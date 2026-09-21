@@ -56,7 +56,7 @@ class AdminUserRoutes(
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
 ) {
     fun register(route: Route) {
-        route.authenticate("dev-auth") {
+        route.authenticate("session-auth", "dev-auth") {
             // POST /v1/admin/users
             post("/v1/admin/users") {
                 val principal = call.principal<UserIdPrincipal>()

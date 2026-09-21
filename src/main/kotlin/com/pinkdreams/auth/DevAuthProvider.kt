@@ -7,7 +7,7 @@ import io.ktor.server.auth.UserIdPrincipal
 import io.ktor.server.auth.basic
 
 class DevAuthProvider {
-    fun install(application: Application) {
+    fun install(application: Application, sessionAuth: AdminSessionAuth) {
         application.install(Authentication) {
             basic("dev-auth") {
                 realm = "Pink Dreams Dev"
@@ -19,6 +19,9 @@ class DevAuthProvider {
                     }
                 }
             }
+            // See SessionCookieAuthProvider's doc comment for why this exists
+            // and why admin routes list it before "dev-auth".
+            sessionCookie("session-auth", sessionAuth)
         }
     }
 }

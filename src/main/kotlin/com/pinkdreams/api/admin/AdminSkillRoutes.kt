@@ -52,7 +52,7 @@ class AdminSkillRoutes(
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
 ) {
     fun register(route: Route) {
-        route.authenticate("dev-auth") {
+        route.authenticate("session-auth", "dev-auth") {
             // GET /v1/admin/skills
             get("/v1/admin/skills") {
                 val principal = call.principal<UserIdPrincipal>()

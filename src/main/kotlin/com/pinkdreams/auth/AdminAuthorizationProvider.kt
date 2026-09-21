@@ -6,6 +6,14 @@ open class AdminAuthorizationProvider {
     private val adminUserIds: Set<UUID> = loadAdminUserIds()
 
     open fun isAdmin(userId: String): Boolean {
+        // A request authenticated via the admin console's session cookie
+        // (SessionCookieAuthProvider) carries this exact synthetic identity —
+        // the session gate itself (a valid, unexpired cookie issued only after
+        // the static-credential login) is the authorization check for that
+        // path, so it is always treated as admin here.
+        if (userId == AdminSessionAuth.SESSION_PRINCIPAL_NAME) {
+            return true
+        }
         return try {
             val uuid = UUID.fromString(userId)
             adminUserIds.contains(uuid)

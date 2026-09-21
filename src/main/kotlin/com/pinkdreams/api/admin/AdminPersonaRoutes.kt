@@ -147,7 +147,7 @@ class AdminPersonaRoutes(
             }
         }
 
-        route.authenticate("dev-auth") {
+        route.authenticate("session-auth", "dev-auth") {
             // POST /v1/admin/personas
             post("/v1/admin/personas") {
                 val principal = call.principal<UserIdPrincipal>()

@@ -238,7 +238,7 @@ class AdminObservabilityRoutes(
     private val aiRuntimeSettings: com.pinkdreams.config.AiRuntimeSettings? = null,
 ) {
     fun register(route: Route) {
-        route.authenticate("dev-auth") {
+        route.authenticate("session-auth", "dev-auth") {
             get("/v1/admin/observability/latency-dashboard") {
                 if (requirePrincipal(adminAuthorizationProvider) == null) return@get
                 val filter = parseFilter(call.request.queryParameters)

@@ -23,6 +23,13 @@ import java.util.concurrent.ConcurrentHashMap
 open class AdminSessionAuth {
     companion object {
         const val COOKIE_NAME = "admin_session"
+
+        // The identity used for the Ktor principal set by SessionCookieAuthProvider
+        // once a request's cookie is verified valid. Not a real user id — it only
+        // needs to satisfy AdminAuthorizationProvider.isAdmin(), which special-cases
+        // this exact string. Never derived from client input.
+        const val SESSION_PRINCIPAL_NAME = "admin-session-principal"
+
         private const val SESSION_TTL_MILLIS = 24L * 60 * 60 * 1000
 
         // TEMPORARY static credentials — replace with a real admin identity

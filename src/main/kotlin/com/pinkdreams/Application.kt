@@ -100,7 +100,8 @@ fun Application.module(
         }
     }
 
-    DevAuthProvider().install(this)
+    val sessionAuth = adminSessionAuth ?: AdminSessionAuth()
+    DevAuthProvider().install(this, sessionAuth)
 
     // Initialize database and repositories if not provided
     val db = database ?: DatabaseFactory.connect(databaseConfig)
@@ -239,7 +240,6 @@ fun Application.module(
     )
 
     val authProvider = adminAuthProvider ?: AdminAuthorizationProvider()
-    val sessionAuth = adminSessionAuth ?: AdminSessionAuth()
 
     // Admin session gate — layered IN ADDITION to the existing dev-auth
     // basic-auth + AdminAuthorizationProvider mechanism used by every admin

@@ -139,7 +139,7 @@ class AdminConversationRoutes(
     private val timestampFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
     fun register(route: Route) {
-        route.authenticate("dev-auth") {
+        route.authenticate("session-auth", "dev-auth") {
             get("/v1/admin/conversations") {
                 if (requirePrincipal() == null) return@get
                 val limit = call.request.queryParameters["limit"]?.toIntOrNull()?.coerceIn(1, 200) ?: 50

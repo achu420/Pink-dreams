@@ -132,7 +132,7 @@ class AdminTestChatRoutes(
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
 ) {
     fun register(route: Route) {
-        route.authenticate("dev-auth") {
+        route.authenticate("session-auth", "dev-auth") {
             post("/v1/admin/test-chat/conversations") {
                 if (requirePrincipal() == null) return@post
                 val request = try {
