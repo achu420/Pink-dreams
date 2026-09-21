@@ -382,16 +382,16 @@
         </div>
         <div class="nav-group">
             <div class="nav-group-label">AI Configuration</div>
-            <div class="nav-item" data-view="setup" data-anchor="sec-personas" data-nav-label="Personas" onclick="navigate(this,'setup','sec-personas')">
+            <div class="nav-item" data-view="personas" data-nav-label="Personas" onclick="navigate(this,'personas')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.5 20c.2-2.7 2-4.6 4.5-4.6"/></svg>
                 Personas</div>
-            <div class="nav-item" data-view="setup" data-anchor="sec-engines" data-nav-label="Engines" onclick="navigate(this,'setup','sec-engines')">
+            <div class="nav-item" data-view="engines" data-nav-label="Engines" onclick="navigate(this,'engines')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>
                 Engines</div>
-            <div class="nav-item" data-view="setup" data-anchor="sec-skills" data-nav-label="Skills" onclick="navigate(this,'setup','sec-skills')">
+            <div class="nav-item" data-view="skills" data-nav-label="Skills" onclick="navigate(this,'skills')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>
                 Skills</div>
-            <div class="nav-item" data-view="setup" data-anchor="sec-aisettings" data-nav-label="AI Settings" onclick="navigate(this,'setup','sec-aisettings')">
+            <div class="nav-item" data-view="aisettings" data-nav-label="AI Settings" onclick="navigate(this,'aisettings')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
                 AI Settings</div>
         </div>
@@ -412,7 +412,7 @@
         </div>
         <div class="nav-group">
             <div class="nav-group-label">Users</div>
-            <div class="nav-item" data-view="setup" data-anchor="sec-users" data-nav-label="Users" onclick="navigate(this,'setup','sec-users')">
+            <div class="nav-item" data-view="users" data-nav-label="Users" onclick="navigate(this,'users')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 8h4M18 6v4"/></svg>
                 Users</div>
         </div>
@@ -486,7 +486,7 @@
             </div>
         </div>
 
-        <div id="setup" class="tab-content">
+        <div id="personas" class="tab-content">
             <div class="section">
                 <a id="sec-personas"></a>
                 <div class="section-head">
@@ -604,7 +604,9 @@
                     <tbody></tbody>
                 </table></div>
             </div>
+        </div>
 
+        <div id="engines" class="tab-content">
             <div class="section">
                 <a id="sec-engines"></a>
                 <div class="section-head">
@@ -665,7 +667,9 @@
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div id="skills" class="tab-content">
             <div class="section">
                 <a id="sec-skills"></a>
                 <div class="section-head">
@@ -783,7 +787,9 @@
                     <tbody></tbody>
                 </table></div>
             </div>
+        </div>
 
+        <div id="aisettings" class="tab-content">
             <div class="section">
                 <a id="sec-aisettings"></a>
                 <div class="section-head">
@@ -924,7 +930,9 @@
                 <div id="aiOverviewError"></div>
                 <div id="aiConfigurationOverview" style="margin-top: 12px;"></div>
             </div>
+        </div>
 
+        <div id="users" class="tab-content">
             <div class="section">
                 <a id="sec-users"></a>
                 <div class="section-head">
@@ -1072,7 +1080,7 @@
                     </select>
                     <div id="noUsersHint" style="display: none; font-size: 12px; color: #666; margin-top: 6px;">
                         No test users yet. Create one in the
-                        <a href="#" onclick="navigate(document.querySelector('[data-anchor=sec-users]'),'setup','sec-users'); return false;">Users section</a>.
+                        <a href="#" onclick="navigate(document.querySelector('[data-view=users]'),'users'); return false;">Users section</a>.
                     </div>
                 </div>
                 <details style="margin-bottom: 15px;">
@@ -1612,27 +1620,12 @@
             }
         });
 
-        // Part 3 — the AI Configuration screen is one scrollable page with
-        // anchors (sec-personas/sec-engines/sec-skills/sec-aisettings/
-        // sec-users); as the admin scrolls past each section, the matching
-        // sidebar sub-item should light up too — without converting this
-        // into separate routes/pages.
-        (function setupSubsectionHighlighting() {
-            const anchorIds = ['sec-personas', 'sec-engines', 'sec-skills', 'sec-aisettings', 'sec-users'];
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (!entry.isIntersecting) return;
-                    if (!document.getElementById('setup').classList.contains('active')) return;
-                    document.querySelectorAll('.nav-item[data-view="setup"]').forEach(el => {
-                        el.classList.toggle('active', el.dataset.anchor === entry.target.id);
-                    });
-                });
-            }, { rootMargin: '-20% 0px -70% 0px' });
-            anchorIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) observer.observe(el);
-            });
-        })();
+        // Personas/Engines/Skills/AI Settings/Users are now separate pages
+        // (each its own #id.tab-content, switched by navigate()) rather than
+        // one scrollable page with anchors — the IntersectionObserver that
+        // used to light up the matching sidebar item while scrolling past
+        // each section is no longer needed; navigate() already sets the
+        // active nav-item directly for a real page switch.
 
         // Task 11 Step 9 — Dashboard. Every number here comes from an
         // existing endpoint (latency-dashboard, ai-configuration, users) —
@@ -1712,7 +1705,7 @@
                     kv('Active Skills', escapeHtml(config.activeSkillCount)) +
                     kv('Runtime Model', escapeHtml(config.runtime.model)) +
                     kv('Max Output Tokens', escapeHtml(config.runtime.maxOutputTokens)) +
-                    '<div style="margin-top:10px;"><a href="#" onclick="navigate(document.querySelector(\'[data-anchor=sec-aisettings]\'),\'setup\',\'sec-aisettings\'); return false;" style="color:var(--rose);font-size:12px;">Open AI Settings →</a></div>'
+                    '<div style="margin-top:10px;"><a href="#" onclick="navigate(document.querySelector(\'[data-view=aisettings]\'),\'aisettings\'); return false;" style="color:var(--rose);font-size:12px;">Open AI Settings →</a></div>'
                 ) : '<div class="empty-state">Unable to load — see Observability for detail.</div>';
 
                 document.getElementById('dashboardSla').innerHTML = (obs && overall && overall.count > 0) ? (
@@ -1954,9 +1947,9 @@
         }
 
         function backToPersonasList() {
-            const nav = document.querySelector('.nav-item[data-anchor="sec-personas"]');
-            if (nav) navigate(nav, 'setup', 'sec-personas');
-            else showView('setup');
+            const nav = document.querySelector('.nav-item[data-view="personas"]');
+            if (nav) navigate(nav, 'personas');
+            else showView('personas');
         }
 
         async function openPersonaDetail(personaId) {
@@ -3374,9 +3367,9 @@
         }
 
         function backToUsersList() {
-            const nav = document.querySelector('.nav-item[data-anchor="sec-users"]');
-            if (nav) navigate(nav, 'setup', 'sec-users');
-            else showView('setup');
+            const nav = document.querySelector('.nav-item[data-view="users"]');
+            if (nav) navigate(nav, 'users');
+            else showView('users');
         }
 
         function downloadConversationTranscript(conversationId) {
