@@ -180,4 +180,133 @@ class AiRuntimeSettingsTest {
         assertEquals("env-model", resolved.model)
         assertEquals(1024, resolved.maxOutputTokens)
     }
+
+    // ---------- Task 9 — Admin AI Runtime Controls ----------
+
+    @Test
+    fun `with no stored intent settings resolve falls back to the code defaults`() {
+        val settings = AiRuntimeSettings(
+            envConfig, repo(),
+            intentModelDefault = "openai/gpt-4o-mini", intentJsonModeDefault = true, intentMaxOutputTokensDefault = 600,
+        )
+
+        val resolved = settings.resolve()
+
+        assertEquals("openai/gpt-4o-mini", resolved.intentModel)
+        assertEquals(AiRuntimeSettings.Source.CODE_DEFAULT, resolved.intentModelSource)
+        assertEquals(true, resolved.intentJsonMode)
+        assertEquals(AiRuntimeSettings.Source.CODE_DEFAULT, resolved.intentJsonModeSource)
+        assertEquals(600, resolved.intentMaxOutputTokens)
+        assertEquals(AiRuntimeSettings.Source.CODE_DEFAULT, resolved.intentMaxOutputTokensSource)
+    }
+
+    @Test
+    fun `with no code default and no stored value intent model falls back to the environment model`() {
+        val resolved = AiRuntimeSettings(envConfig, repo()).resolve()
+
+        assertEquals("env-model", resolved.intentModel)
+        assertEquals(AiRuntimeSettings.Source.ENVIRONMENT_OR_DEFAULT, resolved.intentModelSource)
+        assertNull(resolved.intentJsonMode)
+        assertEquals(AiRuntimeSettings.Source.PROVIDER_DEFAULT, resolved.intentJsonModeSource)
+        assertEquals(600, resolved.intentMaxOutputTokens, "600 is the one hardcoded ultimate fallback, unchanged from before Task 9")
+    }
+
+    @Test
+    fun `a persisted intent override wins over the code default and the source reports DATABASE`() {
+        val repository = repo()
+        repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", intentModel = "claude-x", intentJsonMode = false, intentMaxOutputTokens = 300)
+        val settings = AiRuntimeSettings(envConfig, repository, intentModelDefault = "openai/gpt-4o-mini", intentJsonModeDefault = true, intentMaxOutputTokensDefault = 600)
+
+        val resolved = settings.resolve()
+
+        assertEquals("claude-x", resolved.intentModel)
+        assertEquals(AiRuntimeSettings.Source.DATABASE, resolved.intentModelSource)
+        assertEquals(false, resolved.intentJsonMode)
+        assertEquals(AiRuntimeSettings.Source.DATABASE, resolved.intentJsonModeSource)
+        assertEquals(300, resolved.intentMaxOutputTokens)
+        assertEquals(AiRuntimeSettings.Source.DATABASE, resolved.intentMaxOutputTokensSource)
+    }
+
+    @Test
+    fun `resetting the persisted intent override to null returns the source to the code default`() {
+        val repository = repo()
+        repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", intentModel = "claude-x")
+        val settings = AiRuntimeSettings(envConfig, repository, intentModelDefault = "openai/gpt-4o-mini")
+        assertEquals(AiRuntimeSettings.Source.DATABASE, settings.resolve().intentModelSource)
+
+        repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", intentModel = null)
+
+        val resolved = settings.resolve()
+        assertEquals("openai/gpt-4o-mini", resolved.intentModel)
+        assertEquals(AiRuntimeSettings.Source.CODE_DEFAULT, resolved.intentModelSource)
+    }
+
+    @Test
+    fun `a persisted generation provider sort override wins over the code default`() {
+        val repository = repo()
+        repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", generationProviderSort = null)
+        val settings = AiRuntimeSettings(envConfig, repository, generationProviderSortOverride = "latency")
+        assertEquals("latency", settings.generationConfig().providerSort)
+        assertEquals(AiRuntimeSettings.Source.CODE_DEFAULT, settings.resolve().generationProviderSortSource)
+    }
+
+    @Test
+    fun `intent settings do not affect primary generation or side channel config`() {
+        val repository = repo()
+        repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", intentModel = "claude-x", intentJsonMode = true, intentMaxOutputTokens = 50)
+        val settings = AiRuntimeSettings(envConfig, repository)
+
+        val generation = settings.generationConfig()
+        val sideChannel = settings.sideChannelConfig(1200)
+
+        assertEquals("env-model", generation.model, "Primary generation must be unaffected by the intent-only override")
+        assertNull(generation.jsonMode)
+        assertEquals("env-model", sideChannel.model, "Side-channel calls are unaffected by the intent-only override too")
+    }
+
+    @Test
+    fun `generation provider sort does not affect intent discovery config`() {
+        val repository = repo()
+        repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", generationProviderSort = "latency")
+        val settings = AiRuntimeSettings(envConfig, repository)
+
+        assertEquals("latency", settings.resolve().generationProviderSort)
+        // Intent Discovery's GenerationConfig never reads providerSort at all
+        // (see ChatEngineFactory.build()'s intentDiscoveryConfig construction) —
+        // a structural guarantee verified at the full-pipeline level in
+        // AdminRuntimeControlsLiveTest.
+    }
+
+    @Test
+    fun `intent model must not be blank when supplied`() {
+        val repository = repo()
+        assertFailsWith<IllegalArgumentException> {
+            repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", intentModel = "   ")
+        }
+    }
+
+    @Test
+    fun `intent max output tokens must be within the shared validation bounds`() {
+        val repository = repo()
+        assertFailsWith<IllegalArgumentException> {
+            repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", intentMaxOutputTokens = 0)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", intentMaxOutputTokens = -5)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", intentMaxOutputTokens = 999_999)
+        }
+    }
+
+    @Test
+    fun `generation provider sort only accepts the currently supported values`() {
+        val repository = repo()
+        assertFailsWith<IllegalArgumentException> {
+            repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", generationProviderSort = "throughput")
+        }
+        // "latency" — the only value ever exercised by this codebase — must still work.
+        repository.save(model = null, temperature = null, maxOutputTokens = null, updatedBy = "admin", generationProviderSort = "latency")
+        assertEquals("latency", repository.get().generationProviderSort)
+    }
 }

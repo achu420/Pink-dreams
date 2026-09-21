@@ -191,6 +191,23 @@ class PipelineChatEngineSkillIntegrationTest {
         assertTrue(blocks.none { it.content.startsWith("SELECTED SKILL") })
     }
 
+    // --- Task 8 Part 4: the selected skill reaches GenerationRequest.skillKey ---
+    @Test
+    fun `the selected skill key is stamped onto the generation request for exchange attribution`() {
+        val fixture = fixture(intentReplies = listOf("""{"skillKey":"flirting"}"""))
+        assertIs<ChatResult.Success>(sendTurn(fixture, "you look cute today"))
+
+        assertEquals("flirting", fixture.llmClient.capturedGenerationRequests.single().skillKey)
+    }
+
+    @Test
+    fun `a None skill selection stamps a null skillKey never a guessed value`() {
+        val fixture = fixture(intentReplies = listOf("""{"skillKey":"none"}"""))
+        assertIs<ChatResult.Success>(sendTurn(fixture, "what's the capital of France?"))
+
+        assertEquals(null, fixture.llmClient.capturedGenerationRequests.single().skillKey)
+    }
+
     @Test
     fun `no skill infrastructure configured behaves exactly as before Phase B`() {
         val db = DatabaseFactory.connectInMemory()

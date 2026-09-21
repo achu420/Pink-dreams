@@ -572,10 +572,19 @@ class TestChatServiceTest {
     @Test
     fun `a test conversation with no explicit intent override inherits the production default rather than losing it`() {
         val w = World()
-        // Simulate Application.kt's production configuration: the ONE
-        // production Dependencies instance has a real, non-null Intent
-        // override (as it does after the Primary Generation Latency phase).
-        val productionWithDefault = w.productionDeps.copy(intentModelOverride = "openai/gpt-4o-mini", intentJsonModeOverride = true)
+        // Simulate Application.kt's production configuration (Task 9): the
+        // ONE production AiRuntimeSettings instance carries the real Intent
+        // code defaults (as it does after the Make Intent Discovery Fast +
+        // Reliable phase) — Dependencies.intentModelOverride itself stays
+        // null for production post-Task-9; the default now lives in
+        // AiRuntimeSettings, which TestChatService.buildEngineFor() consults
+        // via resolve() as the inheritance fallback.
+        val productionAiRuntimeSettings = com.pinkdreams.config.AiRuntimeSettings(
+            w.llmConfig, w.aiSettingsRepo,
+            intentModelDefault = "openai/gpt-4o-mini",
+            intentJsonModeDefault = true,
+        )
+        val productionWithDefault = w.productionDeps.copy(aiRuntimeSettings = productionAiRuntimeSettings)
         val service = TestChatService(productionWithDefault, w.conversations, w.personas, w.cores, w.skills, w.users)
         val created = service.create(
             TestChatService.CreationRequest(personaId = w.personaId, testUserId = w.testUserId),

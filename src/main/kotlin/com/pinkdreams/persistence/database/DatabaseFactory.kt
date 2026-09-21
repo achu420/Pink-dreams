@@ -151,6 +151,14 @@ object AiSettings : Table("ai_settings") {
     val model = text("model").nullable()
     val temperature = double("temperature").nullable()
     val maxOutputTokens = integer("max_output_tokens").nullable()
+    // Task 9 — Admin AI Runtime Controls. Same nullable-means-"not configured
+    // here, fall back to the code default" convention as the three columns
+    // above; see AiRuntimeSettings.resolve() for the single authoritative
+    // resolution path these feed into.
+    val intentModel = text("intent_model").nullable()
+    val intentJsonMode = bool("intent_json_mode").nullable()
+    val intentMaxOutputTokens = integer("intent_max_output_tokens").nullable()
+    val generationProviderSort = text("generation_provider_sort").nullable()
     val updatedAt = datetime("updated_at")
     val updatedBy = text("updated_by").nullable()
 
@@ -581,6 +589,17 @@ object LlmExchanges : Table("llm_exchanges") {
     val requestBody = text("request_body").nullable()
     val responseBody = text("response_body").nullable()
     val createdAt = datetime("created_at")
+    // Task 8 Part 4 — the smallest safe structured field needed to associate
+    // an exchange with the skill SkillSelection actually chose for this
+    // turn, sourced directly from the existing SkillSelection.Selected(key)
+    // the pipeline already computes (LlmIntentDiscovery/ChatEngine) — never
+    // inferred from free text, never a new routing decision. Null means
+    // either SkillSelection.None (a genuine "no skill" outcome) or an
+    // exchange recorded before this column existed; the two are
+    // deliberately indistinguishable here (see the Task 8 report) — the
+    // dashboard must treat both as "no attribution available", not invent a
+    // difference the data doesn't support.
+    val skillKey = varchar("skill_key", 128).nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

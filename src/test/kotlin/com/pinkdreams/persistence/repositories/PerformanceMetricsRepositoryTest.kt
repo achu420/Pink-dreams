@@ -1,10 +1,15 @@
 package com.pinkdreams.persistence.repositories
 
 import com.pinkdreams.persistence.database.DatabaseFactory
+import com.pinkdreams.persistence.database.Messages
+import com.pinkdreams.persistence.database.defaultNow
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import java.util.UUID
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 /**
  * Task 3 — SLA / Performance Data Model.
@@ -27,6 +32,7 @@ class PerformanceMetricsRepositoryTest {
         outcome: LlmExchangeRepository.Outcome = LlmExchangeRepository.Outcome.SUCCESS,
         conversationId: UUID = UUID.randomUUID(),
         turnRequestId: UUID = UUID.randomUUID(),
+        skillKey: String? = null,
     ) {
         exchangeRepo.record(
             LlmExchangeRepository.RecordInput(
@@ -38,6 +44,7 @@ class PerformanceMetricsRepositoryTest {
                 provider = provider,
                 latencyMs = latencyMs,
                 outcome = outcome,
+                skillKey = skillKey,
             ),
         )
     }
@@ -174,5 +181,116 @@ class PerformanceMetricsRepositoryTest {
         assertEquals(0L, stats.count)
         assertEquals(null, stats.p50)
         assertEquals(null, stats.avg)
+    }
+
+    // --- Task 8 Part 4 — skill attribution ---
+
+    @Test
+    fun `statsBySkill groups by the attributed skill and merges None with pre-attribution rows under 'none'`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        record(exchangeRepo, 1000, skillKey = "flirting")
+        record(exchangeRepo, 3000, skillKey = "flirting")
+        record(exchangeRepo, 2000, skillKey = "emotional_support")
+        record(exchangeRepo, 5000, skillKey = null) // SkillSelection.None or pre-Task-8
+
+        val bySkill = metrics.statsBySkill()
+
+        assertEquals(2, bySkill["flirting"]!!.count)
+        // nearest-rank over sorted [1000, 3000]: ceil(0.50*2)=1st value=1000
+        assertEquals(1000L, bySkill["flirting"]!!.p50)
+        assertEquals(1, bySkill["emotional_support"]!!.count)
+        assertEquals(1, bySkill["none"]!!.count)
+    }
+
+    @Test
+    fun `filtering by skillKey narrows every aggregate to that skill only`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        record(exchangeRepo, 1000, skillKey = "flirting")
+        record(exchangeRepo, 9000, skillKey = "dating")
+
+        val stats = metrics.latencyStats(PerformanceMetricsRepository.MetricsFilter(skillKey = "flirting"))
+
+        assertEquals(1L, stats.count)
+        assertEquals(1000L, stats.p50)
+    }
+
+    @Test
+    fun `filtering by outcome narrows the result set to that outcome only`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        record(exchangeRepo, 1000, outcome = LlmExchangeRepository.Outcome.SUCCESS)
+        record(exchangeRepo, 2000, outcome = LlmExchangeRepository.Outcome.PROVIDER_ERROR)
+
+        val stats = metrics.latencyStats(PerformanceMetricsRepository.MetricsFilter(outcome = "PROVIDER_ERROR"))
+
+        assertEquals(1L, stats.count)
+        assertEquals(2000L, stats.p50)
+    }
+
+    @Test
+    fun `findExchanges preserves skillKey for export`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        record(exchangeRepo, 1000, skillKey = "dating")
+
+        val exchanges = metrics.findExchanges()
+
+        assertEquals("dating", exchanges.single().skillKey)
+    }
+
+    // --- Task 8 Part 6 — stage timings, read from the existing messages.metadata blob ---
+
+    @Test
+    fun `stageTimingsForTurn reads the existing lvm_stage_timings metadata for the assistant message of that turn`() {
+        val database = db()
+        val metrics = PerformanceMetricsRepository(database)
+        val turnId = UUID.randomUUID()
+        insertAssistantMessage(
+            database,
+            requestId = turnId,
+            metadataJson = """{"lvm_stage_timings":"{\"context_assembly\":\"12\",\"generation\":\"2048\"}"}""",
+        )
+
+        val stageTimings = metrics.stageTimingsForTurn(turnId)
+
+        assertEquals(mapOf("context_assembly" to 12L, "generation" to 2048L), stageTimings)
+    }
+
+    @Test
+    fun `stageTimingsForTurn returns null when no assistant message exists for the turn`() {
+        val database = db()
+        val metrics = PerformanceMetricsRepository(database)
+
+        assertNull(metrics.stageTimingsForTurn(UUID.randomUUID()))
+    }
+
+    @Test
+    fun `stageTimingsForTurn returns null rather than crashing on legacy metadata with no stage timings key`() {
+        val database = db()
+        val metrics = PerformanceMetricsRepository(database)
+        val turnId = UUID.randomUUID()
+        insertAssistantMessage(database, requestId = turnId, metadataJson = """{"lvm_config":"{}"}""")
+
+        assertNull(metrics.stageTimingsForTurn(turnId))
+    }
+
+    private fun insertAssistantMessage(database: Database, requestId: UUID, metadataJson: String) {
+        transaction(database) {
+            Messages.insert {
+                it[Messages.id] = UUID.randomUUID()
+                it[Messages.conversationId] = UUID.randomUUID()
+                it[Messages.role] = "assistant"
+                it[Messages.content] = "reply"
+                it[Messages.requestId] = requestId
+                it[Messages.metadata] = metadataJson
+                it[Messages.createdAt] = defaultNow()
+            }
+        }
     }
 }

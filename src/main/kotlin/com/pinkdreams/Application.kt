@@ -126,7 +126,24 @@ fun Application.module(
     // eliminated all >20s turns (16.7%->0%) with no observed quality
     // change. See AiRuntimeSettings.generationConfig() for how this reaches
     // only primary generation, never side-channel calls.
-    val aiRuntimeSettings = com.pinkdreams.config.AiRuntimeSettings(llmConfig, aiSettingsRepo, generationProviderSortOverride = "latency")
+    // Task 9 — Admin AI Runtime Controls. The four *Default params below are
+    // the exact same production-validated literals that used to live only as
+    // hardcoded ChatEngineFactory.Dependencies constructor args further down
+    // this file (intentModelOverride = "openai/gpt-4o-mini", etc.) — moved
+    // here so AiRuntimeSettings.resolve() is the ONE place that decides
+    // "DB override, or this code default" for every one of these settings,
+    // rather than that precedence being duplicated across Application.kt,
+    // ChatEngineFactory, and TestChatService. With an empty ai_settings
+    // table, resolve() yields exactly these same values — no behavior change
+    // for a fresh deployment.
+    val aiRuntimeSettings = com.pinkdreams.config.AiRuntimeSettings(
+        llmConfig,
+        aiSettingsRepo,
+        generationProviderSortOverride = "latency",
+        intentModelDefault = "openai/gpt-4o-mini",
+        intentJsonModeDefault = true,
+        intentMaxOutputTokensDefault = 600,
+    )
     // Only seed for a genuine application startup (no database explicitly
     // injected) — never for tests, which pass their own isolated `database`
     // and must see empty configuration tables unless they seed them themselves.
@@ -184,17 +201,20 @@ fun Application.module(
         executionRepository = executionRepo,
         aiRuntimeSettings = aiRuntimeSettings,
         sensitivePreferenceService = sensitivePreferenceService,
-        // Make Intent Discovery Fast + Reliable phase: promoted from
-        // Test-Chat-validated candidate to production default. A live
-        // 90-turn validation showed malformed output 13.3%->0%, budget
-        // exhaustion 0% (non-reasoning model), Intent p50 4968ms->1043ms,
-        // with a real but modest routing-accuracy tradeoff (measured
-        // ~4-5 points lower than the reasoning baseline). The JSON-mode
-        // reinforcement text is appended at request-construction time in
-        // LlmIntentDiscovery only — the stored Intent Engine v3 content is
-        // never modified.
-        intentModelOverride = "openai/gpt-4o-mini",
-        intentJsonModeOverride = true,
+        // Task 9 — Admin AI Runtime Controls. These three stay null for the
+        // ONE production engine (previously "openai/gpt-4o-mini/true/null"
+        // literals here — see the Make Intent Discovery Fast + Reliable
+        // phase history for why those values were chosen; they are
+        // unchanged, just relocated to aiRuntimeSettings's intentModelDefault/
+        // intentJsonModeDefault above). Null here means "no per-instance pin
+        // for this engine" — the production engine always resolves Intent
+        // config live through `aiRuntimeSettings.resolve()` inside
+        // ChatEngineFactory.build() instead, which is what makes an admin's
+        // DB change apply on the next request with no redeploy. This field
+        // is still used by Test Chat's own per-conversation pin — see
+        // TestChatService.buildEngineFor().
+        intentModelOverride = null,
+        intentJsonModeOverride = null,
     )
 
     // Initialize ChatEngine if not provided
@@ -250,6 +270,9 @@ fun Application.module(
             exchangeRepository = com.pinkdreams.persistence.repositories.LlmExchangeRepository(db),
             metricsRepository = com.pinkdreams.persistence.repositories.PerformanceMetricsRepository(db),
             adminAuthorizationProvider = authProvider,
+            // Task 9 — aiRuntimeSettings.resolve() is now the sole source for
+            // Effective Configuration; no separate override fields needed.
+            aiRuntimeSettings = aiRuntimeSettings,
         ).register(this)
     }
 }

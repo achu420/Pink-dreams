@@ -204,6 +204,101 @@ class AdminIntentEngineAndSettingsRoutesTest {
         )
     }
 
+    // ---------- Task 9 — Admin AI Runtime Controls ----------
+
+    @Test
+    fun `intent and provider-sort settings default to their code default source`() = testApplication {
+        setup()
+
+        val body = json(client.get("/v1/admin/ai-settings") { basicAuth(adminId.toString(), "x") }.bodyAsText())
+
+        assertEquals("CODE_DEFAULT", body["intentModelSource"]!!.jsonPrimitive.content)
+        assertEquals("CODE_DEFAULT", body["intentJsonModeSource"]!!.jsonPrimitive.content)
+        assertEquals("CODE_DEFAULT", body["intentMaxOutputTokensSource"]!!.jsonPrimitive.content)
+    }
+
+    @Test
+    fun `saving intent and provider-sort settings persists them and reports DATABASE as the source`() = testApplication {
+        setup()
+
+        val saved = client.put("/v1/admin/ai-settings") {
+            basicAuth(adminId.toString(), "x")
+            contentType(ContentType.Application.Json)
+            setBody("""{"intentModel": "claude-x", "intentJsonMode": false, "intentMaxOutputTokens": 300, "generationProviderSort": "latency", "confirm": true}""")
+        }
+
+        assertEquals(HttpStatusCode.OK, saved.status)
+        val body = json(saved.bodyAsText())
+        assertEquals("claude-x", body["intentModel"]!!.jsonPrimitive.content)
+        assertEquals("DATABASE", body["intentModelSource"]!!.jsonPrimitive.content)
+        assertEquals(false, body["intentJsonMode"]!!.jsonPrimitive.content.toBoolean())
+        assertEquals("DATABASE", body["intentJsonModeSource"]!!.jsonPrimitive.content)
+        assertEquals(300, body["intentMaxOutputTokens"]!!.jsonPrimitive.content.toInt())
+        assertEquals("DATABASE", body["intentMaxOutputTokensSource"]!!.jsonPrimitive.content)
+        assertEquals("latency", body["generationProviderSort"]!!.jsonPrimitive.content)
+        assertEquals("DATABASE", body["generationProviderSortSource"]!!.jsonPrimitive.content)
+    }
+
+    @Test
+    fun `resetting intent model to null clears the override and reverts the source to the code default`() = testApplication {
+        setup()
+        client.put("/v1/admin/ai-settings") {
+            basicAuth(adminId.toString(), "x")
+            contentType(ContentType.Application.Json)
+            setBody("""{"intentModel": "claude-x", "confirm": true}""")
+        }
+
+        val reset = client.put("/v1/admin/ai-settings") {
+            basicAuth(adminId.toString(), "x")
+            contentType(ContentType.Application.Json)
+            setBody("""{"intentModel": null, "confirm": true}""")
+        }
+
+        val body = json(reset.bodyAsText())
+        assertEquals("CODE_DEFAULT", body["intentModelSource"]!!.jsonPrimitive.content, "Reset must fall back to the code default, not persist it as a new stored value")
+        assertEquals(null, body["storedIntentModel"])
+    }
+
+    @Test
+    fun `an out of range intent max output tokens is rejected with a validation error`() = testApplication {
+        setup()
+
+        val response = client.put("/v1/admin/ai-settings") {
+            basicAuth(adminId.toString(), "x")
+            contentType(ContentType.Application.Json)
+            setBody("""{"intentMaxOutputTokens": 0, "confirm": true}""")
+        }
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @Test
+    fun `an unsupported generation provider sort value is rejected with a validation error`() = testApplication {
+        setup()
+
+        val response = client.put("/v1/admin/ai-settings") {
+            basicAuth(adminId.toString(), "x")
+            contentType(ContentType.Application.Json)
+            setBody("""{"generationProviderSort": "throughput", "confirm": true}""")
+        }
+
+        assertEquals(HttpStatusCode.BadRequest, response.status)
+    }
+
+    @Test
+    fun `a blank intent model is treated as clearing the override same as the existing model field convention`() = testApplication {
+        setup()
+
+        val response = client.put("/v1/admin/ai-settings") {
+            basicAuth(adminId.toString(), "x")
+            contentType(ContentType.Application.Json)
+            setBody("""{"intentModel": "   ", "confirm": true}""")
+        }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        assertEquals("CODE_DEFAULT", json(response.bodyAsText())["intentModelSource"]!!.jsonPrimitive.content)
+    }
+
     // ---------- section 29: configuration overview ----------
 
     @Test

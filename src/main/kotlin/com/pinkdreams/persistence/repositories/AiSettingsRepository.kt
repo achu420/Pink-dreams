@@ -33,12 +33,18 @@ open class AiSettingsRepository(private val db: Database) {
         val model: String?,
         val temperature: Double?,
         val maxOutputTokens: Int?,
+        // Task 9 — Admin AI Runtime Controls. Same "null = not configured
+        // here" convention as the three fields above.
+        val intentModel: String? = null,
+        val intentJsonMode: Boolean? = null,
+        val intentMaxOutputTokens: Int? = null,
+        val generationProviderSort: String? = null,
         val updatedAt: LocalDateTime?,
         val updatedBy: String?,
     ) {
         companion object {
             /** Nothing configured — every field falls through to env/default. */
-            val EMPTY = StoredAiSettings(null, null, null, null, null)
+            val EMPTY = StoredAiSettings(null, null, null, updatedAt = null, updatedBy = null)
         }
     }
 
@@ -61,14 +67,24 @@ open class AiSettingsRepository(private val db: Database) {
         temperature: Double?,
         maxOutputTokens: Int?,
         updatedBy: String?,
+        // Task 9 — Admin AI Runtime Controls. Same null-clears-the-override
+        // convention as the three parameters above.
+        intentModel: String? = null,
+        intentJsonMode: Boolean? = null,
+        intentMaxOutputTokens: Int? = null,
+        generationProviderSort: String? = null,
     ): StoredAiSettings = transaction(db) {
-        validate(temperature, maxOutputTokens)
+        validate(temperature, maxOutputTokens, intentModel, intentMaxOutputTokens, generationProviderSort)
         val exists = AiSettings.select { AiSettings.id eq AiSettings.SINGLETON_ID }.any()
         if (exists) {
             AiSettings.update({ AiSettings.id eq AiSettings.SINGLETON_ID }) {
                 it[AiSettings.model] = model
                 it[AiSettings.temperature] = temperature
                 it[AiSettings.maxOutputTokens] = maxOutputTokens
+                it[AiSettings.intentModel] = intentModel
+                it[AiSettings.intentJsonMode] = intentJsonMode
+                it[AiSettings.intentMaxOutputTokens] = intentMaxOutputTokens
+                it[AiSettings.generationProviderSort] = generationProviderSort
                 it[AiSettings.updatedAt] = defaultNow()
                 it[AiSettings.updatedBy] = updatedBy
             }
@@ -78,6 +94,10 @@ open class AiSettingsRepository(private val db: Database) {
                 it[AiSettings.model] = model
                 it[AiSettings.temperature] = temperature
                 it[AiSettings.maxOutputTokens] = maxOutputTokens
+                it[AiSettings.intentModel] = intentModel
+                it[AiSettings.intentJsonMode] = intentJsonMode
+                it[AiSettings.intentMaxOutputTokens] = intentMaxOutputTokens
+                it[AiSettings.generationProviderSort] = generationProviderSort
                 it[AiSettings.updatedAt] = defaultNow()
                 it[AiSettings.updatedBy] = updatedBy
             }
@@ -85,7 +105,13 @@ open class AiSettingsRepository(private val db: Database) {
         get()
     }
 
-    private fun validate(temperature: Double?, maxOutputTokens: Int?) {
+    private fun validate(
+        temperature: Double?,
+        maxOutputTokens: Int?,
+        intentModel: String?,
+        intentMaxOutputTokens: Int?,
+        generationProviderSort: String?,
+    ) {
         if (temperature != null) {
             require(temperature in MIN_TEMPERATURE..MAX_TEMPERATURE) {
                 "Temperature must be between $MIN_TEMPERATURE and $MAX_TEMPERATURE"
@@ -96,12 +122,38 @@ open class AiSettingsRepository(private val db: Database) {
                 "Max output tokens must be between $MIN_MAX_OUTPUT_TOKENS and $MAX_MAX_OUTPUT_TOKENS"
             }
         }
+        if (intentModel != null) {
+            require(intentModel.isNotBlank()) { "Intent model must not be blank if supplied" }
+        }
+        if (intentMaxOutputTokens != null) {
+            require(intentMaxOutputTokens in MIN_MAX_OUTPUT_TOKENS..MAX_MAX_OUTPUT_TOKENS) {
+                "Intent max output tokens must be between $MIN_MAX_OUTPUT_TOKENS and $MAX_MAX_OUTPUT_TOKENS"
+            }
+        }
+        // Task 9 Part 12 — the current OpenRouterLlmClient implementation only
+        // ever sends `provider: {sort: "..."}` verbatim with no allowlist of
+        // its own; the only value this codebase actually exercises anywhere
+        // (production default, Test Chat pins, every existing test) is
+        // "latency". Rather than inventing support for other OpenRouter sort
+        // modes ("throughput", "price", etc.) that were never validated
+        // against this codebase's own behavior, this stays a closed
+        // allowlist of one — a deliberately conservative choice, not an
+        // oversight.
+        if (generationProviderSort != null) {
+            require(generationProviderSort in SUPPORTED_PROVIDER_SORTS) {
+                "generationProviderSort must be one of $SUPPORTED_PROVIDER_SORTS, or null for no preference"
+            }
+        }
     }
 
     private fun rowToModel(row: ResultRow) = StoredAiSettings(
         model = row[AiSettings.model],
         temperature = row[AiSettings.temperature],
         maxOutputTokens = row[AiSettings.maxOutputTokens],
+        intentModel = row[AiSettings.intentModel],
+        intentJsonMode = row[AiSettings.intentJsonMode],
+        intentMaxOutputTokens = row[AiSettings.intentMaxOutputTokens],
+        generationProviderSort = row[AiSettings.generationProviderSort],
         updatedAt = row[AiSettings.updatedAt],
         updatedBy = row[AiSettings.updatedBy],
     )
@@ -113,5 +165,6 @@ open class AiSettingsRepository(private val db: Database) {
         // Generous upper bound: this guards against a typo costing real money,
         // not against any particular model's context window.
         const val MAX_MAX_OUTPUT_TOKENS = 32000
+        val SUPPORTED_PROVIDER_SORTS = setOf("latency")
     }
 }

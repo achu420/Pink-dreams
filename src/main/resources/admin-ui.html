@@ -34,6 +34,93 @@
         .tab-button.active { border-bottom-color: #007bff; color: #007bff; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+
+        /* ==================================================================
+           Task 7 — Observability tab visual restyle. Scoped entirely under
+           #observability so nothing here touches the rest of this file's
+           existing light theme, tabs, or working functionality (Setup, Chat,
+           Test Chat). Palette/tokens mirror the AMIA admin-console prototype
+           (Claude outputs/amia-admin-panel-prototype) that this tab is being
+           made visually consistent with — a design reference only; that file
+           is a static mock with no live API calls, this tab is wired to the
+           real Task 2-6 endpoints.
+           ================================================================== */
+        #observability {
+            --obs-near-black: #190611;
+            --obs-deep-plum: #2A0B1C;
+            --obs-rose: #E85A88;
+            --obs-soft-rose: #F3A0B7;
+            --obs-blush: #F7D8E1;
+            --obs-warm-white: #FFF8FB;
+            --obs-muted-mauve: #CDBBC4;
+            --obs-surface: #231018;
+            --obs-surface-2: #2C1420;
+            --obs-border: rgba(247,216,225,0.10);
+            --obs-border-strong: rgba(247,216,225,0.18);
+            --obs-success: #3ED598;
+            --obs-warning: #F2B84B;
+            --obs-danger: #F0567A;
+            --obs-radius: 14px;
+            --obs-font-serif: 'Cormorant Garamond', Georgia, serif;
+            background: var(--obs-near-black);
+            color: var(--obs-warm-white);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            padding: 22px;
+            border-radius: 10px;
+            margin: -20px;
+        }
+        #observability h2, #observability h3 { border-bottom: none; color: var(--obs-warm-white); font-family: var(--obs-font-serif); font-weight: 600; }
+        #observability h2 { font-size: 26px; margin-bottom: 4px; }
+        #observability h3 { font-size: 16px; margin-bottom: 10px; }
+        #observability .obs-subtitle { font-size: 12.5px; color: var(--obs-muted-mauve); margin-bottom: 18px; }
+        #observability .obs-card {
+            background: var(--obs-surface); border: 1px solid var(--obs-border); border-radius: var(--obs-radius);
+            padding: 18px; margin-bottom: 16px;
+        }
+        #observability .obs-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        #observability .obs-stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-bottom: 16px; }
+        #observability .obs-stat-card { background: var(--obs-surface); border: 1px solid var(--obs-border); border-radius: var(--obs-radius); padding: 14px 16px; }
+        #observability .obs-stat-card .obs-stat-label { font-size: 11.5px; color: var(--obs-muted-mauve); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 8px; }
+        #observability .obs-stat-card .obs-stat-value { font-size: 24px; font-weight: 700; font-family: var(--obs-font-serif); color: var(--obs-warm-white); }
+        #observability .obs-stat-card.obs-primary-sla { border-color: var(--obs-rose); background: linear-gradient(160deg, rgba(232,90,136,.14), var(--obs-surface)); }
+        #observability .obs-filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 16px; }
+        #observability .obs-filters .obs-field { flex: 1; min-width: 150px; }
+        #observability .obs-filters label { display: block; font-size: 11px; color: var(--obs-muted-mauve); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 6px; }
+        #observability .obs-filters select, #observability .obs-filters input[type=text] {
+            width: 100%; background: var(--obs-surface-2); border: 1px solid var(--obs-border-strong); color: var(--obs-warm-white);
+            padding: 9px 12px; border-radius: 9px; font-size: 12.5px;
+        }
+        #observability button { background: linear-gradient(135deg, var(--obs-rose), #d43f6d); color: #fff; border: none; border-radius: 9px; padding: 9px 16px; font-weight: 600; font-size: 12.5px; cursor: pointer; }
+        #observability button:hover { filter: brightness(1.06); }
+        #observability button.obs-ghost { background: var(--obs-surface-2); border: 1px solid var(--obs-border-strong); color: var(--obs-warm-white); }
+        #observability button.obs-ghost:hover { background: var(--obs-surface); filter: none; }
+        #observability table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+        #observability th { text-align: left; color: var(--obs-muted-mauve); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; padding: 8px 10px; border-bottom: 1px solid var(--obs-border); }
+        #observability td { padding: 10px; border-bottom: 1px solid var(--obs-border); color: var(--obs-warm-white); }
+        #observability tr.obs-row-click { cursor: pointer; }
+        #observability tr.obs-row-click:hover { background: rgba(247,216,225,.05); }
+        #observability .obs-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; }
+        #observability .obs-badge.success { background: rgba(62,213,152,.14); color: var(--obs-success); }
+        #observability .obs-badge.danger { background: rgba(240,86,122,.14); color: var(--obs-danger); }
+        #observability .obs-badge.muted { background: rgba(205,187,196,.14); color: var(--obs-muted-mauve); }
+        #observability .obs-badge.testing { background: rgba(242,184,75,.16); color: var(--obs-warning); }
+        #observability .obs-empty { text-align: center; padding: 40px 20px; color: var(--obs-muted-mauve); font-size: 13px; }
+        #observability .obs-loading { padding: 20px; color: var(--obs-muted-mauve); font-size: 13px; }
+        #observability .obs-error { color: var(--obs-danger); background: rgba(240,86,122,.1); border: 1px solid rgba(240,86,122,.3); padding: 10px 14px; border-radius: 9px; margin-bottom: 12px; font-size: 12.5px; }
+        #observability .obs-code-block { background: #0f0509; border: 1px solid var(--obs-border-strong); color: var(--obs-soft-rose); font-family: 'SF Mono', Consolas, monospace; font-size: 11.5px; line-height: 1.6; border-radius: 9px; padding: 12px; width: 100%; resize: vertical; }
+        #observability .obs-kv { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--obs-border); font-size: 12.5px; }
+        #observability .obs-kv:last-child { border-bottom: none; }
+        #observability .obs-kv .obs-k { color: var(--obs-muted-mauve); }
+        #observability .obs-kv .obs-v { font-weight: 600; text-align: right; }
+        #observability .obs-refreshed { font-size: 11px; color: var(--obs-muted-mauve); }
+        #observability .obs-copy-btn { padding: 4px 10px; font-size: 11px; margin-bottom: 6px; }
+        #observability .obs-gap { height: 1px; background: var(--obs-border); margin: 22px 0; border: none; }
+        /* showError()/showSuccess() are shared across every tab and write
+           the page's default light-theme .error/.success classes — restyled
+           here only within #observability so those two functions need no
+           changes and every other tab keeps its original look. */
+        #observability .error { color: var(--obs-danger); background: rgba(240,86,122,.1); border: 1px solid rgba(240,86,122,.3); border-radius: 9px; }
+        #observability .success { color: var(--obs-success); background: rgba(62,213,152,.1); border: 1px solid rgba(62,213,152,.3); border-radius: 9px; }
     </style>
 </head>
 <body>
@@ -255,6 +342,49 @@
                 </div>
                 <button onclick="saveAiSettings()">Apply to All Generation…</button>
                 <button class="secondary" onclick="loadAiSettings()" style="margin-left: 8px;">Refresh</button>
+
+                <hr style="margin: 20px 0;">
+
+                <h3 style="margin-bottom: 8px;">Intent Discovery</h3>
+                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                    These affect <b>Intent Discovery only</b> — the skill-selection classifier, never
+                    primary generation, memory extraction, continuity, or memory-engine maintenance.
+                    Leave a field blank to clear the override and fall back to the code default.
+                </div>
+                <div class="form-group">
+                    <label>Intent Model (blank = code default):</label>
+                    <input type="text" id="intentSettingsModel" placeholder="e.g. openai/gpt-4o-mini">
+                </div>
+                <div class="form-group">
+                    <label>Intent JSON Mode:</label>
+                    <select id="intentSettingsJsonMode">
+                        <option value="">(code default)</option>
+                        <option value="true">true</option>
+                        <option value="false">false</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Intent Max Output Tokens (blank = code default):</label>
+                    <input type="number" id="intentSettingsMaxTokens" min="1" max="32000" placeholder="blank">
+                </div>
+                <button onclick="saveAiSettings()">Apply to Intent Discovery…</button>
+
+                <hr style="margin: 20px 0;">
+
+                <h3 style="margin-bottom: 8px;">Primary Generation — Provider Routing</h3>
+                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                    OpenRouter's upstream-provider routing preference for primary generation only.
+                    The only value this system currently supports is <code>latency</code> — no other
+                    OpenRouter routing modes have been validated against this codebase.
+                </div>
+                <div class="form-group">
+                    <label>Provider Sort:</label>
+                    <select id="intentSettingsProviderSort">
+                        <option value="">(no preference)</option>
+                        <option value="latency">latency</option>
+                    </select>
+                </div>
+                <button onclick="saveAiSettings()">Apply Provider Routing…</button>
             </div>
 
             <div class="section">
@@ -431,15 +561,20 @@
         </div>
 
         <div id="observability" class="tab-content">
-            <div class="section">
-                <h2>LLM Observability &amp; SLA Dashboard</h2>
-                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
-                    Reads directly from the raw LLM exchange capture (Task 2) and the
-                    aggregation layer (Task 3) — nothing here is estimated from logs.
-                </div>
+            <h2>Observability</h2>
+            <div class="obs-subtitle">
+                Reads directly from the raw LLM exchange capture (Task 2) and the aggregation
+                layer (Task 3) — nothing here is estimated from logs. No AI behavior, model,
+                prompt, or production configuration is changed by this screen.
+            </div>
 
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 15px;">
-                    <div class="form-group" style="flex: 1; min-width: 140px; margin-bottom: 0;">
+            <div class="obs-card">
+                <div class="obs-card-head">
+                    <h3 style="margin:0;">Filters</h3>
+                    <span class="obs-refreshed" id="obsLastRefreshed"></span>
+                </div>
+                <div class="obs-filters">
+                    <div class="obs-field">
                         <label>Workload</label>
                         <select id="obsWorkloadFilter">
                             <option value="">(all)</option>
@@ -450,50 +585,88 @@
                             <option value="memory_engine_maintenance">memory_engine_maintenance</option>
                         </select>
                     </div>
-                    <div class="form-group" style="flex: 1; min-width: 140px; margin-bottom: 0;">
+                    <div class="obs-field">
                         <label>Model contains</label>
                         <input type="text" id="obsModelFilter" placeholder="e.g. deepseek">
                     </div>
-                    <div class="form-group" style="flex: 1; min-width: 140px; margin-bottom: 0;">
+                    <div class="obs-field">
                         <label>Provider contains</label>
                         <input type="text" id="obsProviderFilter" placeholder="e.g. CoreWeave">
                     </div>
-                    <div style="margin-bottom: 0;">
+                    <div class="obs-field">
+                        <label>Skill</label>
+                        <input type="text" id="obsSkillFilter" placeholder="e.g. flirting">
+                    </div>
+                    <div class="obs-field">
+                        <label>Outcome</label>
+                        <select id="obsOutcomeFilter">
+                            <option value="">(all)</option>
+                            <option value="SUCCESS">SUCCESS</option>
+                            <option value="MALFORMED">MALFORMED</option>
+                            <option value="BUDGET_EXHAUSTION">BUDGET_EXHAUSTION</option>
+                            <option value="PROVIDER_ERROR">PROVIDER_ERROR</option>
+                            <option value="EXCEPTION">EXCEPTION</option>
+                        </select>
+                    </div>
+                    <div>
                         <button onclick="loadLatencyDashboard()">Apply Filters</button>
                     </div>
+                    <div>
+                        <button class="obs-ghost" onclick="resetObsFilters()">↺ Reset</button>
+                    </div>
+                    <div>
+                        <button class="obs-ghost" onclick="loadLatencyDashboard()">⟳ Refresh</button>
+                    </div>
                 </div>
-                <div id="obsDashboardError"></div>
-                <div id="obsDashboard"></div>
+            </div>
 
-                <hr style="margin: 25px 0;">
+            <div class="obs-card">
+                <div class="obs-card-head">
+                    <h3 style="margin:0;">Effective Configuration</h3>
+                    <button class="obs-ghost" onclick="loadEffectiveConfiguration()">⟳ Refresh</button>
+                </div>
+                <div class="obs-subtitle">
+                    The configuration ChatEngineFactory actually builds for the next call
+                    on each workload right now — read-only, sourced live from
+                    AiRuntimeSettings and the code-level overrides in Application.kt.
+                    No AI behavior is changed by viewing this.
+                </div>
+                <div id="obsEffectiveConfig"><div class="obs-loading">Loading…</div></div>
+            </div>
 
-                <h3 style="margin-bottom: 10px;">Find an exchange or turn</h3>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 10px;">
-                    <div class="form-group" style="flex: 1; min-width: 220px; margin-bottom: 0;">
+            <div id="obsDashboardError"></div>
+            <div id="obsDashboard"><div class="obs-loading">Loading dashboard…</div></div>
+
+            <div class="obs-gap"></div>
+
+            <div class="obs-card">
+                <h3>Exchange &amp; Turn Explorer</h3>
+                <div class="obs-filters">
+                    <div class="obs-field">
                         <label>Conversation ID</label>
                         <input type="text" id="obsConversationId" placeholder="paste a conversation UUID">
                     </div>
-                    <div style="margin-bottom: 0;">
+                    <div>
                         <button onclick="loadConversationExchanges()">Load Exchanges</button>
                     </div>
                 </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 15px;">
-                    <div class="form-group" style="flex: 1; min-width: 220px; margin-bottom: 0;">
+                <div class="obs-filters">
+                    <div class="obs-field">
                         <label>Turn Request ID</label>
                         <input type="text" id="obsTurnId" placeholder="paste a turnRequestId to trace one turn">
                     </div>
-                    <div style="margin-bottom: 0;">
+                    <div>
                         <button onclick="loadTurnTrace()">Trace Turn</button>
                     </div>
                 </div>
                 <div id="obsListError"></div>
-                <div id="obsExchangeList"></div>
+                <div id="obsExchangeList"><div class="obs-empty">Load exchanges by conversation, or trace a specific turn.</div></div>
                 <div id="obsExchangeDetail" style="margin-top: 15px;"></div>
+            </div>
 
-                <hr style="margin: 25px 0;">
-
-                <h3 style="margin-bottom: 10px;">Export (Task 6)</h3>
-                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+            <div class="obs-card">
+                <h3>Export</h3>
+                <div class="obs-subtitle" style="margin-bottom: 12px;">
                     Uses the same workload/model/provider filters set above.
                     The CSV is summary fields only (raw request/response bodies
                     are never included in a bulk export — open a single exchange
@@ -502,7 +675,9 @@
                     exchange's full detail.
                 </div>
                 <button onclick="downloadExchangesCsv()">Export exchanges as CSV</button>
-                <button class="secondary" onclick="downloadPerformanceJson()">Export performance stats as JSON</button>
+                <button class="obs-ghost" onclick="downloadPerformanceJson()">Export performance stats as JSON</button>
+            </div>
+        </div>
 
         <div id="debugPanel" style="display: none; margin-top: 20px;">
             <div class="section">
@@ -555,11 +730,17 @@
             return 'Basic ' + btoa(`${userId}:admin-console`);
         }
 
+        let obsDashboardLoadedOnce = false;
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
             document.getElementById(tab).classList.add('active');
             event.target.classList.add('active');
+            if (tab === 'observability' && !obsDashboardLoadedOnce) {
+                obsDashboardLoadedOnce = true;
+                loadLatencyDashboard();
+                loadEffectiveConfiguration();
+            }
         }
 
         function showError(elementId, msg) {
@@ -1061,6 +1242,10 @@
                     <tr><td>Model</td><td>${s.model}</td><td>${label(s.modelSource)}</td></tr>
                     <tr><td>Temperature</td><td>${s.temperature === null || s.temperature === undefined ? 'provider default' : s.temperature}</td><td>${label(s.temperatureSource)}</td></tr>
                     <tr><td>Max output tokens</td><td>${s.maxOutputTokens}</td><td>${label(s.maxOutputTokensSource)}</td></tr>
+                    <tr><td>Intent Model</td><td>${s.intentModel}</td><td>${label(s.intentModelSource)}</td></tr>
+                    <tr><td>Intent JSON Mode</td><td>${s.intentJsonMode === null || s.intentJsonMode === undefined ? 'provider default' : s.intentJsonMode}</td><td>${label(s.intentJsonModeSource)}</td></tr>
+                    <tr><td>Intent Max Output Tokens</td><td>${s.intentMaxOutputTokens}</td><td>${label(s.intentMaxOutputTokensSource)}</td></tr>
+                    <tr><td>Generation Provider Sort</td><td>${s.generationProviderSort === null || s.generationProviderSort === undefined ? 'no preference' : s.generationProviderSort}</td><td>${label(s.generationProviderSortSource)}</td></tr>
                 `;
                 document.getElementById('aiSettingsAudit').textContent = s.updatedAt
                     ? `Last changed ${s.updatedAt} by ${s.updatedBy || 'unknown'}`
@@ -1072,6 +1257,12 @@
                     (s.storedTemperature === null || s.storedTemperature === undefined) ? '' : s.storedTemperature;
                 document.getElementById('aiSettingsMaxTokens').value =
                     (s.storedMaxOutputTokens === null || s.storedMaxOutputTokens === undefined) ? '' : s.storedMaxOutputTokens;
+                document.getElementById('intentSettingsModel').value = s.storedIntentModel || '';
+                document.getElementById('intentSettingsJsonMode').value =
+                    (s.storedIntentJsonMode === null || s.storedIntentJsonMode === undefined) ? '' : String(s.storedIntentJsonMode);
+                document.getElementById('intentSettingsMaxTokens').value =
+                    (s.storedIntentMaxOutputTokens === null || s.storedIntentMaxOutputTokens === undefined) ? '' : s.storedIntentMaxOutputTokens;
+                document.getElementById('intentSettingsProviderSort').value = s.storedGenerationProviderSort || '';
             } catch (e) {
                 showError('aiSettingsError', e.message);
             }
@@ -1085,17 +1276,34 @@
             const temperature = tempRaw === '' ? null : parseFloat(tempRaw);
             const maxOutputTokens = tokensRaw === '' ? null : parseInt(tokensRaw, 10);
 
+            const intentModelRaw = document.getElementById('intentSettingsModel').value.trim();
+            const intentJsonModeRaw = document.getElementById('intentSettingsJsonMode').value;
+            const intentTokensRaw = document.getElementById('intentSettingsMaxTokens').value.trim();
+            const providerSortRaw = document.getElementById('intentSettingsProviderSort').value;
+            const intentModel = intentModelRaw || null;
+            const intentJsonMode = intentJsonModeRaw === '' ? null : (intentJsonModeRaw === 'true');
+            const intentMaxOutputTokens = intentTokensRaw === '' ? null : parseInt(intentTokensRaw, 10);
+            const generationProviderSort = providerSortRaw || null;
+
             const summary =
                 `Model: ${model || '(fall back to environment)'}\n` +
                 `Temperature: ${temperature === null ? '(provider default)' : temperature}\n` +
-                `Max output tokens: ${maxOutputTokens === null ? '(fall back to environment)' : maxOutputTokens}`;
-            if (!confirm(`Apply these settings to ALL generation?\n\n${summary}`)) return;
+                `Max output tokens: ${maxOutputTokens === null ? '(fall back to environment)' : maxOutputTokens}\n` +
+                `Intent Model: ${intentModel || '(code default)'}\n` +
+                `Intent JSON Mode: ${intentJsonMode === null ? '(code default)' : intentJsonMode}\n` +
+                `Intent Max Output Tokens: ${intentMaxOutputTokens === null ? '(code default)' : intentMaxOutputTokens}\n` +
+                `Generation Provider Sort: ${generationProviderSort || '(no preference)'}`;
+            if (!confirm(`Apply these settings?\n\n${summary}`)) return;
 
             try {
                 const res = await fetch(`${ADMIN_BASE}/ai-settings`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model, temperature, maxOutputTokens, confirm: true })
+                    body: JSON.stringify({
+                        model, temperature, maxOutputTokens,
+                        intentModel, intentJsonMode, intentMaxOutputTokens, generationProviderSort,
+                        confirm: true,
+                    })
                 });
                 if (!res.ok) {
                     const body = await res.json().catch(() => null);
@@ -1876,108 +2084,189 @@
             return ms >= 1000 ? (ms / 1000).toFixed(2) + 's' : ms + 'ms';
         }
 
+        // Every provider/model string and any free-text field below is
+        // attacker-influenced (it originates from an upstream LLM provider's
+        // response, not our own code) and is injected via innerHTML — never
+        // trust it. Applied to every such value before interpolation.
+        function escapeHtml(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function statsRow(label, stats) {
             if (!stats || stats.count === 0) {
-                return `<tr><td>${label}</td><td colspan="6" style="color:#999;">no data</td></tr>`;
+                return `<tr><td>${escapeHtml(label)}</td><td colspan="7" style="color:var(--obs-muted-mauve);">no data</td></tr>`;
             }
-            return `<tr><td>${label}</td><td>${stats.count}</td><td>${fmtMs(stats.p50)}</td><td>${fmtMs(stats.p75)}</td><td>${fmtMs(stats.p95)}</td><td>${fmtMs(stats.p99)}</td><td>${fmtMs(stats.max)}</td><td>${stats.avg ? fmtMs(Math.round(stats.avg)) : '—'}</td></tr>`;
+            return `<tr><td>${escapeHtml(label)}</td><td>${stats.count}</td><td>${fmtMs(stats.p50)}</td><td>${fmtMs(stats.p75)}</td><td>${fmtMs(stats.p95)}</td><td>${fmtMs(stats.p99)}</td><td>${fmtMs(stats.max)}</td><td>${stats.avg ? fmtMs(Math.round(stats.avg)) : '—'}</td></tr>`;
+        }
+
+        function resetObsFilters() {
+            document.getElementById('obsWorkloadFilter').value = '';
+            document.getElementById('obsModelFilter').value = '';
+            document.getElementById('obsProviderFilter').value = '';
+            document.getElementById('obsSkillFilter').value = '';
+            document.getElementById('obsOutcomeFilter').value = '';
+            loadLatencyDashboard();
+        }
+
+        // Task 8 Part 2 — read-only report of the config actually governing
+        // the next call on each workload. Escaped like everything else that
+        // renders model/provider strings, even though these particular
+        // values come from our own config rather than a provider response.
+        function sourceBadge(source) {
+            const cls = source === 'DATABASE' ? 'success' : (source === 'CODE_DEFAULT' ? 'testing' : 'muted');
+            return `<span class="obs-badge ${cls}">${escapeHtml(source)}</span>`;
+        }
+
+        async function loadEffectiveConfiguration() {
+            const el = document.getElementById('obsEffectiveConfig');
+            el.innerHTML = '<div class="obs-loading">Loading…</div>';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/observability/effective-configuration`);
+                if (!res.ok) {
+                    el.innerHTML = `<div class="obs-empty">Failed to load: ${res.status}</div>`;
+                    return;
+                }
+                const data = await res.json();
+                el.innerHTML = `
+                    <table>
+                        <thead><tr><th>Workload</th><th>Model</th><th>Temperature</th><th>Max Tokens</th><th>Reasoning</th><th>JSON Mode</th><th>Provider Sort</th></tr></thead>
+                        <tbody>${data.workloads.map(w => `
+                            <tr>
+                                <td>${escapeHtml(w.workload)}</td>
+                                <td>${escapeHtml(w.model)} ${sourceBadge(w.modelSource)}</td>
+                                <td>${w.temperature ?? '—'} ${sourceBadge(w.temperatureSource)}</td>
+                                <td>${w.maxOutputTokens} ${sourceBadge(w.maxOutputTokensSource)}</td>
+                                <td>${w.reasoningEnabled === null ? '—' : (w.reasoningEnabled ? 'ON' : 'OFF')}</td>
+                                <td>${w.jsonMode === null ? '—' : (w.jsonMode ? 'ON' : 'OFF')}</td>
+                                <td>${w.providerSort ?? '—'} ${sourceBadge(w.providerSortSource)}</td>
+                            </tr>`).join('')}</tbody>
+                    </table>
+                `;
+            } catch (e) {
+                el.innerHTML = `<div class="obs-empty">Failed to load: ${e.message}</div>`;
+            }
+        }
+
+        function statsTableCard(title, entries) {
+            const rows = Object.entries(entries || {}).map(([k, v]) => statsRow(k, v)).join('');
+            return `
+                <div class="obs-card">
+                    <h3>${title}</h3>
+                    <table>
+                        <thead><tr><th>${title.replace('By ', '')}</th><th>Count</th><th>p50</th><th>p75</th><th>p95</th><th>p99</th><th>Max</th><th>Avg</th></tr></thead>
+                        <tbody>${rows || '<tr><td colspan="8" class="obs-empty">no exchanges match this filter</td></tr>'}</tbody>
+                    </table>
+                </div>
+            `;
         }
 
         async function loadLatencyDashboard() {
-            const params = new URLSearchParams();
-            const workload = document.getElementById('obsWorkloadFilter').value.trim();
-            const model = document.getElementById('obsModelFilter').value.trim();
-            const provider = document.getElementById('obsProviderFilter').value.trim();
-            if (workload) params.set('workload', workload);
-            if (model) params.set('model', model);
-            if (provider) params.set('provider', provider);
+            const params = obsCurrentFilterParams();
+
+            document.getElementById('obsDashboardError').innerHTML = '';
+            document.getElementById('obsDashboard').innerHTML = '<div class="obs-loading">Loading dashboard…</div>';
 
             try {
                 const res = await fetch(`${ADMIN_BASE}/observability/latency-dashboard?${params.toString()}`);
                 if (!res.ok) {
                     showError('obsDashboardError', 'Failed to load dashboard: ' + res.status);
+                    document.getElementById('obsDashboard').innerHTML = '';
                     return;
                 }
                 const data = await res.json();
                 const el = document.getElementById('obsDashboard');
-                const rows = Object.entries(data.byWorkload || {}).map(([k, v]) => statsRow(k, v)).join('');
-                const modelRows = Object.entries(data.byModel || {}).map(([k, v]) => statsRow(k, v)).join('');
-                const providerRows = Object.entries(data.byProvider || {}).map(([k, v]) => statsRow(k, v)).join('');
+                const overall = data.overall;
                 const sla = data.slaBuckets;
                 const err = data.errorRate;
+
+                if (!overall || overall.count === 0) {
+                    el.innerHTML = '<div class="obs-empty">No exchanges match the selected filters.</div>';
+                    document.getElementById('obsLastRefreshed').textContent = 'Last refreshed ' + new Date().toLocaleTimeString();
+                    return;
+                }
+
                 el.innerHTML = `
-                    <div class="grid" style="margin-bottom: 15px;">
-                        <div>
-                            <b>SLA Buckets</b> (total ${sla.total})
-                            <table>
-                                <tr><td>≤5s</td><td>${sla.le5s}</td></tr>
-                                <tr><td>≤8s</td><td>${sla.le8s}</td></tr>
-                                <tr><td>≤10s</td><td>${sla.le10s}</td></tr>
-                                <tr><td>&gt;10s</td><td>${sla.gt10s}</td></tr>
-                                <tr><td>&gt;20s</td><td>${sla.gt20s}</td></tr>
-                                <tr><td><b>Within 10s rate</b></td><td><b>${sla.within10sRatePercent.toFixed(1)}%</b></td></tr>
-                            </table>
-                        </div>
-                        <div>
-                            <b>Outcomes</b> (total ${err.total})
-                            <table>
-                                <tr><td>Success</td><td>${err.success}</td></tr>
-                                <tr><td>Malformed</td><td>${err.malformed}</td></tr>
-                                <tr><td>Budget exhaustion</td><td>${err.budgetExhaustion}</td></tr>
-                                <tr><td>Provider error</td><td>${err.providerError}</td></tr>
-                                <tr><td>Exception</td><td>${err.exception}</td></tr>
-                                <tr><td><b>Failure rate</b></td><td><b>${err.failureRatePercent.toFixed(1)}%</b></td></tr>
-                            </table>
-                        </div>
+                    <div class="obs-stat-row">
+                        <div class="obs-stat-card"><div class="obs-stat-label">Total Exchanges</div><div class="obs-stat-value">${overall.count}</div></div>
+                        <div class="obs-stat-card"><div class="obs-stat-label">p50</div><div class="obs-stat-value">${fmtMs(overall.p50)}</div></div>
+                        <div class="obs-stat-card"><div class="obs-stat-label">p95</div><div class="obs-stat-value">${fmtMs(overall.p95)}</div></div>
+                        <div class="obs-stat-card"><div class="obs-stat-label">p99</div><div class="obs-stat-value">${fmtMs(overall.p99)}</div></div>
+                        <div class="obs-stat-card"><div class="obs-stat-label">Average</div><div class="obs-stat-value">${overall.avg ? fmtMs(Math.round(overall.avg)) : '—'}</div></div>
+                        <div class="obs-stat-card"><div class="obs-stat-label">Max</div><div class="obs-stat-value">${fmtMs(overall.max)}</div></div>
+                        <div class="obs-stat-card obs-primary-sla"><div class="obs-stat-label">≤10s (SLA)</div><div class="obs-stat-value">${sla.within10sRatePercent.toFixed(1)}%</div></div>
+                        <div class="obs-stat-card"><div class="obs-stat-label">Error rate</div><div class="obs-stat-value">${err.failureRatePercent.toFixed(1)}%</div></div>
                     </div>
-                    <b>By Workload</b>
-                    <table>
-                        <thead><tr><th>Workload</th><th>Count</th><th>p50</th><th>p75</th><th>p95</th><th>p99</th><th>Max</th><th>Avg</th></tr></thead>
-                        <tbody>${rows || '<tr><td colspan="8" style="color:#999;">no exchanges match this filter</td></tr>'}</tbody>
-                    </table>
-                    <b style="display:block; margin-top: 15px;">By Model</b>
-                    <table>
-                        <thead><tr><th>Model</th><th>Count</th><th>p50</th><th>p75</th><th>p95</th><th>p99</th><th>Max</th><th>Avg</th></tr></thead>
-                        <tbody>${modelRows || '<tr><td colspan="8" style="color:#999;">no exchanges match this filter</td></tr>'}</tbody>
-                    </table>
-                    <b style="display:block; margin-top: 15px;">By Provider</b>
-                    <table>
-                        <thead><tr><th>Provider</th><th>Count</th><th>p50</th><th>p75</th><th>p95</th><th>p99</th><th>Max</th><th>Avg</th></tr></thead>
-                        <tbody>${providerRows || '<tr><td colspan="8" style="color:#999;">no exchanges match this filter</td></tr>'}</tbody>
-                    </table>
+
+                    <div class="obs-card">
+                        <h3>SLA Buckets <span style="font-weight:400;color:var(--obs-muted-mauve);font-size:12px;">(total ${sla.total})</span></h3>
+                        <table>
+                            <thead><tr><th>≤5s</th><th>≤8s</th><th>≤10s</th><th>&gt;10s</th><th>&gt;20s</th></tr></thead>
+                            <tbody><tr><td>${sla.le5s}</td><td>${sla.le8s}</td><td>${sla.le10s}</td><td>${sla.gt10s}</td><td>${sla.gt20s}</td></tr></tbody>
+                        </table>
+                    </div>
+
+                    <div class="obs-card">
+                        <h3>Outcomes <span style="font-weight:400;color:var(--obs-muted-mauve);font-size:12px;">(total ${err.total})</span></h3>
+                        <table>
+                            <thead><tr><th>Success</th><th>Malformed</th><th>Budget exhaustion</th><th>Provider error</th><th>Exception</th></tr></thead>
+                            <tbody><tr><td>${err.success}</td><td>${err.malformed}</td><td>${err.budgetExhaustion}</td><td>${err.providerError}</td><td>${err.exception}</td></tr></tbody>
+                        </table>
+                    </div>
+
+                    ${statsTableCard('By Workload', data.byWorkload)}
+                    ${statsTableCard('By Skill', data.bySkill)}
+                    ${statsTableCard('By Model', data.byModel)}
+                    ${statsTableCard('By Provider', data.byProvider)}
                 `;
+                document.getElementById('obsLastRefreshed').textContent = 'Last refreshed ' + new Date().toLocaleTimeString();
             } catch (e) {
                 showError('obsDashboardError', 'Failed to load dashboard: ' + e.message);
+                document.getElementById('obsDashboard').innerHTML = '';
             }
         }
 
+        function outcomeBadge(outcome) {
+            const cls = outcome === 'SUCCESS' ? 'success' : 'danger';
+            return `<span class="obs-badge ${cls}">${escapeHtml(outcome)}</span>`;
+        }
+
         function exchangeRow(ex) {
-            const badge = ex.outcome === 'SUCCESS' ? '' : ` style="color:#d32f2f; font-weight:600;"`;
-            return `<tr onclick="loadExchangeDetail('${ex.id}')" style="cursor:pointer;">
-                <td>${ex.id.substring(0, 8)}…</td>
-                <td>${ex.workload}</td>
-                <td>${ex.model || '—'}</td>
-                <td>${ex.provider || '—'}</td>
+            return `<tr class="obs-row-click" onclick="loadExchangeDetail('${ex.id}')">
+                <td>${escapeHtml(ex.id.substring(0, 8))}…</td>
+                <td>${escapeHtml(ex.workload)}</td>
+                <td>${escapeHtml(ex.skillKey) || '—'}</td>
+                <td>${escapeHtml(ex.model) || '—'}</td>
+                <td>${escapeHtml(ex.provider) || '—'}</td>
                 <td>${fmtMs(ex.latencyMs)}</td>
-                <td>${ex.finishReason || '—'}</td>
-                <td${badge}>${ex.outcome}</td>
-                <td>${ex.isTestChat ? 'TEST' : 'PROD'}</td>
-                <td>${ex.createdAt}</td>
+                <td>${escapeHtml(ex.finishReason) || '—'}</td>
+                <td>${outcomeBadge(ex.outcome)}</td>
+                <td><span class="obs-badge ${ex.isTestChat ? 'testing' : 'muted'}">${ex.isTestChat ? 'TEST' : 'PROD'}</span></td>
+                <td>${escapeHtml(ex.createdAt)}</td>
             </tr>`;
+        }
+
+        function exchangeTable(exchanges) {
+            return `<table>
+                <thead><tr><th>Exchange</th><th>Workload</th><th>Skill</th><th>Model</th><th>Provider</th><th>Latency</th><th>Finish</th><th>Outcome</th><th>Mode</th><th>Time</th></tr></thead>
+                <tbody>${exchanges.map(exchangeRow).join('')}</tbody>
+            </table>`;
         }
 
         function renderExchangeList(exchanges) {
             const el = document.getElementById('obsExchangeList');
             if (!exchanges.length) {
-                el.innerHTML = '<div style="color:#999;">No exchanges found.</div>';
+                el.innerHTML = '<div class="obs-empty">No exchanges match the selected filters.</div>';
                 return;
             }
             el.innerHTML = `
-                <div style="font-size:12px; color:#666; margin-bottom:6px;">Click a row to load its full request/response (lazy-loaded, never fetched until asked for).</div>
-                <table>
-                    <thead><tr><th>Exchange</th><th>Workload</th><th>Model</th><th>Provider</th><th>Latency</th><th>Finish</th><th>Outcome</th><th>Mode</th><th>Time</th></tr></thead>
-                    <tbody>${exchanges.map(exchangeRow).join('')}</tbody>
-                </table>
+                <div class="obs-subtitle">Click a row to load its full request/response (lazy-loaded, never fetched until asked for).</div>
+                ${exchangeTable(exchanges)}
             `;
         }
 
@@ -1988,17 +2277,44 @@
                 return;
             }
             document.getElementById('obsExchangeDetail').innerHTML = '';
+            document.getElementById('obsExchangeList').innerHTML = '<div class="obs-loading">Loading exchanges…</div>';
+            const skillKey = document.getElementById('obsSkillFilter').value.trim();
+            const outcome = document.getElementById('obsOutcomeFilter').value.trim();
+            const extra = new URLSearchParams();
+            if (skillKey) extra.set('skillKey', skillKey);
+            if (outcome) extra.set('outcome', outcome);
             try {
-                const res = await fetch(`${ADMIN_BASE}/observability/exchanges?conversationId=${encodeURIComponent(conversationId)}&limit=200`);
+                const res = await fetch(`${ADMIN_BASE}/observability/exchanges?conversationId=${encodeURIComponent(conversationId)}&limit=200&${extra.toString()}`);
                 if (!res.ok) {
                     showError('obsListError', 'Failed to load exchanges: ' + res.status);
+                    document.getElementById('obsExchangeList').innerHTML = '';
                     return;
                 }
                 const data = await res.json();
                 renderExchangeList(data.exchanges);
             } catch (e) {
                 showError('obsListError', 'Failed to load exchanges: ' + e.message);
+                document.getElementById('obsExchangeList').innerHTML = '';
             }
+        }
+
+        // Task 8 Part 5/6 — renders the wall-clock pipeline-stage timings
+        // already captured by ChatEngine (see PerformanceMetricsRepository.
+        // stageTimingsForTurn's doc comment) alongside the turn's LLM
+        // exchanges. Explicitly says "not currently measured" for a null
+        // result — never a fabricated 0ms — since some turns (a failed one
+        // that never reached PERSIST, or one recorded before this capture)
+        // genuinely have no stage timings to show.
+        function stageTimingsBlock(stageTimingsMs) {
+            if (!stageTimingsMs) {
+                return '<div class="obs-subtitle" style="margin-top:12px;">Stage timings: NOT CURRENTLY MEASURED for this turn (no assistant message metadata, or it predates this capture).</div>';
+            }
+            const rows = Object.entries(stageTimingsMs).map(([stage, ms]) =>
+                `<tr><td>${escapeHtml(stage)}</td><td>${fmtMs(ms)}</td></tr>`).join('');
+            return `
+                <div class="obs-subtitle" style="margin-top:12px; margin-bottom: 6px;">Pipeline stage timings (measured, from the same turn's persisted diagnostics):</div>
+                <table><thead><tr><th>Stage</th><th>Duration</th></tr></thead><tbody>${rows}</tbody></table>
+            `;
         }
 
         async function loadTurnTrace() {
@@ -2008,69 +2324,111 @@
                 return;
             }
             document.getElementById('obsExchangeDetail').innerHTML = '';
+            document.getElementById('obsExchangeList').innerHTML = '<div class="obs-loading">Loading turn trace…</div>';
             try {
                 const res = await fetch(`${ADMIN_BASE}/observability/turns/${encodeURIComponent(turnId)}`);
                 if (!res.ok) {
                     showError('obsListError', res.status === 404 ? 'No exchanges recorded for this turn' : 'Failed to load turn: ' + res.status);
+                    document.getElementById('obsExchangeList').innerHTML = '';
                     return;
                 }
                 const data = await res.json();
+                if (!data.exchanges.length) {
+                    document.getElementById('obsExchangeList').innerHTML = '<div class="obs-empty">No exchanges recorded for this turn.</div>';
+                    return;
+                }
                 document.getElementById('obsExchangeList').innerHTML =
-                    `<div style="margin-bottom:8px;">On-path (user-facing) latency for this turn: <b>${fmtMs(data.onPathLatencyMs)}</b></div>` +
-                    `<table><thead><tr><th>Exchange</th><th>Workload</th><th>Model</th><th>Provider</th><th>Latency</th><th>Finish</th><th>Outcome</th><th>Mode</th><th>Time</th></tr></thead><tbody>${data.exchanges.map(exchangeRow).join('')}</tbody></table>`;
+                    `<div class="obs-subtitle">On-path (user-facing) latency for this turn — Intent + generation, excluding async side-channels: <b style="color:var(--obs-warm-white);">${fmtMs(data.onPathLatencyMs)}</b></div>` +
+                    exchangeTable(data.exchanges) +
+                    stageTimingsBlock(data.stageTimingsMs);
             } catch (e) {
                 showError('obsListError', 'Failed to load turn: ' + e.message);
+                document.getElementById('obsExchangeList').innerHTML = '';
             }
         }
 
+        // Falls back to a manual select+execCommand copy when the async
+        // Clipboard API is unavailable (e.g. served over plain HTTP on a
+        // non-localhost host, where browsers require a secure context).
+        function copyTextareaContent(textareaId) {
+            const ta = document.getElementById(textareaId);
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(ta.value).catch(() => fallbackCopy(ta));
+            } else {
+                fallbackCopy(ta);
+            }
+        }
+        function fallbackCopy(ta) {
+            ta.removeAttribute('readonly');
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) { /* best-effort only */ }
+            ta.setAttribute('readonly', 'readonly');
+        }
+
         async function loadExchangeDetail(id) {
+            document.getElementById('obsExchangeDetail').innerHTML = '<div class="obs-loading">Loading exchange…</div>';
             try {
                 const res = await fetch(`${ADMIN_BASE}/observability/exchanges/${id}`);
                 if (!res.ok) {
                     showError('obsListError', 'Failed to load exchange: ' + res.status);
+                    document.getElementById('obsExchangeDetail').innerHTML = '';
                     return;
                 }
                 const data = await res.json();
                 const s = data.summary;
+                // Raw request/response bodies come straight from an upstream LLM
+                // provider — untrusted text, rendered ONLY inside a readonly
+                // <textarea> (never innerHTML'd as markup, never executed) and
+                // still explicitly escaped here as defense in depth.
                 document.getElementById('obsExchangeDetail').innerHTML = `
-                    <div class="section" style="background:#f9f9f9;">
-                        <h3>Exchange ${s.id}</h3>
-                        <table>
-                            <tr><td>Turn</td><td>${s.turnRequestId}</td></tr>
-                            <tr><td>Conversation</td><td>${s.conversationId}</td></tr>
-                            <tr><td>Workload</td><td>${s.workload}</td></tr>
-                            <tr><td>Model / Provider</td><td>${s.model || '—'} / ${s.provider || '—'}</td></tr>
-                            <tr><td>Latency</td><td>${fmtMs(s.latencyMs)}</td></tr>
-                            <tr><td>Tokens (prompt/completion/reasoning/total)</td><td>${data.promptTokens ?? '—'} / ${data.completionTokens ?? '—'} / ${s.reasoningTokens ?? '—'} / ${s.totalTokens ?? '—'}</td></tr>
-                            <tr><td>Finish reason</td><td>${s.finishReason || '—'}</td></tr>
-                            <tr><td>HTTP status</td><td>${data.httpStatusCode ?? '—'}</td></tr>
-                            <tr><td>Outcome</td><td>${s.outcome}</td></tr>
-                            <tr><td>Error</td><td>${data.errorClass ? (data.errorClass + ': ' + (data.errorMessage || '')) : '—'}</td></tr>
-                            <tr><td>Mode</td><td>${s.isTestChat ? 'TEST' : 'PRODUCTION'}</td></tr>
-                        </table>
-                        <div style="margin-top:10px;">
-                            <label style="font-weight:600; display:block; margin-bottom:6px;">Raw request body (secrets already redacted at capture time):</label>
-                            <textarea readonly style="width:100%; height:150px; background:#1e1e1e; color:#ff9d00; font-family:monospace; font-size:11px; padding:10px; border-radius:4px;">${data.requestBody || '(not captured)'}</textarea>
+                    <div class="obs-card" style="background:var(--obs-surface-2);">
+                        <h3>Exchange ${escapeHtml(s.id)}</h3>
+                        <div class="obs-kv"><div class="obs-k">Turn</div><div class="obs-v">${escapeHtml(s.turnRequestId)}</div></div>
+                        <div class="obs-kv"><div class="obs-k">Conversation</div><div class="obs-v">${escapeHtml(s.conversationId)}</div></div>
+                        <div class="obs-kv"><div class="obs-k">Workload</div><div class="obs-v">${escapeHtml(s.workload)}</div></div>
+                        <div class="obs-kv"><div class="obs-k">Skill</div><div class="obs-v">${escapeHtml(s.skillKey) || '—'}</div></div>
+                        <div class="obs-kv"><div class="obs-k">Model / Provider</div><div class="obs-v">${escapeHtml(s.model) || '—'} / ${escapeHtml(s.provider) || '—'}</div></div>
+                        <div class="obs-kv"><div class="obs-k">Latency</div><div class="obs-v">${fmtMs(s.latencyMs)}</div></div>
+                        <div class="obs-kv"><div class="obs-k">Tokens (prompt/completion/reasoning/total)</div><div class="obs-v">${data.promptTokens ?? '—'} / ${data.completionTokens ?? '—'} / ${s.reasoningTokens ?? '—'} / ${s.totalTokens ?? '—'}</div></div>
+                        <div class="obs-kv"><div class="obs-k">Finish reason</div><div class="obs-v">${escapeHtml(s.finishReason) || '—'}</div></div>
+                        <div class="obs-kv"><div class="obs-k">HTTP status</div><div class="obs-v">${data.httpStatusCode ?? '—'}</div></div>
+                        <div class="obs-kv"><div class="obs-k">Outcome</div><div class="obs-v">${outcomeBadge(s.outcome)}</div></div>
+                        <div class="obs-kv"><div class="obs-k">Error</div><div class="obs-v">${data.errorClass ? (escapeHtml(data.errorClass) + ': ' + escapeHtml(data.errorMessage || '')) : '—'}</div></div>
+                        <div class="obs-kv"><div class="obs-k">Mode</div><div class="obs-v"><span class="obs-badge ${s.isTestChat ? 'testing' : 'muted'}">${s.isTestChat ? 'TEST' : 'PRODUCTION'}</span></div></div>
+
+                        <div style="margin-top:14px;">
+                            <label style="font-weight:600; display:block; margin-bottom:6px; font-size:12.5px;">Raw request body (secrets already redacted at capture time):</label>
+                            <button class="obs-ghost obs-copy-btn" onclick="copyTextareaContent('obsReqBody')">Copy</button>
+                            <textarea id="obsReqBody" readonly class="obs-code-block" style="height:150px;">${escapeHtml(data.requestBody) || '(not captured)'}</textarea>
                         </div>
                         <div style="margin-top:10px;">
-                            <label style="font-weight:600; display:block; margin-bottom:6px;">Raw response body:</label>
-                            <textarea readonly style="width:100%; height:150px; background:#1e1e1e; color:#ff9d00; font-family:monospace; font-size:11px; padding:10px; border-radius:4px;">${data.responseBody || '(not captured)'}</textarea>
+                            <label style="font-weight:600; display:block; margin-bottom:6px; font-size:12.5px;">Raw response body:</label>
+                            <button class="obs-ghost obs-copy-btn" onclick="copyTextareaContent('obsResBody')">Copy</button>
+                            <textarea id="obsResBody" readonly class="obs-code-block" style="height:150px;">${escapeHtml(data.responseBody) || '(not captured)'}</textarea>
                         </div>
                     </div>
                 `;
             } catch (e) {
                 showError('obsListError', 'Failed to load exchange: ' + e.message);
+                document.getElementById('obsExchangeDetail').innerHTML = '';
             }
         }
 
+        // Shared by the dashboard, exchange/turn lookups, and both exports, so
+        // every observability view stays consistent with whatever filter is
+        // currently set (Task 8 Part 7 — filters must apply everywhere).
         function obsCurrentFilterParams() {
             const params = new URLSearchParams();
             const workload = document.getElementById('obsWorkloadFilter').value.trim();
             const model = document.getElementById('obsModelFilter').value.trim();
             const provider = document.getElementById('obsProviderFilter').value.trim();
+            const skillKey = document.getElementById('obsSkillFilter').value.trim();
+            const outcome = document.getElementById('obsOutcomeFilter').value.trim();
             if (workload) params.set('workload', workload);
             if (model) params.set('model', model);
             if (provider) params.set('provider', provider);
+            if (skillKey) params.set('skillKey', skillKey);
+            if (outcome) params.set('outcome', outcome);
             return params;
         }
 

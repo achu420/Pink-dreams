@@ -63,6 +63,14 @@ data class ChatContext(
     val blocks: List<ContextBlock>,
     val engineVersionId: UUID? = null,
     val personaCoreVersionId: UUID? = null,
+    // Task 8 Part 4 — stamped onto the context AFTER skill selection runs
+    // (ChatEngine.process(), the SKILL_SELECTION stage) so the downstream
+    // call that reuses this context — primary generation — carries the
+    // actual selected skill through to GenerationRequest.from(), with no
+    // per-call-site plumbing. Null means SkillSelection.None (a genuine "no
+    // skill" outcome), never "not yet known" — only ever set once, after
+    // selection has already completed.
+    val selectedSkillKey: String? = null,
 )
 
 data class ContextBlock(val role: String, val content: String)
@@ -290,14 +298,19 @@ class PipelineChatEngine(
 
         val skillEnrichedContext = timed("skill_context_enrichment") {
             try {
-                if (skillSelection is SkillSelection.Selected && skillContextEnricher != null) {
+                val enriched = if (skillSelection is SkillSelection.Selected && skillContextEnricher != null) {
                     skillContextEnricher.enrich(memoryEnrichedContext, skillSelection)
                 } else {
                     memoryEnrichedContext
                 }
+                // Task 8 — stamp the ACTUAL selection outcome regardless of whether
+                // an enricher is configured, so exchange attribution (which skill
+                // was in effect for this generation) never depends on whether a
+                // content-injecting enricher happens to be wired up.
+                enriched.copy(selectedSkillKey = (skillSelection as? SkillSelection.Selected)?.skillKey)
             } catch (e: Exception) {
                 System.err.println("SKILL_CONTEXT_ENRICHMENT: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
-                memoryEnrichedContext
+                memoryEnrichedContext.copy(selectedSkillKey = (skillSelection as? SkillSelection.Selected)?.skillKey)
             }
         }
         val afterSkillSelection = afterContext.advance(PipelineStage.SKILL_SELECTION)

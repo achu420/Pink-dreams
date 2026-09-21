@@ -31,6 +31,12 @@ data class UpdateAiSettingsRequest(
     val model: String? = null,
     val temperature: Double? = null,
     val maxOutputTokens: Int? = null,
+    // Task 9 — Admin AI Runtime Controls. Same null-clears-the-override
+    // convention as the three fields above.
+    val intentModel: String? = null,
+    val intentJsonMode: Boolean? = null,
+    val intentMaxOutputTokens: Int? = null,
+    val generationProviderSort: String? = null,
     /**
      * Required acknowledgement: these settings affect EVERY generation, so a
      * change cannot be made accidentally by a malformed or exploratory PUT.
@@ -49,6 +55,19 @@ data class AiSettingsResponse(
     val storedModel: String?,
     val storedTemperature: Double?,
     val storedMaxOutputTokens: Int?,
+    // Task 9 — Admin AI Runtime Controls.
+    val intentModel: String,
+    val intentModelSource: String,
+    val intentJsonMode: Boolean?,
+    val intentJsonModeSource: String,
+    val intentMaxOutputTokens: Int,
+    val intentMaxOutputTokensSource: String,
+    val generationProviderSort: String?,
+    val generationProviderSortSource: String,
+    val storedIntentModel: String?,
+    val storedIntentJsonMode: Boolean?,
+    val storedIntentMaxOutputTokens: Int?,
+    val storedGenerationProviderSort: String?,
     val updatedAt: String?,
     val updatedBy: String?,
 )
@@ -131,6 +150,10 @@ class AdminAiSettingsRoutes(
                         temperature = request.temperature,
                         maxOutputTokens = request.maxOutputTokens,
                         updatedBy = principal.name,
+                        intentModel = request.intentModel?.trim()?.ifBlank { null },
+                        intentJsonMode = request.intentJsonMode,
+                        intentMaxOutputTokens = request.intentMaxOutputTokens,
+                        generationProviderSort = request.generationProviderSort?.trim()?.ifBlank { null },
                     )
                     call.respond(HttpStatusCode.OK, settingsResponse())
                 } catch (e: IllegalArgumentException) {
@@ -187,6 +210,18 @@ class AdminAiSettingsRoutes(
             storedModel = stored?.model,
             storedTemperature = stored?.temperature,
             storedMaxOutputTokens = stored?.maxOutputTokens,
+            intentModel = resolved.intentModel,
+            intentModelSource = resolved.intentModelSource.name,
+            intentJsonMode = resolved.intentJsonMode,
+            intentJsonModeSource = resolved.intentJsonModeSource.name,
+            intentMaxOutputTokens = resolved.intentMaxOutputTokens,
+            intentMaxOutputTokensSource = resolved.intentMaxOutputTokensSource.name,
+            generationProviderSort = resolved.generationProviderSort,
+            generationProviderSortSource = resolved.generationProviderSortSource.name,
+            storedIntentModel = stored?.intentModel,
+            storedIntentJsonMode = stored?.intentJsonMode,
+            storedIntentMaxOutputTokens = stored?.intentMaxOutputTokens,
+            storedGenerationProviderSort = stored?.generationProviderSort,
             updatedAt = stored?.updatedAt?.toString(),
             updatedBy = stored?.updatedBy,
         )

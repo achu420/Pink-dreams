@@ -71,6 +71,10 @@ data class LatencyDashboardResponse(
     val byWorkload: Map<String, LatencyStatsResponse>,
     val byModel: Map<String, LatencyStatsResponse>,
     val byProvider: Map<String, LatencyStatsResponse>,
+    // Task 8 Part 3/4 — "none" covers both a genuine SkillSelection.None
+    // outcome and any exchange recorded before skill attribution existed;
+    // see MetricsFilter's own doc comment for why those stay merged.
+    val bySkill: Map<String, LatencyStatsResponse>,
 )
 
 @Serializable
@@ -88,6 +92,9 @@ data class ExchangeSummaryResponse(
     val finishReason: String?,
     val outcome: String,
     val createdAt: String,
+    // Task 8 Part 4/8 — null means SkillSelection.None OR a pre-Task-8
+    // exchange; both render as "no skill attributed", never guessed at.
+    val skillKey: String?,
 )
 
 @Serializable
@@ -103,6 +110,36 @@ data class ExchangeDetailResponse(
     val responseBody: String?,
 )
 
+/**
+ * Task 8 Part 2 — one workload's ACTUALLY EFFECTIVE generation config, as
+ * [com.pinkdreams.chat.ChatEngineFactory.build] genuinely constructs it —
+ * not a re-derivation, a direct report of the same values/sources that
+ * would be passed to the LLM client for the next call on this workload.
+ */
+@Serializable
+data class WorkloadEffectiveConfigResponse(
+    val workload: String,
+    val model: String,
+    val modelSource: String,
+    val temperature: Double?,
+    val temperatureSource: String,
+    val maxOutputTokens: Int,
+    val maxOutputTokensSource: String,
+    val reasoningEnabled: Boolean?,
+    val jsonMode: Boolean?,
+    // Task 9 — truthful source for jsonMode, mirroring the others. Optional
+    // with a PROVIDER_DEFAULT default so every pre-Task-9 construction site
+    // (the three side-channel workloads below) keeps compiling unchanged.
+    val jsonModeSource: String = "PROVIDER_DEFAULT",
+    val providerSort: String?,
+    val providerSortSource: String,
+)
+
+@Serializable
+data class EffectiveConfigurationResponse(
+    val workloads: List<WorkloadEffectiveConfigResponse>,
+)
+
 @Serializable
 data class ExchangeListResponse(
     val exchanges: List<ExchangeSummaryResponse>,
@@ -115,6 +152,15 @@ data class TurnTraceResponse(
     val conversationId: String,
     val onPathLatencyMs: Long,
     val exchanges: List<ExchangeSummaryResponse>,
+    // Task 8 Part 5/6 — the wall-clock pipeline-stage timings ChatEngine
+    // already measures (context_assembly, intent_discovery,
+    // memory_context_selection, skill_context_enrichment, generation,
+    // persist, total_before_persist — whichever ran for this turn), read
+    // from the assistant message's existing metadata, not re-instrumented.
+    // Null when no assistant message exists for this turn (e.g. it failed
+    // before PERSIST) or it predates this capture — the UI must render that
+    // as "not currently measured", never a fabricated zero.
+    val stageTimingsMs: Map<String, Long>?,
 )
 
 /**
@@ -131,6 +177,12 @@ class AdminObservabilityRoutes(
     private val exchangeRepository: LlmExchangeRepository,
     private val metricsRepository: PerformanceMetricsRepository,
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
+    // Task 8 Part 2 / Task 9 Part 13 — Effective Configuration. As of Task
+    // 9, `aiRuntimeSettings.resolve()` is the ONE authoritative resolution
+    // path for every one of these settings (DB override, else code
+    // default) — this endpoint is now a pure read of that single source,
+    // with no independent precedence logic of its own.
+    private val aiRuntimeSettings: com.pinkdreams.config.AiRuntimeSettings? = null,
 ) {
     fun register(route: Route) {
         route.authenticate("dev-auth") {
@@ -146,8 +198,18 @@ class AdminObservabilityRoutes(
                         byWorkload = metricsRepository.statsByWorkload(filter).mapValues { it.value.toResponse() },
                         byModel = metricsRepository.statsByModel(filter).mapValues { it.value.toResponse() },
                         byProvider = metricsRepository.statsByProvider(filter).mapValues { it.value.toResponse() },
+                        bySkill = metricsRepository.statsBySkill(filter).mapValues { it.value.toResponse() },
                     ),
                 )
+            }
+
+            // Task 8 Part 2 — read-only report of the config ChatEngineFactory
+            // actually builds for each workload right now. No new persistence,
+            // no behavior change: this endpoint only reads AiRuntimeSettings
+            // and the same code-level overrides Application.kt already wires.
+            get("/v1/admin/observability/effective-configuration") {
+                if (requirePrincipal(adminAuthorizationProvider) == null) return@get
+                call.respond(HttpStatusCode.OK, effectiveConfiguration())
             }
 
             get("/v1/admin/observability/exchanges") {
@@ -156,6 +218,8 @@ class AdminObservabilityRoutes(
                 val isTestChat = call.request.queryParameters["isTestChat"]?.toBooleanStrictOrNull()
                 val limit = call.request.queryParameters["limit"]?.toIntOrNull()?.coerceIn(1, 500) ?: 100
                 val conversationId = call.request.queryParameters["conversationId"]?.let { parseUuidOrNull(it) }
+                val skillKey = call.request.queryParameters["skillKey"]
+                val outcome = call.request.queryParameters["outcome"]
 
                 val exchanges = when {
                     conversationId != null -> exchangeRepository.findForConversation(conversationId, limit)
@@ -168,7 +232,13 @@ class AdminObservabilityRoutes(
                         return@get
                     }
                 }
-                call.respond(HttpStatusCode.OK, ExchangeListResponse(exchanges.map { it.toSummary() }, exchanges.size))
+                // skillKey/outcome apply on top of the required conversationId/workload
+                // dimension above (in-memory — this endpoint's result sets are already
+                // capped by `limit`, never a full-table scan).
+                val filtered = exchanges
+                    .let { list -> if (skillKey != null) list.filter { it.skillKey == skillKey } else list }
+                    .let { list -> if (outcome != null) list.filter { it.outcome.name == outcome } else list }
+                call.respond(HttpStatusCode.OK, ExchangeListResponse(filtered.map { it.toSummary() }, filtered.size))
             }
 
             get("/v1/admin/observability/exchanges/{id}") {
@@ -217,6 +287,7 @@ class AdminObservabilityRoutes(
                         conversationId = breakdown.conversationId.toString(),
                         onPathLatencyMs = breakdown.onPathLatencyMs(),
                         exchanges = breakdown.exchanges.map { it.toSummary() },
+                        stageTimingsMs = metricsRepository.stageTimingsForTurn(turnRequestId),
                     ),
                 )
             }
@@ -242,6 +313,7 @@ class AdminObservabilityRoutes(
                         byWorkload = metricsRepository.statsByWorkload(filter).mapValues { it.value.toResponse() },
                         byModel = metricsRepository.statsByModel(filter).mapValues { it.value.toResponse() },
                         byProvider = metricsRepository.statsByProvider(filter).mapValues { it.value.toResponse() },
+                        bySkill = metricsRepository.statsBySkill(filter).mapValues { it.value.toResponse() },
                     ),
                 )
             }
@@ -262,13 +334,13 @@ class AdminObservabilityRoutes(
      */
     private fun exchangesToCsv(exchanges: List<LlmExchangeRepository.Exchange>): String {
         val header = listOf(
-            "id", "turnRequestId", "conversationId", "workload", "isTestChat", "model", "provider",
+            "id", "turnRequestId", "conversationId", "workload", "skillKey", "isTestChat", "model", "provider",
             "latencyMs", "promptTokens", "completionTokens", "reasoningTokens", "totalTokens",
             "finishReason", "httpStatusCode", "outcome", "errorClass", "createdAt",
         ).joinToString(",")
         val rows = exchanges.joinToString("\n") { e ->
             listOf(
-                e.id, e.turnRequestId, e.conversationId, e.workload, e.isTestChat, e.model ?: "",
+                e.id, e.turnRequestId, e.conversationId, e.workload, e.skillKey ?: "", e.isTestChat, e.model ?: "",
                 e.provider ?: "", e.latencyMs, e.promptTokens ?: "", e.completionTokens ?: "",
                 e.reasoningTokens ?: "", e.totalTokens ?: "", e.finishReason ?: "", e.httpStatusCode ?: "",
                 e.outcome.name, csvEscape(e.errorClass ?: ""), e.createdAt,
@@ -294,6 +366,81 @@ class AdminObservabilityRoutes(
             isTestChat = params["isTestChat"]?.toBooleanStrictOrNull(),
             from = params["from"]?.let { parseDateTimeOrNull(it) },
             to = params["to"]?.let { parseDateTimeOrNull(it) },
+            skillKey = params["skillKey"],
+            outcome = params["outcome"],
+        )
+    }
+
+    /**
+     * Task 8 Part 2 / Task 9 Part 13. `aiRuntimeSettings.resolve()` is now
+     * the single authoritative resolution for model/temperature/
+     * maxOutputTokens (primary generation) AND intentModel/intentJsonMode/
+     * intentMaxOutputTokens/generationProviderSort (Intent Discovery +
+     * provider routing) — this endpoint just reads it and reports the truthful
+     * source for each field, live, with no independent precedence logic.
+     * Documented, unchanged discrepancy: memory_extraction/
+     * continuity_summarization/memory_engine_maintenance still build their
+     * GenerationConfig directly from the raw environment/default model in
+     * ChatEngineFactory (never resolve()'d) — see AiRuntimeSettings.environmentModel's
+     * own doc comment. That was flagged, not fixed, in Task 8 and remains
+     * out of scope here (Task 9 targets Intent + primary-generation
+     * provider-routing only, per its own Part 18).
+     */
+    private fun effectiveConfiguration(): EffectiveConfigurationResponse {
+        val resolved = aiRuntimeSettings?.resolve()
+        val environmentModel = aiRuntimeSettings?.environmentModel ?: "unknown"
+
+        val primaryGeneration = WorkloadEffectiveConfigResponse(
+            workload = "primary_generation",
+            model = resolved?.model ?: environmentModel,
+            modelSource = resolved?.modelSource?.name ?: "ENVIRONMENT_OR_DEFAULT",
+            temperature = resolved?.temperature,
+            temperatureSource = resolved?.temperatureSource?.name ?: "ENVIRONMENT_OR_DEFAULT",
+            maxOutputTokens = resolved?.maxOutputTokens ?: 0,
+            maxOutputTokensSource = resolved?.maxOutputTokensSource?.name ?: "ENVIRONMENT_OR_DEFAULT",
+            reasoningEnabled = false,
+            jsonMode = null,
+            providerSort = resolved?.generationProviderSort,
+            providerSortSource = resolved?.generationProviderSortSource?.name ?: "PROVIDER_DEFAULT",
+        )
+        val intentDiscovery = WorkloadEffectiveConfigResponse(
+            workload = "intent_discovery",
+            model = resolved?.intentModel ?: environmentModel,
+            modelSource = resolved?.intentModelSource?.name ?: "ENVIRONMENT_OR_DEFAULT",
+            temperature = null,
+            temperatureSource = "PROVIDER_DEFAULT",
+            maxOutputTokens = resolved?.intentMaxOutputTokens ?: 600,
+            maxOutputTokensSource = resolved?.intentMaxOutputTokensSource?.name ?: "CODE_DEFAULT",
+            reasoningEnabled = null,
+            jsonMode = resolved?.intentJsonMode,
+            jsonModeSource = resolved?.intentJsonModeSource?.name ?: "PROVIDER_DEFAULT",
+            providerSort = null,
+            providerSortSource = "PROVIDER_DEFAULT",
+        )
+        fun sideChannel(workload: String, maxOutputTokens: Int) = WorkloadEffectiveConfigResponse(
+            workload = workload,
+            model = environmentModel,
+            // Documented discrepancy: side-channel calls use raw environmentModel
+            // directly (ChatEngineFactory.build()), NEVER the DB-resolved model —
+            // so this is always ENVIRONMENT_OR_DEFAULT regardless of ai_settings.
+            modelSource = "ENVIRONMENT_OR_DEFAULT",
+            temperature = null,
+            temperatureSource = "PROVIDER_DEFAULT",
+            maxOutputTokens = maxOutputTokens,
+            maxOutputTokensSource = "CODE_DEFAULT",
+            reasoningEnabled = null,
+            jsonMode = null,
+            providerSort = null,
+            providerSortSource = "PROVIDER_DEFAULT",
+        )
+        return EffectiveConfigurationResponse(
+            workloads = listOf(
+                primaryGeneration,
+                intentDiscovery,
+                sideChannel("memory_extraction", 1200),
+                sideChannel("continuity_summarization", 1000),
+                sideChannel("memory_engine_maintenance", 6000),
+            ),
         )
     }
 
@@ -319,6 +466,7 @@ class AdminObservabilityRoutes(
         finishReason = finishReason,
         outcome = outcome.name,
         createdAt = createdAt.toString(),
+        skillKey = skillKey,
     )
 
     private fun PerformanceMetricsRepository.LatencyStats.toResponse() = LatencyStatsResponse(count, p50, p75, p95, p99, max, avg)

@@ -63,6 +63,12 @@ data class GenerationRequest(
     val personaCoreVersionId: UUID,
     val context: ChatContext,
     val config: GenerationConfig,
+    // Task 8 Part 4 — the skill SELECTED for this turn at the time this call
+    // was made (null for SkillSelection.None, or any call independent of
+    // skill selection, e.g. intent_discovery itself). Sourced from
+    // ChatContext.selectedSkillKey so it reaches every downstream call that
+    // reuses the same enriched context — today, primary generation.
+    val skillKey: String? = null,
 ) {
     companion object {
         fun from(request: ChatRequest, context: ChatContext, config: GenerationConfig): GenerationRequest {
@@ -79,6 +85,7 @@ data class GenerationRequest(
                 personaCoreVersionId = personaCoreVersionId,
                 context = context,
                 config = config,
+                skillKey = context.selectedSkillKey,
             )
         }
     }

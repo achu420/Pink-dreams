@@ -1,6 +1,7 @@
 package com.pinkdreams.persistence.repositories
 
 import com.pinkdreams.persistence.database.LlmExchanges
+import com.pinkdreams.persistence.database.Messages
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Op
 import org.jetbrains.exposed.sql.ResultRow
@@ -11,6 +12,8 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.math.ceil
@@ -34,15 +37,14 @@ import kotlin.math.ceil
 class PerformanceMetricsRepository(private val db: Database) {
 
     /**
-     * Every dimension this task's spec lists that [LlmExchanges] can actually
-     * answer directly: workload (stands in for "Engine" — each workload IS a
-     * pipeline stage/engine), model, provider, conversation, turn, date-time,
-     * and production vs Test Chat. Skill/Persona/Intent-result breakdowns are
-     * NOT implemented here — see the honest gap note in the Task 3 report:
-     * the skill selected for a turn is not currently a queryable column on
-     * any table, only free text inside a per-message metadata blob, and
-     * fabricating a join against that would not be a real dimension, just a
-     * best-effort string match.
+     * Every dimension [LlmExchanges] can answer directly: workload (stands
+     * in for "Engine" — each workload IS a pipeline stage/engine), model,
+     * provider, conversation, turn, date-time, production vs Test Chat,
+     * outcome, and — as of Task 8 Part 4 — skill, now that
+     * [LlmExchanges.skillKey] is a genuine captured column rather than the
+     * "not a real column anywhere" gap Tasks 3-5 documented. Persona/engine
+     * version breakdowns remain out of scope for this task (see the Task 8
+     * report) — only skill was requested as the smallest safe addition.
      */
     data class MetricsFilter(
         val workload: String? = null,
@@ -52,6 +54,8 @@ class PerformanceMetricsRepository(private val db: Database) {
         val isTestChat: Boolean? = null,
         val from: LocalDateTime? = null,
         val to: LocalDateTime? = null,
+        val skillKey: String? = null,
+        val outcome: String? = null,
     )
 
     data class LatencyStats(
@@ -138,6 +142,7 @@ class PerformanceMetricsRepository(private val db: Database) {
         requestBody = row[LlmExchanges.requestBody],
         responseBody = row[LlmExchanges.responseBody],
         createdAt = row[LlmExchanges.createdAt],
+        skillKey = row[LlmExchanges.skillKey],
     )
 
     fun latencyStats(filter: MetricsFilter = MetricsFilter()): LatencyStats = transaction(db) {
@@ -181,6 +186,16 @@ class PerformanceMetricsRepository(private val db: Database) {
     fun statsByProvider(filter: MetricsFilter = MetricsFilter()): Map<String, LatencyStats> =
         groupedStats(filter) { it[LlmExchanges.provider] ?: "unknown" }
 
+    /**
+     * Task 8 Part 4/3 — "none" covers BOTH SkillSelection.None (a genuine "no
+     * skill" outcome) and any exchange recorded before this column existed;
+     * the two are indistinguishable at the exchange level (see the column's
+     * own doc comment), so they are grouped together rather than the
+     * dashboard fabricating a distinction the data doesn't support.
+     */
+    fun statsBySkill(filter: MetricsFilter = MetricsFilter()): Map<String, LatencyStats> =
+        groupedStats(filter) { it[LlmExchanges.skillKey] ?: "none" }
+
     private fun groupedStats(filter: MetricsFilter, keyOf: (org.jetbrains.exposed.sql.ResultRow) -> String): Map<String, LatencyStats> =
         transaction(db) {
             LlmExchanges.select { buildCondition(filter) }
@@ -200,6 +215,35 @@ class PerformanceMetricsRepository(private val db: Database) {
         TurnLatencyBreakdown(turnRequestId, exchanges.first().conversationId, exchanges)
     }
 
+    /**
+     * Task 8 Part 6 — exposes the wall-clock pipeline-stage timings
+     * ChatEngine.process() already measures and RepositoryChatPersistence
+     * already persists (as the `lvm_stage_timings` key inside the assistant
+     * message's `metadata` JSON blob — see both classes' own doc comments).
+     * No new instrumentation: this only reads and re-shapes data that was
+     * already being captured for the debug panel, joined here by the shared
+     * ChatRequest.requestId so the turn trace can show it alongside the LLM
+     * exchanges for the same turn. Returns null when no assistant message
+     * exists for this turn (a failed turn that never reached PERSIST) or its
+     * metadata carries no stage timings (a turn that predates this
+     * capture — Runtime Quality + Latency Verification phase).
+     */
+    fun stageTimingsForTurn(turnRequestId: UUID): Map<String, Long>? = transaction(db) {
+        val metadataJson = Messages.select {
+            (Messages.requestId eq turnRequestId) and (Messages.role eq "assistant")
+        }.limit(1).map { it[Messages.metadata] }.singleOrNull() ?: return@transaction null
+
+        try {
+            val outer = kotlinx.serialization.json.Json.parseToJsonElement(metadataJson).jsonObject
+            val stageTimingsRaw = outer["lvm_stage_timings"]?.jsonPrimitive?.content ?: return@transaction null
+            val stageTimings = kotlinx.serialization.json.Json.parseToJsonElement(stageTimingsRaw).jsonObject
+            stageTimings.mapValues { (_, v) -> v.jsonPrimitive.content.toLongOrNull() ?: 0L }.takeIf { it.isNotEmpty() }
+        } catch (e: Exception) {
+            // Malformed/legacy metadata must degrade to "unavailable", never crash the turn trace.
+            null
+        }
+    }
+
     private fun buildCondition(filter: MetricsFilter): Op<Boolean> {
         var condition: Op<Boolean> = Op.TRUE
         filter.workload?.let { condition = condition and (LlmExchanges.workload eq it) }
@@ -209,6 +253,8 @@ class PerformanceMetricsRepository(private val db: Database) {
         filter.isTestChat?.let { condition = condition and (LlmExchanges.isTestChat eq it) }
         filter.from?.let { condition = condition and (LlmExchanges.createdAt greaterEq it) }
         filter.to?.let { condition = condition and (LlmExchanges.createdAt lessEq it) }
+        filter.skillKey?.let { condition = condition and (LlmExchanges.skillKey eq it) }
+        filter.outcome?.let { condition = condition and (LlmExchanges.outcome eq it) }
         return condition
     }
 

@@ -55,6 +55,7 @@ class ObservableLlmClient(
                         outcome = LlmExchangeRepository.Outcome.SUCCESS,
                         requestBody = exchange?.request?.requestBody,
                         responseBody = exchange?.response?.responseBody,
+                        skillKey = request.skillKey,
                     ),
                 )
             }
@@ -81,6 +82,7 @@ class ObservableLlmClient(
                         errorMessage = e.message,
                         requestBody = lastExchange?.request?.requestBody,
                         responseBody = lastExchange?.response?.responseBody,
+                        skillKey = request.skillKey,
                     ),
                 )
             }
@@ -109,6 +111,7 @@ class ObservableLlmClient(
                         errorMessage = e.message,
                         requestBody = lastExchange?.request?.requestBody,
                         responseBody = lastExchange?.response?.responseBody,
+                        skillKey = request.skillKey,
                     ),
                 )
             }

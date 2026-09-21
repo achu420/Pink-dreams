@@ -235,25 +235,31 @@ class TestChatService(
             aiRuntimeSettings = AiRuntimeSettings(
                 productionDependencies.llmConfig,
                 PinnedAiSettingsRepository(db, snapshot.model, snapshot.temperature, snapshot.maxOutputTokens),
-                // Fall back to the PRODUCTION instance's own default when this
-                // test conversation doesn't explicitly pin its own — a plain
-                // `?:` here (not just `snapshot.generationProviderSort`)
-                // because a Test Chat conversation that never mentions this
-                // field must still see whatever production is actually
-                // configured with, not silently lose it.
+                // Task 9 — Admin AI Runtime Controls. Resolved from the
+                // PRODUCTION instance's own `resolve()` (DB override, if any,
+                // else its code default) rather than the old frozen
+                // constructor-literal field, so a Test Chat conversation that
+                // doesn't pin its own value inherits whatever production is
+                // ACTUALLY effectively running right now — including an
+                // admin's live DB change — not just Application.kt's original
+                // startup constant. A plain `?:` here (not just
+                // `snapshot.generationProviderSort`) because a conversation
+                // that never mentions this field must still see production's
+                // real value, not silently lose it.
                 generationProviderSortOverride = snapshot.generationProviderSort
-                    ?: productionDependencies.aiRuntimeSettings.generationProviderSortOverride,
+                    ?: productionDependencies.aiRuntimeSettings.resolve().generationProviderSort,
             ),
             // Phase ADMIN-3 section 11: test memory never touches production
             // memory for this persona — see MemoryScopeResolver.
             memoryScopeResolver = TestMemoryScope(snapshot.memoryScopePersonaId),
-            // Intent Discovery Model Latency Investigation phase. Same
-            // fallback reasoning as generationProviderSortOverride above.
-            intentModelOverride = snapshot.intentModel ?: productionDependencies.intentModelOverride,
+            // Intent Discovery Model Latency Investigation phase. Same live,
+            // resolve()-based fallback reasoning as generationProviderSortOverride
+            // above — see that comment.
+            intentModelOverride = snapshot.intentModel ?: productionDependencies.aiRuntimeSettings.resolve().intentModel,
             // Intent Discovery Budget Investigation phase.
-            intentMaxOutputTokensOverride = snapshot.intentMaxOutputTokens ?: productionDependencies.intentMaxOutputTokensOverride,
+            intentMaxOutputTokensOverride = snapshot.intentMaxOutputTokens ?: productionDependencies.aiRuntimeSettings.resolve().intentMaxOutputTokens,
             // Make Intent Discovery Fast + Reliable phase.
-            intentJsonModeOverride = snapshot.intentJsonMode ?: productionDependencies.intentJsonModeOverride,
+            intentJsonModeOverride = snapshot.intentJsonMode ?: productionDependencies.aiRuntimeSettings.resolve().intentJsonMode,
             // LLM Observability and Raw Exchange Capture phase: every
             // exchange from a Test Chat conversation is tagged so it's
             // distinguishable from production traffic.

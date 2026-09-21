@@ -26,11 +26,12 @@ import kotlin.test.assertTrue
  */
 class ObservableLlmClientTest {
 
-    private fun request(workload: String = "test_workload") = GenerationRequest(
+    private fun request(workload: String = "test_workload", skillKey: String? = null) = GenerationRequest(
         requestId = UUID.randomUUID(), userId = UUID.randomUUID(), conversationId = UUID.randomUUID(),
         personaId = UUID.randomUUID(), engineVersionId = UUID.randomUUID(), personaCoreVersionId = UUID.randomUUID(),
         context = ChatContext(blocks = listOf(ContextBlock("system", "x"))),
         config = GenerationConfig(model = "test-model", workload = workload),
+        skillKey = skillKey,
     )
 
     private fun exchange(status: Int = 200, isError: Boolean = false) = ProviderExchange(
@@ -204,6 +205,42 @@ class ObservableLlmClientTest {
 
         assertEquals(false, repository.findForTurn(prodReq.requestId).single().isTestChat)
         assertEquals(true, repository.findForTurn(testReq.requestId).single().isTestChat)
+    }
+
+    @Test
+    fun `11 - Task 8 - the selected skill is captured on a successful exchange`() {
+        val repository = repo()
+        val client = LlmClient { LlmResponse(content = "ok", providerExchange = exchange()) }
+        val observable = ObservableLlmClient(client, repository, isTestChat = false)
+        val req = request(skillKey = "flirting")
+
+        observable.generate(req)
+
+        assertEquals("flirting", repository.findForTurn(req.requestId).single().skillKey)
+    }
+
+    @Test
+    fun `12 - Task 8 - a null skill (SkillSelection#None) is recorded as null, never guessed at`() {
+        val repository = repo()
+        val client = LlmClient { LlmResponse(content = "ok", providerExchange = exchange()) }
+        val observable = ObservableLlmClient(client, repository, isTestChat = false)
+        val req = request(skillKey = null)
+
+        observable.generate(req)
+
+        assertEquals(null, repository.findForTurn(req.requestId).single().skillKey)
+    }
+
+    @Test
+    fun `13 - Task 8 - the selected skill is captured even on a failed exchange`() {
+        val repository = repo()
+        val fakeClient = ExchangeCapturingFake(exchange(status = 500, isError = true)) { throw RuntimeException("boom") }
+        val observable = ObservableLlmClient(fakeClient, repository, isTestChat = false)
+        val req = request(skillKey = "emotional_support")
+
+        assertTrue(runCatching { observable.generate(req) }.isFailure)
+
+        assertEquals("emotional_support", repository.findForTurn(req.requestId).single().skillKey)
     }
 
     /**

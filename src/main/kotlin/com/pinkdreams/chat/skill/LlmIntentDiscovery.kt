@@ -26,6 +26,14 @@ class LlmIntentDiscovery(
     private val client: LlmClient,
     private val skillRepository: SkillRepository,
     private val config: GenerationConfig = GenerationConfig(maxOutputTokens = DEFAULT_MAX_OUTPUT_TOKENS),
+    // Task 9 — Admin AI Runtime Controls. Resolved PER CALL rather than
+    // captured at construction, mirroring LlmGenerator's own
+    // `configProvider` pattern exactly (Phase ADMIN-2) — this is what lets
+    // an admin's persisted intentModel/intentJsonMode/intentMaxOutputTokens
+    // override take effect on the next turn instead of the next redeploy.
+    // Defaults to the constructor config, so every existing caller/test
+    // behaves exactly as before.
+    private val configProvider: () -> GenerationConfig = { config },
     private val recentHistoryLimit: Int = DEFAULT_RECENT_HISTORY_LIMIT,
     // Phase ADMIN-2: the decision rules now come from the ACTIVE Intent Engine
     // version rather than a Kotlin string. Null (tests, or a deployment with no
@@ -46,6 +54,10 @@ class LlmIntentDiscovery(
     private data class SkillSelectionDto(val skillKey: String? = null)
 
     override fun selectSkill(request: ChatRequest, context: ChatContext): SkillSelection {
+        // A failure resolving admin settings must never block skill selection:
+        // fall back to the constructor config, which is always valid — same
+        // convention as LlmGenerator.generate().
+        val config = runCatching { configProvider() }.getOrDefault(config)
         return try {
             val candidateKeys = skillRepository.findAllActiveKeys()
             if (candidateKeys.isEmpty()) return SkillSelection.None

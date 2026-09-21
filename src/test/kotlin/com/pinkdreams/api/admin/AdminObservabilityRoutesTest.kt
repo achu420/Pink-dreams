@@ -16,6 +16,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.insert
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -63,6 +64,7 @@ class AdminObservabilityRoutesTest {
         outcome: LlmExchangeRepository.Outcome = LlmExchangeRepository.Outcome.SUCCESS,
         requestBody: String = """{"model":"x"}""",
         responseBody: String = """{"choices":[]}""",
+        skillKey: String? = null,
     ): UUID {
         val turnId = UUID.randomUUID()
         repo.record(
@@ -77,6 +79,7 @@ class AdminObservabilityRoutesTest {
                 outcome = outcome,
                 requestBody = requestBody,
                 responseBody = responseBody,
+                skillKey = skillKey,
             ),
         )
         return turnId
@@ -323,5 +326,136 @@ class AdminObservabilityRoutesTest {
 
         assertEquals(HttpStatusCode.Forbidden, csvResponse.status)
         assertEquals(HttpStatusCode.Forbidden, jsonResponse.status)
+    }
+
+    // --- Task 8 ---
+
+    @Test
+    fun `latency dashboard includes a bySkill breakdown and respects the skillKey filter`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        seedExchange(repo, conversationId, skillKey = "flirting", latencyMs = 1000)
+        seedExchange(repo, conversationId, skillKey = "dating", latencyMs = 9000)
+
+        val all = client.get("/v1/admin/observability/latency-dashboard") { basicAuth(adminId.toString(), "x") }
+        val allBody = json(all.bodyAsText())
+        assertTrue(allBody["bySkill"]!!.jsonObject.containsKey("flirting"))
+        assertTrue(allBody["bySkill"]!!.jsonObject.containsKey("dating"))
+
+        val filtered = client.get("/v1/admin/observability/latency-dashboard?skillKey=flirting") { basicAuth(adminId.toString(), "x") }
+        val filteredBody = json(filtered.bodyAsText())
+        assertEquals(1, filteredBody["overall"]!!.jsonObject["count"]!!.jsonPrimitive.content.toInt())
+    }
+
+    @Test
+    fun `exchange list respects the skillKey and outcome filters on top of the required conversationId dimension`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        seedExchange(repo, conversationId, skillKey = "flirting", outcome = LlmExchangeRepository.Outcome.SUCCESS)
+        seedExchange(repo, conversationId, skillKey = "dating", outcome = LlmExchangeRepository.Outcome.PROVIDER_ERROR)
+
+        val response = client.get("/v1/admin/observability/exchanges?conversationId=$conversationId&skillKey=flirting") {
+            basicAuth(adminId.toString(), "x")
+        }
+        val exchanges = json(response.bodyAsText())["exchanges"]!!.jsonArray
+        assertEquals(1, exchanges.size)
+        assertEquals("flirting", exchanges[0].jsonObject["skillKey"]!!.jsonPrimitive.content)
+
+        val outcomeFiltered = client.get("/v1/admin/observability/exchanges?conversationId=$conversationId&outcome=PROVIDER_ERROR") {
+            basicAuth(adminId.toString(), "x")
+        }
+        val outcomeExchanges = json(outcomeFiltered.bodyAsText())["exchanges"]!!.jsonArray
+        assertEquals(1, outcomeExchanges.size)
+        assertEquals("PROVIDER_ERROR", outcomeExchanges[0].jsonObject["outcome"]!!.jsonPrimitive.content)
+    }
+
+    @Test
+    fun `an exchange recorded before skill attribution existed has a null skillKey not a guessed one`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        seedExchange(repo, conversationId, skillKey = null)
+
+        val response = client.get("/v1/admin/observability/exchanges?conversationId=$conversationId") { basicAuth(adminId.toString(), "x") }
+
+        assertEquals(null, json(response.bodyAsText())["exchanges"]!!.jsonArray[0].jsonObject["skillKey"])
+    }
+
+    @Test
+    fun `CSV export includes the skillKey column`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        seedExchange(repo, conversationId, skillKey = "flirting")
+
+        val response = client.get("/v1/admin/observability/export/exchanges.csv?conversationId=$conversationId") {
+            basicAuth(adminId.toString(), "x")
+        }
+
+        val lines = response.bodyAsText().trim().lines()
+        assertTrue(lines[0].contains("skillKey"), "Header must include the new attribution column")
+        assertTrue(lines[1].contains("flirting"))
+    }
+
+    @Test
+    fun `effective configuration reports one entry per workload without requiring database access`() = testApplication {
+        setup()
+
+        val response = client.get("/v1/admin/observability/effective-configuration") { basicAuth(adminId.toString(), "x") }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val workloads = json(response.bodyAsText())["workloads"]!!.jsonArray
+        val workloadNames = workloads.map { it.jsonObject["workload"]!!.jsonPrimitive.content }.toSet()
+        assertEquals(
+            setOf("primary_generation", "intent_discovery", "memory_extraction", "continuity_summarization", "memory_engine_maintenance"),
+            workloadNames,
+        )
+    }
+
+    @Test
+    fun `effective configuration requires admin access`() = testApplication {
+        setup()
+
+        val response = client.get("/v1/admin/observability/effective-configuration") { basicAuth(nonAdminId.toString(), "x") }
+
+        assertEquals(HttpStatusCode.Forbidden, response.status)
+    }
+
+    @Test
+    fun `turn trace includes stage timings when the assistant message metadata carries them`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        val turnId = seedExchange(repo, conversationId, workload = "primary_generation")
+        org.jetbrains.exposed.sql.transactions.transaction(db) {
+            com.pinkdreams.persistence.database.Messages.insert {
+                it[id] = UUID.randomUUID()
+                it[com.pinkdreams.persistence.database.Messages.conversationId] = conversationId
+                it[role] = "assistant"
+                it[content] = "reply"
+                it[requestId] = turnId
+                it[metadata] = """{"lvm_stage_timings":"{\"generation\":\"1234\"}"}"""
+                it[createdAt] = com.pinkdreams.persistence.database.defaultNow()
+            }
+        }
+
+        val response = client.get("/v1/admin/observability/turns/$turnId") { basicAuth(adminId.toString(), "x") }
+
+        val stageTimings = json(response.bodyAsText())["stageTimingsMs"]!!.jsonObject
+        assertEquals(1234, stageTimings["generation"]!!.jsonPrimitive.content.toInt())
+    }
+
+    @Test
+    fun `turn trace stage timings are null not fabricated when no assistant message exists for the turn`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        val turnId = seedExchange(repo, conversationId)
+
+        val response = client.get("/v1/admin/observability/turns/$turnId") { basicAuth(adminId.toString(), "x") }
+
+        assertEquals(null, json(response.bodyAsText())["stageTimingsMs"])
     }
 }

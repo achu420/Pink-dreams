@@ -40,7 +40,36 @@ class AiRuntimeSettings(
     // conversation that doesn't override it, which is exactly backwards for
     // "Test Chat runs the same pipeline as production" (ADMIN-3).
     val generationProviderSortOverride: String? = null,
+    // Task 9 — Admin AI Runtime Controls. The CODE-LEVEL default for each
+    // Intent Discovery knob, consulted by resolve() only when no DB override
+    // exists — the exact same role generationProviderSortOverride already
+    // played above, just extended to the three settings that used to live
+    // only as literal Application.kt constructor args on
+    // ChatEngineFactory.Dependencies (see that class's own now-narrowed doc
+    // comment). Null (every existing test's default) means "no code-level
+    // default beyond the ultimate fallback below" — intentModelDefault null
+    // falls all the way to llmConfig.model, matching the exact pre-Task-9
+    // behavior of `deps.intentModelOverride ?: llmConfig.model`.
+    val intentModelDefault: String? = null,
+    val intentJsonModeDefault: Boolean? = null,
+    val intentMaxOutputTokensDefault: Int? = null,
 ) {
+    // Task 8 Part 2 — Effective Configuration. Exposes the raw
+    // environment/default model (never DB-resolved) so the admin UI can
+    // accurately report the true effective value for workloads that do NOT
+    // go through resolve() today. This is a genuine, pre-existing
+    // discrepancy this task surfaces rather than silently fixes (per Part
+    // 11 — no behavior changes beyond what's explicitly requested):
+    // ChatEngineFactory builds memory_extraction/continuity_summarization/
+    // memory_engine_maintenance's GenerationConfig directly from
+    // llmConfig.model, and intent_discovery from
+    // `intentModelOverride ?: llmConfig.model` — NEITHER path calls
+    // resolve() or sideChannelConfig(), so an admin's persisted `model`
+    // override in ai_settings currently affects ONLY primary_generation,
+    // not the four other workloads, despite AiSettingsResponse's own
+    // documentation previously claiming otherwise.
+    val environmentModel: String get() = llmConfig.model
+
     data class Resolved(
         val model: String,
         val temperature: Double?,
@@ -48,16 +77,55 @@ class AiRuntimeSettings(
         val modelSource: Source,
         val temperatureSource: Source,
         val maxOutputTokensSource: Source,
+        // Task 9 — Admin AI Runtime Controls. Resolved with the exact same
+        // DB-override-then-code-default precedence as the three fields
+        // above, just for Intent Discovery's own knobs and primary
+        // generation's provider-sort preference.
+        val intentModel: String,
+        val intentModelSource: Source,
+        val intentJsonMode: Boolean?,
+        val intentJsonModeSource: Source,
+        val intentMaxOutputTokens: Int,
+        val intentMaxOutputTokensSource: Source,
+        val generationProviderSort: String?,
+        val generationProviderSortSource: Source,
     )
 
     /** Where a resolved value actually came from — surfaced to the admin UI. */
-    enum class Source { DATABASE, ENVIRONMENT_OR_DEFAULT }
+    enum class Source { DATABASE, CODE_DEFAULT, ENVIRONMENT_OR_DEFAULT, PROVIDER_DEFAULT }
 
     fun resolve(): Resolved {
         // A repository failure must never take down generation: fall through to
         // the environment-resolved configuration, which is the pre-ADMIN-2
         // behavior and is always valid.
         val stored = runCatching { repository?.get() }.getOrNull()
+
+        val intentModel = stored?.intentModel ?: intentModelDefault ?: llmConfig.model
+        val intentModelSource = when {
+            stored?.intentModel != null -> Source.DATABASE
+            intentModelDefault != null -> Source.CODE_DEFAULT
+            else -> Source.ENVIRONMENT_OR_DEFAULT
+        }
+        val intentJsonMode = stored?.intentJsonMode ?: intentJsonModeDefault
+        val intentJsonModeSource = when {
+            stored?.intentJsonMode != null -> Source.DATABASE
+            intentJsonModeDefault != null -> Source.CODE_DEFAULT
+            else -> Source.PROVIDER_DEFAULT
+        }
+        // 600 is the one pre-Task-9 hardcoded ultimate fallback
+        // (ChatEngineFactory's own literal, `deps.intentMaxOutputTokensOverride
+        // ?: 600`) — preserved exactly, never a behavior change.
+        val intentMaxOutputTokens = stored?.intentMaxOutputTokens ?: intentMaxOutputTokensDefault ?: 600
+        val intentMaxOutputTokensSource = when {
+            stored?.intentMaxOutputTokens != null -> Source.DATABASE
+            else -> Source.CODE_DEFAULT
+        }
+        val generationProviderSort = stored?.generationProviderSort ?: generationProviderSortOverride
+        val generationProviderSortSource = when {
+            stored?.generationProviderSort != null -> Source.DATABASE
+            generationProviderSortOverride != null -> Source.CODE_DEFAULT
+            else -> Source.PROVIDER_DEFAULT
+        }
 
         return Resolved(
             model = stored?.model ?: llmConfig.model,
@@ -66,6 +134,14 @@ class AiRuntimeSettings(
             modelSource = if (stored?.model != null) Source.DATABASE else Source.ENVIRONMENT_OR_DEFAULT,
             temperatureSource = if (stored?.temperature != null) Source.DATABASE else Source.ENVIRONMENT_OR_DEFAULT,
             maxOutputTokensSource = if (stored?.maxOutputTokens != null) Source.DATABASE else Source.ENVIRONMENT_OR_DEFAULT,
+            intentModel = intentModel,
+            intentModelSource = intentModelSource,
+            intentJsonMode = intentJsonMode,
+            intentJsonModeSource = intentJsonModeSource,
+            intentMaxOutputTokens = intentMaxOutputTokens,
+            intentMaxOutputTokensSource = intentMaxOutputTokensSource,
+            generationProviderSort = generationProviderSort,
+            generationProviderSortSource = generationProviderSortSource,
         )
     }
 
@@ -107,7 +183,12 @@ class AiRuntimeSettings(
             temperature = resolved.temperature,
             maxOutputTokens = resolved.maxOutputTokens,
             reasoningEnabled = false,
-            providerSort = generationProviderSortOverride,
+            // Task 9 — now DB-aware (via resolve()) rather than reading the
+            // constructor field directly, so an admin's persisted override
+            // takes effect on the next request with no restart. Falls back
+            // to generationProviderSortOverride exactly as before when no
+            // DB row exists.
+            providerSort = resolved.generationProviderSort,
             workload = "primary_generation",
         )
     }

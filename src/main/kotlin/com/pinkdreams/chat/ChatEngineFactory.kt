@@ -198,15 +198,40 @@ object ChatEngineFactory {
         // reasoning/temperature wiring in OpenRouterLlmClient itself is kept
         // — it is correct infrastructure and worth having available — it is
         // simply not exercised for this workload.
+        val intentDiscoveryConfig = GenerationConfig(
+            model = deps.intentModelOverride ?: llmConfig.model,
+            maxOutputTokens = deps.intentMaxOutputTokensOverride ?: 600,
+            jsonMode = deps.intentJsonModeOverride,
+            workload = "intent_discovery",
+        )
         val intentDiscovery = LlmIntentDiscovery(
             llmClient,
             deps.skillRepository,
-            GenerationConfig(
-                model = deps.intentModelOverride ?: llmConfig.model,
-                maxOutputTokens = deps.intentMaxOutputTokensOverride ?: 600,
-                jsonMode = deps.intentJsonModeOverride,
-                workload = "intent_discovery",
-            ),
+            config = intentDiscoveryConfig,
+            // Task 9 — Admin AI Runtime Controls. Resolved PER CALL (see
+            // LlmIntentDiscovery's own doc comment), the same way
+            // LlmGenerator resolves primary generation's config. Precedence:
+            // deps.intentModelOverride/etc. is the highest-priority pin for
+            // THIS ENGINE INSTANCE — for the one production engine it is
+            // always null (Application.kt no longer sets a literal here; see
+            // its own comment), so production always reaches
+            // aiRuntimeSettings.resolve() and picks up the live DB override.
+            // For a TEST CHAT engine, TestChatService.buildEngineFor() sets
+            // this to the conversation's explicit pin (if any) or the
+            // CURRENT resolved production value (if not) — either way it is
+            // non-null and short-circuits here, so a Test Chat conversation
+            // is never affected by an admin changing the DB setting
+            // mid-conversation (it already captured the production value at
+            // creation-equivalent resolution time via its own fallback).
+            configProvider = {
+                val resolved = deps.aiRuntimeSettings.resolve()
+                GenerationConfig(
+                    model = deps.intentModelOverride ?: resolved.intentModel,
+                    maxOutputTokens = deps.intentMaxOutputTokensOverride ?: resolved.intentMaxOutputTokens,
+                    jsonMode = deps.intentJsonModeOverride ?: resolved.intentJsonMode,
+                    workload = "intent_discovery",
+                )
+            },
             intentEngineRepository = deps.intentEngineRepository,
             exchangeRepository = exchangeRepository,
         )

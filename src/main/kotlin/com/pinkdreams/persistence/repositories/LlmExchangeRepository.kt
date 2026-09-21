@@ -47,6 +47,8 @@ class LlmExchangeRepository(private val db: Database) {
         val requestBody: String?,
         val responseBody: String?,
         val createdAt: LocalDateTime,
+        // Task 8 Part 4.
+        val skillKey: String?,
     )
 
     data class RecordInput(
@@ -68,6 +70,9 @@ class LlmExchangeRepository(private val db: Database) {
         val errorMessage: String? = null,
         val requestBody: String? = null,
         val responseBody: String? = null,
+        // Task 8 Part 4 — optional so every pre-Task-8 caller/test keeps
+        // compiling and recording exactly as before.
+        val skillKey: String? = null,
     )
 
     /**
@@ -101,6 +106,7 @@ class LlmExchangeRepository(private val db: Database) {
             it[requestBody] = input.requestBody
             it[responseBody] = input.responseBody
             it[createdAt] = defaultNow()
+            it[skillKey] = input.skillKey
         }
         id
     }
@@ -180,5 +186,6 @@ class LlmExchangeRepository(private val db: Database) {
         requestBody = row[LlmExchanges.requestBody],
         responseBody = row[LlmExchanges.responseBody],
         createdAt = row[LlmExchanges.createdAt],
+        skillKey = row[LlmExchanges.skillKey],
     )
 }
