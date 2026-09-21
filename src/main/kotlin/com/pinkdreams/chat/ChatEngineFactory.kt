@@ -19,12 +19,14 @@ import com.pinkdreams.config.LlmConfig
 import com.pinkdreams.llm.GenerationConfig
 import com.pinkdreams.llm.LlmClient
 import com.pinkdreams.llm.LlmGenerator
+import com.pinkdreams.llm.observability.ObservableLlmClient
 import com.pinkdreams.persistence.RepositoryChatExecutionCoordinator
 import com.pinkdreams.persistence.RepositoryChatPersistence
 import com.pinkdreams.persistence.repositories.ChatRequestExecutionRepository
 import com.pinkdreams.persistence.repositories.ConversationEngineRepository
 import com.pinkdreams.persistence.repositories.ConversationRepository
 import com.pinkdreams.persistence.repositories.IntentEngineRepository
+import com.pinkdreams.persistence.repositories.LlmExchangeRepository
 import com.pinkdreams.persistence.repositories.MemoryEngineRepository
 import com.pinkdreams.persistence.repositories.MemoryFactRepository
 import com.pinkdreams.persistence.repositories.MessageRepository
@@ -72,13 +74,49 @@ object ChatEngineFactory {
         // Phase ADMIN-3: PRODUCTION for the one startup engine, a
         // per-conversation TestMemoryScope for every TEST engine.
         val memoryScopeResolver: MemoryScopeResolver = ProductionMemoryScope,
+        // Intent Discovery Model Latency Investigation phase: an isolated,
+        // reversible per-workload override for Intent Discovery's model ONLY
+        // — independent of llmConfig.model and of AiRuntimeSettings (which
+        // governs primary generation and side-channel calls, but was never
+        // read by Intent Discovery). Null (the default, always true for the
+        // one production engine) means Intent Discovery keeps using
+        // llmConfig.model exactly as before this field existed. Wired
+        // through Test Chat's per-conversation snapshot (see
+        // ConversationRepository.ConfigurationSnapshot.intentModel) so a
+        // candidate model can be pinned and benchmarked live without
+        // touching the production default.
+        val intentModelOverride: String? = null,
+        // Intent Discovery Budget Investigation phase: same pattern as
+        // intentModelOverride above — an isolated, reversible per-workload
+        // override for Intent Discovery's maxOutputTokens ONLY. Null (the
+        // default, always true for the one production engine) means Intent
+        // Discovery keeps using 600 exactly as before this field existed.
+        val intentMaxOutputTokensOverride: Int? = null,
+        // Make Intent Discovery Fast + Reliable phase: same pattern again —
+        // an isolated, reversible override for Intent Discovery's
+        // GenerationConfig.jsonMode ONLY. Null (the default) means Intent
+        // Discovery's request is byte-identical to before this field existed.
+        val intentJsonModeOverride: Boolean? = null,
+        // LLM Observability and Raw Exchange Capture phase: explicit,
+        // consistent with the other overrides above — false for the one
+        // production engine, true for every Test Chat engine (set in
+        // TestChatService.buildEngineFor()'s `.copy()`), so every persisted
+        // exchange row records which traffic it came from without needing to
+        // sniff repository types.
+        val isTestChat: Boolean = false,
     )
 
     fun build(deps: Dependencies): PipelineChatEngine {
-        val llmClient = deps.llmClient
         val llmConfig = deps.llmConfig
+        // LLM Observability and Raw Exchange Capture phase: the SAME shared
+        // client every call site already used, wrapped exactly once here so
+        // no call site (Intent, generation, memory extraction, continuity,
+        // memory-engine maintenance) needs to change how it invokes the
+        // client. See ObservableLlmClient's doc comment.
+        val exchangeRepository = LlmExchangeRepository(deps.db)
+        val llmClient: LlmClient = ObservableLlmClient(deps.llmClient, exchangeRepository, deps.isTestChat)
 
-        val generationConfig = GenerationConfig(model = llmConfig.model, maxOutputTokens = llmConfig.maxOutputTokens)
+        val generationConfig = GenerationConfig(model = llmConfig.model, maxOutputTokens = llmConfig.maxOutputTokens, workload = "primary_generation")
         // Resolved per request (not captured here), so an admin change applies on
         // the next message rather than the next deploy.
         val llmGenerator = LlmGenerator(
@@ -91,7 +129,17 @@ object ChatEngineFactory {
         // Phase D/ADMIN-2 history for why these values specifically. Test Chat
         // reuses them unchanged (section 58: no extra LLM call, no different
         // budget just because it's a test).
-        val memoryExtractor = LlmMemoryExtractor(llmClient, GenerationConfig(model = llmConfig.model, maxOutputTokens = 1200))
+        //
+        // Reasoning is intentionally left at the provider default (null) for
+        // memory extraction, continuity, and memory-engine maintenance: all
+        // three are async, post-delivery work — never on the user-facing
+        // critical path — and each involves a genuine judgment call
+        // ("is this durable/contradictory/worth remembering") that reasoning
+        // may meaningfully help with. Disabling reasoning here would trade
+        // background-call cost/duration for a real quality risk, for zero
+        // user-facing latency benefit. See intentDiscovery below, where the
+        // same tradeoff comes out the opposite way.
+        val memoryExtractor = LlmMemoryExtractor(llmClient, GenerationConfig(model = llmConfig.model, maxOutputTokens = 1200, workload = "memory_extraction"))
         val memoryExtractionHook = BestEffortMemoryExtraction(
             extractor = memoryExtractor,
             memoryService = deps.memoryService,
@@ -99,7 +147,7 @@ object ChatEngineFactory {
         )
 
         val continuitySummarizer = com.pinkdreams.chat.continuity.LlmContinuitySummarizer(
-            llmClient, GenerationConfig(model = llmConfig.model, maxOutputTokens = 1000),
+            llmClient, GenerationConfig(model = llmConfig.model, maxOutputTokens = 1000, workload = "continuity_summarization"),
         )
         val continuitySummarizationHook = com.pinkdreams.chat.continuity.BestEffortContinuitySummarization(
             summarizer = continuitySummarizer,
@@ -109,7 +157,7 @@ object ChatEngineFactory {
         )
 
         val memoryEngineMaintainer = LlmMemoryEngineMaintainer(
-            llmClient, deps.memoryEngineRepository, GenerationConfig(model = llmConfig.model, maxOutputTokens = 6000),
+            llmClient, deps.memoryEngineRepository, GenerationConfig(model = llmConfig.model, maxOutputTokens = 6000, workload = "memory_engine_maintenance"),
         )
         val memoryEngineChangeApplier = MemoryEngineChangeApplier(deps.memoryFactRepository)
         val memoryEngineMaintenanceHook = BestEffortMemoryEngineMaintenance(
@@ -126,11 +174,41 @@ object ChatEngineFactory {
             listOf(memoryExtractionHook, continuitySummarizationHook, memoryEngineMaintenanceHook),
         )
 
+        // Runtime Quality + Latency Verification phase — investigated and
+        // REVERTED: reasoningEnabled=false (and, tried as a mitigation,
+        // temperature=0.0) for Intent Discovery.
+        //
+        // A controlled, context-free A/B (25 cases, identical input, only
+        // `reasoning` differing) showed no accuracy difference (92% both) and
+        // a real latency win for reasoning-off — but that test never included
+        // real recent-conversation history. A full live conversation of the
+        // same 25 turns, WITH the real accumulating history Intent Discovery
+        // actually receives in production, told a different story:
+        // reasoning-ON selected a skill on 23/25 turns (92%); reasoning-OFF
+        // (even after adding temperature=0 as a determinism fix) selected a
+        // skill on only 6/25 (24%) — the model became far more likely to
+        // return null once there was real prior context to weigh, and
+        // per-call latency was still highly variable (up to ~13s), not the
+        // consistent ~1-2s seen in the context-free test. temperature=0 made
+        // this WORSE, not better, ruling out "wrong sampling config" as the
+        // fix. See RuntimeLatencyReasoningTest / the phase report for the
+        // full measurement trail. Net: reasoning is genuinely load-bearing
+        // for this classifier once realistic context is involved, so both
+        // knobs are left at the provider default (null) here. The
+        // reasoning/temperature wiring in OpenRouterLlmClient itself is kept
+        // — it is correct infrastructure and worth having available — it is
+        // simply not exercised for this workload.
         val intentDiscovery = LlmIntentDiscovery(
             llmClient,
             deps.skillRepository,
-            GenerationConfig(model = llmConfig.model, maxOutputTokens = 600),
+            GenerationConfig(
+                model = deps.intentModelOverride ?: llmConfig.model,
+                maxOutputTokens = deps.intentMaxOutputTokensOverride ?: 600,
+                jsonMode = deps.intentJsonModeOverride,
+                workload = "intent_discovery",
+            ),
             intentEngineRepository = deps.intentEngineRepository,
+            exchangeRepository = exchangeRepository,
         )
         val skillContextEnricher = SkillContextEnricher(deps.skillRepository)
         val memoryContextSelector = DeterministicMemoryContextSelector(deps.skillRepository)

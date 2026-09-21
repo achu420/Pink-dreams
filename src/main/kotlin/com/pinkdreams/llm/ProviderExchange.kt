@@ -26,3 +26,14 @@ data class ProviderExchange(
     val request: ProviderRequestDiagnostics,
     val response: ProviderResponseDiagnostics,
 )
+
+/**
+ * LLM Observability and Raw Exchange Capture phase: implemented by any
+ * [LlmClient] that can expose the raw exchange of its most recent call even
+ * when that call threw — this is how [com.pinkdreams.llm.observability.ObservableLlmClient]
+ * recovers request/response bodies for a failed exchange without needing
+ * every failure path to thread them through an exception.
+ */
+interface ExchangeCapturing {
+    val lastExchange: ProviderExchange?
+}

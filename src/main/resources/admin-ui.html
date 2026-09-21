@@ -44,6 +44,7 @@
             <button class="tab-button active" onclick="switchTab('setup')">Setup</button>
             <button class="tab-button" onclick="switchTab('chat')">Chat</button>
             <button class="tab-button" onclick="switchTab('testchat')">Test Chat</button>
+            <button class="tab-button" onclick="switchTab('observability')">Observability</button>
         </div>
 
         <div id="setup" class="tab-content active">
@@ -428,6 +429,80 @@
                 </div>
             </div>
         </div>
+
+        <div id="observability" class="tab-content">
+            <div class="section">
+                <h2>LLM Observability &amp; SLA Dashboard</h2>
+                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                    Reads directly from the raw LLM exchange capture (Task 2) and the
+                    aggregation layer (Task 3) — nothing here is estimated from logs.
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1; min-width: 140px; margin-bottom: 0;">
+                        <label>Workload</label>
+                        <select id="obsWorkloadFilter">
+                            <option value="">(all)</option>
+                            <option value="intent_discovery">intent_discovery</option>
+                            <option value="primary_generation">primary_generation</option>
+                            <option value="memory_extraction">memory_extraction</option>
+                            <option value="continuity_summarization">continuity_summarization</option>
+                            <option value="memory_engine_maintenance">memory_engine_maintenance</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1; min-width: 140px; margin-bottom: 0;">
+                        <label>Model contains</label>
+                        <input type="text" id="obsModelFilter" placeholder="e.g. deepseek">
+                    </div>
+                    <div class="form-group" style="flex: 1; min-width: 140px; margin-bottom: 0;">
+                        <label>Provider contains</label>
+                        <input type="text" id="obsProviderFilter" placeholder="e.g. CoreWeave">
+                    </div>
+                    <div style="margin-bottom: 0;">
+                        <button onclick="loadLatencyDashboard()">Apply Filters</button>
+                    </div>
+                </div>
+                <div id="obsDashboardError"></div>
+                <div id="obsDashboard"></div>
+
+                <hr style="margin: 25px 0;">
+
+                <h3 style="margin-bottom: 10px;">Find an exchange or turn</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 10px;">
+                    <div class="form-group" style="flex: 1; min-width: 220px; margin-bottom: 0;">
+                        <label>Conversation ID</label>
+                        <input type="text" id="obsConversationId" placeholder="paste a conversation UUID">
+                    </div>
+                    <div style="margin-bottom: 0;">
+                        <button onclick="loadConversationExchanges()">Load Exchanges</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1; min-width: 220px; margin-bottom: 0;">
+                        <label>Turn Request ID</label>
+                        <input type="text" id="obsTurnId" placeholder="paste a turnRequestId to trace one turn">
+                    </div>
+                    <div style="margin-bottom: 0;">
+                        <button onclick="loadTurnTrace()">Trace Turn</button>
+                    </div>
+                </div>
+                <div id="obsListError"></div>
+                <div id="obsExchangeList"></div>
+                <div id="obsExchangeDetail" style="margin-top: 15px;"></div>
+
+                <hr style="margin: 25px 0;">
+
+                <h3 style="margin-bottom: 10px;">Export (Task 6)</h3>
+                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                    Uses the same workload/model/provider filters set above.
+                    The CSV is summary fields only (raw request/response bodies
+                    are never included in a bulk export — open a single exchange
+                    above for its full payload). Exchange IDs are preserved on
+                    every row so a spreadsheet can be joined back to a specific
+                    exchange's full detail.
+                </div>
+                <button onclick="downloadExchangesCsv()">Export exchanges as CSV</button>
+                <button class="secondary" onclick="downloadPerformanceJson()">Export performance stats as JSON</button>
 
         <div id="debugPanel" style="display: none; margin-top: 20px;">
             <div class="section">
@@ -1791,6 +1866,224 @@
                 select.innerHTML = '<option value="">-- Select Persona --</option>' + data.personas.map(p => `<option value="${p.id}">${p.displayName}</option>`).join('');
             }
         })();
+
+        // Task 5 — Admin Observability UI. Every call below hits the read-only
+        // backend built in Task 5 (AdminObservabilityRoutes), which itself reads
+        // Task 2's raw llm_exchanges capture and Task 3's aggregation layer.
+        // Nothing here computes its own numbers or estimates from logs.
+        function fmtMs(ms) {
+            if (ms === null || ms === undefined) return '—';
+            return ms >= 1000 ? (ms / 1000).toFixed(2) + 's' : ms + 'ms';
+        }
+
+        function statsRow(label, stats) {
+            if (!stats || stats.count === 0) {
+                return `<tr><td>${label}</td><td colspan="6" style="color:#999;">no data</td></tr>`;
+            }
+            return `<tr><td>${label}</td><td>${stats.count}</td><td>${fmtMs(stats.p50)}</td><td>${fmtMs(stats.p75)}</td><td>${fmtMs(stats.p95)}</td><td>${fmtMs(stats.p99)}</td><td>${fmtMs(stats.max)}</td><td>${stats.avg ? fmtMs(Math.round(stats.avg)) : '—'}</td></tr>`;
+        }
+
+        async function loadLatencyDashboard() {
+            const params = new URLSearchParams();
+            const workload = document.getElementById('obsWorkloadFilter').value.trim();
+            const model = document.getElementById('obsModelFilter').value.trim();
+            const provider = document.getElementById('obsProviderFilter').value.trim();
+            if (workload) params.set('workload', workload);
+            if (model) params.set('model', model);
+            if (provider) params.set('provider', provider);
+
+            try {
+                const res = await fetch(`${ADMIN_BASE}/observability/latency-dashboard?${params.toString()}`);
+                if (!res.ok) {
+                    showError('obsDashboardError', 'Failed to load dashboard: ' + res.status);
+                    return;
+                }
+                const data = await res.json();
+                const el = document.getElementById('obsDashboard');
+                const rows = Object.entries(data.byWorkload || {}).map(([k, v]) => statsRow(k, v)).join('');
+                const modelRows = Object.entries(data.byModel || {}).map(([k, v]) => statsRow(k, v)).join('');
+                const providerRows = Object.entries(data.byProvider || {}).map(([k, v]) => statsRow(k, v)).join('');
+                const sla = data.slaBuckets;
+                const err = data.errorRate;
+                el.innerHTML = `
+                    <div class="grid" style="margin-bottom: 15px;">
+                        <div>
+                            <b>SLA Buckets</b> (total ${sla.total})
+                            <table>
+                                <tr><td>≤5s</td><td>${sla.le5s}</td></tr>
+                                <tr><td>≤8s</td><td>${sla.le8s}</td></tr>
+                                <tr><td>≤10s</td><td>${sla.le10s}</td></tr>
+                                <tr><td>&gt;10s</td><td>${sla.gt10s}</td></tr>
+                                <tr><td>&gt;20s</td><td>${sla.gt20s}</td></tr>
+                                <tr><td><b>Within 10s rate</b></td><td><b>${sla.within10sRatePercent.toFixed(1)}%</b></td></tr>
+                            </table>
+                        </div>
+                        <div>
+                            <b>Outcomes</b> (total ${err.total})
+                            <table>
+                                <tr><td>Success</td><td>${err.success}</td></tr>
+                                <tr><td>Malformed</td><td>${err.malformed}</td></tr>
+                                <tr><td>Budget exhaustion</td><td>${err.budgetExhaustion}</td></tr>
+                                <tr><td>Provider error</td><td>${err.providerError}</td></tr>
+                                <tr><td>Exception</td><td>${err.exception}</td></tr>
+                                <tr><td><b>Failure rate</b></td><td><b>${err.failureRatePercent.toFixed(1)}%</b></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    <b>By Workload</b>
+                    <table>
+                        <thead><tr><th>Workload</th><th>Count</th><th>p50</th><th>p75</th><th>p95</th><th>p99</th><th>Max</th><th>Avg</th></tr></thead>
+                        <tbody>${rows || '<tr><td colspan="8" style="color:#999;">no exchanges match this filter</td></tr>'}</tbody>
+                    </table>
+                    <b style="display:block; margin-top: 15px;">By Model</b>
+                    <table>
+                        <thead><tr><th>Model</th><th>Count</th><th>p50</th><th>p75</th><th>p95</th><th>p99</th><th>Max</th><th>Avg</th></tr></thead>
+                        <tbody>${modelRows || '<tr><td colspan="8" style="color:#999;">no exchanges match this filter</td></tr>'}</tbody>
+                    </table>
+                    <b style="display:block; margin-top: 15px;">By Provider</b>
+                    <table>
+                        <thead><tr><th>Provider</th><th>Count</th><th>p50</th><th>p75</th><th>p95</th><th>p99</th><th>Max</th><th>Avg</th></tr></thead>
+                        <tbody>${providerRows || '<tr><td colspan="8" style="color:#999;">no exchanges match this filter</td></tr>'}</tbody>
+                    </table>
+                `;
+            } catch (e) {
+                showError('obsDashboardError', 'Failed to load dashboard: ' + e.message);
+            }
+        }
+
+        function exchangeRow(ex) {
+            const badge = ex.outcome === 'SUCCESS' ? '' : ` style="color:#d32f2f; font-weight:600;"`;
+            return `<tr onclick="loadExchangeDetail('${ex.id}')" style="cursor:pointer;">
+                <td>${ex.id.substring(0, 8)}…</td>
+                <td>${ex.workload}</td>
+                <td>${ex.model || '—'}</td>
+                <td>${ex.provider || '—'}</td>
+                <td>${fmtMs(ex.latencyMs)}</td>
+                <td>${ex.finishReason || '—'}</td>
+                <td${badge}>${ex.outcome}</td>
+                <td>${ex.isTestChat ? 'TEST' : 'PROD'}</td>
+                <td>${ex.createdAt}</td>
+            </tr>`;
+        }
+
+        function renderExchangeList(exchanges) {
+            const el = document.getElementById('obsExchangeList');
+            if (!exchanges.length) {
+                el.innerHTML = '<div style="color:#999;">No exchanges found.</div>';
+                return;
+            }
+            el.innerHTML = `
+                <div style="font-size:12px; color:#666; margin-bottom:6px;">Click a row to load its full request/response (lazy-loaded, never fetched until asked for).</div>
+                <table>
+                    <thead><tr><th>Exchange</th><th>Workload</th><th>Model</th><th>Provider</th><th>Latency</th><th>Finish</th><th>Outcome</th><th>Mode</th><th>Time</th></tr></thead>
+                    <tbody>${exchanges.map(exchangeRow).join('')}</tbody>
+                </table>
+            `;
+        }
+
+        async function loadConversationExchanges() {
+            const conversationId = document.getElementById('obsConversationId').value.trim();
+            if (!conversationId) {
+                showError('obsListError', 'Enter a conversation ID first');
+                return;
+            }
+            document.getElementById('obsExchangeDetail').innerHTML = '';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/observability/exchanges?conversationId=${encodeURIComponent(conversationId)}&limit=200`);
+                if (!res.ok) {
+                    showError('obsListError', 'Failed to load exchanges: ' + res.status);
+                    return;
+                }
+                const data = await res.json();
+                renderExchangeList(data.exchanges);
+            } catch (e) {
+                showError('obsListError', 'Failed to load exchanges: ' + e.message);
+            }
+        }
+
+        async function loadTurnTrace() {
+            const turnId = document.getElementById('obsTurnId').value.trim();
+            if (!turnId) {
+                showError('obsListError', 'Enter a turn request ID first');
+                return;
+            }
+            document.getElementById('obsExchangeDetail').innerHTML = '';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/observability/turns/${encodeURIComponent(turnId)}`);
+                if (!res.ok) {
+                    showError('obsListError', res.status === 404 ? 'No exchanges recorded for this turn' : 'Failed to load turn: ' + res.status);
+                    return;
+                }
+                const data = await res.json();
+                document.getElementById('obsExchangeList').innerHTML =
+                    `<div style="margin-bottom:8px;">On-path (user-facing) latency for this turn: <b>${fmtMs(data.onPathLatencyMs)}</b></div>` +
+                    `<table><thead><tr><th>Exchange</th><th>Workload</th><th>Model</th><th>Provider</th><th>Latency</th><th>Finish</th><th>Outcome</th><th>Mode</th><th>Time</th></tr></thead><tbody>${data.exchanges.map(exchangeRow).join('')}</tbody></table>`;
+            } catch (e) {
+                showError('obsListError', 'Failed to load turn: ' + e.message);
+            }
+        }
+
+        async function loadExchangeDetail(id) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/observability/exchanges/${id}`);
+                if (!res.ok) {
+                    showError('obsListError', 'Failed to load exchange: ' + res.status);
+                    return;
+                }
+                const data = await res.json();
+                const s = data.summary;
+                document.getElementById('obsExchangeDetail').innerHTML = `
+                    <div class="section" style="background:#f9f9f9;">
+                        <h3>Exchange ${s.id}</h3>
+                        <table>
+                            <tr><td>Turn</td><td>${s.turnRequestId}</td></tr>
+                            <tr><td>Conversation</td><td>${s.conversationId}</td></tr>
+                            <tr><td>Workload</td><td>${s.workload}</td></tr>
+                            <tr><td>Model / Provider</td><td>${s.model || '—'} / ${s.provider || '—'}</td></tr>
+                            <tr><td>Latency</td><td>${fmtMs(s.latencyMs)}</td></tr>
+                            <tr><td>Tokens (prompt/completion/reasoning/total)</td><td>${data.promptTokens ?? '—'} / ${data.completionTokens ?? '—'} / ${s.reasoningTokens ?? '—'} / ${s.totalTokens ?? '—'}</td></tr>
+                            <tr><td>Finish reason</td><td>${s.finishReason || '—'}</td></tr>
+                            <tr><td>HTTP status</td><td>${data.httpStatusCode ?? '—'}</td></tr>
+                            <tr><td>Outcome</td><td>${s.outcome}</td></tr>
+                            <tr><td>Error</td><td>${data.errorClass ? (data.errorClass + ': ' + (data.errorMessage || '')) : '—'}</td></tr>
+                            <tr><td>Mode</td><td>${s.isTestChat ? 'TEST' : 'PRODUCTION'}</td></tr>
+                        </table>
+                        <div style="margin-top:10px;">
+                            <label style="font-weight:600; display:block; margin-bottom:6px;">Raw request body (secrets already redacted at capture time):</label>
+                            <textarea readonly style="width:100%; height:150px; background:#1e1e1e; color:#ff9d00; font-family:monospace; font-size:11px; padding:10px; border-radius:4px;">${data.requestBody || '(not captured)'}</textarea>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <label style="font-weight:600; display:block; margin-bottom:6px;">Raw response body:</label>
+                            <textarea readonly style="width:100%; height:150px; background:#1e1e1e; color:#ff9d00; font-family:monospace; font-size:11px; padding:10px; border-radius:4px;">${data.responseBody || '(not captured)'}</textarea>
+                        </div>
+                    </div>
+                `;
+            } catch (e) {
+                showError('obsListError', 'Failed to load exchange: ' + e.message);
+            }
+        }
+
+        function obsCurrentFilterParams() {
+            const params = new URLSearchParams();
+            const workload = document.getElementById('obsWorkloadFilter').value.trim();
+            const model = document.getElementById('obsModelFilter').value.trim();
+            const provider = document.getElementById('obsProviderFilter').value.trim();
+            if (workload) params.set('workload', workload);
+            if (model) params.set('model', model);
+            if (provider) params.set('provider', provider);
+            return params;
+        }
+
+        // Opens the export URL directly rather than fetching it client-side:
+        // the browser's own Basic-Auth session and native "Save As" handling
+        // is exactly what a bulk CSV/JSON export needs, with no extra code.
+        function downloadExchangesCsv() {
+            window.open(`${ADMIN_BASE}/observability/export/exchanges.csv?${obsCurrentFilterParams().toString()}`, '_blank');
+        }
+
+        function downloadPerformanceJson() {
+            window.open(`${ADMIN_BASE}/observability/export/performance.json?${obsCurrentFilterParams().toString()}`, '_blank');
+        }
     </script>
 </body>
 </html>

@@ -32,6 +32,14 @@ class LlmIntentDiscovery(
     // Intent Engine seeded) keeps the previous behavior of using the seed text,
     // so wiring this in changed no existing test's expectations.
     private val intentEngineRepository: IntentEngineRepository? = null,
+    // LLM Observability and Raw Exchange Capture phase: optional so every
+    // existing caller/test is unaffected. Used only to reclassify the
+    // exchange row this call just wrote (via ObservableLlmClient) as
+    // MALFORMED when the response was a valid HTTP success but did not
+    // parse into a JSON object at all — a distinction the client-level
+    // decorator cannot make on its own since it doesn't know Intent's
+    // expected content shape.
+    private val exchangeRepository: com.pinkdreams.persistence.repositories.LlmExchangeRepository? = null,
 ) : IntentDiscovery {
 
     @Serializable
@@ -43,7 +51,21 @@ class LlmIntentDiscovery(
             if (candidateKeys.isEmpty()) return SkillSelection.None
 
             val recent = recentHistoryBlocks(context, recentHistoryLimit)
-            val instructions = resolveInstructions(candidateKeys) ?: return SkillSelection.None
+            val baseInstructions = resolveInstructions(candidateKeys) ?: return SkillSelection.None
+            // Make Intent Discovery Fast + Reliable phase: appended at
+            // request-construction time only — the stored Intent Engine
+            // content itself is never modified. Required for two reasons:
+            // (1) it is the explicit output-contract reinforcement that
+            // measurably eliminated GPT-4o-mini's malformed-output rate
+            // (13.3% -> 0% in an 85-case validation), and (2) OpenRouter's
+            // json_object response_format requires the literal word "json"
+            // to appear somewhere in the request messages, which the stored
+            // v3 content does not otherwise contain.
+            val instructions = if (config.jsonMode == true) {
+                baseInstructions + "\n\n" + JSON_MODE_REINFORCEMENT
+            } else {
+                baseInstructions
+            }
             val discoveryContext = ChatContext(
                 blocks = listOf(ContextBlock("system", instructions)) +
                     recent +
@@ -68,14 +90,44 @@ class LlmIntentDiscovery(
             )
 
             val response = client.generate(generationRequest)
-            val selectedKey = parseSkillKey(response.content) ?: return SkillSelection.None
+            val foundJsonObject = com.pinkdreams.llm.JsonResponseExtractor.extractJsonObject(response.content) != null
+            val selectedKey = parseSkillKey(response.content)
+            logDiagnostics(request, response.metadata, parsedOk = foundJsonObject)
+            if (!foundJsonObject) {
+                try {
+                    exchangeRepository?.markMalformed(request.requestId, "intent_discovery")
+                } catch (_: Exception) {
+                    // Diagnostics enrichment must never affect routing.
+                }
+            }
+            if (selectedKey == null) return SkillSelection.None
             if (selectedKey !in candidateKeys) return SkillSelection.None
 
             SkillSelection.Selected(selectedKey)
+        } catch (e: com.pinkdreams.llm.OpenRouterBudgetExhaustionException) {
+            // Live Intent Model Comparison phase: structured diagnostic for the
+            // one failure mode that matters most to distinguish from a genuine
+            // None decision — never inferred from latency, only from the
+            // provider's own finish_reason/token evidence.
+            System.err.println(
+                "INTENT_DIAGNOSTICS: conversation=${request.conversationId} requestId=${request.requestId} " +
+                    "outcome=BUDGET_EXHAUSTION finishReason=${e.finishReason} completionTokens=${e.completionTokens} " +
+                    "reasoningTokens=${e.reasoningTokens}",
+            )
+            SkillSelection.None
         } catch (_: Exception) {
             // Intent discovery is best-effort and must never prevent normal generation.
             SkillSelection.None
         }
+    }
+
+    private fun logDiagnostics(request: ChatRequest, metadata: Map<String, String>?, parsedOk: Boolean) {
+        System.err.println(
+            "INTENT_DIAGNOSTICS: conversation=${request.conversationId} requestId=${request.requestId} " +
+                "outcome=${if (parsedOk) "COMPLETED" else "MALFORMED"} " +
+                "finishReason=${metadata?.get("finish_reason")} promptTokens=${metadata?.get("prompt_tokens")} " +
+                "completionTokens=${metadata?.get("completion_tokens")} reasoningTokens=${metadata?.get("reasoning_tokens")}",
+        )
     }
 
     /**
@@ -160,6 +212,44 @@ class LlmIntentDiscovery(
 
     companion object {
         private const val DEFAULT_MAX_OUTPUT_TOKENS = 64
+
+        // Make Intent Discovery Fast + Reliable phase. Deliberately code-owned,
+        // not part of the versioned Intent Engine content — see the call site.
+        const val JSON_MODE_REINFORCEMENT =
+            "Respond with a single JSON object only, exactly {\"skillKey\": \"...\"} or " +
+                "{\"skillKey\": null} — no prose, no explanation, no markdown fences, nothing else."
+
+        // Intent Context Minimization & Routing Optimization phase: measured
+        // four smaller alternatives against this 4-turn window using a
+        // controlled 85-case context-free benchmark plus 8 realistic
+        // growing-conversation scenarios covering the named ambiguous skill
+        // pairs (emotional_support/confidence_building, flirting/
+        // flirting_practice, foreplay/sexual_stimulation, dating/
+        // social_practice, relationship_discussion/relationship_guidance,
+        // etc.), all run with reasoning left ON (required — see the Runtime
+        // Quality + Latency Verification phase).
+        //
+        // Result: USER_ONLY (no history), RECENT_2, and RELEVANT_CONTEXT
+        // (last 1 turn) each dropped scenario accuracy from 7/8 to 6/8,
+        // reproducibly missing the exact cases the history window exists to
+        // resolve — e.g. "are you flirting with me right now?" needs the
+        // preceding flirting_practice roleplay setup to disambiguate from
+        // flirting, and a bare "yeah" needs the preceding turns to correctly
+        // resolve to no skill rather than a false positive. A
+        // COMPACT_SUMMARY strategy (reusing the existing
+        // LlmContinuitySummarizer, per architecture rules — no new summary
+        // engine was created) matched this window's 7/8 accuracy but gave
+        // no material prompt-size or latency reduction: the ~1550-1600
+        // token Intent prompt is dominated by the fixed routing
+        // instructions and active-skill-key list, not by conversation
+        // history (removing all history saved only ~60 tokens, ~4% of the
+        // prompt). Reasoning-token generation, not context size, is what
+        // drives Intent latency variance (0-900+ reasoning tokens per call
+        // in the benchmark) — this matches the prior phase's finding that
+        // reasoning must stay enabled. Conclusion: 4 native turns is
+        // already the smallest context that does not measurably harm
+        // routing quality, and no alternative offered a material
+        // efficiency gain to justify the switch. Left unchanged.
         private const val DEFAULT_RECENT_HISTORY_LIMIT = 4
         private val json = Json { ignoreUnknownKeys = true }
     }

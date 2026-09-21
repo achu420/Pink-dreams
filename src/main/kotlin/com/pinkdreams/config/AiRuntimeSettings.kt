@@ -29,6 +29,17 @@ import com.pinkdreams.persistence.repositories.AiSettingsRepository
 class AiRuntimeSettings(
     private val llmConfig: LlmConfig,
     private val repository: AiSettingsRepository? = null,
+    // Primary Generation Latency phase: an isolated, reversible override for
+    // primary generation's OpenRouter provider-routing preference —
+    // deliberately NOT part of the admin-configurable AiSettingsRepository
+    // precedence chain above (this is a code-level default/experiment knob,
+    // not a durable admin-editable setting). Public so TestChatService can
+    // read the production instance's own value as a fallback when a Test
+    // Chat conversation doesn't explicitly pin its own — otherwise a plain
+    // `.copy()` would silently null out the production default for every
+    // conversation that doesn't override it, which is exactly backwards for
+    // "Test Chat runs the same pipeline as production" (ADMIN-3).
+    val generationProviderSortOverride: String? = null,
 ) {
     data class Resolved(
         val model: String,
@@ -68,6 +79,26 @@ class AiRuntimeSettings(
      * budgets before emitting content, and letting an admin lower them from
      * this screen would silently break memory and skill selection. Their model
      * still follows the admin's choice, so a model switch applies everywhere.
+     *
+     * reasoningEnabled = false — Primary Generation Latency + Response Quality
+     * Hardening phase. Unlike Intent Discovery (a discrete classification
+     * judgment, proven to need reasoning: disabling it there previously
+     * collapsed live routing from 92% to 24%), primary generation is a
+     * conversational/stylistic task. A live 35-turn accumulating-conversation
+     * benchmark measured generation averaging 11.2s (49% reasoning-driven,
+     * p95 ~31s, one turn spiking to 44s) with reasoning ON. A paired
+     * reasoning ON/OFF replay of 6 of that conversation's real captured
+     * prompts (casual chat, companionship, "I freeze around girls" coaching,
+     * flirting, an AI-nature question, and intimacy pacing) showed reasoning
+     * OFF cut average latency roughly 3-4x (one pathological 17.3s call
+     * dropped to 1.3s) with no observed loss of persona warmth, naturalness,
+     * or capability-discovery quality — if anything, several OFF responses
+     * were more naturally concise, better matching this phase's own
+     * conciseness goals. A follow-up live Test Chat conversation with this
+     * flag set confirmed the latency win end-to-end (see the phase report).
+     * Intent Discovery, memory extraction, continuity, and memory-engine
+     * maintenance are untouched by this — none of their GenerationConfig
+     * construction sites reference this class.
      */
     fun generationConfig(): GenerationConfig {
         val resolved = resolve()
@@ -75,6 +106,9 @@ class AiRuntimeSettings(
             model = resolved.model,
             temperature = resolved.temperature,
             maxOutputTokens = resolved.maxOutputTokens,
+            reasoningEnabled = false,
+            providerSort = generationProviderSortOverride,
+            workload = "primary_generation",
         )
     }
 

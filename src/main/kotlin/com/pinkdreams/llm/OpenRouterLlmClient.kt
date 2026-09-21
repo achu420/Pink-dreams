@@ -14,6 +14,19 @@ data class OpenRouterRequest(
     @SerialName("max_tokens")
     val maxTokens: Int,
     val stream: Boolean = false,
+    // null = say nothing, use the provider's default. false is the one value
+    // this codebase actually sends, for classification-style side-channel
+    // calls that don't need chain-of-thought — see GenerationConfig.reasoningEnabled.
+    val reasoningEnabled: Boolean? = null,
+    // Runtime Quality + Latency Verification phase finding: this field existed
+    // on GenerationConfig but was never actually sent to the provider — every
+    // call ran at the provider's default sampling regardless of what an admin
+    // configured. Now wired through; see GenerationConfig.temperature.
+    val temperature: Double? = null,
+    // Make Intent Discovery Fast + Reliable phase — see GenerationConfig.jsonMode.
+    val jsonMode: Boolean? = null,
+    // Primary Generation Latency phase — see GenerationConfig.providerSort.
+    val providerSort: String? = null,
 )
 
 @Serializable
@@ -26,6 +39,11 @@ data class OpenRouterMessage(
 data class OpenRouterResponse(
     val id: String,
     val model: String,
+    // The actual upstream host that served this specific request (e.g.
+    // "CoreWeave", "Fireworks") — OpenRouter routes a single model id across
+    // dozens of upstream providers; this is what the Primary Generation
+    // Latency phase's investigation was keyed on. Previously never parsed.
+    val provider: String? = null,
     val choices: List<OpenRouterChoice>,
     val usage: OpenRouterUsage,
 )
@@ -66,6 +84,33 @@ data class OpenRouterUsage(
     val completionTokens: Int,
     @SerialName("total_tokens")
     val totalTokens: Int,
+    @SerialName("completion_tokens_details")
+    val completionTokensDetails: OpenRouterCompletionTokensDetails? = null,
+)
+
+@Serializable
+data class OpenRouterCompletionTokensDetails(
+    @SerialName("reasoning_tokens")
+    val reasoningTokens: Int? = null,
+)
+
+/**
+ * Live Intent Model Comparison phase: thrown instead of a plain
+ * IllegalStateException when a reasoning model exhausts max_tokens on
+ * reasoning before producing content — carries the same diagnostic fields
+ * structurally so a caller (e.g. LlmIntentDiscovery) can log or measure
+ * budget exhaustion precisely, rather than parsing them back out of a
+ * formatted message string.
+ */
+class OpenRouterBudgetExhaustionException(
+    val finishReason: String,
+    val completionTokens: Int,
+    val reasoningTokens: Int?,
+    val provider: String? = null,
+) : IllegalStateException(
+    "OpenRouter returned no content (finish_reason=$finishReason, completionTokens=$completionTokens, " +
+        "reasoningTokens=$reasoningTokens). For reasoning models this usually means max_tokens was exhausted " +
+        "by reasoning before any content was produced.",
 )
 
 class OpenRouterLlmClient(
@@ -74,7 +119,7 @@ class OpenRouterLlmClient(
     private val model: String = "deepseek/deepseek-v4-flash-0731",
     val maxOutputTokens: Int = 1024,
     val timeoutSeconds: Int = 60,
-) : LlmClient {
+) : LlmClient, ExchangeCapturing {
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -86,7 +131,7 @@ class OpenRouterLlmClient(
      * Authorization value since it is redacted at capture time, not display time.
      */
     @Volatile
-    var lastExchange: ProviderExchange? = null
+    override var lastExchange: ProviderExchange? = null
         private set
 
     override fun generate(request: GenerationRequest): LlmResponse {
@@ -143,13 +188,14 @@ class OpenRouterLlmClient(
             // Name the actual cause instead of a generic "empty content": a
             // reasoning model that spent the whole budget thinking reports
             // finish_reason=length with reasoning present but no content, and
-            // the fix is a larger max_tokens for that call site — which this
-            // message states outright so it is diagnosable from logs alone.
-            val reasoningTokens = choice.message.reasoning?.length ?: 0
-            throw IllegalStateException(
-                "OpenRouter returned no content (finish_reason=${choice.finishReason}, " +
-                    "reasoningChars=$reasoningTokens, completionTokens=${response.usage.completionTokens}). " +
-                    "For reasoning models this usually means max_tokens was exhausted by reasoning before any content was produced.",
+            // the fix is a larger max_tokens for that call site — structured
+            // so a caller can measure this precisely (see
+            // OpenRouterBudgetExhaustionException).
+            throw OpenRouterBudgetExhaustionException(
+                finishReason = choice.finishReason,
+                completionTokens = response.usage.completionTokens,
+                reasoningTokens = response.usage.completionTokensDetails?.reasoningTokens,
+                provider = response.provider,
             )
         }
 
@@ -162,6 +208,11 @@ class OpenRouterLlmClient(
                 "prompt_tokens" to response.usage.promptTokens.toString(),
                 "completion_tokens" to response.usage.completionTokens.toString(),
                 "total_tokens" to response.usage.totalTokens.toString(),
+                "reasoning_tokens" to (response.usage.completionTokensDetails?.reasoningTokens ?: 0).toString(),
+                // The actual upstream host — distinct from "provider" above,
+                // which names the API client implementation ("openrouter"),
+                // not the specific host OpenRouter routed this call to.
+                "provider_upstream" to (response.provider ?: ""),
             ),
             providerExchange = exchange,
         )
@@ -180,6 +231,10 @@ class OpenRouterLlmClient(
             messages = messages,
             maxTokens = request.config.maxOutputTokens ?: maxOutputTokens,
             stream = false,
+            reasoningEnabled = request.config.reasoningEnabled,
+            temperature = request.config.temperature,
+            jsonMode = request.config.jsonMode,
+            providerSort = request.config.providerSort,
         )
     }
 
@@ -229,6 +284,18 @@ class OpenRouterLlmClient(
         })
         sb.append("]")
         sb.append(",\"max_tokens\":").append(request.maxTokens)
+        if (request.reasoningEnabled != null) {
+            sb.append(",\"reasoning\":{\"enabled\":").append(request.reasoningEnabled).append("}")
+        }
+        if (request.temperature != null) {
+            sb.append(",\"temperature\":").append(request.temperature)
+        }
+        if (request.jsonMode == true) {
+            sb.append(",\"response_format\":{\"type\":\"json_object\"}")
+        }
+        if (request.providerSort != null) {
+            sb.append(",\"provider\":{\"sort\":\"").append(request.providerSort).append("\"}")
+        }
         sb.append(",\"stream\":false}")
         return sb.toString()
     }

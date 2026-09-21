@@ -140,6 +140,23 @@ object IntentEngineDefaultContent {
         - encouragement vs emotional_support: use encouragement when the user wants
           motivation/celebration around a goal, not comfort for a difficulty.
 
+        ADDITIONAL DISAMBIGUATION
+        - dating vs confidence_building: dating = a specific dating situation/person;
+          confidence_building = building confidence itself, not tied to one situation.
+        - dating vs social_practice: use dating_practice (not social_practice) for a
+          dating-specific practice scenario; social_practice is for general practice.
+        - friendship vs companionship: companionship = wanting presence, unframed;
+          friendship = explicitly framed as an ongoing friend relationship.
+        - advice vs problem_solving: problem_solving = a concrete problem/plan;
+          advice = a general opinion/direction with no plan being built.
+        - playful_teasing vs general_chat: playful_teasing = the message itself is
+          teasing/banter; general_chat = ordinary conversation, no teasing tone.
+
+        FILLER AND TOPIC CHANGES
+        A bare filler/acknowledgement ("hm", "ok", "yeah", "lol", "sure") with no new
+        content is usually null, not general_chat. On a topic change, route by the
+        new topic, not the skill active a few turns ago.
+
         OUTPUT
         Return only:
         {"skillKey": "..."}

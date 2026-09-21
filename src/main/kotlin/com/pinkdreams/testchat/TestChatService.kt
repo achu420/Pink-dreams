@@ -63,6 +63,14 @@ class TestChatService(
         val model: String? = null,
         val temperature: Double? = null,
         val maxOutputTokens: Int? = null,
+        /** Intent Discovery Model Latency Investigation phase: pins Intent Discovery to a specific model, independent of [model] above. Null keeps Intent Discovery on the same model as everything else. */
+        val intentModel: String? = null,
+        /** Intent Discovery Budget Investigation phase: pins Intent Discovery's maxOutputTokens, independent of [maxOutputTokens] above. Null keeps Intent Discovery on the production default (600). */
+        val intentMaxOutputTokens: Int? = null,
+        /** Make Intent Discovery Fast + Reliable phase: pins Intent Discovery's provider JSON-object mode. Null keeps Intent Discovery unchanged. */
+        val intentJsonMode: Boolean? = null,
+        /** Primary Generation Latency phase: pins PRIMARY generation's OpenRouter provider-routing preference. Null keeps generation's provider routing unchanged. */
+        val generationProviderSort: String? = null,
     )
 
     fun create(request: CreationRequest): CreationResult {
@@ -146,6 +154,10 @@ class TestChatService(
             temperature = request.temperature,
             maxOutputTokens = request.maxOutputTokens,
             memoryScopePersonaId = memoryScopePersona.id,
+            intentModel = request.intentModel,
+            intentMaxOutputTokens = request.intentMaxOutputTokens,
+            intentJsonMode = request.intentJsonMode,
+            generationProviderSort = request.generationProviderSort,
         )
 
         val conversation = conversationRepository.createTest(
@@ -223,10 +235,29 @@ class TestChatService(
             aiRuntimeSettings = AiRuntimeSettings(
                 productionDependencies.llmConfig,
                 PinnedAiSettingsRepository(db, snapshot.model, snapshot.temperature, snapshot.maxOutputTokens),
+                // Fall back to the PRODUCTION instance's own default when this
+                // test conversation doesn't explicitly pin its own — a plain
+                // `?:` here (not just `snapshot.generationProviderSort`)
+                // because a Test Chat conversation that never mentions this
+                // field must still see whatever production is actually
+                // configured with, not silently lose it.
+                generationProviderSortOverride = snapshot.generationProviderSort
+                    ?: productionDependencies.aiRuntimeSettings.generationProviderSortOverride,
             ),
             // Phase ADMIN-3 section 11: test memory never touches production
             // memory for this persona — see MemoryScopeResolver.
             memoryScopeResolver = TestMemoryScope(snapshot.memoryScopePersonaId),
+            // Intent Discovery Model Latency Investigation phase. Same
+            // fallback reasoning as generationProviderSortOverride above.
+            intentModelOverride = snapshot.intentModel ?: productionDependencies.intentModelOverride,
+            // Intent Discovery Budget Investigation phase.
+            intentMaxOutputTokensOverride = snapshot.intentMaxOutputTokens ?: productionDependencies.intentMaxOutputTokensOverride,
+            // Make Intent Discovery Fast + Reliable phase.
+            intentJsonModeOverride = snapshot.intentJsonMode ?: productionDependencies.intentJsonModeOverride,
+            // LLM Observability and Raw Exchange Capture phase: every
+            // exchange from a Test Chat conversation is tagged so it's
+            // distinguishable from production traffic.
+            isTestChat = true,
         )
         return ChatEngineFactory.build(pinnedDependencies)
     }

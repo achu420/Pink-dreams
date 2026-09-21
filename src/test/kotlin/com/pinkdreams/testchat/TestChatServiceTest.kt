@@ -536,4 +536,76 @@ class TestChatServiceTest {
         val result = w.service.sendMessage(prodConversation.id, UUID.randomUUID(), "hello")
         assertTrue(result is TestChatService.MessageResult.Rejected)
     }
+
+    /**
+     * Intent Discovery Model Comparison v2 phase: end-to-end proof that Test
+     * Chat's intentModel field actually reaches Intent Discovery's model
+     * selection through the real TestChatService -> ChatEngineFactory path
+     * (not merely at the Dependencies-construction level, which
+     * IntentModelOverrideTest already covers) — and that primary generation
+     * keeps using llmConfig.model, completely unaffected.
+     */
+    @Test
+    fun `test chat can explicitly select the intent model independent of generation`() {
+        val w = World()
+        val created = w.service.create(
+            TestChatService.CreationRequest(personaId = w.personaId, testUserId = w.testUserId, intentModel = "candidate/model-x"),
+        ) as TestChatService.CreationResult.Created
+
+        w.service.sendMessage(created.conversation.id, UUID.randomUUID(), "hello") as TestChatService.MessageResult.Sent
+
+        val requestsSnapshot = synchronized(w.llmClient.requestsSeen) { w.llmClient.requestsSeen.toList() }
+        val intentCalls = requestsSnapshot.filter {
+            (it.context.blocks.firstOrNull { b -> b.role == "system" }?.content ?: "").contains("Intent Discovery component")
+        }
+        val generationCalls = requestsSnapshot.filter {
+            !(it.context.blocks.firstOrNull { b -> b.role == "system" }?.content ?: "").let { s ->
+                s.contains("Intent Discovery component") || s.contains("memory-extraction system") || s.contains("TASK 1") || s.contains("userMemoryChanges")
+            }
+        }
+        assertTrue(intentCalls.isNotEmpty(), "Expected at least one Intent Discovery call")
+        assertTrue(generationCalls.isNotEmpty(), "Expected at least one generation call")
+        assertTrue(intentCalls.all { it.config.model == "candidate/model-x" }, "Intent Discovery must use the pinned candidate model")
+        assertTrue(generationCalls.all { it.config.model == w.llmConfig.model }, "Primary generation must be unaffected by the Intent-only override")
+    }
+
+    @Test
+    fun `a test conversation with no explicit intent override inherits the production default rather than losing it`() {
+        val w = World()
+        // Simulate Application.kt's production configuration: the ONE
+        // production Dependencies instance has a real, non-null Intent
+        // override (as it does after the Primary Generation Latency phase).
+        val productionWithDefault = w.productionDeps.copy(intentModelOverride = "openai/gpt-4o-mini", intentJsonModeOverride = true)
+        val service = TestChatService(productionWithDefault, w.conversations, w.personas, w.cores, w.skills, w.users)
+        val created = service.create(
+            TestChatService.CreationRequest(personaId = w.personaId, testUserId = w.testUserId),
+        ) as TestChatService.CreationResult.Created
+
+        service.sendMessage(created.conversation.id, UUID.randomUUID(), "hello") as TestChatService.MessageResult.Sent
+
+        val intentCalls = synchronized(w.llmClient.requestsSeen) { w.llmClient.requestsSeen.toList() }.filter {
+            (it.context.blocks.firstOrNull { b -> b.role == "system" }?.content ?: "").contains("Intent Discovery component")
+        }
+        assertTrue(intentCalls.isNotEmpty())
+        assertTrue(
+            intentCalls.all { it.config.model == "openai/gpt-4o-mini" && it.config.jsonMode == true },
+            "A Test Chat conversation that never mentions intentModel/intentJsonMode must inherit production's own default, not silently reset it to null",
+        )
+    }
+
+    @Test
+    fun `with no intent model pinned test chat falls back to the same model as everything else`() {
+        val w = World()
+        val created = w.service.create(
+            TestChatService.CreationRequest(personaId = w.personaId, testUserId = w.testUserId),
+        ) as TestChatService.CreationResult.Created
+
+        w.service.sendMessage(created.conversation.id, UUID.randomUUID(), "hello") as TestChatService.MessageResult.Sent
+
+        val intentCalls = synchronized(w.llmClient.requestsSeen) { w.llmClient.requestsSeen.toList() }.filter {
+            (it.context.blocks.firstOrNull { b -> b.role == "system" }?.content ?: "").contains("Intent Discovery component")
+        }
+        assertTrue(intentCalls.isNotEmpty())
+        assertTrue(intentCalls.all { it.config.model == w.llmConfig.model }, "intentModel = null (production default) must keep Intent Discovery on the same model as everything else")
+    }
 }

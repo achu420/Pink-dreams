@@ -41,6 +41,14 @@ data class CreateTestChatRequest(
     val model: String? = null,
     val temperature: Double? = null,
     val maxOutputTokens: Int? = null,
+    /** Intent Discovery Model Latency Investigation phase: pins Intent Discovery to a specific model, independent of [model]. Null keeps Intent Discovery on the same model as everything else. */
+    val intentModel: String? = null,
+    /** Intent Discovery Budget Investigation phase: pins Intent Discovery's maxOutputTokens, independent of [maxOutputTokens]. Null keeps Intent Discovery on the production default (600). */
+    val intentMaxOutputTokens: Int? = null,
+    /** Make Intent Discovery Fast + Reliable phase: pins Intent Discovery's provider JSON-object mode. Null keeps Intent Discovery unchanged. */
+    val intentJsonMode: Boolean? = null,
+    /** Primary Generation Latency phase: pins PRIMARY generation's OpenRouter provider-routing preference (e.g. "latency"). Null keeps generation's provider routing unchanged. */
+    val generationProviderSort: String? = null,
 )
 
 @Serializable
@@ -53,6 +61,10 @@ data class ConfigurationSnapshotResponse(
     val model: String?,
     val temperature: Double?,
     val maxOutputTokens: Int?,
+    val intentModel: String?,
+    val intentMaxOutputTokens: Int?,
+    val intentJsonMode: Boolean?,
+    val generationProviderSort: String?,
 )
 
 @Serializable
@@ -93,6 +105,8 @@ data class TestMessageDiagnosticsResponse(
     val responseMetadata: Map<String, String>? = null,
     /** Provider request/response with secrets already redacted upstream (OpenRouterLlmClient) — section 57. */
     val providerExchange: Map<String, String>? = null,
+    /** Measured per-stage wall-clock duration (ms) for this turn's user-facing pipeline path. */
+    val stageTimingsMs: Map<String, String>? = null,
 )
 
 @Serializable
@@ -149,6 +163,10 @@ class AdminTestChatRoutes(
                             model = request.model,
                             temperature = request.temperature,
                             maxOutputTokens = request.maxOutputTokens,
+                            intentModel = request.intentModel,
+                            intentMaxOutputTokens = request.intentMaxOutputTokens,
+                            intentJsonMode = request.intentJsonMode,
+                            generationProviderSort = request.generationProviderSort,
                         ),
                     )
                 ) {
@@ -270,6 +288,7 @@ class AdminTestChatRoutes(
                     generationConfig = parseMetadataSection(message.metadata, "lvm_config"),
                     responseMetadata = parseMetadataSection(message.metadata, "lvm_response_metadata"),
                     providerExchange = parseMetadataSection(message.metadata, "lvm_provider_exchange"),
+                    stageTimingsMs = parseMetadataSection(message.metadata, "lvm_stage_timings"),
                 )
             },
         )
@@ -284,6 +303,10 @@ class AdminTestChatRoutes(
         model = snapshot.model,
         temperature = snapshot.temperature,
         maxOutputTokens = snapshot.maxOutputTokens,
+        intentModel = snapshot.intentModel,
+        intentMaxOutputTokens = snapshot.intentMaxOutputTokens,
+        intentJsonMode = snapshot.intentJsonMode,
+        generationProviderSort = snapshot.generationProviderSort,
     )
 
     /**

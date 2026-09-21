@@ -41,7 +41,15 @@ class BestEffortMemoryExtraction(
     private val memoryScopeResolver: MemoryScopeResolver = ProductionMemoryScope,
 ) : PostDeliveryMemoryExtraction {
     override fun dispatch(turn: CompletedTurn) {
+        // Runtime Quality + Latency Verification phase: dispatchedAtNanos is
+        // captured on the CALLING thread, before handing off to the executor —
+        // this is what proves the user-facing response never waited for this
+        // work: the caller (PipelineChatEngine) returns immediately after this
+        // method returns, and this method returns before extraction even starts.
+        val dispatchedAtNanos = System.nanoTime()
         CompletableFuture.runAsync({
+            val startedAtNanos = System.nanoTime()
+            val queueDelayMs = (startedAtNanos - dispatchedAtNanos) / 1_000_000
             try {
                 val scopedPersonaId = memoryScopeResolver.resolve(turn.request.userId, turn.request.personaId, turn.request.conversationId)
                 val result = extractor.extract(turn)
@@ -49,12 +57,14 @@ class BestEffortMemoryExtraction(
                     it.copy(source = "llm_extracted", tier = "hot")
                 }
                 val accepted = memoryService.record(turn.request.userId, scopedPersonaId, candidates)
+                val durationMs = (System.nanoTime() - startedAtNanos) / 1_000_000
                 // Log the success path too, not only failures: "extracted nothing"
                 // and "the hook never ran" are indistinguishable otherwise, which
                 // makes a silently empty memory store impossible to diagnose.
                 System.err.println(
                     "MEMORY_EXTRACTION: conversation=${turn.request.conversationId} " +
-                        "requestId=${turn.request.requestId} proposed=${candidates.size} accepted=${accepted.size}",
+                        "requestId=${turn.request.requestId} proposed=${candidates.size} accepted=${accepted.size} " +
+                        "queueDelayMs=$queueDelayMs durationMs=$durationMs",
                 )
                 if (result.referencedFactIds.isNotEmpty()) {
                     memoryService.markReferenced(

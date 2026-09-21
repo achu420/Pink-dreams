@@ -39,8 +39,12 @@ class AiRuntimeSettingsTest {
     @Test
     fun `an empty settings table reproduces the previous generation config exactly`() {
         // The regression this guards: adding an admin layer must not change a
-        // running deployment that has never touched the admin screen.
-        val before = GenerationConfig(model = envConfig.model, maxOutputTokens = envConfig.maxOutputTokens)
+        // running deployment that has never touched the admin screen. reasoningEnabled
+        // is the one deliberate exception: the Primary Generation Latency + Response
+        // Quality Hardening phase measured reasoning-off as a real latency win for
+        // generation specifically (see GenerationReasoningConfigTest for the evidence
+        // trail) and applies regardless of admin settings.
+        val before = GenerationConfig(model = envConfig.model, maxOutputTokens = envConfig.maxOutputTokens, reasoningEnabled = false, workload = "primary_generation")
         val after = AiRuntimeSettings(envConfig, repo()).generationConfig()
 
         assertEquals(before, after)
@@ -138,7 +142,7 @@ class AiRuntimeSettingsTest {
 
         val config = AiRuntimeSettings(envConfig, repository).generationConfig()
 
-        assertEquals(GenerationConfig(model = "chosen-model", temperature = 0.6, maxOutputTokens = 777), config)
+        assertEquals(GenerationConfig(model = "chosen-model", temperature = 0.6, maxOutputTokens = 777, reasoningEnabled = false, workload = "primary_generation"), config)
     }
 
     @Test

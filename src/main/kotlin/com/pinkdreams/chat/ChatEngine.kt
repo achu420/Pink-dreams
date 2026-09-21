@@ -77,6 +77,16 @@ data class LlmExecutionDiagnostics(
     // this type deliberately stays a plain Map so the chat core never depends on
     // any provider-specific (e.g. OpenRouter) type.
     val providerExchange: Map<String, String>? = null,
+    // Runtime Quality + Latency Verification phase — measured wall-clock
+    // duration (milliseconds, as a string) of each user-facing pipeline
+    // stage for THIS turn, keyed by stage name. Populated by
+    // PipelineChatEngine, merged into the same persisted diagnostics as
+    // everything else above (never a second diagnostics store), and
+    // deliberately excludes async post-delivery work (memory extraction,
+    // continuity, memory-engine maintenance) — those are fire-and-forget by
+    // design (section 6) and are timed/logged separately, not on the
+    // user-facing critical path this map exists to measure.
+    val stageTimingsMs: Map<String, String>? = null,
 )
 
 data class GenerationResponse(
@@ -191,7 +201,21 @@ class PipelineChatEngine(
     private val memoryContextEnricher: SkillAwareMemoryEnricher? = null,
 ) : ChatEngine {
     override fun process(request: ChatRequest): ChatResult {
+        val turnStartNanos = System.nanoTime()
         val state = PipelineState(PipelineStage.RECEIVED, listOf(PipelineStage.RECEIVED))
+        // Runtime Quality + Latency Verification phase: measured wall-clock
+        // duration of each user-facing stage for this one turn, in the order
+        // they actually run. Never on the critical path itself — timing a
+        // block adds a System.nanoTime() call before/after, not a new stage.
+        val stageTimings = linkedMapOf<String, Long>()
+        fun <T> timed(label: String, block: () -> T): T {
+            val start = System.nanoTime()
+            try {
+                return block()
+            } finally {
+                stageTimings[label] = (System.nanoTime() - start) / 1_000_000
+            }
+        }
 
         when (val claim = executionCoordinator.claim(request)) {
             is StageResult.Failed -> return failure(request, claim.code, state, PipelineStage.RECEIVED, false)
@@ -212,9 +236,10 @@ class PipelineChatEngine(
         }
         val afterModeration = afterEntitlement.advance(PipelineStage.INPUT_MODERATION)
 
-        val context = when (val result = contextAssembler.assemble(request)) {
-            is StageResult.Failed -> return failure(request, result.code, afterModeration, PipelineStage.CONTEXT_ASSEMBLY)
-            is StageResult.Succeeded -> result.value
+        val contextResult = timed("context_assembly") { contextAssembler.assemble(request) }
+        val context = when (contextResult) {
+            is StageResult.Failed -> return failure(request, contextResult.code, afterModeration, PipelineStage.CONTEXT_ASSEMBLY)
+            is StageResult.Succeeded -> contextResult.value
         }
         val afterContext = afterModeration.advance(PipelineStage.CONTEXT_ASSEMBLY)
 
@@ -223,19 +248,21 @@ class PipelineChatEngine(
         // failure) must never block or alter normal chat delivery — it degrades to
         // "no skill selected" and generation proceeds against the assembled
         // context unchanged.
-        val skillSelection = try {
-            val selection = intentDiscovery.selectSkill(request, context)
-            when (selection) {
-                is SkillSelection.Selected ->
-                    System.err.println("SKILL_SELECTION: selected='${selection.skillKey}' conversation=${request.conversationId} requestId=${request.requestId}")
-                SkillSelection.None ->
-                    System.err.println("SKILL_SELECTION: none conversation=${request.conversationId} requestId=${request.requestId}")
+        val skillSelection = timed("intent_discovery") {
+            try {
+                val selection = intentDiscovery.selectSkill(request, context)
+                when (selection) {
+                    is SkillSelection.Selected ->
+                        System.err.println("SKILL_SELECTION: selected='${selection.skillKey}' conversation=${request.conversationId} requestId=${request.requestId}")
+                    SkillSelection.None ->
+                        System.err.println("SKILL_SELECTION: none conversation=${request.conversationId} requestId=${request.requestId}")
+                }
+                selection
+            } catch (e: Exception) {
+                // Never log message/skill content here — only that a failure occurred.
+                System.err.println("SKILL_SELECTION: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
+                SkillSelection.None
             }
-            selection
-        } catch (e: Exception) {
-            // Never log message/skill content here — only that a failure occurred.
-            System.err.println("SKILL_SELECTION: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
-            SkillSelection.None
         }
 
         // Phase C — skill-aware memory context selection runs strictly after skill
@@ -247,33 +274,38 @@ class PipelineChatEngine(
         // exception here silently keeps the context UNCHANGED, i.e. the
         // assembler's own already-correct, skill-agnostic top-N memory block,
         // which is the existing/original MemoryService selection.
-        val memoryEnrichedContext = try {
-            val enriched = memoryContextEnricher?.enrich(context, request, skillSelection) ?: context
-            System.err.println(
-                "MEMORY_CONTEXT_SELECTION: ${if (memoryContextEnricher != null) "applied" else "skipped (not configured)"} " +
-                    "conversation=${request.conversationId} requestId=${request.requestId}",
-            )
-            enriched
-        } catch (e: Exception) {
-            System.err.println("MEMORY_CONTEXT_SELECTION: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
-            context
+        val memoryEnrichedContext = timed("memory_context_selection") {
+            try {
+                val enriched = memoryContextEnricher?.enrich(context, request, skillSelection) ?: context
+                System.err.println(
+                    "MEMORY_CONTEXT_SELECTION: ${if (memoryContextEnricher != null) "applied" else "skipped (not configured)"} " +
+                        "conversation=${request.conversationId} requestId=${request.requestId}",
+                )
+                enriched
+            } catch (e: Exception) {
+                System.err.println("MEMORY_CONTEXT_SELECTION: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
+                context
+            }
         }
 
-        val skillEnrichedContext = try {
-            if (skillSelection is SkillSelection.Selected && skillContextEnricher != null) {
-                skillContextEnricher.enrich(memoryEnrichedContext, skillSelection)
-            } else {
+        val skillEnrichedContext = timed("skill_context_enrichment") {
+            try {
+                if (skillSelection is SkillSelection.Selected && skillContextEnricher != null) {
+                    skillContextEnricher.enrich(memoryEnrichedContext, skillSelection)
+                } else {
+                    memoryEnrichedContext
+                }
+            } catch (e: Exception) {
+                System.err.println("SKILL_CONTEXT_ENRICHMENT: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
                 memoryEnrichedContext
             }
-        } catch (e: Exception) {
-            System.err.println("SKILL_CONTEXT_ENRICHMENT: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
-            memoryEnrichedContext
         }
         val afterSkillSelection = afterContext.advance(PipelineStage.SKILL_SELECTION)
 
-        val generated = when (val result = generator.generate(request, skillEnrichedContext)) {
-            is StageResult.Failed -> return failure(request, result.code, afterSkillSelection, PipelineStage.GENERATION)
-            is StageResult.Succeeded -> result.value
+        val generationResult = timed("generation") { generator.generate(request, skillEnrichedContext) }
+        val generated = when (generationResult) {
+            is StageResult.Failed -> return failure(request, generationResult.code, afterSkillSelection, PipelineStage.GENERATION)
+            is StageResult.Succeeded -> generationResult.value
         }
         val afterGeneration = afterSkillSelection.advance(PipelineStage.GENERATION)
 
@@ -289,9 +321,10 @@ class PipelineChatEngine(
             is ValidationDecision.Rejected -> {
                 val afterRegeneration = afterValidation.advance(PipelineStage.REGENERATE)
                 val afterRegenerationGeneration = afterRegeneration.advance(PipelineStage.GENERATION)
-                val regenerated = when (val result = generator.generate(request, skillEnrichedContext)) {
-                    is StageResult.Failed -> return failure(request, result.code, afterRegeneration, PipelineStage.GENERATION)
-                    is StageResult.Succeeded -> result.value
+                val regenerationResult = timed("regeneration") { generator.generate(request, skillEnrichedContext) }
+                val regenerated = when (regenerationResult) {
+                    is StageResult.Failed -> return failure(request, regenerationResult.code, afterRegeneration, PipelineStage.GENERATION)
+                    is StageResult.Succeeded -> regenerationResult.value
                 }
                 val secondValidation = try {
                     outputValidator.validate(request, regenerated)
@@ -311,11 +344,23 @@ class PipelineChatEngine(
             }
         }
 
-        val persisted = when (val result = persistence.persist(request, validatedResponse)) {
-            is StageResult.Failed -> return failure(request, result.code, finalState, PipelineStage.PERSIST)
-            is StageResult.Succeeded -> result.value
+        val totalSoFarMs = (System.nanoTime() - turnStartNanos) / 1_000_000
+        stageTimings["total_before_persist"] = totalSoFarMs
+        val responseWithTimings = validatedResponse.copy(
+            executionDiagnostics = (validatedResponse.executionDiagnostics ?: LlmExecutionDiagnostics(null, null, null))
+                .copy(stageTimingsMs = stageTimings.mapValues { it.value.toString() }),
+        )
+
+        val persistResult = timed("persist") { persistence.persist(request, responseWithTimings) }
+        val persisted = when (persistResult) {
+            is StageResult.Failed -> return failure(request, persistResult.code, finalState, PipelineStage.PERSIST)
+            is StageResult.Succeeded -> persistResult.value
         }
         val afterPersistence = finalState.advance(PipelineStage.PERSIST)
+        System.err.println(
+            "STAGE_TIMINGS: conversation=${request.conversationId} requestId=${request.requestId} " +
+                stageTimings.entries.joinToString(" ") { "${it.key}=${it.value}ms" },
+        )
 
         when (val result = delivery.deliver(request, persisted)) {
             is StageResult.Failed -> return failure(request, result.code, afterPersistence, PipelineStage.DELIVER, false)

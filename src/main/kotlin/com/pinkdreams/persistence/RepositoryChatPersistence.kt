@@ -46,6 +46,9 @@ class RepositoryChatPersistence(
                 put("lvm_provider_exchange", buildJsonObject {
                     diag.providerExchange?.forEach { (k, v) -> put(k, v) }
                 }.toString())
+                put("lvm_stage_timings", buildJsonObject {
+                    diag.stageTimingsMs?.forEach { (k, v) -> put(k, v) }
+                }.toString())
             }
         }.toString()
     }

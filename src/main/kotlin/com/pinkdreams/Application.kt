@@ -119,7 +119,14 @@ fun Application.module(
     // ai_settings this yields exactly the previous values, so adding this layer
     // cannot change a running deployment's behavior. Constructed once here and
     // shared by generation and the admin routes, so both report the same thing.
-    val aiRuntimeSettings = com.pinkdreams.config.AiRuntimeSettings(llmConfig, aiSettingsRepo)
+    // Primary Generation Latency phase: promoted from Test-Chat-validated
+    // candidate to production default. A live 30-turn A/B (same model, same
+    // weights — this only changes which upstream host OpenRouter routes to)
+    // showed generation p50 5026ms->2280ms, p95 34871ms->12728ms, and
+    // eliminated all >20s turns (16.7%->0%) with no observed quality
+    // change. See AiRuntimeSettings.generationConfig() for how this reaches
+    // only primary generation, never side-channel calls.
+    val aiRuntimeSettings = com.pinkdreams.config.AiRuntimeSettings(llmConfig, aiSettingsRepo, generationProviderSortOverride = "latency")
     // Only seed for a genuine application startup (no database explicitly
     // injected) — never for tests, which pass their own isolated `database`
     // and must see empty configuration tables unless they seed them themselves.
@@ -177,6 +184,17 @@ fun Application.module(
         executionRepository = executionRepo,
         aiRuntimeSettings = aiRuntimeSettings,
         sensitivePreferenceService = sensitivePreferenceService,
+        // Make Intent Discovery Fast + Reliable phase: promoted from
+        // Test-Chat-validated candidate to production default. A live
+        // 90-turn validation showed malformed output 13.3%->0%, budget
+        // exhaustion 0% (non-reasoning model), Intent p50 4968ms->1043ms,
+        // with a real but modest routing-accuracy tradeoff (measured
+        // ~4-5 points lower than the reasoning baseline). The JSON-mode
+        // reinforcement text is appended at request-construction time in
+        // LlmIntentDiscovery only — the stored Intent Engine v3 content is
+        // never modified.
+        intentModelOverride = "openai/gpt-4o-mini",
+        intentJsonModeOverride = true,
     )
 
     // Initialize ChatEngine if not provided
@@ -226,6 +244,11 @@ fun Application.module(
             testChatService = testChatService,
             conversationRepository = conversationRepo,
             messageRepository = messageRepo,
+            adminAuthorizationProvider = authProvider,
+        ).register(this)
+        com.pinkdreams.api.admin.AdminObservabilityRoutes(
+            exchangeRepository = com.pinkdreams.persistence.repositories.LlmExchangeRepository(db),
+            metricsRepository = com.pinkdreams.persistence.repositories.PerformanceMetricsRepository(db),
             adminAuthorizationProvider = authProvider,
         ).register(this)
     }

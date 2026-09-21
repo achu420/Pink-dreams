@@ -40,6 +40,32 @@ open class ConversationRepository(private val db: Database) {
         val maxOutputTokens: Int?,
         /** A real, hidden Personas row scoping this test conversation's memory — see MemoryScopeResolver.TestMemoryScope. */
         val memoryScopePersonaId: UUID,
+        /**
+         * Intent Discovery Model Latency Investigation phase: an independent
+         * override, separate from [model]. Null means Intent Discovery keeps
+         * using the same model as everything else (unchanged behavior).
+         */
+        val intentModel: String? = null,
+        /**
+         * Intent Discovery Budget Investigation phase: an independent
+         * override, separate from [maxOutputTokens] (which governs primary
+         * generation). Null means Intent Discovery keeps using 600, the
+         * production default.
+         */
+        val intentMaxOutputTokens: Int? = null,
+        /**
+         * Make Intent Discovery Fast + Reliable phase: an independent
+         * override for Intent Discovery's provider JSON-object mode. Null
+         * means Intent Discovery's request is unchanged from before this
+         * field existed.
+         */
+        val intentJsonMode: Boolean? = null,
+        /**
+         * Primary Generation Latency phase: an independent override for
+         * PRIMARY generation's OpenRouter provider-routing preference (e.g.
+         * "latency"). Null means generation's provider routing is unchanged.
+         */
+        val generationProviderSort: String? = null,
     )
 
     data class Conversation(
@@ -97,6 +123,10 @@ open class ConversationRepository(private val db: Database) {
             it[Conversations.snapshotTemperature] = snapshot.temperature
             it[Conversations.snapshotMaxOutputTokens] = snapshot.maxOutputTokens
             it[Conversations.snapshotMemoryScopePersonaId] = snapshot.memoryScopePersonaId
+            it[Conversations.snapshotIntentModel] = snapshot.intentModel
+            it[Conversations.snapshotIntentMaxOutputTokens] = snapshot.intentMaxOutputTokens
+            it[Conversations.snapshotIntentJsonMode] = snapshot.intentJsonMode
+            it[Conversations.snapshotGenerationProviderSort] = snapshot.generationProviderSort
         }
         findById(id)!!
     }
@@ -206,6 +236,10 @@ open class ConversationRepository(private val db: Database) {
                 temperature = row[Conversations.snapshotTemperature],
                 maxOutputTokens = row[Conversations.snapshotMaxOutputTokens],
                 memoryScopePersonaId = row[Conversations.snapshotMemoryScopePersonaId] ?: row[Conversations.personaId],
+                intentModel = row[Conversations.snapshotIntentModel],
+                intentMaxOutputTokens = row[Conversations.snapshotIntentMaxOutputTokens],
+                intentJsonMode = row[Conversations.snapshotIntentJsonMode],
+                generationProviderSort = row[Conversations.snapshotGenerationProviderSort],
             )
         } else {
             null

@@ -66,6 +66,7 @@ object DatabaseFactory {
             Conversations,
             Messages,
             ChatRequestExecutions,
+            LlmExchanges,
         )
     }
 }
@@ -483,6 +484,24 @@ object Conversations : Table("conversations") {
     val snapshotModel = text("snapshot_model").nullable()
     val snapshotTemperature = double("snapshot_temperature").nullable()
     val snapshotMaxOutputTokens = integer("snapshot_max_output_tokens").nullable()
+    // Intent Discovery Model Latency Investigation phase: a SEPARATE,
+    // independent override from snapshotModel above. snapshotModel governs
+    // primary generation and side-channel calls (via AiRuntimeSettings);
+    // Intent Discovery never read that field and had no per-workload
+    // override at all — see ChatEngineFactory. Null (the default) means
+    // Intent Discovery keeps using the same model as everything else,
+    // exactly as before this field existed.
+    val snapshotIntentModel = text("snapshot_intent_model").nullable()
+    // Intent Discovery Budget Investigation phase: independent from
+    // snapshotMaxOutputTokens above, which governs primary generation only.
+    val snapshotIntentMaxOutputTokens = integer("snapshot_intent_max_output_tokens").nullable()
+    // Make Intent Discovery Fast + Reliable phase: independent from every
+    // other snapshot field above.
+    val snapshotIntentJsonMode = bool("snapshot_intent_json_mode").nullable()
+    // Primary Generation Latency phase: governs PRIMARY generation's
+    // provider-routing preference only — independent of every Intent-only
+    // field above.
+    val snapshotGenerationProviderSort = text("snapshot_generation_provider_sort").nullable()
 
     override val primaryKey = PrimaryKey(id)
 }
@@ -513,6 +532,57 @@ object ChatRequestExecutions : Table("chat_request_executions") {
     val completedAt = datetime("completed_at").nullable()
 
     override val primaryKey = PrimaryKey(conversationId, clientMessageId)
+}
+
+// LLM Observability and Raw Exchange Capture phase — NEW BACKEND WORK. No
+// prior table captured a raw LLM exchange for anything other than the
+// primary generation call (and only inside messages.metadata, one row per
+// TURN, not per LLM call). Intent, memory extraction, continuity, and
+// memory-engine maintenance had no persisted record at all — only
+// non-persisted, non-queryable System.err log lines. This table is the
+// single, uniform record for EVERY LlmClient.generate() call across every
+// workload, written by the ObservableLlmClient decorator (see
+// com.pinkdreams.llm.observability), which wraps the shared LlmClient once
+// in ChatEngineFactory.build() so no call site needs to change how it
+// invokes the client.
+object LlmExchanges : Table("llm_exchanges") {
+    val id = uuid("id")
+    // The ChatRequest.requestId shared by every LLM call made during one
+    // turn (Intent + generation + async memory calls all reuse it) — this is
+    // what lets exchanges be reconstructed per-turn, not just per-call.
+    val turnRequestId = uuid("turn_request_id")
+    val conversationId = uuid("conversation_id")
+    val workload = varchar("workload", 64)
+    val isTestChat = bool("is_test_chat").default(false)
+    val model = text("model").nullable()
+    val provider = varchar("provider", 128).nullable()
+    val latencyMs = long("latency_ms")
+    val promptTokens = integer("prompt_tokens").nullable()
+    val completionTokens = integer("completion_tokens").nullable()
+    val reasoningTokens = integer("reasoning_tokens").nullable()
+    val totalTokens = integer("total_tokens").nullable()
+    val finishReason = varchar("finish_reason", 64).nullable()
+    val httpStatusCode = integer("http_status_code").nullable()
+    // outcome distinguishes what the previous phase's log-only diagnostics
+    // could only approximate: a genuine provider/network failure (isError
+    // on the HTTP response, or an exception before any response arrived) is
+    // NOT the same thing as a reasoning model exhausting its token budget
+    // (OpenRouterBudgetExhaustionException), which is NOT the same thing as
+    // a successful HTTP response containing text that fails to parse as the
+    // expected shape (malformed output) — all three previously collapsed
+    // into "no LlmResponse", indistinguishable from each other.
+    val outcome = varchar("outcome", 32) // SUCCESS | BUDGET_EXHAUSTION | PROVIDER_ERROR | EXCEPTION
+    val errorClass = varchar("error_class", 255).nullable()
+    val errorMessage = text("error_message").nullable()
+    // Raw bodies, exactly as exchanged — requestHeaders is captured
+    // pre-redacted at the OpenRouterLlmClient call site (never contains the
+    // Authorization header); see ProviderExchange's own doc comment, which
+    // this table's writer relies on rather than re-implementing redaction.
+    val requestBody = text("request_body").nullable()
+    val responseBody = text("response_body").nullable()
+    val createdAt = datetime("created_at")
+
+    override val primaryKey = PrimaryKey(id)
 }
 
 fun defaultNow(): LocalDateTime = LocalDateTime.now()

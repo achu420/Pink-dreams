@@ -1,0 +1,15 @@
+# AMIA Overnight Claude Work Package
+
+Execute in order:
+
+1.  `00_MASTER_WORKFLOW.md`
+2.  `01_REPOSITORY_RECONNAISSANCE.md`
+3.  `02_LLM_OBSERVABILITY_AND_RAW_EXCHANGE_CAPTURE.md`
+4.  `03_RUNTIME_PIPELINE_AND_CONTEXT_AUDIT.md`
+5.  `04_ADMIN_UI_SPEC_AND_IMPLEMENTATION.md`
+6.  `05_LATENCY_RELIABILITY_HARDENING.md`
+7.  `06_PRODUCTION_VALIDATION_AND_RELEASE.md`
+8.  `07_FINAL_REVIEW_AND_HANDOFF.md`
+
+The master workflow controls the sequence. Each task must be verified
+before proceeding.
