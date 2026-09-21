@@ -128,7 +128,11 @@ class AdminPersonaRoutes(
         personaRepository.findById(personaId)?.activeCoreVersionId == versionId
 
     fun register(route: Route) {
-        // Serve admin UI without auth (public access to QA console)
+        // Serves the admin UI HTML itself. Gated by the admin session cookie
+        // check in Application.kt's intercept (see AdminSessionAuth) — this
+        // route body has no auth logic of its own, matching how every other
+        // admin route below also defers to a shared mechanism rather than
+        // re-implementing it.
         route.get("/admin") {
             val resource = Thread.currentThread().contextClassLoader.getResource("admin-ui.html")
             if (resource != null) {

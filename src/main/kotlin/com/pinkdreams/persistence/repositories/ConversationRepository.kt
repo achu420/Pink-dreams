@@ -14,6 +14,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.time.LocalDateTime
@@ -221,6 +222,33 @@ open class ConversationRepository(private val db: Database) {
             it[Conversations.memoryEngineProcessedCount] = newProcessedCount
         }
         updated == 1
+    }
+
+    /**
+     * Module 07 — Conversations Inspector (admin). Unlike [findAllForUser],
+     * this is not scoped to a single user — an admin needs to browse across
+     * every user's conversations, optionally narrowed by user and/or persona.
+     * Read-only; introduced purely for the admin inspector, no existing
+     * caller's query shape is touched.
+     */
+    open fun findAllAdmin(
+        limit: Int = 50,
+        offset: Int = 0,
+        userId: UUID? = null,
+        personaId: UUID? = null,
+    ): List<Conversation> = transaction(db) {
+        val conditions = mutableListOf<org.jetbrains.exposed.sql.Op<Boolean>>()
+        if (userId != null) conditions.add(Conversations.userId eq userId)
+        if (personaId != null) conditions.add(Conversations.personaId eq personaId)
+        val query = if (conditions.isEmpty()) {
+            Conversations.selectAll()
+        } else {
+            Conversations.select { conditions.reduce { a, b -> a and b } }
+        }
+        query
+            .orderBy(Conversations.createdAt to org.jetbrains.exposed.sql.SortOrder.DESC, Conversations.id to org.jetbrains.exposed.sql.SortOrder.DESC)
+            .limit(limit, offset.toLong())
+            .map(::rowToModel)
     }
 
     private fun rowToModel(row: ResultRow): Conversation {

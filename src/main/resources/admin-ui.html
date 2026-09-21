@@ -217,6 +217,96 @@
            changes and every other tab keeps its original look. */
         #observability .error { color: var(--obs-danger); background: rgba(240,86,122,.1); border: 1px solid rgba(240,86,122,.3); border-radius: 9px; }
         #observability .success { color: var(--obs-success); background: rgba(62,213,152,.1); border: 1px solid rgba(62,213,152,.3); border-radius: 9px; }
+
+        /* ==================================================================
+           Modules 01-06 — version-history / filter / section-header patterns.
+           Built entirely from the existing AMIA :root tokens above; no second
+           palette or design system is introduced. Shared by Personas,
+           Engines, Skills, AI Settings, Dashboard and Users.
+           ================================================================== */
+        .section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+        .section-head h2 { margin: 0; }
+        .section-head .section-actions button { margin-right: 0; margin-left: 8px; }
+        .section-sub { font-size: 12px; color: var(--muted-mauve); margin: -8px 0 14px; line-height: 1.5; }
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 14px; }
+        .filter-bar .filter-field { flex: 1 1 160px; min-width: 130px; }
+        .filter-bar .filter-field.narrow { flex: 0 1 120px; }
+        .filter-bar label { font-size: 10px; margin-bottom: 5px; }
+        .filter-bar input, .filter-bar select { font-size: 12.5px; padding: 8px 10px; }
+        .filter-count { font-size: 11.5px; color: var(--muted-mauve); align-self: center; white-space: nowrap; }
+
+        /* Expandable version-history row inside a normal AMIA table. */
+        .vh-toggle { cursor: pointer; user-select: none; color: var(--soft-rose); font-weight: 700; width: 24px; text-align: center; }
+        tr.vh-detail > td { background: var(--surface-2); padding: 0; }
+        tr.vh-detail .vh-inner { padding: 14px 16px; }
+        tr.vh-detail:hover { background: var(--surface-2); }
+        .vh-inner table { margin-top: 6px; }
+        .vh-inner .vh-title { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-mauve); font-weight: 700; margin-bottom: 4px; }
+        .vh-inner td, .vh-inner th { white-space: normal; }
+        .row-actions button { padding: 5px 11px; font-size: 11.5px; margin-right: 6px; }
+        .badge.prod { background: rgba(62,213,152,.16); color: var(--success); }
+        .badge.draft { background: rgba(205,187,196,.16); color: var(--muted-mauve); }
+        .badge.archived { background: rgba(205,187,196,.10); color: var(--muted-mauve); }
+        .mono { font-family: 'SF Mono', Consolas, monospace; font-size: 11.5px; }
+        .collapse-panel { border: 1px dashed var(--border-strong); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; background: var(--surface-2); }
+        .sub-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+        .sub-card > h3 { margin-bottom: 4px; }
+        .sub-card .sub-note { font-size: 12px; color: var(--muted-mauve); margin-bottom: 12px; line-height: 1.5; }
+        .kv-line { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+        .kv-line:last-child { border-bottom: none; }
+        .kv-line .kv-k { color: var(--muted-mauve); }
+        .kv-line .kv-v { font-weight: 600; text-align: right; word-break: break-word; }
+        .usage-bar { display: inline-block; vertical-align: middle; width: 70px; height: 6px; background: rgba(247,216,225,.12); border-radius: 3px; overflow: hidden; margin-right: 8px; }
+        .usage-bar > span { display: block; height: 100%; background: var(--rose); }
+
+        /* Segmented Production/Testing toggle (Test Chat, module 08). */
+        .seg-toggle { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 9px; overflow: hidden; }
+        .seg-toggle button { margin: 0; border-radius: 0; background: var(--surface-2); color: var(--muted-mauve); border: none; padding: 8px 16px; font-size: 12.5px; }
+        .seg-toggle button.active { background: linear-gradient(135deg, var(--rose), #d43f6d); color: #fff; }
+
+        /* Test Chat transcript bubbles. */
+        .tc-log { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; min-height: 160px; max-height: 460px; overflow-y: auto; margin-bottom: 12px; }
+        .tc-bubble { max-width: 78%; padding: 10px 13px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+        .tc-bubble.user { margin-left: auto; background: linear-gradient(135deg, rgba(232,90,136,.30), rgba(212,63,109,.22)); border: 1px solid rgba(232,90,136,.35); }
+        .tc-bubble.assistant { margin-right: auto; background: var(--surface); border: 1px solid var(--border-strong); }
+        .tc-bubble.pending { opacity: .6; font-style: italic; }
+        .tc-bubble .tc-meta { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted-mauve); margin-bottom: 5px; }
+
+        /* ---------- Module 07 — Conversations Inspector: 3-pane layout ---------- */
+        .ci-shell { display: flex; height: 78vh; min-height: 480px; }
+        .ci-pane { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+        .ci-pane + .ci-pane { border-left: 1px solid var(--border); }
+        .ci-pane-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .ci-list { flex: 0 0 26%; }
+        .ci-transcript { flex: 1 1 44%; }
+        .ci-inspector { flex: 0 0 30%; }
+        .ci-list-items, .ci-transcript-body, .ci-inspector-body { overflow-y: auto; flex: 1; padding: 8px; }
+        .ci-empty { text-align: center; padding: 40px 16px; color: var(--muted-mauve); font-size: 12.5px; }
+        .ci-conv-item { padding: 10px 12px; border-radius: 9px; cursor: pointer; margin-bottom: 4px; font-size: 12.5px; }
+        .ci-conv-item:hover { background: rgba(247,216,225,.06); }
+        .ci-conv-item.active { background: linear-gradient(90deg, rgba(232,90,136,.22), rgba(232,90,136,.06)); }
+        .ci-conv-item .ci-conv-persona { font-weight: 600; color: var(--warm-white); }
+        .ci-conv-item .ci-conv-meta { color: var(--muted-mauve); font-size: 11px; margin-top: 2px; }
+        .ci-msg { padding: 10px 12px; margin: 0 4px 8px; border-radius: 9px; border-left: 3px solid var(--rose); background: var(--surface-2); cursor: pointer; font-size: 12.5px; }
+        .ci-msg:hover { filter: brightness(1.1); }
+        .ci-msg.selected { outline: 2px solid var(--rose); }
+        .ci-msg.assistant { border-left-color: var(--soft-rose); }
+        .ci-msg.system { border-left-color: var(--muted-mauve); }
+        .ci-msg .ci-msg-head { display: flex; justify-content: space-between; gap: 8px; color: var(--muted-mauve); font-size: 10.5px; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 6px; }
+        .ci-msg .ci-msg-content { white-space: pre-wrap; word-break: break-word; }
+        .ci-kv { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+        .ci-kv:last-child { border-bottom: none; }
+        .ci-kv .ci-k { color: var(--muted-mauve); }
+        .ci-kv .ci-v { text-align: right; font-weight: 600; word-break: break-all; }
+        .ci-section-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-mauve); font-weight: 700; margin: 14px 4px 6px; }
+        .ci-code-block { background: #0f0509; border: 1px solid var(--border-strong); color: var(--soft-rose); font-family: 'SF Mono', Consolas, monospace; font-size: 11px; line-height: 1.5; border-radius: 9px; padding: 10px; width: 100%; max-height: 160px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+        .ci-exchange-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px; padding: 10px; margin: 0 4px 10px; }
+        @media (max-width: 1100px) {
+            .ci-shell { flex-direction: column; height: auto; }
+            .ci-pane { flex: none; }
+            .ci-pane + .ci-pane { border-left: none; border-top: 1px solid var(--border); }
+            .ci-list-items, .ci-transcript-body, .ci-inspector-body { max-height: 320px; }
+        }
     </style>
 </head>
 <body>
@@ -242,6 +332,7 @@
             <div class="nav-item" data-view="observability" onclick="navigate(this,'observability')">Observability</div>
             <div class="nav-item" data-view="chat" onclick="navigate(this,'chat')">Conversations</div>
             <div class="nav-item" data-view="testchat" onclick="navigate(this,'testchat')">Test Chat</div>
+            <div class="nav-item" data-view="convinspector" onclick="navigate(this,'convinspector')">Conversations Inspector</div>
         </div>
         <div class="nav-group">
             <div class="nav-group-label">Users</div>
@@ -260,6 +351,7 @@
             <h1 id="topbarTitle">Dashboard</h1>
             <div class="topbar-right">
                 <div class="env-pill"><span class="dot"></span> <span id="envLabel">Live</span></div>
+                <button class="secondary" onclick="adminLogout()">Log Out</button>
             </div>
         </div>
         <div class="content">
@@ -303,36 +395,70 @@
         <div id="setup" class="tab-content">
             <div class="section">
                 <a id="sec-personas"></a>
-                <h2>1. Create Persona</h2>
+                <div class="section-head">
+                    <h2>Personas</h2>
+                    <div class="section-actions">
+                        <button class="secondary" onclick="loadPersonas()">⟳ Refresh</button>
+                        <button onclick="togglePanel('createPersonaPanel')">+ New Persona</button>
+                    </div>
+                </div>
+                <div class="section-sub">
+                    <b>Production</b> is the core version currently active for a persona — what real
+                    users receive. <b>Testing</b> is the newest published version that is not yet
+                    active: ready to try in Test Chat, with no effect on production until activated.
+                    Expand a row for that persona's full, never-deleted version history.
+                </div>
                 <div id="createPersonaError"></div>
-                <div class="form-group">
-                    <label>Slug:</label>
-                    <input type="text" id="personaSlug" placeholder="e.g., alice">
+
+                <div class="filter-bar">
+                    <div class="filter-field">
+                        <label for="personaSearch">Search</label>
+                        <input type="text" id="personaSearch" placeholder="name or slug" oninput="renderPersonas()">
+                    </div>
+                    <div class="filter-field narrow">
+                        <label for="personaStatusFilter">Status</label>
+                        <select id="personaStatusFilter" onchange="renderPersonas()">
+                            <option value="">All</option>
+                            <option value="draft">draft</option>
+                            <option value="active">active</option>
+                            <option value="retired">retired</option>
+                        </select>
+                    </div>
+                    <div class="filter-count" id="personaFilterCount"></div>
                 </div>
-                <div class="form-group">
-                    <label>Display Name:</label>
-                    <input type="text" id="personaName" placeholder="e.g., Alice">
+
+                <div class="collapse-panel" id="createPersonaPanel" style="display:none;">
+                    <h3>New Persona</h3>
+                    <div class="form-group">
+                        <label>Slug:</label>
+                        <input type="text" id="personaSlug" placeholder="e.g., alice">
+                    </div>
+                    <div class="form-group">
+                        <label>Display Name:</label>
+                        <input type="text" id="personaName" placeholder="e.g., Alice">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender:</label>
+                        <input type="text" id="personaGender" placeholder="e.g., female">
+                    </div>
+                    <div class="form-group">
+                        <label>Orientation:</label>
+                        <input type="text" id="personaOrientation" placeholder="e.g., straight">
+                    </div>
+                    <div class="form-group">
+                        <label>Apparent Age:</label>
+                        <input type="number" id="personaAge" placeholder="25" min="18" max="100">
+                    </div>
+                    <button onclick="createPersona()">Create Persona</button>
+                    <button class="secondary" onclick="togglePanel('createPersonaPanel')">Cancel</button>
                 </div>
-                <div class="form-group">
-                    <label>Gender:</label>
-                    <input type="text" id="personaGender" placeholder="e.g., female">
-                </div>
-                <div class="form-group">
-                    <label>Orientation:</label>
-                    <input type="text" id="personaOrientation" placeholder="e.g., straight">
-                </div>
-                <div class="form-group">
-                    <label>Apparent Age:</label>
-                    <input type="number" id="personaAge" placeholder="25" min="18" max="100">
-                </div>
-                <button onclick="createPersona()">Create Persona</button>
-                <button class="secondary" onclick="loadPersonas()">Refresh List</button>
-                <div class="table-wrap"><table id="personasTable" style="margin-top: 20px;">
-                    <thead><tr><th>Name</th><th>Slug</th><th>Status</th><th>Actions</th></tr></thead>
+
+                <div class="table-wrap"><table id="personasTable">
+                    <thead><tr><th></th><th>Persona</th><th>Slug</th><th>Status</th><th>Production</th><th>Testing</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table></div>
 
-                <div id="editPersonaModal" style="display: none; margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 4px;">
+                <div id="editPersonaModal" class="collapse-panel" style="display: none; margin-top: 20px;">
                     <h3>Edit Persona</h3>
                     <div class="form-group">
                         <label>Display Name:</label>
@@ -356,7 +482,14 @@
             </div>
 
             <div class="section">
-                <h2>2. Create & Activate Core Version</h2>
+                <div class="section-head">
+                    <h2>Persona Core Versions</h2>
+                </div>
+                <div class="section-sub">
+                    Author a new draft of a persona's core content. Drafts affect nothing until
+                    published, and published versions affect nothing until activated — versions are
+                    never deleted, so every past transcript stays reproducible.
+                </div>
                 <div id="versionError"></div>
                 <div class="form-group">
                     <label>Select Persona:</label>
@@ -373,59 +506,117 @@
                 <button onclick="createVersion()">Create Draft</button>
                 <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server.</div>
                 <div class="table-wrap"><table id="versionsTable" style="margin-top: 20px;">
-                    <thead><tr><th>Version</th><th>Status</th><th>Active</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Version</th><th>Stage</th><th>Status</th><th>Author</th><th>Changelog</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table></div>
             </div>
 
             <div class="section">
                 <a id="sec-engines"></a>
-                <h2>3. Create & Activate Conversation Engine Version</h2>
+                <div class="section-head">
+                    <h2>Conversation Engines</h2>
+                    <div class="section-actions">
+                        <button class="secondary" onclick="loadEngines()">⟳ Refresh</button>
+                        <button onclick="togglePanel('createEnginePanel')">+ New Draft</button>
+                    </div>
+                </div>
+                <div class="section-sub">
+                    The universal conversation rules applied to every persona. At most ONE engine
+                    version is active at a time (database-enforced) — activating a new one
+                    atomically deactivates the previous one.
+                </div>
                 <div id="engineError"></div>
-                <div class="form-group">
-                    <label>Content:</label>
-                    <textarea id="engineContent" placeholder="Universal conversation engine rules..."></textarea>
+
+                <div class="stat-row" id="engineStageCards"></div>
+
+                <div class="collapse-panel" id="createEnginePanel" style="display:none;">
+                    <h3>New Engine Version</h3>
+                    <div class="form-group">
+                        <label>Content:</label>
+                        <textarea id="engineContent" placeholder="Universal conversation engine rules..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Changelog Note (optional):</label>
+                        <input type="text" id="engineChangelogNote" placeholder="e.g., clarified boundary handling">
+                    </div>
+                    <button onclick="createEngineVersion()">Create Draft</button>
+                    <button class="secondary" onclick="togglePanel('createEnginePanel')">Cancel</button>
+                    <div class="section-sub" style="margin: 8px 0 0;">Version number is assigned automatically by the server.</div>
                 </div>
-                <div class="form-group">
-                    <label>Changelog Note (optional):</label>
-                    <input type="text" id="engineChangelogNote" placeholder="e.g., clarified boundary handling">
+
+                <div class="filter-bar">
+                    <div class="filter-field narrow">
+                        <label for="engineStatusFilter">Status</label>
+                        <select id="engineStatusFilter" onchange="renderEngines()">
+                            <option value="">All</option>
+                            <option value="draft">draft</option>
+                            <option value="published">published</option>
+                            <option value="archived">archived</option>
+                        </select>
+                    </div>
+                    <div class="filter-count" id="engineFilterCount"></div>
                 </div>
-                <button onclick="createEngineVersion()">Create Draft</button>
-                <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server.</div>
-                <button class="secondary" onclick="loadEngines()" style="margin-top: 10px;">Refresh Engines</button>
-                <div class="table-wrap"><table id="enginesTable" style="margin-top: 20px;">
-                    <thead><tr><th>Version</th><th>Status</th><th>Active</th><th>Actions</th></tr></thead>
+
+                <div class="vh-title">Version history</div>
+                <div class="table-wrap"><table id="enginesTable">
+                    <thead><tr><th>Version</th><th>Stage</th><th>Status</th><th>Author</th><th>Changelog</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table></div>
             </div>
 
             <div class="section">
                 <a id="sec-skills"></a>
-                <h2>4. Skills</h2>
+                <div class="section-head">
+                    <h2>Skills</h2>
+                    <div class="section-actions">
+                        <button class="secondary" onclick="loadSkills()">⟳ Refresh</button>
+                        <button onclick="togglePanel('createSkillPanel')">+ New Draft</button>
+                    </div>
+                </div>
+                <div class="section-sub">
+                    Skills are versioned independently <b>per key</b> — each key has its own
+                    Production (active) and Testing (newest published, not yet active) version.
+                    Expand a key for its full version history. Usage share is measured from real
+                    recorded LLM exchanges, never estimated.
+                </div>
                 <div id="skillError"></div>
-                <div class="form-group">
-                    <label>Key (e.g. "flirting", "friendship"):</label>
-                    <input type="text" id="skillKey" placeholder="skill_key">
+
+                <div class="collapse-panel" id="createSkillPanel" style="display:none;">
+                    <h3>New Skill Version</h3>
+                    <div class="form-group">
+                        <label>Key (e.g. "flirting", "friendship"):</label>
+                        <input type="text" id="skillKey" placeholder="skill_key">
+                    </div>
+                    <div class="form-group">
+                        <label>Content:</label>
+                        <textarea id="skillContent" placeholder="PURPOSE:&#10;...&#10;&#10;BEHAVIOR:&#10;...&#10;&#10;DO NOT:&#10;..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Changelog Note (optional):</label>
+                        <input type="text" id="skillChangelogNote" placeholder="e.g., softened tone">
+                    </div>
+                    <button onclick="createSkillVersion()">Create Draft</button>
+                    <button class="secondary" onclick="togglePanel('createSkillPanel')">Cancel</button>
+                    <div class="section-sub" style="margin: 8px 0 0;">Version number is assigned automatically by the server, per key.</div>
                 </div>
-                <div class="form-group">
-                    <label>Content:</label>
-                    <textarea id="skillContent" placeholder="PURPOSE:\n...\n\nBEHAVIOR:\n...\n\nDO NOT:\n..."></textarea>
+
+                <div class="filter-bar">
+                    <div class="filter-field">
+                        <label for="skillSearch">Search key</label>
+                        <input type="text" id="skillSearch" placeholder="e.g. flirting" oninput="renderSkills()">
+                    </div>
+                    <div class="filter-count" id="skillFilterCount"></div>
                 </div>
-                <div class="form-group">
-                    <label>Changelog Note (optional):</label>
-                    <input type="text" id="skillChangelogNote" placeholder="e.g., softened tone">
-                </div>
-                <button onclick="createSkillVersion()">Create Draft</button>
-                <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server, per key. Multiple keys can each have their own active version.</div>
-                <button class="secondary" onclick="loadSkills()" style="margin-top: 10px;">Refresh Skills</button>
-                <div class="table-wrap"><table id="skillsTable" style="margin-top: 20px;">
-                    <thead><tr><th>Key</th><th>Version</th><th>Status</th><th>Active</th><th>Actions</th></tr></thead>
+
+                <div class="table-wrap"><table id="skillsTable">
+                    <thead><tr><th></th><th>Key</th><th>Production</th><th>Testing</th><th>Versions</th><th>Usage share</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
                 </table></div>
+                <div class="section-sub" id="skillUsageNote" style="margin-top: 10px;"></div>
             </div>
 
             <div class="section">
-                <h2>5. Memory Engine</h2>
+                <h2>Memory Engine</h2>
                 <div id="memoryEngineError"></div>
                 <div class="form-group">
                     <label>Memory Engine Prompt:</label>
@@ -453,7 +644,7 @@
             </div>
 
             <div class="section">
-                <h2>6. Intent Engine</h2>
+                <h2>Intent Engine</h2>
                 <div id="intentEngineError"></div>
                 <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
                     Decides which Skill represents the user's current intent. It never generates a
@@ -484,121 +675,196 @@
 
             <div class="section">
                 <a id="sec-aisettings"></a>
-                <h2>7. AI Runtime Settings</h2>
-                <div id="aiSettingsError"></div>
-                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
+                <div class="section-head">
+                    <h2>AI Settings</h2>
+                    <div class="section-actions">
+                        <button class="secondary" onclick="loadAiSettings(); loadAiConfiguration();">⟳ Refresh</button>
+                    </div>
+                </div>
+                <div class="section-sub">
                     Precedence: <b>database setting → environment variable → application default</b>.
                     Leave a field blank to clear the override and fall back. These settings affect
-                    <b>every</b> generation, so applying them requires confirmation.
-                    Side-channel calls (memory extraction, intent discovery, memory maintenance) follow
-                    the model but keep their own measured token budgets.
+                    <b>every</b> generation, so applying them requires confirmation. Side-channel
+                    calls (memory extraction, intent discovery, memory maintenance) follow the model
+                    but keep their own measured token budgets.
                 </div>
-                <table id="aiSettingsCurrentTable">
-                    <thead><tr><th>Setting</th><th>Current value</th><th>Source</th></tr></thead>
-                    <tbody></tbody>
-                </table>
-                <div style="font-size: 12px; color: #666; margin: 8px 0;" id="aiSettingsAudit"></div>
-                <div class="form-group">
-                    <label>Model (blank = use environment):</label>
-                    <input type="text" id="aiSettingsModel" placeholder="e.g. deepseek/deepseek-v4.1-flash">
-                </div>
-                <div class="form-group">
-                    <label>Temperature 0–2 (blank = provider default):</label>
-                    <input type="number" id="aiSettingsTemperature" step="0.1" min="0" max="2" placeholder="blank">
-                </div>
-                <div class="form-group">
-                    <label>Max Output Tokens (blank = use environment):</label>
-                    <input type="number" id="aiSettingsMaxTokens" min="1" max="32000" placeholder="blank">
-                </div>
-                <button onclick="saveAiSettings()">Apply to All Generation…</button>
-                <button class="secondary" onclick="loadAiSettings()" style="margin-left: 8px;">Refresh</button>
+                <div id="aiSettingsError"></div>
 
-                <hr style="margin: 20px 0;">
+                <div class="sub-card">
+                    <h3>Current Values</h3>
+                    <div class="sub-note">
+                        What the runtime resolves right now, and which layer of the precedence chain
+                        each value came from.
+                    </div>
+                    <div class="table-wrap"><table id="aiSettingsCurrentTable">
+                        <thead><tr><th>Setting</th><th>Applies to</th><th>Current value</th><th>Source</th></tr></thead>
+                        <tbody></tbody>
+                    </table></div>
+                    <div class="section-sub" style="margin: 10px 0 0;" id="aiSettingsAudit"></div>
+                </div>
 
-                <h3 style="margin-bottom: 8px;">Intent Discovery</h3>
-                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
-                    These affect <b>Intent Discovery only</b> — the skill-selection classifier, never
-                    primary generation, memory extraction, continuity, or memory-engine maintenance.
-                    Leave a field blank to clear the override and fall back to the code default.
-                </div>
-                <div class="form-group">
-                    <label>Intent Model (blank = code default):</label>
-                    <input type="text" id="intentSettingsModel" placeholder="e.g. openai/gpt-4o-mini">
-                </div>
-                <div class="form-group">
-                    <label>Intent JSON Mode:</label>
-                    <select id="intentSettingsJsonMode">
-                        <option value="">(code default)</option>
-                        <option value="true">true</option>
-                        <option value="false">false</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Intent Max Output Tokens (blank = code default):</label>
-                    <input type="number" id="intentSettingsMaxTokens" min="1" max="32000" placeholder="blank">
-                </div>
-                <button onclick="saveAiSettings()">Apply to Intent Discovery…</button>
+                <div class="grid">
+                    <div class="sub-card">
+                        <h3>Primary Generation</h3>
+                        <div class="sub-note">
+                            The model that writes every persona reply. Applies to <b>all</b>
+                            generation, so a change here is confirmed before it is applied.
+                        </div>
+                        <div class="form-group">
+                            <label>Model (blank = use environment):</label>
+                            <input type="text" id="aiSettingsModel" placeholder="e.g. deepseek/deepseek-v4.1-flash">
+                        </div>
+                        <div class="form-group">
+                            <label>Temperature 0–2 (blank = provider default):</label>
+                            <input type="number" id="aiSettingsTemperature" step="0.1" min="0" max="2" placeholder="blank">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Output Tokens (blank = use environment):</label>
+                            <input type="number" id="aiSettingsMaxTokens" min="1" max="32000" placeholder="blank">
+                        </div>
+                        <button onclick="saveAiSettings()">Apply to All Generation…</button>
+                    </div>
 
-                <hr style="margin: 20px 0;">
+                    <div class="sub-card">
+                        <h3>Intent Discovery</h3>
+                        <div class="sub-note">
+                            These affect <b>Intent Discovery only</b> — the skill-selection
+                            classifier, never primary generation, memory extraction, continuity, or
+                            memory-engine maintenance. Blank clears the override and falls back to
+                            the code default.
+                        </div>
+                        <div class="form-group">
+                            <label>Intent Model (blank = code default):</label>
+                            <input type="text" id="intentSettingsModel" placeholder="e.g. openai/gpt-4o-mini">
+                        </div>
+                        <div class="form-group">
+                            <label>Intent JSON Mode:</label>
+                            <select id="intentSettingsJsonMode">
+                                <option value="">(code default)</option>
+                                <option value="true">true</option>
+                                <option value="false">false</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Intent Max Output Tokens (blank = code default):</label>
+                            <input type="number" id="intentSettingsMaxTokens" min="1" max="32000" placeholder="blank">
+                        </div>
+                        <button onclick="saveAiSettings()">Apply to Intent Discovery…</button>
+                    </div>
+                </div>
 
-                <h3 style="margin-bottom: 8px;">Primary Generation — Provider Routing</h3>
-                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
-                    OpenRouter's upstream-provider routing preference for primary generation only.
-                    The only value this system currently supports is <code>latency</code> — no other
-                    OpenRouter routing modes have been validated against this codebase.
+                <div class="sub-card">
+                    <h3>Provider Routing</h3>
+                    <div class="sub-note">
+                        OpenRouter's upstream-provider routing preference for <b>primary generation
+                        only</b>. The only value this system currently supports is
+                        <code>latency</code> — no other OpenRouter routing modes have been validated
+                        against this codebase.
+                    </div>
+                    <div class="form-group" style="max-width: 320px;">
+                        <label>Provider Sort:</label>
+                        <select id="intentSettingsProviderSort">
+                            <option value="">(no preference)</option>
+                            <option value="latency">latency</option>
+                        </select>
+                    </div>
+                    <button onclick="saveAiSettings()">Apply Provider Routing…</button>
                 </div>
-                <div class="form-group">
-                    <label>Provider Sort:</label>
-                    <select id="intentSettingsProviderSort">
-                        <option value="">(no preference)</option>
-                        <option value="latency">latency</option>
-                    </select>
-                </div>
-                <button onclick="saveAiSettings()">Apply Provider Routing…</button>
             </div>
 
             <div class="section">
-                <h2>8. AI Configuration Overview</h2>
-                <div id="aiOverviewError"></div>
-                <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
-                    Exactly which AI configuration is currently running.
+                <div class="section-head">
+                    <h2>AI Configuration Overview</h2>
+                    <div class="section-actions">
+                        <button class="secondary" onclick="loadAiConfiguration()">⟳ Refresh</button>
+                    </div>
                 </div>
-                <button class="secondary" onclick="loadAiConfiguration()">Refresh Overview</button>
+                <div class="section-sub">Exactly which AI configuration is currently running.</div>
+                <div id="aiOverviewError"></div>
                 <div id="aiConfigurationOverview" style="margin-top: 12px;"></div>
             </div>
 
             <div class="section">
                 <a id="sec-users"></a>
-                <h2>9. Create Test User</h2>
+                <div class="section-head">
+                    <h2>Users</h2>
+                    <div class="section-actions">
+                        <button class="secondary" onclick="loadAdminUsers()">⟳ Refresh</button>
+                        <button onclick="togglePanel('createUserPanel')">+ New User</button>
+                    </div>
+                </div>
+                <div class="section-sub">
+                    Every user known to this backend, with the profile fields the chat pipeline
+                    actually reads. This backend stores no "test user" flag on a user row, so users
+                    are not split into Users / Test Users tabs — doing so would require inventing a
+                    distinction the data does not carry.
+                </div>
                 <div id="createUserError"></div>
-                <div class="form-group">
-                    <label>Display Name: *</label>
-                    <input type="text" id="newUserDisplayName" placeholder="e.g., Test Tara">
+
+                <div class="collapse-panel" id="createUserPanel" style="display:none;">
+                    <h3>New User</h3>
+                    <div class="form-group">
+                        <label>Display Name: *</label>
+                        <input type="text" id="newUserDisplayName" placeholder="e.g., Test Tara">
+                    </div>
+                    <div class="form-group">
+                        <label>Gender:</label>
+                        <input type="text" id="newUserGender" placeholder="e.g., female">
+                    </div>
+                    <div class="form-group">
+                        <label>Interest (attraction — male / female / both):</label>
+                        <select id="newUserInterest">
+                            <option value="">-- Not set --</option>
+                            <option value="male">male</option>
+                            <option value="female">female</option>
+                            <option value="both">both</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>City:</label>
+                        <input type="text" id="newUserCity" placeholder="e.g., Delhi">
+                    </div>
+                    <div class="form-group">
+                        <label>Age (18-120):</label>
+                        <input type="number" id="newUserAge" placeholder="28" min="18" max="120">
+                    </div>
+                    <button onclick="createTestUser()">Create User</button>
+                    <button class="secondary" onclick="togglePanel('createUserPanel')">Cancel</button>
                 </div>
-                <div class="form-group">
-                    <label>Gender:</label>
-                    <input type="text" id="newUserGender" placeholder="e.g., female">
+
+                <div class="filter-bar">
+                    <div class="filter-field">
+                        <label for="userSearch">Search</label>
+                        <input type="text" id="userSearch" placeholder="name, city or user id" oninput="renderUsers()">
+                    </div>
+                    <div class="filter-field narrow">
+                        <label for="userGenderFilter">Gender</label>
+                        <select id="userGenderFilter" onchange="renderUsers()"><option value="">All</option></select>
+                    </div>
+                    <div class="filter-field narrow">
+                        <label for="userInterestFilter">Interest</label>
+                        <select id="userInterestFilter" onchange="renderUsers()"><option value="">All</option></select>
+                    </div>
+                    <div class="filter-field narrow">
+                        <label for="userCityFilter">City</label>
+                        <select id="userCityFilter" onchange="renderUsers()"><option value="">All</option></select>
+                    </div>
+                    <div class="filter-field narrow">
+                        <label for="userMinAge">Min age</label>
+                        <input type="number" id="userMinAge" min="18" max="120" placeholder="18" oninput="renderUsers()">
+                    </div>
+                    <div class="filter-field narrow">
+                        <label for="userMaxAge">Max age</label>
+                        <input type="number" id="userMaxAge" min="18" max="120" placeholder="120" oninput="renderUsers()">
+                    </div>
+                    <div>
+                        <button class="secondary" onclick="resetUserFilters()">↺ Reset</button>
+                    </div>
+                    <div class="filter-count" id="userFilterCount"></div>
                 </div>
-                <div class="form-group">
-                    <label>Interest (attraction — male / female / both):</label>
-                    <select id="newUserInterest">
-                        <option value="">-- Not set --</option>
-                        <option value="male">male</option>
-                        <option value="female">female</option>
-                        <option value="both">both</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>City:</label>
-                    <input type="text" id="newUserCity" placeholder="e.g., Delhi">
-                </div>
-                <div class="form-group">
-                    <label>Age (18-120):</label>
-                    <input type="number" id="newUserAge" placeholder="28" min="18" max="120">
-                </div>
-                <button onclick="createTestUser()">Create User</button>
-                <div class="table-wrap"><table id="usersTable" style="margin-top: 20px;">
-                    <thead><tr><th>Display Name</th><th>Gender</th><th>Interest</th><th>City</th><th>Age</th></tr></thead>
+
+                <div class="table-wrap"><table id="usersTable">
+                    <thead><tr><th>Display Name</th><th>Gender</th><th>Interest</th><th>City</th><th>Age</th><th>User ID</th></tr></thead>
                     <tbody></tbody>
                 </table></div>
             </div>
@@ -614,7 +880,8 @@
                         <option value="">-- Select User --</option>
                     </select>
                     <div id="noUsersHint" style="display: none; font-size: 12px; color: #666; margin-top: 6px;">
-                        No test users yet. Create one in the <a href="#" onclick="document.querySelector('.tab-button').click(); return false;">Setup tab</a> (section 6).
+                        No test users yet. Create one in the
+                        <a href="#" onclick="navigate(document.querySelector('[data-anchor=sec-users]'),'setup','sec-users'); return false;">Users section</a>.
                     </div>
                 </div>
                 <details style="margin-bottom: 15px;">
@@ -668,6 +935,48 @@
             </div>
         </div>
 
+        <!-- Module 07 — Conversations Inspector. A 3-pane read-only view over
+             real data (ConversationRepository / MessageRepository /
+             LlmExchangeRepository), reusing the existing AdminObservabilityRoutes
+             exchange data rather than duplicating its query logic. Scoped under
+             #convinspector so nothing here touches any other tab's markup or CSS. -->
+        <div id="convinspector" class="tab-content">
+            <div class="section" style="padding: 0; overflow: hidden;">
+                <div class="ci-shell">
+                    <div class="ci-pane ci-list">
+                        <div class="ci-pane-head">
+                            <h3 style="margin:0;">Conversations</h3>
+                            <button class="secondary" onclick="ciLoadConversations()" style="margin:0; padding: 5px 10px; font-size: 11px;">Refresh</button>
+                        </div>
+                        <div class="form-group" style="margin: 10px 12px;">
+                            <input type="text" id="ciFilterUserId" placeholder="Filter by user UUID" onchange="ciLoadConversations()">
+                        </div>
+                        <div id="ciListError" class="error" style="display:none; margin: 0 12px 10px;"></div>
+                        <div id="ciConversationList" class="ci-list-items">
+                            <div class="ci-empty">Loading…</div>
+                        </div>
+                    </div>
+                    <div class="ci-pane ci-transcript">
+                        <div class="ci-pane-head">
+                            <h3 style="margin:0;" id="ciTranscriptTitle">Select a conversation</h3>
+                        </div>
+                        <div id="ciDetailError" class="error" style="display:none; margin: 10px 12px;"></div>
+                        <div id="ciTranscript" class="ci-transcript-body">
+                            <div class="ci-empty">No conversation selected.</div>
+                        </div>
+                    </div>
+                    <div class="ci-pane ci-inspector">
+                        <div class="ci-pane-head">
+                            <h3 style="margin:0;">Inspector</h3>
+                        </div>
+                        <div id="ciInspector" class="ci-inspector-body">
+                            <div class="ci-empty">Select a message to inspect its LLM execution.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="testchat" class="tab-content">
             <div class="section">
                 <h2>Test Chat</h2>
@@ -680,6 +989,14 @@
 
                 <div id="tcCreatePanel">
                     <div class="form-group">
+                        <label>Configuration</label>
+                        <div class="seg-toggle" id="tcModeToggle">
+                            <button type="button" id="tcModeProduction" class="active" onclick="setTestChatMode('PRODUCTION')">Production</button>
+                            <button type="button" id="tcModeTesting" onclick="setTestChatMode('TESTING')">Testing</button>
+                        </div>
+                        <div class="section-sub" id="tcModeNote" style="margin: 8px 0 0;"></div>
+                    </div>
+                    <div class="form-group">
                         <label>Persona:</label>
                         <select id="tcPersonaSelect"></select>
                     </div>
@@ -687,8 +1004,8 @@
                         <label>Test User:</label>
                         <select id="tcUserSelect"></select>
                     </div>
-                    <details>
-                        <summary style="cursor: pointer; color: #666; font-size: 12px;">Advanced: pin specific versions (optional — leave blank to use the Testing default)</summary>
+                    <details id="tcAdvanced">
+                        <summary style="cursor: pointer; color: var(--muted-mauve); font-size: 12px;">Advanced: pin specific versions (overrides the toggle above)</summary>
                         <div class="form-group" style="margin-top: 8px;">
                             <label>Conversation Engine version:</label>
                             <select id="tcEngineVersion"><option value="">(Testing default)</option></select>
@@ -711,20 +1028,24 @@
                 </div>
 
                 <div id="tcActivePanel" style="display: none; margin-top: 20px;">
-                    <div style="background: #fff3cd; border: 1px solid #ffe69c; border-radius: 4px; padding: 10px; margin-bottom: 12px;">
-                        <b>Mode: TEST</b> — configuration snapshot (read-only):
-                        <table style="margin-top: 6px;">
+                    <div class="sub-card">
+                        <div class="section-head" style="margin-bottom: 8px;">
+                            <h3 style="margin:0;">Configuration snapshot <span class="badge testing">TEST MODE</span></h3>
+                            <span class="filter-count">Read-only — frozen when this test chat was created</span>
+                        </div>
+                        <div class="table-wrap"><table>
                             <tbody id="tcSnapshotTable"></tbody>
-                        </table>
+                        </table></div>
                     </div>
 
-                    <div id="tcMessages" style="border: 1px solid #ddd; border-radius: 4px; padding: 10px; min-height: 120px; margin-bottom: 10px;"></div>
+                    <div id="tcMessages" class="tc-log"></div>
 
                     <div class="form-group">
                         <input type="text" id="tcMessageInput" placeholder="Type a test message..." onkeypress="if(event.key==='Enter') sendTestChatMessage()">
                     </div>
-                    <button onclick="sendTestChatMessage()">Send Test Message</button>
-                    <button class="secondary" onclick="startNewTestChat()" style="margin-left: 10px;">New Test Chat</button>
+                    <button id="tcSendBtn" onclick="sendTestChatMessage()">Send Test Message</button>
+                    <button class="secondary" onclick="clearTestChatLog()">Clear Transcript</button>
+                    <button class="secondary" onclick="startNewTestChat()">New Test Chat</button>
 
                     <div id="tcInspector" style="margin-top: 16px;"></div>
                 </div>
@@ -951,6 +1272,23 @@
         const API_BASE = '/v1';
         const ADMIN_BASE = '/v1/admin';
 
+        // Admin session gate: if the server's session-cookie check rejects an
+        // admin-scoped fetch() (no valid session, e.g. cookie expired or this
+        // tab was left open across a server restart), redirect to the login
+        // page instead of leaving the UI stuck showing "Failed to load: 401"
+        // everywhere. Scoped to ADMIN_BASE calls only — chat-scoped requests
+        // authenticate as a selected test user via authHeaderFor() and are
+        // unaffected by this gate.
+        const _nativeFetch = window.fetch.bind(window);
+        window.fetch = async function (input, init) {
+            const res = await _nativeFetch(input, init);
+            const url = typeof input === 'string' ? input : (input && input.url) || '';
+            if (res.status === 401 && url.startsWith(ADMIN_BASE) && !url.includes('/auth/login')) {
+                window.location.href = '/admin-login.html?redirect=' + encodeURIComponent('/admin');
+            }
+            return res;
+        };
+
         // Chat-scoped requests (/v1/conversations...) must be authenticated AS THE
         // SELECTED TEST USER, per the existing DevAuthProvider Basic-Auth convention
         // (the same one AdminQAConsoleAPITest already uses server-side) — never a
@@ -978,6 +1316,7 @@
 
         let obsDashboardLoadedOnce = false;
         let dashboardLoadedOnce = false;
+        let ciLoadedOnce = false;
 
         // Task 11 — sidebar navigation. Every existing tab-content div/ID and
         // every existing JS function (loadLatencyDashboard, loadAiSettings,
@@ -986,6 +1325,7 @@
         const NAV_TITLES = {
             dashboard: 'Dashboard', setup: 'AI Configuration', observability: 'Observability',
             chat: 'Conversations', testchat: 'Test Chat', revenue: 'Revenue', transactions: 'Transactions',
+            convinspector: 'Conversations Inspector',
         };
 
         function showView(tab) {
@@ -1002,6 +1342,10 @@
             if (tab === 'dashboard' && !dashboardLoadedOnce) {
                 dashboardLoadedOnce = true;
                 loadDashboard();
+            }
+            if (tab === 'convinspector' && !ciLoadedOnce) {
+                ciLoadedOnce = true;
+                ciLoadConversations();
             }
         }
 
@@ -1048,40 +1392,70 @@
         async function loadDashboard() {
             document.getElementById('dashboardError').style.display = 'none';
             try {
-                const [obsRes, configRes, usersRes] = await Promise.all([
+                const [obsRes, configRes, usersRes, personasRes, statsRes] = await Promise.all([
                     fetch(`${ADMIN_BASE}/observability/latency-dashboard`),
                     fetch(`${ADMIN_BASE}/ai-configuration`),
                     fetch(`${ADMIN_BASE}/users`),
+                    fetch(`${ADMIN_BASE}/personas`),
+                    fetch(`${ADMIN_BASE}/stats/activity`),
                 ]);
                 const obs = obsRes.ok ? await obsRes.json() : null;
                 const config = configRes.ok ? await configRes.json() : null;
                 const users = usersRes.ok ? await usersRes.json() : null;
+                const personas = personasRes.ok ? await personasRes.json() : null;
+                const stats = statsRes.ok ? await statsRes.json() : null;
 
                 const overall = obs?.overall;
                 const sla = obs?.slaBuckets;
                 const err = obs?.errorRate;
-                document.getElementById('dashboardStats').innerHTML = `
-                    <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value">${users ? users.users.length : '—'}</div></div>
-                    <div class="stat-card"><div class="stat-label">Recorded Exchanges</div><div class="stat-value">${overall ? overall.count : '—'}</div></div>
-                    <div class="stat-card"><div class="stat-label">p95 Latency</div><div class="stat-value">${overall ? fmtMs(overall.p95) : '—'}</div></div>
-                    <div class="stat-card"><div class="stat-label">≤10s (SLA)</div><div class="stat-value">${sla ? sla.within10sRatePercent.toFixed(1) + '%' : '—'}</div></div>
-                    <div class="stat-card"><div class="stat-label">Error Rate</div><div class="stat-value">${err ? err.failureRatePercent.toFixed(1) + '%' : '—'}</div></div>
-                    <div class="stat-card"><div class="stat-label">Active Skills</div><div class="stat-value">${config ? config.activeSkillCount : '—'}</div></div>
-                `;
+                const activePersonaCount = personas
+                    ? (personas.personas || []).filter(p => p.status === 'active').length
+                    : null;
 
-                document.getElementById('dashboardAiSummary').innerHTML = config ? `
-                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted-mauve);">Conversation Engine</span><span>v${config.conversationEngine.version ?? '—'}</span></div>
-                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted-mauve);">Intent Engine</span><span>v${config.intentEngine.version ?? '—'}</span></div>
-                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted-mauve);">Memory Engine</span><span>v${config.memoryEngine.version ?? '—'}</span></div>
-                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;"><span style="color:var(--muted-mauve);">Runtime Model</span><span>${escapeHtml(config.runtime.model)}</span></div>
-                ` : '<div class="empty-state">Unable to load — see Observability for detail.</div>';
+                // Every number below is read from a real endpoint. A metric
+                // whose backing data is unavailable renders "—" rather than a
+                // fabricated value — no card here is a placeholder.
+                const card = (label, value, note) => `
+                    <div class="stat-card">
+                        <div class="stat-label">${escapeHtml(label)}</div>
+                        <div class="stat-value">${value}</div>
+                        ${note ? `<div class="filter-count" style="margin-top:6px;">${escapeHtml(note)}</div>` : ''}
+                    </div>`;
+                document.getElementById('dashboardStats').innerHTML =
+                    card('Total Users', users ? users.users.length : '—', 'all provisioned users') +
+                    card('Active Personas', activePersonaCount === null ? '—' : activePersonaCount,
+                         personas ? `${(personas.personas || []).length} total` : '') +
+                    card('Active Skills', config ? config.activeSkillCount : '—', 'one active version per key') +
+                    card('Conversations (24h)', stats ? stats.conversationsLast24h : '—',
+                         stats ? `${stats.totalConversations} all time` : '') +
+                    card('Messages (24h)', stats ? stats.messagesLast24h : '—',
+                         stats ? `${stats.userMessagesLast24h} from users` : '') +
+                    card('Test Conversations', stats ? stats.testConversations : '—', 'Test Chat sessions') +
+                    card('Recorded Exchanges', overall ? overall.count : '—', 'LLM calls captured') +
+                    card('p95 Latency', overall ? fmtMs(overall.p95) : '—', 'on recorded exchanges') +
+                    card('≤10s (SLA)', sla ? sla.within10sRatePercent.toFixed(1) + '%' : '—', 'measurement point') +
+                    card('Error Rate', err ? err.failureRatePercent.toFixed(1) + '%' : '—', 'failed exchanges');
 
-                document.getElementById('dashboardSla').innerHTML = (obs && overall && overall.count > 0) ? `
-                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted-mauve);">p50</span><span>${fmtMs(overall.p50)}</span></div>
-                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted-mauve);">p99</span><span>${fmtMs(overall.p99)}</span></div>
-                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;"><span style="color:var(--muted-mauve);">&gt;10s turns</span><span>${sla.gt10s}</span></div>
-                    <div style="margin-top:10px;"><a href="#" onclick="document.querySelector('[data-view=observability]').click(); return false;" style="color:var(--rose);font-size:12px;">View full Observability dashboard →</a></div>
-                ` : '<div class="empty-state">No exchanges recorded yet.</div>';
+                const kv = (k, v) => `<div class="kv-line"><span class="kv-k">${escapeHtml(k)}</span><span class="kv-v">${v}</span></div>`;
+                document.getElementById('dashboardAiSummary').innerHTML = config ? (
+                    kv('Conversation Engine', config.conversationEngine.version != null ? 'v' + escapeHtml(config.conversationEngine.version) : 'none active') +
+                    kv('Intent Engine', config.intentEngine.version != null ? 'v' + escapeHtml(config.intentEngine.version) : 'none active') +
+                    kv('Memory Engine', config.memoryEngine.version != null ? 'v' + escapeHtml(config.memoryEngine.version) : 'none active') +
+                    kv('Active Skills', escapeHtml(config.activeSkillCount)) +
+                    kv('Runtime Model', escapeHtml(config.runtime.model)) +
+                    kv('Max Output Tokens', escapeHtml(config.runtime.maxOutputTokens)) +
+                    '<div style="margin-top:10px;"><a href="#" onclick="navigate(document.querySelector(\'[data-anchor=sec-aisettings]\'),\'setup\',\'sec-aisettings\'); return false;" style="color:var(--rose);font-size:12px;">Open AI Settings →</a></div>'
+                ) : '<div class="empty-state">Unable to load — see Observability for detail.</div>';
+
+                document.getElementById('dashboardSla').innerHTML = (obs && overall && overall.count > 0) ? (
+                    kv('p50', fmtMs(overall.p50)) +
+                    kv('p95', fmtMs(overall.p95)) +
+                    kv('p99', fmtMs(overall.p99)) +
+                    kv('&gt;10s turns', escapeHtml(sla.gt10s)) +
+                    kv('&gt;20s turns', escapeHtml(sla.gt20s)) +
+                    kv('Sample size', 'n=' + escapeHtml(overall.count)) +
+                    '<div style="margin-top:10px;"><a href="#" onclick="document.querySelector(\'[data-view=observability]\').click(); return false;" style="color:var(--rose);font-size:12px;">View full Observability dashboard →</a></div>'
+                ) : '<div class="empty-state">No exchanges recorded yet — insufficient data for an SLA snapshot.</div>';
             } catch (e) {
                 const errEl = document.getElementById('dashboardError');
                 errEl.style.display = 'block';
@@ -1129,26 +1503,183 @@
             }
         }
 
+        // Collapsible inline panels (create forms). Purely presentational —
+        // the inputs inside keep their original IDs so every existing
+        // create/save function works unchanged.
+        function togglePanel(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+            if (el.style.display === 'block') el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        /**
+         * Module 02 — Personas.
+         *
+         * "Production" and "Testing" are DERIVED, not stored: Production is the
+         * version the server already marks isActive (Personas.active_core_version_id),
+         * Testing is the highest-numbered PUBLISHED version that is not active —
+         * i.e. the one that is ready to activate but has not been. Both come
+         * straight from the existing GET .../core-versions response; no new
+         * endpoint and no new concept was added to the backend for this.
+         */
+        let personasCache = [];              // persona rows from GET /v1/admin/personas
+        const personaVersionsCache = {};     // personaId -> core-version rows
+        const personaExpanded = {};          // personaId -> bool
+
+        function stageOf(versions) {
+            const list = versions || [];
+            const production = list.find(v => v.isActive) || null;
+            const testing = list
+                .filter(v => v.status === 'published' && !v.isActive)
+                .sort((a, b) => b.version - a.version)[0] || null;
+            const latestDraft = list
+                .filter(v => v.status === 'draft')
+                .sort((a, b) => b.version - a.version)[0] || null;
+            return { production, testing, latestDraft };
+        }
+
+        function stageBadge(kind, version) {
+            if (version == null) return '<span class="badge muted">none</span>';
+            const cls = kind === 'production' ? 'prod' : 'testing';
+            const label = kind === 'production' ? 'PRODUCTION' : 'TESTING';
+            return `<span class="badge ${cls}">${label} · v${version}</span>`;
+        }
+
+        function statusBadge(status, isActive) {
+            if (isActive) return '<span class="badge prod">ACTIVE</span>';
+            if (status === 'published') return '<span class="badge testing">PUBLISHED</span>';
+            if (status === 'archived') return '<span class="badge archived">ARCHIVED</span>';
+            return `<span class="badge draft">${escapeHtml(String(status || 'draft')).toUpperCase()}</span>`;
+        }
+
         async function loadPersonas() {
             try {
                 const res = await fetch(`${ADMIN_BASE}/personas`);
                 if (!res.ok) throw new Error('Failed to load personas');
                 const data = await res.json();
-                const table = document.querySelector('#personasTable tbody');
-                table.innerHTML = data.personas.length ? data.personas.map(p => `
-                    <tr>
-                        <td>${escapeHtml(p.displayName)}</td>
-                        <td>${escapeHtml(p.slug)}</td>
-                        <td>${escapeHtml(p.status)}</td>
-                        <td>
-                            <button onclick="selectPersona('${p.id}', '${escAttr(p.displayName)}')" class="secondary">Select</button>
-                            <button onclick="editPersona('${p.id}', '${escAttr(p.displayName)}', '${escAttr(p.gender)}', '${escAttr(p.orientation)}', ${p.apparentAge})" class="secondary">✎ Edit</button>
-                        </td>
-                    </tr>
-                `).join('') : emptyRow(4, 'No personas found.');
+                personasCache = data.personas || [];
+
+                // One small read per persona against the endpoint that already
+                // exists — the admin persona list is deliberately small, and this
+                // is exactly the data the Production/Testing badges describe.
+                await Promise.all(personasCache.map(async p => {
+                    try {
+                        const vres = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(p.id)}/core-versions`);
+                        personaVersionsCache[p.id] = vres.ok ? ((await vres.json()).versions || []) : null;
+                    } catch (e) {
+                        personaVersionsCache[p.id] = null; // unknown, never guessed
+                    }
+                }));
+                renderPersonas();
             } catch (e) {
                 showError('createPersonaError', e.message);
             }
+        }
+
+        function renderPersonas() {
+            const table = document.querySelector('#personasTable tbody');
+            if (!table) return;
+            const term = (document.getElementById('personaSearch').value || '').trim().toLowerCase();
+            const status = document.getElementById('personaStatusFilter').value;
+            const rows = personasCache.filter(p => {
+                if (status && p.status !== status) return false;
+                if (!term) return true;
+                return (p.displayName || '').toLowerCase().includes(term) ||
+                       (p.slug || '').toLowerCase().includes(term);
+            });
+
+            document.getElementById('personaFilterCount').textContent =
+                `${rows.length} of ${personasCache.length} personas`;
+
+            table.innerHTML = rows.length ? rows.map(p => {
+                const versions = personaVersionsCache[p.id];
+                const known = Array.isArray(versions);
+                const { production, testing } = stageOf(versions);
+                const open = !!personaExpanded[p.id];
+                return `
+                    <tr>
+                        <td class="vh-toggle" onclick="togglePersonaVersions('${escAttr(p.id)}')"
+                            role="button" tabindex="0" aria-label="Toggle version history for ${escAttr(p.displayName)}">${open ? '▾' : '▸'}</td>
+                        <td>${escapeHtml(p.displayName)}</td>
+                        <td class="mono">${escapeHtml(p.slug)}</td>
+                        <td>${statusBadge(p.status, false)}</td>
+                        <td>${known ? stageBadge('production', production ? production.version : null) : '<span class="badge muted">unavailable</span>'}</td>
+                        <td>${known ? stageBadge('testing', testing ? testing.version : null) : '<span class="badge muted">unavailable</span>'}</td>
+                        <td class="row-actions">
+                            <button onclick="selectPersona('${escAttr(p.id)}', '${escAttr(p.displayName)}')" class="secondary">Versions →</button>
+                            <button onclick="editPersona('${escAttr(p.id)}', '${escAttr(p.displayName)}', '${escAttr(p.gender)}', '${escAttr(p.orientation)}', ${Number(p.apparentAge) || 0})" class="secondary">✎ Edit</button>
+                        </td>
+                    </tr>
+                    <tr class="vh-detail" id="personaVersions-${escAttr(p.id)}" style="display:${open ? '' : 'none'};">
+                        <td colspan="7"><div class="vh-inner">${personaVersionHistoryHtml(p.id)}</div></td>
+                    </tr>`;
+            }).join('') : emptyRow(7, personasCache.length ? 'No personas match these filters.' : 'No personas found.');
+        }
+
+        function personaVersionHistoryHtml(personaId) {
+            const versions = personaVersionsCache[personaId];
+            if (!Array.isArray(versions)) {
+                return '<div class="vh-title">Version history</div><div class="empty-state" style="padding:20px;">Version history could not be loaded for this persona.</div>';
+            }
+            if (versions.length === 0) {
+                return '<div class="vh-title">Version history</div><div class="empty-state" style="padding:20px;">No core versions yet — create the first draft below.</div>';
+            }
+            const sorted = versions.slice().sort((a, b) => b.version - a.version);
+            return `
+                <div class="vh-title">Version history — ${sorted.length} version(s), never deleted</div>
+                <table>
+                    <thead><tr><th>Version</th><th>Stage</th><th>Status</th><th>Author</th><th>Changelog</th><th>Actions</th></tr></thead>
+                    <tbody>${sorted.map(v => `
+                        <tr>
+                            <td class="mono">v${v.version}</td>
+                            <td>${v.isActive ? '<span class="badge prod">PRODUCTION</span>'
+                                 : (v.status === 'published' ? '<span class="badge testing">TESTING</span>' : '<span class="badge muted">—</span>')}</td>
+                            <td>${statusBadge(v.status, v.isActive)}</td>
+                            <td>${escapeHtml(v.author) || '—'}</td>
+                            <td>${escapeHtml(v.changelogNote) || '—'}</td>
+                            <td class="row-actions">
+                                ${v.status === 'draft' ? `<button onclick="publishVersionFor('${escAttr(personaId)}','${escAttr(v.id)}')" class="secondary">Publish</button>` : ''}
+                                ${v.status === 'published' && !v.isActive ? `<button onclick="activateVersionFor('${escAttr(personaId)}','${escAttr(v.id)}',${Number(v.version) || 0})" class="secondary">Activate</button>` : ''}
+                                ${v.status === 'published' && !v.isActive ? `<button onclick="archiveVersionFor('${escAttr(personaId)}','${escAttr(v.id)}')" class="secondary">Archive</button>` : ''}
+                            </td>
+                        </tr>`).join('')}</tbody>
+                </table>`;
+        }
+
+        function togglePersonaVersions(personaId) {
+            personaExpanded[personaId] = !personaExpanded[personaId];
+            renderPersonas();
+        }
+
+        // The expandable-row actions reuse the SAME endpoints the version
+        // section below already calls, then refresh both views so the
+        // Production/Testing badges cannot drift from the history table.
+        async function personaVersionAction(personaId, versionId, action) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(personaId)}/core-versions/${encodeURIComponent(versionId)}/${action}`, { method: 'POST' });
+                if (!res.ok) throw new Error(`Failed to ${action} version`);
+                await loadPersonas();
+                if (selectedPersonaId === personaId) loadVersions();
+                loadAiConfiguration();
+            } catch (e) {
+                showError('createPersonaError', e.message);
+            }
+        }
+
+        function publishVersionFor(personaId, versionId) {
+            personaVersionAction(personaId, versionId, 'publish');
+        }
+
+        async function activateVersionFor(personaId, versionId, version) {
+            const current = stageOf(personaVersionsCache[personaId]).production;
+            if (!confirm(`Activate persona core version?\n\nCurrent: ${current ? 'v' + current.version : 'none'}\nNew:     v${version}\n\nThis becomes what production users receive for this persona.`)) return;
+            personaVersionAction(personaId, versionId, 'activate');
+        }
+
+        function archiveVersionFor(personaId, versionId) {
+            if (!confirm('Archive this version? It stays in history and can never be deleted, but will no longer be offered for activation.')) return;
+            personaVersionAction(personaId, versionId, 'archive');
         }
 
         let selectedPersonaId = '';
@@ -1156,9 +1687,11 @@
 
         function selectPersona(id, name) {
             selectedPersonaId = id;
-            document.getElementById('personaSelect').value = id;
-            document.getElementById('personaSelect').innerHTML = `<option value="${id}">${name}</option>`;
+            const select = document.getElementById('personaSelect');
+            select.innerHTML = `<option value="${escAttr(id)}">${escapeHtml(name)}</option>`;
+            select.value = id;
             loadVersions();
+            select.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         function editPersona(id, name, gender, orientation, age) {
@@ -1239,40 +1772,37 @@
                 if (!res.ok) throw new Error('Failed to load versions');
                 const data = await res.json();
                 const table = document.querySelector('#versionsTable tbody');
-                table.innerHTML = data.versions.length ? data.versions.map(v => `
+                personaVersionsCache[selectedPersonaId] = data.versions || [];
+                const sorted = (data.versions || []).slice().sort((a, b) => b.version - a.version);
+                table.innerHTML = sorted.length ? sorted.map(v => `
                     <tr>
-                        <td>v${v.version}</td>
-                        <td>${escapeHtml(v.status)}</td>
-                        <td>${v.isActive ? '✓' : ''}</td>
-                        <td>
-                            ${v.status === 'draft' ? `<button onclick="publishVersion('${selectedPersonaId}', '${v.id}')" class="secondary">Publish</button>` : ''}
-                            ${v.status === 'published' && !v.isActive ? `<button onclick="activateVersion('${selectedPersonaId}', '${v.id}')" class="secondary">Activate</button>` : ''}
+                        <td class="mono">v${v.version}</td>
+                        <td>${v.isActive ? '<span class="badge prod">PRODUCTION</span>'
+                             : (v.status === 'published' ? '<span class="badge testing">TESTING</span>' : '<span class="badge muted">—</span>')}</td>
+                        <td>${statusBadge(v.status, v.isActive)}</td>
+                        <td>${escapeHtml(v.author) || '—'}</td>
+                        <td>${escapeHtml(v.changelogNote) || '—'}</td>
+                        <td class="row-actions">
+                            ${v.status === 'draft' ? `<button onclick="publishVersion('${escAttr(selectedPersonaId)}', '${escAttr(v.id)}')" class="secondary">Publish</button>` : ''}
+                            ${v.status === 'published' && !v.isActive ? `<button onclick="activateVersionFor('${escAttr(selectedPersonaId)}', '${escAttr(v.id)}', ${Number(v.version) || 0})" class="secondary">Activate</button>` : ''}
+                            ${v.status === 'published' && !v.isActive ? `<button onclick="archiveVersionFor('${escAttr(selectedPersonaId)}', '${escAttr(v.id)}')" class="secondary">Archive</button>` : ''}
                         </td>
                     </tr>
-                `).join('') : emptyRow(4, 'No persona core versions found.');
+                `).join('') : emptyRow(6, 'No persona core versions found.');
             } catch (e) {
                 showError('versionError', e.message);
             }
         }
 
-        async function publishVersion(personaId, versionId) {
-            try {
-                const res = await fetch(`${ADMIN_BASE}/personas/${personaId}/core-versions/${versionId}/publish`, { method: 'POST' });
-                if (!res.ok) throw new Error('Failed to publish');
-                loadVersions();
-            } catch (e) {
-                showError('versionError', e.message);
-            }
+        // Kept as the single publish/activate entry points; both now delegate
+        // to personaVersionAction so the Production/Testing badges in the
+        // persona table are refreshed by exactly the same code path.
+        function publishVersion(personaId, versionId) {
+            personaVersionAction(personaId, versionId, 'publish');
         }
 
-        async function activateVersion(personaId, versionId) {
-            try {
-                const res = await fetch(`${ADMIN_BASE}/personas/${personaId}/core-versions/${versionId}/activate`, { method: 'POST' });
-                if (!res.ok) throw new Error('Failed to activate');
-                loadVersions();
-            } catch (e) {
-                showError('versionError', e.message);
-            }
+        function activateVersion(personaId, versionId) {
+            personaVersionAction(personaId, versionId, 'activate');
         }
 
         async function createEngineVersion() {
@@ -1301,46 +1831,105 @@
             }
         }
 
+        /**
+         * Module 03 — Conversation Engines. Same derivation rule as Personas:
+         * Production = the server's isActive row, Testing = the newest
+         * published-but-not-active row. Both read from the existing
+         * GET /v1/admin/engines response; no new backend endpoint exists or
+         * was needed for this view.
+         */
+        let enginesCache = [];
+
         async function loadEngines() {
             try {
                 const res = await fetch(`${ADMIN_BASE}/engines`);
                 if (!res.ok) throw new Error('Failed to load engines');
                 const data = await res.json();
-                const table = document.querySelector('#enginesTable tbody');
-                table.innerHTML = data.engines.length ? data.engines.map(e => `
-                    <tr>
-                        <td>v${e.version}</td>
-                        <td>${escapeHtml(e.status)}</td>
-                        <td>${e.isActive ? '✓' : ''}</td>
-                        <td>
-                            ${e.status === 'draft' ? `<button onclick="publishEngineVersion('${e.id}')" class="secondary">Publish</button>` : ''}
-                            ${e.status === 'published' && !e.isActive ? `<button onclick="activateEngineVersion('${e.id}')" class="secondary">Activate</button>` : ''}
-                        </td>
-                    </tr>
-                `).join('') : emptyRow(4, 'No conversation engine versions found.');
+                enginesCache = data.engines || [];
+                renderEngines();
             } catch (e) {
                 showError('engineError', e.message);
             }
         }
 
-        async function publishEngineVersion(engineId) {
+        function renderEngines() {
+            const table = document.querySelector('#enginesTable tbody');
+            if (!table) return;
+            const { production, testing, latestDraft } = stageOf(enginesCache);
+
+            document.getElementById('engineStageCards').innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Production (active)</div>
+                    <div class="stat-value">${production ? 'v' + production.version : '—'}</div>
+                    <div class="filter-count" style="margin-top:6px;">${production ? escapeHtml(production.changelogNote) || 'no changelog note' : 'no engine is active'}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Testing (published, not active)</div>
+                    <div class="stat-value">${testing ? 'v' + testing.version : '—'}</div>
+                    <div class="filter-count" style="margin-top:6px;">${testing ? escapeHtml(testing.changelogNote) || 'no changelog note' : 'nothing staged'}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Latest draft</div>
+                    <div class="stat-value">${latestDraft ? 'v' + latestDraft.version : '—'}</div>
+                    <div class="filter-count" style="margin-top:6px;">${latestDraft ? 'awaiting publish' : 'no unpublished draft'}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total versions</div>
+                    <div class="stat-value">${enginesCache.length}</div>
+                    <div class="filter-count" style="margin-top:6px;">never deleted</div>
+                </div>`;
+
+            const status = document.getElementById('engineStatusFilter').value;
+            const rows = enginesCache
+                .filter(e => !status || e.status === status)
+                .slice()
+                .sort((a, b) => b.version - a.version);
+            document.getElementById('engineFilterCount').textContent =
+                `${rows.length} of ${enginesCache.length} versions`;
+
+            table.innerHTML = rows.length ? rows.map(e => `
+                <tr>
+                    <td class="mono">v${e.version}</td>
+                    <td>${e.isActive ? '<span class="badge prod">PRODUCTION</span>'
+                         : (e.status === 'published' ? '<span class="badge testing">TESTING</span>' : '<span class="badge muted">—</span>')}</td>
+                    <td>${statusBadge(e.status, e.isActive)}</td>
+                    <td>${escapeHtml(e.author || e.createdBy) || '—'}</td>
+                    <td>${escapeHtml(e.changelogNote) || '—'}</td>
+                    <td class="row-actions">
+                        ${e.status === 'draft' ? `<button onclick="publishEngineVersion('${escAttr(e.id)}')" class="secondary">Publish</button>` : ''}
+                        ${e.status === 'published' && !e.isActive ? `<button onclick="activateEngineVersion('${escAttr(e.id)}', ${Number(e.version) || 0})" class="secondary">Activate</button>` : ''}
+                        ${e.status === 'published' && !e.isActive ? `<button onclick="archiveEngineVersion('${escAttr(e.id)}')" class="secondary">Archive</button>` : ''}
+                    </td>
+                </tr>
+            `).join('') : emptyRow(6, enginesCache.length ? 'No versions match this filter.' : 'No conversation engine versions found.');
+        }
+
+        async function engineAction(engineId, action) {
             try {
-                const res = await fetch(`${ADMIN_BASE}/engines/${engineId}/publish`, { method: 'POST' });
-                if (!res.ok) throw new Error('Failed to publish');
-                loadEngines();
+                const res = await fetch(`${ADMIN_BASE}/engines/${encodeURIComponent(engineId)}/${action}`, { method: 'POST' });
+                if (!res.ok) throw new Error(`Failed to ${action} engine version`);
+                await loadEngines();
+                loadAiConfiguration();
             } catch (e) {
                 showError('engineError', e.message);
             }
         }
 
-        async function activateEngineVersion(engineId) {
-            try {
-                const res = await fetch(`${ADMIN_BASE}/engines/${engineId}/activate`, { method: 'POST' });
-                if (!res.ok) throw new Error('Failed to activate');
-                loadEngines();
-            } catch (e) {
-                showError('engineError', e.message);
-            }
+        function publishEngineVersion(engineId) {
+            engineAction(engineId, 'publish');
+        }
+
+        function activateEngineVersion(engineId, version) {
+            const current = stageOf(enginesCache).production;
+            if (version != null && !confirm(
+                `Activate conversation engine?\n\nCurrent: ${current ? 'v' + current.version : 'none'}\nNew:     v${version}\n\n` +
+                'At most one engine is active — activating this deactivates the current one for every conversation.')) return;
+            engineAction(engineId, 'activate');
+        }
+
+        function archiveEngineVersion(engineId) {
+            if (!confirm('Archive this engine version? It stays in history (never deleted) but will no longer be offered for activation.')) return;
+            engineAction(engineId, 'archive');
         }
 
         async function createSkillVersion() {
@@ -1370,48 +1959,165 @@
             }
         }
 
+        /**
+         * Module 04 — Skills. Grouped BY KEY (the unit that actually has its
+         * own active version), with the same Production/Testing derivation as
+         * Personas and Engines.
+         *
+         * Usage share is REAL measured data, not an estimate: it reuses the
+         * existing observability latency-dashboard's `bySkill` aggregation,
+         * which is computed from the `skill_key` column captured on every
+         * recorded llm_exchanges row. No new endpoint or query was added for
+         * it. If no exchanges have been recorded, the column honestly says so
+         * instead of showing a fabricated percentage.
+         */
+        let skillsCache = [];
+        let skillUsageCounts = null;   // null = not available, {} = available but empty
+        const skillExpanded = {};
+
+        function skillsByKey() {
+            const groups = {};
+            skillsCache.forEach(s => {
+                (groups[s.key] = groups[s.key] || []).push(s);
+            });
+            return groups;
+        }
+
         async function loadSkills() {
             try {
-                const res = await fetch(`${ADMIN_BASE}/skills`);
+                const [res, usageRes] = await Promise.all([
+                    fetch(`${ADMIN_BASE}/skills`),
+                    fetch(`${ADMIN_BASE}/observability/latency-dashboard`).catch(() => null),
+                ]);
                 if (!res.ok) throw new Error('Failed to load skills');
-                const data = await res.json();
-                const table = document.querySelector('#skillsTable tbody');
-                const sorted = data.skills.slice().sort((a, b) => a.key.localeCompare(b.key) || a.version - b.version);
-                table.innerHTML = sorted.length ? sorted.map(s => `
+                skillsCache = (await res.json()).skills || [];
+
+                skillUsageCounts = null;
+                if (usageRes && usageRes.ok) {
+                    const dash = await usageRes.json();
+                    const bySkill = dash.bySkill || {};
+                    const counts = {};
+                    Object.entries(bySkill).forEach(([key, stats]) => {
+                        if (stats && typeof stats.count === 'number') counts[key] = stats.count;
+                    });
+                    skillUsageCounts = counts;
+                }
+                renderSkills();
+            } catch (e) {
+                showError('skillError', e.message);
+            }
+        }
+
+        function renderSkills() {
+            const table = document.querySelector('#skillsTable tbody');
+            if (!table) return;
+            const term = (document.getElementById('skillSearch').value || '').trim().toLowerCase();
+            const groups = skillsByKey();
+            const keys = Object.keys(groups).sort().filter(k => !term || k.toLowerCase().includes(term));
+
+            const totalUsage = skillUsageCounts
+                ? Object.values(skillUsageCounts).reduce((a, b) => a + b, 0)
+                : 0;
+
+            document.getElementById('skillFilterCount').textContent =
+                `${keys.length} of ${Object.keys(groups).length} skill keys`;
+            document.getElementById('skillUsageNote').innerHTML = skillUsageCounts === null
+                ? 'Usage share is unavailable — the observability aggregation could not be read. No estimate is shown in its place.'
+                : (totalUsage === 0
+                    ? 'Usage share: no LLM exchanges with a recorded skill key exist yet, so there is nothing to measure. Percentages appear once real traffic is recorded.'
+                    : `Usage share measured over ${totalUsage} recorded exchange(s) that carry a skill key (all time, unfiltered).`);
+
+            table.innerHTML = keys.length ? keys.map(key => {
+                const versions = groups[key];
+                const { production, testing } = stageOf(versions);
+                const open = !!skillExpanded[key];
+                const count = skillUsageCounts ? (skillUsageCounts[key] || 0) : null;
+                const share = (count !== null && totalUsage > 0) ? (count / totalUsage) * 100 : null;
+                const usageCell = share === null
+                    ? '<span class="filter-count">no data</span>'
+                    : `<span class="usage-bar"><span style="width:${share.toFixed(1)}%"></span></span><span class="mono">${share.toFixed(1)}%</span> <span class="filter-count">(${count})</span>`;
+                return `
                     <tr>
-                        <td>${escapeHtml(s.key)}</td>
-                        <td>v${s.version}</td>
-                        <td>${escapeHtml(s.status)}</td>
-                        <td>${s.isActive ? '✓' : ''}</td>
-                        <td>
-                            ${s.status === 'draft' ? `<button onclick="publishSkillVersion('${s.id}')" class="secondary">Publish</button>` : ''}
-                            ${s.status === 'published' && !s.isActive ? `<button onclick="activateSkillVersion('${s.id}')" class="secondary">Activate</button>` : ''}
+                        <td class="vh-toggle" onclick="toggleSkillVersions('${escAttr(key)}')"
+                            role="button" tabindex="0" aria-label="Toggle version history for ${escAttr(key)}">${open ? '▾' : '▸'}</td>
+                        <td class="mono">${escapeHtml(key)}</td>
+                        <td>${stageBadge('production', production ? production.version : null)}</td>
+                        <td>${stageBadge('testing', testing ? testing.version : null)}</td>
+                        <td>${versions.length}</td>
+                        <td>${usageCell}</td>
+                        <td class="row-actions">
+                            <button class="secondary" onclick="prefillSkillKey('${escAttr(key)}')">+ New draft</button>
                         </td>
                     </tr>
-                `).join('') : emptyRow(5, 'No skills found.');
+                    <tr class="vh-detail" id="skillVersions-${escAttr(key)}" style="display:${open ? '' : 'none'};">
+                        <td colspan="7"><div class="vh-inner">${skillVersionHistoryHtml(key)}</div></td>
+                    </tr>`;
+            }).join('') : emptyRow(7, skillsCache.length ? 'No skill keys match this search.' : 'No skills found.');
+        }
+
+        function skillVersionHistoryHtml(key) {
+            const versions = (skillsByKey()[key] || []).slice().sort((a, b) => b.version - a.version);
+            return `
+                <div class="vh-title">Version history for “${escapeHtml(key)}” — ${versions.length} version(s)</div>
+                <table>
+                    <thead><tr><th>Version</th><th>Stage</th><th>Status</th><th>Author</th><th>Changelog</th><th>Actions</th></tr></thead>
+                    <tbody>${versions.map(s => `
+                        <tr>
+                            <td class="mono">v${s.version}</td>
+                            <td>${s.isActive ? '<span class="badge prod">PRODUCTION</span>'
+                                 : (s.status === 'published' ? '<span class="badge testing">TESTING</span>' : '<span class="badge muted">—</span>')}</td>
+                            <td>${statusBadge(s.status, s.isActive)}</td>
+                            <td>${escapeHtml(s.author) || '—'}</td>
+                            <td>${escapeHtml(s.changelogNote) || '—'}</td>
+                            <td class="row-actions">
+                                ${s.status === 'draft' ? `<button onclick="publishSkillVersion('${escAttr(s.id)}')" class="secondary">Publish</button>` : ''}
+                                ${s.status === 'published' && !s.isActive ? `<button onclick="activateSkillVersion('${escAttr(s.id)}','${escAttr(key)}',${Number(s.version) || 0})" class="secondary">Activate</button>` : ''}
+                                ${s.status === 'published' && !s.isActive ? `<button onclick="archiveSkillVersion('${escAttr(s.id)}')" class="secondary">Archive</button>` : ''}
+                            </td>
+                        </tr>`).join('')}</tbody>
+                </table>`;
+        }
+
+        function toggleSkillVersions(key) {
+            skillExpanded[key] = !skillExpanded[key];
+            renderSkills();
+        }
+
+        function prefillSkillKey(key) {
+            const panel = document.getElementById('createSkillPanel');
+            panel.style.display = 'block';
+            document.getElementById('skillKey').value = key;
+            document.getElementById('skillContent').focus();
+            panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        async function skillAction(skillId, action) {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/skills/${encodeURIComponent(skillId)}/${action}`, { method: 'POST' });
+                if (!res.ok) throw new Error(`Failed to ${action} skill version`);
+                await loadSkills();
+                loadAiConfiguration();
+                loadIntentEngines();
             } catch (e) {
                 showError('skillError', e.message);
             }
         }
 
-        async function publishSkillVersion(skillId) {
-            try {
-                const res = await fetch(`${ADMIN_BASE}/skills/${skillId}/publish`, { method: 'POST' });
-                if (!res.ok) throw new Error('Failed to publish');
-                loadSkills();
-            } catch (e) {
-                showError('skillError', e.message);
-            }
+        function publishSkillVersion(skillId) {
+            skillAction(skillId, 'publish');
         }
 
-        async function activateSkillVersion(skillId) {
-            try {
-                const res = await fetch(`${ADMIN_BASE}/skills/${skillId}/activate`, { method: 'POST' });
-                if (!res.ok) throw new Error('Failed to activate');
-                loadSkills();
-            } catch (e) {
-                showError('skillError', e.message);
+        function activateSkillVersion(skillId, key, version) {
+            if (key != null) {
+                const current = stageOf(skillsByKey()[key]).production;
+                if (!confirm(`Activate skill “${key}”?\n\nCurrent: ${current ? 'v' + current.version : 'none'}\nNew:     v${version}\n\nThis becomes the version used whenever Intent Discovery selects this skill.`)) return;
             }
+            skillAction(skillId, 'activate');
+        }
+
+        function archiveSkillVersion(skillId) {
+            if (!confirm('Archive this skill version? It stays in history (never deleted) but will no longer be offered for activation.')) return;
+            skillAction(skillId, 'archive');
         }
 
         async function createMemoryEngineVersion() {
@@ -1584,16 +2290,28 @@
                 const res = await fetch(`${ADMIN_BASE}/ai-settings`);
                 if (!res.ok) throw new Error('Failed to load AI settings');
                 const s = await res.json();
-                const label = src => src === 'DATABASE' ? 'admin setting' : 'environment / default';
-                document.querySelector('#aiSettingsCurrentTable tbody').innerHTML = `
-                    <tr><td>Model</td><td>${s.model}</td><td>${label(s.modelSource)}</td></tr>
-                    <tr><td>Temperature</td><td>${s.temperature === null || s.temperature === undefined ? 'provider default' : s.temperature}</td><td>${label(s.temperatureSource)}</td></tr>
-                    <tr><td>Max output tokens</td><td>${s.maxOutputTokens}</td><td>${label(s.maxOutputTokensSource)}</td></tr>
-                    <tr><td>Intent Model</td><td>${s.intentModel}</td><td>${label(s.intentModelSource)}</td></tr>
-                    <tr><td>Intent JSON Mode</td><td>${s.intentJsonMode === null || s.intentJsonMode === undefined ? 'provider default' : s.intentJsonMode}</td><td>${label(s.intentJsonModeSource)}</td></tr>
-                    <tr><td>Intent Max Output Tokens</td><td>${s.intentMaxOutputTokens}</td><td>${label(s.intentMaxOutputTokensSource)}</td></tr>
-                    <tr><td>Generation Provider Sort</td><td>${s.generationProviderSort === null || s.generationProviderSort === undefined ? 'no preference' : s.generationProviderSort}</td><td>${label(s.generationProviderSortSource)}</td></tr>
-                `;
+                // The source badge reports which layer of the resolve()
+                // precedence chain supplied the value. The precedence itself is
+                // decided server-side by AiRuntimeSettings and is only
+                // DISPLAYED here — this UI never re-implements or overrides it.
+                const label = src => src === 'DATABASE'
+                    ? '<span class="badge prod">ADMIN SETTING</span>'
+                    : (src === 'CODE_DEFAULT'
+                        ? '<span class="badge testing">CODE DEFAULT</span>'
+                        : `<span class="badge muted">${escapeHtml(src || 'ENVIRONMENT')}</span>`);
+                const val = v => (v === null || v === undefined) ? null : escapeHtml(String(v));
+                const row = (name, applies, value, fallbackText, source) =>
+                    `<tr><td>${escapeHtml(name)}</td><td><span class="filter-count">${escapeHtml(applies)}</span></td>` +
+                    `<td class="mono">${value === null ? `<span class="filter-count">${escapeHtml(fallbackText)}</span>` : value}</td>` +
+                    `<td>${label(source)}</td></tr>`;
+                document.querySelector('#aiSettingsCurrentTable tbody').innerHTML =
+                    row('Model', 'Primary generation', val(s.model), 'unset', s.modelSource) +
+                    row('Temperature', 'Primary generation', val(s.temperature), 'provider default', s.temperatureSource) +
+                    row('Max output tokens', 'Primary generation', val(s.maxOutputTokens), 'unset', s.maxOutputTokensSource) +
+                    row('Provider sort', 'Primary generation', val(s.generationProviderSort), 'no preference', s.generationProviderSortSource) +
+                    row('Intent model', 'Intent discovery', val(s.intentModel), 'unset', s.intentModelSource) +
+                    row('Intent JSON mode', 'Intent discovery', val(s.intentJsonMode), 'provider default', s.intentJsonModeSource) +
+                    row('Intent max output tokens', 'Intent discovery', val(s.intentMaxOutputTokens), 'unset', s.intentMaxOutputTokensSource);
                 document.getElementById('aiSettingsAudit').textContent = s.updatedAt
                     ? `Last changed ${s.updatedAt} by ${s.updatedBy || 'unknown'}`
                     : 'No admin override stored — running entirely on environment / defaults.';
@@ -1672,21 +2390,23 @@
                 if (!res.ok) throw new Error('Failed to load AI configuration');
                 const c = await res.json();
                 const ver = v => (v && v.version != null) ? ('v' + v.version) : 'none active';
+                // Every value below is admin-entered or DB-sourced free text and
+                // is escaped before innerHTML interpolation.
                 const personas = (c.personaCores || []).map(p =>
-                    `<tr><td>Persona Core — ${p.displayName} (${p.slug})</td><td>${p.activeCoreVersion != null ? 'v' + p.activeCoreVersion : 'none active'}</td><td>${p.personaStatus}</td></tr>`
+                    `<tr><td>Persona Core — ${escapeHtml(p.displayName)} (${escapeHtml(p.slug)})</td><td>${p.activeCoreVersion != null ? 'v' + escapeHtml(p.activeCoreVersion) : 'none active'}</td><td>${escapeHtml(p.personaStatus)}</td></tr>`
                 ).join('');
                 document.getElementById('aiConfigurationOverview').innerHTML = `
-                    <table>
+                    <div class="table-wrap"><table>
                         <thead><tr><th>Component</th><th>Running</th><th>Detail</th></tr></thead>
                         <tbody>
-                            <tr><td>Conversation Engine</td><td>${ver(c.conversationEngine)}</td><td>${(c.conversationEngine && c.conversationEngine.changelogNote) || ''}</td></tr>
-                            <tr><td>Intent Engine</td><td>${ver(c.intentEngine)}</td><td>${(c.intentEngine && c.intentEngine.changelogNote) || ''}</td></tr>
-                            <tr><td>Memory Engine</td><td>${ver(c.memoryEngine)}</td><td>batch ${c.memoryBatchSize != null ? c.memoryBatchSize : '—'}, relevant-memory target ${c.relevantMemoryTarget != null ? c.relevantMemoryTarget : '—'}</td></tr>
+                            <tr><td>Conversation Engine</td><td>${ver(c.conversationEngine)}</td><td>${escapeHtml((c.conversationEngine && c.conversationEngine.changelogNote) || '')}</td></tr>
+                            <tr><td>Intent Engine</td><td>${ver(c.intentEngine)}</td><td>${escapeHtml((c.intentEngine && c.intentEngine.changelogNote) || '')}</td></tr>
+                            <tr><td>Memory Engine</td><td>${ver(c.memoryEngine)}</td><td>batch ${c.memoryBatchSize != null ? escapeHtml(c.memoryBatchSize) : '—'}, relevant-memory target ${c.relevantMemoryTarget != null ? escapeHtml(c.relevantMemoryTarget) : '—'}</td></tr>
                             ${personas}
-                            <tr><td>Skills</td><td>${c.activeSkillCount} active</td><td>${(c.activeSkillKeys || []).join(', ')}</td></tr>
-                            <tr><td>AI Runtime</td><td>${c.runtime.model}</td><td>temperature ${c.runtime.temperature == null ? 'provider default' : c.runtime.temperature}, max tokens ${c.runtime.maxOutputTokens}</td></tr>
+                            <tr><td>Skills</td><td>${escapeHtml(c.activeSkillCount)} active</td><td>${escapeHtml((c.activeSkillKeys || []).join(', '))}</td></tr>
+                            <tr><td>AI Runtime</td><td>${escapeHtml(c.runtime.model)}</td><td>temperature ${c.runtime.temperature == null ? 'provider default' : escapeHtml(c.runtime.temperature)}, max tokens ${escapeHtml(c.runtime.maxOutputTokens)}</td></tr>
                         </tbody>
-                    </table>`;
+                    </table></div>`;
             } catch (e) {
                 showError('aiOverviewError', e.message);
             }
@@ -1697,6 +2417,44 @@
         let tcConversationId = null;
         let tcPersonasCache = [];
         let tcUsersCache = [];
+        // Module 08 — Production/Testing toggle. TestChatService ALREADY
+        // supports pinning an exact version per component (CreateTestChatRequest
+        // takes conversationEngineVersion / personaCoreVersion /
+        // intentEngineVersion / memoryEngineVersion), so this toggle is purely a
+        // UI convenience that fills in those existing fields. No chat-engine
+        // selection logic is added, and ChatEngineFactory/TestChatService are
+        // not touched.
+        let tcMode = 'PRODUCTION';
+        let tcVersionLists = { engine: [], intent: [], memory: [], core: [] };
+
+        function setTestChatMode(mode) {
+            tcMode = mode;
+            document.getElementById('tcModeProduction').classList.toggle('active', mode === 'PRODUCTION');
+            document.getElementById('tcModeTesting').classList.toggle('active', mode === 'TESTING');
+            document.getElementById('tcModeNote').textContent = mode === 'PRODUCTION'
+                ? 'Runs against exactly what production users get today: the ACTIVE version of every component. Nothing about production is changed by running this.'
+                : 'Runs against the newest PUBLISHED-but-not-yet-active version of every component, falling back to the active version where nothing is staged. Activation stays a separate, explicit action.';
+            applyTestChatModeToSelects();
+        }
+
+        // Resolves the toggle into concrete version numbers using the SAME
+        // Production/Testing derivation the Personas/Engines/Skills screens use.
+        function applyTestChatModeToSelects() {
+            const pick = list => {
+                const { production, testing } = stageOf(list);
+                const chosen = tcMode === 'PRODUCTION' ? production : (testing || production);
+                return chosen ? String(chosen.version) : '';
+            };
+            const set = (id, value) => {
+                const select = document.getElementById(id);
+                if (!select) return;
+                select.value = Array.from(select.options).some(o => o.value === value) ? value : '';
+            };
+            set('tcEngineVersion', pick(tcVersionLists.engine));
+            set('tcIntentVersion', pick(tcVersionLists.intent));
+            set('tcMemoryVersion', pick(tcVersionLists.memory));
+            set('tcCoreVersion', pick(tcVersionLists.core));
+        }
 
         async function loadTestChatOptions() {
             try {
@@ -1711,25 +2469,26 @@
                 tcUsersCache = usersRes.ok ? (await usersRes.json()).users || [] : [];
 
                 document.getElementById('tcPersonaSelect').innerHTML = tcPersonasCache.map(p =>
-                    `<option value="${p.id}">${p.displayName} (${p.slug})</option>`).join('') || '<option value="">No personas yet</option>';
+                    `<option value="${escAttr(p.id)}">${escapeHtml(p.displayName)} (${escapeHtml(p.slug)})</option>`).join('') || '<option value="">No personas yet</option>';
                 document.getElementById('tcUserSelect').innerHTML = tcUsersCache.map(u =>
-                    `<option value="${u.userId}">${u.displayName || u.userId}</option>`).join('') || '<option value="">No test users yet — create one in Setup</option>';
+                    `<option value="${escAttr(u.userId)}">${escapeHtml(u.displayName || u.userId)}</option>`).join('') || '<option value="">No test users yet — create one in Setup</option>';
 
                 const versionOptions = (list, labelActive) => (list || []).map(v =>
-                    `<option value="${v.version}">v${v.version} — ${v.isActive ? labelActive : v.status.toUpperCase()}</option>`).join('');
+                    `<option value="${escAttr(v.version)}">v${escapeHtml(v.version)} — ${v.isActive ? labelActive : escapeHtml(String(v.status).toUpperCase())}</option>`).join('');
                 if (enginesRes.ok) {
-                    const engines = (await enginesRes.json()).engines || [];
-                    document.getElementById('tcEngineVersion').innerHTML = '<option value="">(Testing default)</option>' + versionOptions(engines, 'PRODUCTION');
+                    tcVersionLists.engine = (await enginesRes.json()).engines || [];
+                    document.getElementById('tcEngineVersion').innerHTML = '<option value="">(auto — from the toggle above)</option>' + versionOptions(tcVersionLists.engine, 'PRODUCTION');
                 }
                 if (intentRes.ok) {
-                    const intents = (await intentRes.json()).intentEngines || [];
-                    document.getElementById('tcIntentVersion').innerHTML = '<option value="">(Testing default)</option>' + versionOptions(intents, 'PRODUCTION');
+                    tcVersionLists.intent = (await intentRes.json()).intentEngines || [];
+                    document.getElementById('tcIntentVersion').innerHTML = '<option value="">(auto — from the toggle above)</option>' + versionOptions(tcVersionLists.intent, 'PRODUCTION');
                 }
                 if (memoryRes.ok) {
-                    const mems = (await memoryRes.json()).memoryEngines || [];
-                    document.getElementById('tcMemoryVersion').innerHTML = '<option value="">(Testing default)</option>' + versionOptions(mems, 'PRODUCTION');
+                    tcVersionLists.memory = (await memoryRes.json()).memoryEngines || [];
+                    document.getElementById('tcMemoryVersion').innerHTML = '<option value="">(auto — from the toggle above)</option>' + versionOptions(tcVersionLists.memory, 'PRODUCTION');
                 }
                 await loadTestChatCoreVersions();
+                setTestChatMode(tcMode);
             } catch (e) {
                 showError('tcCreateError', e.message);
             }
@@ -1738,13 +2497,18 @@
         async function loadTestChatCoreVersions() {
             const personaId = document.getElementById('tcPersonaSelect').value;
             const select = document.getElementById('tcCoreVersion');
-            if (!personaId) { select.innerHTML = '<option value="">(Testing default)</option>'; return; }
+            if (!personaId) {
+                tcVersionLists.core = [];
+                select.innerHTML = '<option value="">(auto — from the toggle above)</option>';
+                return;
+            }
             try {
-                const res = await fetch(`${ADMIN_BASE}/personas/${personaId}/core-versions`);
+                const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(personaId)}/core-versions`);
                 if (!res.ok) return;
-                const versions = (await res.json()).versions || [];
-                select.innerHTML = '<option value="">(Testing default)</option>' + versions.map(v =>
-                    `<option value="${v.version}">v${v.version} — ${v.isActive ? 'PRODUCTION' : v.status.toUpperCase()}</option>`).join('');
+                tcVersionLists.core = (await res.json()).versions || [];
+                select.innerHTML = '<option value="">(auto — from the toggle above)</option>' + tcVersionLists.core.map(v =>
+                    `<option value="${escAttr(v.version)}">v${escapeHtml(v.version)} — ${v.isActive ? 'PRODUCTION' : escapeHtml(String(v.status).toUpperCase())}</option>`).join('');
+                applyTestChatModeToSelects();
             } catch (e) { /* leave default option */ }
         }
         document.addEventListener('DOMContentLoaded', () => {
@@ -1790,33 +2554,62 @@
         }
 
         function renderTcSnapshot(config) {
-            document.getElementById('tcSnapshotTable').innerHTML = `
-                <tr><td>Conversation Engine</td><td>v${config.conversationEngineVersion}</td></tr>
-                <tr><td>Persona Core</td><td>v${config.personaCoreVersion}</td></tr>
-                <tr><td>Intent Engine</td><td>v${config.intentEngineVersion}</td></tr>
-                <tr><td>Memory Engine</td><td>v${config.memoryEngineVersion}</td></tr>
-                <tr><td>Skills</td><td>${Object.entries(config.skillVersions || {}).map(([k, v]) => `${k} v${v}`).join(', ')}</td></tr>
-                <tr><td>Model</td><td>${config.model || '(testing default runtime settings)'}</td></tr>
-                <tr><td>Temperature</td><td>${config.temperature == null ? '—' : config.temperature}</td></tr>
-                <tr><td>Max Output Tokens</td><td>${config.maxOutputTokens == null ? '—' : config.maxOutputTokens}</td></tr>
-            `;
+            const skills = Object.entries(config.skillVersions || {})
+                .map(([k, v]) => `${escapeHtml(k)} v${escapeHtml(v)}`).join(', ');
+            const row = (k, v) => `<tr><td>${escapeHtml(k)}</td><td class="mono">${v}</td></tr>`;
+            document.getElementById('tcSnapshotTable').innerHTML =
+                row('Mode selected', tcMode === 'PRODUCTION'
+                    ? '<span class="badge prod">PRODUCTION CONFIG</span>'
+                    : '<span class="badge testing">TESTING CONFIG</span>') +
+                row('Conversation Engine', 'v' + escapeHtml(config.conversationEngineVersion)) +
+                row('Persona Core', 'v' + escapeHtml(config.personaCoreVersion)) +
+                row('Intent Engine', 'v' + escapeHtml(config.intentEngineVersion)) +
+                row('Memory Engine', 'v' + escapeHtml(config.memoryEngineVersion)) +
+                row('Skills', skills || '<span class="filter-count">none active</span>') +
+                row('Model', escapeHtml(config.model) || '<span class="filter-count">testing default runtime settings</span>') +
+                row('Temperature', config.temperature == null ? '—' : escapeHtml(config.temperature)) +
+                row('Max Output Tokens', config.maxOutputTokens == null ? '—' : escapeHtml(config.maxOutputTokens));
         }
 
         function startNewTestChat() {
             tcConversationId = null;
             document.getElementById('tcCreatePanel').style.display = 'block';
             document.getElementById('tcActivePanel').style.display = 'none';
+            clearTestChatLog();
+        }
+
+        // Clears only what is displayed in this browser tab. The test
+        // conversation and its recorded exchanges remain in the database —
+        // nothing is deleted server-side.
+        function clearTestChatLog() {
+            document.getElementById('tcMessages').innerHTML = '';
+            document.getElementById('tcInspector').innerHTML = '';
+        }
+
+        function tcAppendBubble(role, html, extraClass) {
+            const messagesEl = document.getElementById('tcMessages');
+            const bubble = document.createElement('div');
+            bubble.className = `tc-bubble ${role}${extraClass ? ' ' + extraClass : ''}`;
+            bubble.innerHTML = html;
+            messagesEl.appendChild(bubble);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+            return bubble;
         }
 
         async function sendTestChatMessage() {
             const input = document.getElementById('tcMessageInput');
+            const sendBtn = document.getElementById('tcSendBtn');
             const content = input.value.trim();
-            if (!content || !tcConversationId) return;
+            if (!content || !tcConversationId || sendBtn.disabled) return;
             input.value = '';
-            const messagesEl = document.getElementById('tcMessages');
-            messagesEl.innerHTML += `<div><b>You:</b> ${content}</div>`;
+            tcAppendBubble('user', `<div class="tc-meta">You</div>${escapeHtml(content)}`);
+            const pending = tcAppendBubble('assistant', '<div class="tc-meta">Assistant</div>generating…', 'pending');
+            sendBtn.disabled = true;
+            const originalLabel = sendBtn.textContent;
+            sendBtn.textContent = 'Sending…';
+            const started = performance.now();
             try {
-                const res = await fetch(`${ADMIN_BASE}/test-chat/conversations/${tcConversationId}/messages`, {
+                const res = await fetch(`${ADMIN_BASE}/test-chat/conversations/${encodeURIComponent(tcConversationId)}/messages`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ content }),
@@ -1826,11 +2619,20 @@
                     throw new Error((err && err.error && err.error.message) || 'Test chat message failed');
                 }
                 const result = await res.json();
-                messagesEl.innerHTML += `<div><b>Assistant</b> (skill: ${result.selectedSkill || 'none'}): ${result.content}</div>`;
-                messagesEl.scrollTop = messagesEl.scrollHeight;
+                const elapsed = ((performance.now() - started) / 1000).toFixed(1);
+                pending.classList.remove('pending');
+                pending.innerHTML =
+                    `<div class="tc-meta">Assistant · skill: ${escapeHtml(result.selectedSkill) || 'none'} · ${escapeHtml(elapsed)}s</div>` +
+                    escapeHtml(result.content);
+                document.getElementById('tcMessages').scrollTop = document.getElementById('tcMessages').scrollHeight;
                 await loadTestChatInspector(result.messageId);
             } catch (e) {
+                pending.classList.remove('pending');
+                pending.innerHTML = `<div class="tc-meta">Assistant · failed</div><span style="color:var(--danger);">${escapeHtml(e.message)}</span>`;
                 showError('tcCreateError', e.message);
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = originalLabel;
             }
         }
 
@@ -1849,13 +2651,13 @@
                         <summary style="cursor: pointer; font-weight: 600;">🔍 Debug: this message's actual generation (section 20/21)</summary>
                         <div style="margin-top: 8px;">
                             <b>Actual context sent to the model:</b>
-                            <pre style="background: #1e1e1e; color: #9cdcfe; padding: 8px; border-radius: 4px; max-height: 200px; overflow: auto; font-size: 11px;">${Object.entries(blocks).map(([k, v]) => `[${k.split('_')[0]}] ${v}`).join('\\n\\n')}</pre>
+                            <pre class="ci-code-block" style="max-height: 200px;">${escapeHtml(Object.entries(blocks).map(([k, v]) => `[${k.split('_')[0]}] ${v}`).join('\n\n'))}</pre>
                             <b>LLM request configuration:</b>
-                            <pre style="background: #1e1e1e; color: #dcdcaa; padding: 8px; border-radius: 4px; font-size: 11px;">${JSON.stringify(config, null, 2)}</pre>
+                            <pre class="ci-code-block">${escapeHtml(JSON.stringify(config, null, 2))}</pre>
                             <b>Provider response metadata:</b>
-                            <pre style="background: #1e1e1e; color: #ce9178; padding: 8px; border-radius: 4px; font-size: 11px;">${JSON.stringify(message.responseMetadata || {}, null, 2)}</pre>
+                            <pre class="ci-code-block">${escapeHtml(JSON.stringify(message.responseMetadata || {}, null, 2))}</pre>
                             <b>Full provider exchange (secrets already redacted upstream):</b>
-                            <pre style="background: #1e1e1e; color: #ff9d00; padding: 8px; border-radius: 4px; max-height: 200px; overflow: auto; font-size: 11px;">${JSON.stringify(provider, null, 2)}</pre>
+                            <pre class="ci-code-block" style="max-height: 200px;">${escapeHtml(JSON.stringify(provider, null, 2))}</pre>
                         </div>
                     </details>`;
             } catch (e) { /* inspector is best-effort — never block sending */ }
@@ -1900,16 +2702,8 @@
                 const data = await res.json();
                 adminUsers = data.users || [];
 
-                const table = document.querySelector('#usersTable tbody');
-                table.innerHTML = adminUsers.length ? adminUsers.map(u => `
-                    <tr>
-                        <td>${escapeHtml(u.displayName) || '(unnamed)'}</td>
-                        <td>${escapeHtml(u.gender) || '—'}</td>
-                        <td>${escapeHtml(u.interest) || '—'}</td>
-                        <td>${escapeHtml(u.city) || '—'}</td>
-                        <td>${u.age != null ? u.age : '—'}</td>
-                    </tr>
-                `).join('') : emptyRow(5, 'No users found.');
+                refreshUserFilterOptions();
+                renderUsers();
 
                 const select = document.getElementById('chatUserSelect');
                 const previousValue = preferredUserId || select.value;
@@ -1924,6 +2718,85 @@
             } catch (e) {
                 showError('chatError', e.message);
             }
+        }
+
+        /**
+         * Module 06 — Users. Search/filter is entirely CLIENT-SIDE over the
+         * list GET /v1/admin/users already returned — no new endpoint, no new
+         * query parameter, and no extra round trip per keystroke.
+         *
+         * There is deliberately no Users / Test Users split: the backend's
+         * user + user_profile rows carry no is_test-style flag (see
+         * AdminUserRoutes / UserProfileRepository), so any such split would be
+         * an invented distinction rather than a real one.
+         */
+        function distinctValues(field) {
+            return Array.from(new Set(
+                adminUsers.map(u => (u[field] || '').trim()).filter(v => v !== '')
+            )).sort((a, b) => a.localeCompare(b));
+        }
+
+        function refreshUserFilterOptions() {
+            [['userGenderFilter', 'gender'], ['userInterestFilter', 'interest'], ['userCityFilter', 'city']]
+                .forEach(([selectId, field]) => {
+                    const select = document.getElementById(selectId);
+                    if (!select) return;
+                    const previous = select.value;
+                    select.innerHTML = '<option value="">All</option>' +
+                        distinctValues(field).map(v => `<option value="${escAttr(v)}">${escapeHtml(v)}</option>`).join('');
+                    // Keep the admin's current choice if it still exists.
+                    select.value = Array.from(select.options).some(o => o.value === previous) ? previous : '';
+                });
+        }
+
+        function renderUsers() {
+            const table = document.querySelector('#usersTable tbody');
+            if (!table) return;
+            const term = (document.getElementById('userSearch').value || '').trim().toLowerCase();
+            const gender = document.getElementById('userGenderFilter').value;
+            const interest = document.getElementById('userInterestFilter').value;
+            const city = document.getElementById('userCityFilter').value;
+            const minRaw = document.getElementById('userMinAge').value;
+            const maxRaw = document.getElementById('userMaxAge').value;
+            const min = minRaw === '' ? null : parseInt(minRaw, 10);
+            const max = maxRaw === '' ? null : parseInt(maxRaw, 10);
+
+            const rows = adminUsers.filter(u => {
+                if (gender && (u.gender || '') !== gender) return false;
+                if (interest && (u.interest || '') !== interest) return false;
+                if (city && (u.city || '') !== city) return false;
+                // A user with no recorded age is excluded only when an age
+                // bound is actually set — an unknown age is never treated as 0.
+                if (min !== null && !isNaN(min) && (u.age == null || u.age < min)) return false;
+                if (max !== null && !isNaN(max) && (u.age == null || u.age > max)) return false;
+                if (!term) return true;
+                return [u.displayName, u.city, u.userId, u.gender, u.interest]
+                    .some(v => (v || '').toLowerCase().includes(term));
+            });
+
+            document.getElementById('userFilterCount').textContent =
+                `${rows.length} of ${adminUsers.length} users`;
+
+            table.innerHTML = rows.length ? rows.map(u => `
+                <tr>
+                    <td>${escapeHtml(u.displayName) || '(unnamed)'}</td>
+                    <td>${escapeHtml(u.gender) || '—'}</td>
+                    <td>${escapeHtml(u.interest) || '—'}</td>
+                    <td>${escapeHtml(u.city) || '—'}</td>
+                    <td>${u.age != null ? escapeHtml(u.age) : '—'}</td>
+                    <td class="mono" title="${escAttr(u.userId)}">${escapeHtml(String(u.userId).slice(0, 8))}…</td>
+                </tr>
+            `).join('') : emptyRow(6, adminUsers.length ? 'No users match these filters.' : 'No users found.');
+        }
+
+        function resetUserFilters() {
+            document.getElementById('userSearch').value = '';
+            document.getElementById('userGenderFilter').value = '';
+            document.getElementById('userInterestFilter').value = '';
+            document.getElementById('userCityFilter').value = '';
+            document.getElementById('userMinAge').value = '';
+            document.getElementById('userMaxAge').value = '';
+            renderUsers();
         }
 
         async function createTestUser() {
@@ -2128,7 +3001,7 @@
                             : '';
                         return `<div class="message ${msgClass}" style="cursor: pointer; position: relative;"
                             onclick="showLLMDebug(${JSON.stringify(m).replace(/"/g, '&quot;')})">
-                            <span style="font-family: monospace; font-size: 10px; color: #888;">${seq}</span> <strong>${roleLabel}</strong>${duration}: ${m.content}
+                            <span style="font-family: monospace; font-size: 10px; color: #888;">${seq}</span> <strong>${escapeHtml(roleLabel)}</strong>${duration}: ${escapeHtml(m.content)}
                             ${m.role === 'assistant' ? '<div style="font-size: 9px; color: #999; margin-top: 4px;">💡 click for LLM data</div>' : ''}
                         </div>`;
                     }).join('');
@@ -2303,10 +3176,10 @@
                         html += '<div style="margin-bottom: 15px;"><div style="font-weight: 700; color: #0056b3; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 2px solid #0056b3;">🤖 LLM EXTRACTED</div>';
                         llmExtracted.forEach(m => {
                             html += `<div style="margin-bottom: 8px; padding: 8px; background: #e3f2fd; border-left: 3px solid #0056b3; cursor: pointer; border-radius: 3px;" onclick="this.style.backgroundColor = this.style.backgroundColor === 'rgb(200, 200, 255)' ? '#e3f2fd' : 'rgb(200, 200, 255)'">
-                                <div style="font-weight: 600; color: #0056b3;">${m.factType || 'Unknown'}</div>
-                                <div style="color: #333; margin: 3px 0; word-wrap: break-word; font-size: 11px;">${m.fact || m.content || ''}</div>
+                                <div style="font-weight: 600; color: #0056b3;">${escapeHtml(m.factType) || "Unknown"}</div>
+                                <div style="color: #333; margin: 3px 0; word-wrap: break-word; font-size: 11px;">${escapeHtml(m.fact || m.content || "")}</div>
                                 <div style="color: #666; font-size: 10px; margin-top: 3px;">
-                                    <span>📌 ${m.tier || 'hot'}</span> • <span>⚡ ${m.criticality || 'medium'}</span> • <span>📂 ${m.status || 'open'}</span>
+                                    <span>📌 ${escapeHtml(m.tier) || "hot"}</span> • <span>⚡ ${escapeHtml(m.criticality) || "medium"}</span> • <span>📂 ${escapeHtml(m.status) || "open"}</span>
                                 </div>
                             </div>`;
                         });
@@ -2318,10 +3191,10 @@
                         html += '<div><div style="font-weight: 700; color: #27ae60; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 2px solid #27ae60;">✏️ MANUAL</div>';
                         manual.forEach(m => {
                             html += `<div style="margin-bottom: 8px; padding: 8px; background: #d4edda; border-left: 3px solid #27ae60; cursor: pointer; border-radius: 3px;" onclick="this.style.backgroundColor = this.style.backgroundColor === 'rgb(150, 255, 150)' ? '#d4edda' : 'rgb(150, 255, 150)'">
-                                <div style="font-weight: 600; color: #27ae60;">${m.factType || 'Unknown'}</div>
-                                <div style="color: #333; margin: 3px 0; word-wrap: break-word; font-size: 11px;">${m.fact || m.content || ''}</div>
+                                <div style="font-weight: 600; color: #27ae60;">${escapeHtml(m.factType) || "Unknown"}</div>
+                                <div style="color: #333; margin: 3px 0; word-wrap: break-word; font-size: 11px;">${escapeHtml(m.fact || m.content || "")}</div>
                                 <div style="color: #666; font-size: 10px; margin-top: 3px;">
-                                    <span>📌 ${m.tier || 'hot'}</span> • <span>⚡ ${m.criticality || 'medium'}</span> • <span>📂 ${m.status || 'open'}</span>
+                                    <span>📌 ${escapeHtml(m.tier) || "hot"}</span> • <span>⚡ ${escapeHtml(m.criticality) || "medium"}</span> • <span>📂 ${escapeHtml(m.status) || "open"}</span>
                                 </div>
                             </div>`;
                         });
@@ -2419,7 +3292,7 @@
             if (res.ok) {
                 const data = await res.json();
                 const select = document.getElementById('chatPersonaSelect');
-                select.innerHTML = '<option value="">-- Select Persona --</option>' + data.personas.map(p => `<option value="${p.id}">${p.displayName}</option>`).join('');
+                select.innerHTML = '<option value="">-- Select Persona --</option>' + data.personas.map(p => `<option value="${escAttr(p.id)}">${escapeHtml(p.displayName)}</option>`).join('');
             }
         })();
 
@@ -2961,6 +3834,164 @@
 
         function downloadPerformanceJson() {
             window.open(`${ADMIN_BASE}/observability/export/performance.json?${obsCurrentFilterParams().toString()}`, '_blank');
+        }
+
+        // Module 07 — Conversations Inspector. Read-only 3-pane view: real
+        // conversations (left) -> real transcript (center) -> real LLM
+        // exchange data for the selected message's turn (right). Every field
+        // rendered here comes from AdminConversationRoutes, which itself is a
+        // thin read layer over ConversationRepository / MessageRepository /
+        // LlmExchangeRepository / MemoryFactRepository — nothing fabricated.
+        let ciSelectedConversationId = null;
+        let ciSelectedMessageId = null;
+
+        async function adminLogout() {
+            try { await fetch(`${ADMIN_BASE}/auth/logout`, { method: 'POST' }); } catch (e) { /* best effort */ }
+            window.location.href = '/admin-login.html';
+        }
+
+        async function ciLoadConversations() {
+            const listEl = document.getElementById('ciConversationList');
+            const errEl = document.getElementById('ciListError');
+            errEl.style.display = 'none';
+            listEl.innerHTML = '<div class="ci-empty">Loading…</div>';
+            try {
+                const userId = document.getElementById('ciFilterUserId').value.trim();
+                const params = new URLSearchParams({ limit: '50' });
+                if (userId) params.set('userId', userId);
+                const res = await fetch(`${ADMIN_BASE}/conversations?${params.toString()}`);
+                if (!res.ok) {
+                    listEl.innerHTML = '';
+                    errEl.textContent = 'Failed to load conversations: ' + res.status;
+                    errEl.style.display = 'block';
+                    return;
+                }
+                const data = await res.json();
+                const conversations = data.conversations || [];
+                if (conversations.length === 0) {
+                    listEl.innerHTML = '<div class="ci-empty">No conversations found.</div>';
+                    return;
+                }
+                listEl.innerHTML = conversations.map(c => `
+                    <div class="ci-conv-item${c.id === ciSelectedConversationId ? ' active' : ''}" onclick="ciSelectConversation('${escAttr(c.id)}')">
+                        <div class="ci-conv-persona">${escapeHtml(c.personaDisplayName || c.personaId)}</div>
+                        <div class="ci-conv-meta">
+                            user ${escapeHtml(c.userId.slice(0, 8))}… ·
+                            <span class="badge ${c.state === 'active' ? 'success' : 'muted'}" style="padding:1px 8px;">${escapeHtml(c.state)}</span>
+                            ${c.executionMode === 'TEST' ? '<span class="badge testing" style="padding:1px 8px;">TEST</span>' : ''}
+                        </div>
+                        <div class="ci-conv-meta">${escapeHtml(c.lastMessageAt || c.createdAt)}</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                listEl.innerHTML = '';
+                errEl.textContent = 'Failed to load conversations: ' + e.message;
+                errEl.style.display = 'block';
+            }
+        }
+
+        async function ciSelectConversation(conversationId) {
+            ciSelectedConversationId = conversationId;
+            ciSelectedMessageId = null;
+            document.querySelectorAll('.ci-conv-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('ciInspector').innerHTML = '<div class="ci-empty">Select a message to inspect its LLM execution.</div>';
+
+            const errEl = document.getElementById('ciDetailError');
+            const transcriptEl = document.getElementById('ciTranscript');
+            errEl.style.display = 'none';
+            transcriptEl.innerHTML = '<div class="ci-empty">Loading…</div>';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/conversations/${conversationId}`);
+                if (!res.ok) {
+                    transcriptEl.innerHTML = '';
+                    errEl.textContent = 'Failed to load conversation: ' + res.status;
+                    errEl.style.display = 'block';
+                    return;
+                }
+                const data = await res.json();
+                document.getElementById('ciTranscriptTitle').textContent =
+                    (data.conversation.personaDisplayName || data.conversation.personaId) + ' · ' + data.conversation.id.slice(0, 8) + '…';
+
+                // Re-render the list with the active row highlighted without a
+                // network round trip.
+                document.querySelectorAll('.ci-conv-item').forEach(el => {
+                    if (el.getAttribute('onclick') === `ciSelectConversation('${conversationId}')`) el.classList.add('active');
+                });
+
+                const messagesHtml = (data.messages || []).map(m => `
+                    <div class="ci-msg ${escAttr(m.role)}${m.id === ciSelectedMessageId ? ' selected' : ''}" onclick="ciSelectMessage('${escAttr(conversationId)}','${escAttr(m.id)}')">
+                        <div class="ci-msg-head">
+                            <span>${escapeHtml(m.role)} · ${escapeHtml(m.createdAt)}</span>
+                            <span>${m.engineVersionNumber != null ? 'engine v' + m.engineVersionNumber : ''} ${m.personaCoreVersionNumber != null ? 'persona v' + m.personaCoreVersionNumber : ''}</span>
+                        </div>
+                        <div class="ci-msg-content">${escapeHtml(m.content)}</div>
+                    </div>
+                `).join('') || '<div class="ci-empty">No messages in this conversation.</div>';
+
+                const factsHtml = (data.memoryFacts || []).length === 0
+                    ? '<div class="ci-empty">No memory facts learned for this user/persona.</div>'
+                    : data.memoryFacts.map(f => `
+                        <div class="ci-exchange-card">
+                            <div class="ci-kv"><span class="ci-k">Fact</span><span class="ci-v" style="text-align:left;">${escapeHtml(f.fact)}</span></div>
+                            <div class="ci-kv"><span class="ci-k">Type</span><span class="ci-v">${escapeHtml(f.factType)}</span></div>
+                            <div class="ci-kv"><span class="ci-k">Criticality</span><span class="ci-v">${escapeHtml(f.criticality)}</span></div>
+                            <div class="ci-kv"><span class="ci-k">Status</span><span class="ci-v">${escapeHtml(f.status)}</span></div>
+                            <div class="ci-kv"><span class="ci-k">Source</span><span class="ci-v">${escapeHtml(f.source)}</span></div>
+                        </div>
+                    `).join('');
+
+                transcriptEl.innerHTML = messagesHtml +
+                    '<div class="ci-section-label">Memory facts (user ↔ persona relationship)</div>' +
+                    factsHtml;
+            } catch (e) {
+                transcriptEl.innerHTML = '';
+                errEl.textContent = 'Failed to load conversation: ' + e.message;
+                errEl.style.display = 'block';
+            }
+        }
+
+        async function ciSelectMessage(conversationId, messageId) {
+            ciSelectedMessageId = messageId;
+            document.querySelectorAll('.ci-msg').forEach(el => el.classList.remove('selected'));
+            const clicked = document.querySelector(`.ci-msg[onclick="ciSelectMessage('${conversationId}','${messageId}')"]`);
+            if (clicked) clicked.classList.add('selected');
+
+            const inspectorEl = document.getElementById('ciInspector');
+            inspectorEl.innerHTML = '<div class="ci-empty">Loading…</div>';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/conversations/${conversationId}/messages/${messageId}/execution`);
+                if (!res.ok) {
+                    inspectorEl.innerHTML = `<div class="ci-empty">Failed to load execution data: ${res.status}</div>`;
+                    return;
+                }
+                const data = await res.json();
+                if (!data.requestId) {
+                    inspectorEl.innerHTML = '<div class="ci-empty">This message has no associated request (e.g. a system message) — nothing to inspect.</div>';
+                    return;
+                }
+                if ((data.exchanges || []).length === 0) {
+                    inspectorEl.innerHTML = '<div class="ci-empty">No LLM exchanges recorded for this turn.</div>';
+                    return;
+                }
+                inspectorEl.innerHTML = `<div class="ci-section-label">Turn ${escapeHtml(data.requestId.slice(0, 8))}… — ${data.exchanges.length} exchange(s)</div>` +
+                    data.exchanges.map(ex => `
+                        <div class="ci-exchange-card">
+                            <div class="ci-kv"><span class="ci-k">Workload</span><span class="ci-v">${escapeHtml(ex.workload)}${ex.skillKey ? ' · ' + escapeHtml(ex.skillKey) : ''}</span></div>
+                            <div class="ci-kv"><span class="ci-k">Outcome</span><span class="ci-v badge ${ex.outcome === 'SUCCESS' ? 'success' : 'danger'}" style="padding:1px 8px;">${escapeHtml(ex.outcome)}</span></div>
+                            <div class="ci-kv"><span class="ci-k">Model / Provider</span><span class="ci-v">${escapeHtml(ex.model || '—')} / ${escapeHtml(ex.provider || '—')}</span></div>
+                            <div class="ci-kv"><span class="ci-k">Latency</span><span class="ci-v">${ex.latencyMs} ms</span></div>
+                            <div class="ci-kv"><span class="ci-k">Tokens (p/c/r/t)</span><span class="ci-v">${ex.promptTokens ?? '—'} / ${ex.completionTokens ?? '—'} / ${ex.reasoningTokens ?? '—'} / ${ex.totalTokens ?? '—'}</span></div>
+                            <div class="ci-kv"><span class="ci-k">Finish reason</span><span class="ci-v">${escapeHtml(ex.finishReason || '—')}</span></div>
+                            ${ex.httpStatusCode != null ? `<div class="ci-kv"><span class="ci-k">HTTP status</span><span class="ci-v">${ex.httpStatusCode}</span></div>` : ''}
+                            ${ex.errorClass ? `<div class="ci-kv"><span class="ci-k">Error</span><span class="ci-v">${escapeHtml(ex.errorClass)}: ${escapeHtml(ex.errorMessage || '')}</span></div>` : ''}
+                            <div class="ci-kv"><span class="ci-k">Test Chat</span><span class="ci-v">${ex.isTestChat ? 'Yes' : 'No'}</span></div>
+                            ${ex.requestBody ? `<div style="margin-top:8px; font-size:11px; color: var(--muted-mauve);">Request body</div><div class="ci-code-block">${escapeHtml(ex.requestBody)}</div>` : ''}
+                            ${ex.responseBody ? `<div style="margin-top:8px; font-size:11px; color: var(--muted-mauve);">Response body</div><div class="ci-code-block">${escapeHtml(ex.responseBody)}</div>` : ''}
+                        </div>
+                    `).join('');
+            } catch (e) {
+                inspectorEl.innerHTML = `<div class="ci-empty">Failed to load execution data: ${e.message}</div>`;
+            }
         }
     </script>
 </body>

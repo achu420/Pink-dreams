@@ -6,6 +6,7 @@ import com.pinkdreams.api.chat.ChatRoutes
 import com.pinkdreams.api.conversation.ConversationHistoryRoutes
 import com.pinkdreams.api.health.HealthRoutes
 import com.pinkdreams.auth.AdminAuthorizationProvider
+import com.pinkdreams.auth.AdminSessionAuth
 import com.pinkdreams.auth.DevAuthProvider
 import com.pinkdreams.chat.ChatEngine
 import com.pinkdreams.chat.PipelineChatEngine
@@ -38,6 +39,8 @@ import java.util.concurrent.Executor
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCallPipeline
+import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
@@ -46,6 +49,8 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.request.path
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
+import io.ktor.server.response.respondRedirect
 import io.ktor.server.routing.routing
 import io.ktor.server.routing.get
 import kotlinx.serialization.json.Json
@@ -67,6 +72,7 @@ fun Application.module(
     conversationRepository: ConversationRepository? = null,
     adminAuthProvider: AdminAuthorizationProvider? = null,
     database: Database? = null,
+    adminSessionAuth: AdminSessionAuth? = null,
 ) {
     install(ContentNegotiation) {
         json(Json {
@@ -233,8 +239,80 @@ fun Application.module(
     )
 
     val authProvider = adminAuthProvider ?: AdminAuthorizationProvider()
+    val sessionAuth = adminSessionAuth ?: AdminSessionAuth()
+
+    // Admin session gate — layered IN ADDITION to the existing dev-auth
+    // basic-auth + AdminAuthorizationProvider mechanism used by every admin
+    // route below (registered via `route.authenticate("dev-auth")` +
+    // isAdmin()). This intercept runs before routing, so it never needs to
+    // know about that mechanism's internals — it only decides whether a
+    // request may proceed to it at all.
+    //
+    // - GET /admin (the admin UI page): requires a valid session cookie;
+    //   otherwise redirects to the login page. A browser navigating here has
+    //   no way to attach a bearer/basic-auth header on its own, so a session
+    //   cookie is the only thing that can satisfy this.
+    // - Every other /v1/admin/* route (except the login/logout endpoints
+    //   themselves, which must stay reachable to establish a session):
+    //   requires a valid session cookie OR an Authorization header. The
+    //   Authorization-header allowance is what keeps every existing admin
+    //   route test working unchanged — those tests authenticate with
+    //   basicAuth(...) and carry no session cookie, and still go on to be
+    //   checked by the existing dev-auth + isAdmin gate exactly as before.
+    //   A real unauthenticated browser request (no cookie, no header) is
+    //   rejected here with 401 (never a redirect) so admin-ui.html's own
+    //   fetch() calls can detect it and redirect client-side.
+    intercept(ApplicationCallPipeline.Plugins) {
+        val path = call.request.path()
+        val isAdminAuthEndpoint = path == "/v1/admin/auth/login" || path == "/v1/admin/auth/logout"
+        val isAdminUiPage = path == "/admin"
+        val isAdminApi = path.startsWith("/v1/admin/") && !isAdminAuthEndpoint
+
+        if (isAdminUiPage || isAdminApi) {
+            val sessionToken = call.request.cookies[AdminSessionAuth.COOKIE_NAME]
+            val hasValidSession = sessionAuth.isValidSession(sessionToken)
+            // A mere Authorization header's *presence* is not proof of anything — it must
+            // actually be a well-formed Basic credential with a non-blank username and
+            // password, matching the check DevAuthProvider itself performs. This keeps the
+            // pre-existing test/API basicAuth(...) call sites working without letting an
+            // unauthenticated caller bypass the session gate with an arbitrary header value.
+            val hasBasicAuthHeader = call.request.headers[io.ktor.http.HttpHeaders.Authorization]
+                ?.let { headerValue ->
+                    if (!headerValue.startsWith("Basic ", ignoreCase = true)) return@let false
+                    try {
+                        val decoded = String(java.util.Base64.getDecoder().decode(headerValue.substring(6).trim()))
+                        val separatorIndex = decoded.indexOf(':')
+                        if (separatorIndex < 0) return@let false
+                        decoded.substring(0, separatorIndex).isNotBlank() && decoded.substring(separatorIndex + 1).isNotBlank()
+                    } catch (e: IllegalArgumentException) {
+                        false
+                    }
+                } ?: false
+
+            if (!hasValidSession && !(isAdminApi && hasBasicAuthHeader)) {
+                if (isAdminUiPage) {
+                    call.respondRedirect("/admin-login.html")
+                } else {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Admin session required", null)),
+                    )
+                }
+                finish()
+            }
+        }
+    }
 
     routing {
+        com.pinkdreams.api.admin.AdminAuthRoutes(sessionAuth).register(this)
+        get("/admin-login.html") {
+            val resource = Thread.currentThread().contextClassLoader.getResource("admin-login.html")
+            if (resource != null) {
+                call.respondText(resource.readText(), io.ktor.http.ContentType.Text.Html)
+            } else {
+                call.respond(HttpStatusCode.NotFound, "Admin login page not found")
+            }
+        }
         HealthRoutes().register(this)
         ChatRoutes(engine, conversationRepo, memoryFactRepo).register(this)
         ConversationHistoryRoutes(conversationRepo, messageRepo, userRepository = userRepo).register(this)
@@ -273,6 +351,21 @@ fun Application.module(
             // Task 9 — aiRuntimeSettings.resolve() is now the sole source for
             // Effective Configuration; no separate override fields needed.
             aiRuntimeSettings = aiRuntimeSettings,
+        ).register(this)
+        // Module 05 — Dashboard activity counters (read-only COUNT(*) only).
+        com.pinkdreams.api.admin.AdminStatsRoutes(
+            statsRepository = com.pinkdreams.persistence.repositories.AdminStatsRepository(db),
+            adminAuthorizationProvider = authProvider,
+        ).register(this)
+        com.pinkdreams.api.admin.AdminConversationRoutes(
+            conversationRepository = conversationRepo,
+            messageRepository = messageRepo,
+            memoryFactRepository = memoryFactRepo,
+            exchangeRepository = com.pinkdreams.persistence.repositories.LlmExchangeRepository(db),
+            personaRepository = personaRepo,
+            personaCoreVersionRepository = coreVersionRepo,
+            conversationEngineRepository = engineRepo,
+            adminAuthorizationProvider = authProvider,
         ).register(this)
     }
 }

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMIA Admin Console — Sign In</title>
+    <style>
+        :root {
+            --near-black: #190611;
+            --deep-plum: #2A0B1C;
+            --rose: #E85A88;
+            --soft-rose: #F3A0B7;
+            --blush: #F7D8E1;
+            --warm-white: #FFF8FB;
+            --muted-mauve: #CDBBC4;
+            --surface: #231018;
+            --surface-2: #2C1420;
+            --border: rgba(247,216,225,0.10);
+            --border-strong: rgba(247,216,225,0.18);
+            --danger: #F0567A;
+            --radius: 14px;
+            --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            font-family: var(--font-sans);
+            background: radial-gradient(circle at 20% 15%, var(--deep-plum), var(--near-black) 60%);
+            color: var(--warm-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .card {
+            width: 100%;
+            max-width: 360px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.4);
+        }
+        .brand-name { font-family: var(--font-serif); font-size: 26px; font-weight: 600; letter-spacing: .03em; }
+        .brand-sub { font-size: 10.5px; letter-spacing: .12em; color: var(--muted-mauve); text-transform: uppercase; margin: 2px 0 24px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--muted-mauve); font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+        input {
+            width: 100%; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: 9px;
+            font-family: inherit; background: var(--surface-2); color: var(--warm-white); font-size: 14px;
+        }
+        input:focus-visible, button:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; }
+        button {
+            width: 100%; padding: 11px 18px; margin-top: 6px;
+            background: linear-gradient(135deg, var(--rose), #d43f6d); color: #fff; border: none;
+            border-radius: 9px; cursor: pointer; font-weight: 600; font-size: 14px;
+        }
+        button:hover { filter: brightness(1.08); }
+        button:disabled { opacity: .6; cursor: default; }
+        .error {
+            display: none;
+            color: var(--danger); padding: 10px 14px; background: rgba(240,86,122,.1);
+            border: 1px solid rgba(240,86,122,.3); border-radius: 9px; margin-bottom: 16px; font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <form class="card" id="loginForm" autocomplete="on">
+        <div class="brand-name">🎭 AMIA</div>
+        <div class="brand-sub">Admin Console</div>
+        <div class="error" id="loginError"></div>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" id="loginBtn">Sign In</button>
+    </form>
+    <script>
+        const form = document.getElementById('loginForm');
+        const errorEl = document.getElementById('loginError');
+        const btn = document.getElementById('loginBtn');
+
+        // Return to whatever admin page the user was trying to reach, when known.
+        const params = new URLSearchParams(window.location.search);
+        const redirectTo = params.get('redirect') || '/admin';
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            errorEl.style.display = 'none';
+            btn.disabled = true;
+            try {
+                const res = await fetch('/v1/admin/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value,
+                        password: document.getElementById('password').value,
+                    }),
+                });
+                if (res.ok) {
+                    window.location.href = redirectTo;
+                } else {
+                    errorEl.textContent = 'Invalid username or password.';
+                    errorEl.style.display = 'block';
+                }
+            } catch (e) {
+                errorEl.textContent = 'Could not reach the server. Please try again.';
+                errorEl.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
