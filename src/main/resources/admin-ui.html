@@ -84,6 +84,13 @@
         }
         .nav-item:hover { background: rgba(247,216,225,0.06); }
         .nav-item.active { background: linear-gradient(90deg, rgba(232,90,136,.22), rgba(232,90,136,.06)); color: var(--warm-white); }
+        /* Task 12 — keyboard focus must be visible; color alone never
+           indicates active/focus state (accessibility pass). */
+        .nav-item:focus-visible, button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+            outline: 2px solid var(--rose); outline-offset: 2px;
+        }
+        .table-wrap { overflow-x: auto; max-width: 100%; }
+        .table-wrap td, .table-wrap th { white-space: nowrap; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
         .main { flex: 1; min-width: 0; }
         .topbar {
             display: flex; align-items: center; gap: 14px; padding: 14px 24px; border-bottom: 1px solid var(--border);
@@ -249,7 +256,7 @@
 
     <div class="main">
         <div class="topbar">
-            <button class="secondary" id="sidebarToggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <button class="secondary" id="sidebarToggle" aria-label="Toggle navigation menu" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
             <h1 id="topbarTitle">Dashboard</h1>
             <div class="topbar-right">
                 <div class="env-pill"><span class="dot"></span> <span id="envLabel">Live</span></div>
@@ -320,10 +327,10 @@
                 </div>
                 <button onclick="createPersona()">Create Persona</button>
                 <button class="secondary" onclick="loadPersonas()">Refresh List</button>
-                <table id="personasTable" style="margin-top: 20px;">
+                <div class="table-wrap"><table id="personasTable" style="margin-top: 20px;">
                     <thead><tr><th>Name</th><th>Slug</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
-                </table>
+                </table></div>
 
                 <div id="editPersonaModal" style="display: none; margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 4px;">
                     <h3>Edit Persona</h3>
@@ -365,10 +372,10 @@
                 </div>
                 <button onclick="createVersion()">Create Draft</button>
                 <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server.</div>
-                <table id="versionsTable" style="margin-top: 20px;">
+                <div class="table-wrap"><table id="versionsTable" style="margin-top: 20px;">
                     <thead><tr><th>Version</th><th>Status</th><th>Active</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
-                </table>
+                </table></div>
             </div>
 
             <div class="section">
@@ -386,10 +393,10 @@
                 <button onclick="createEngineVersion()">Create Draft</button>
                 <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server.</div>
                 <button class="secondary" onclick="loadEngines()" style="margin-top: 10px;">Refresh Engines</button>
-                <table id="enginesTable" style="margin-top: 20px;">
+                <div class="table-wrap"><table id="enginesTable" style="margin-top: 20px;">
                     <thead><tr><th>Version</th><th>Status</th><th>Active</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
-                </table>
+                </table></div>
             </div>
 
             <div class="section">
@@ -411,10 +418,10 @@
                 <button onclick="createSkillVersion()">Create Draft</button>
                 <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server, per key. Multiple keys can each have their own active version.</div>
                 <button class="secondary" onclick="loadSkills()" style="margin-top: 10px;">Refresh Skills</button>
-                <table id="skillsTable" style="margin-top: 20px;">
+                <div class="table-wrap"><table id="skillsTable" style="margin-top: 20px;">
                     <thead><tr><th>Key</th><th>Version</th><th>Status</th><th>Active</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
-                </table>
+                </table></div>
             </div>
 
             <div class="section">
@@ -439,10 +446,10 @@
                 <button onclick="createMemoryEngineVersion()">Create Draft</button>
                 <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server.</div>
                 <button class="secondary" onclick="loadMemoryEngines()" style="margin-top: 10px;">Refresh Memory Engines</button>
-                <table id="memoryEnginesTable" style="margin-top: 20px;">
+                <div class="table-wrap"><table id="memoryEnginesTable" style="margin-top: 20px;">
                     <thead><tr><th>Version</th><th>Status</th><th>Active</th><th>Batch</th><th>Target</th><th>Author</th><th>Changelog</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
-                </table>
+                </table></div>
             </div>
 
             <div class="section">
@@ -469,10 +476,10 @@
                 <button onclick="createIntentEngineVersion()">Create Draft</button>
                 <div style="font-size: 11px; color: #666; margin-top: 6px;">Version number is assigned automatically by the server.</div>
                 <button class="secondary" onclick="loadIntentEngines()" style="margin-top: 10px;">Refresh Intent Engines</button>
-                <table id="intentEnginesTable" style="margin-top: 20px;">
+                <div class="table-wrap"><table id="intentEnginesTable" style="margin-top: 20px;">
                     <thead><tr><th>Version</th><th>Status</th><th>Active</th><th>Author</th><th>Changelog</th><th>Actions</th></tr></thead>
                     <tbody></tbody>
-                </table>
+                </table></div>
             </div>
 
             <div class="section">
@@ -590,10 +597,10 @@
                     <input type="number" id="newUserAge" placeholder="28" min="18" max="120">
                 </div>
                 <button onclick="createTestUser()">Create User</button>
-                <table id="usersTable" style="margin-top: 20px;">
+                <div class="table-wrap"><table id="usersTable" style="margin-top: 20px;">
                     <thead><tr><th>Display Name</th><th>Gender</th><th>Interest</th><th>City</th><th>Age</th></tr></thead>
                     <tbody></tbody>
-                </table>
+                </table></div>
             </div>
         </div>
 
@@ -954,6 +961,21 @@
             return 'Basic ' + btoa(`${userId}:admin-console`);
         }
 
+        // Part 16 — accessibility: sidebar items are plain elements styled
+        // as nav links (matching the existing AMIA prototype's own markup
+        // convention) but must still behave like real navigation controls
+        // for keyboard users.
+        document.querySelectorAll('.nav-item').forEach(el => {
+            el.setAttribute('role', 'button');
+            el.setAttribute('tabindex', '0');
+            el.addEventListener('keydown', (evt) => {
+                if (evt.key === 'Enter' || evt.key === ' ') {
+                    evt.preventDefault();
+                    el.click();
+                }
+            });
+        });
+
         let obsDashboardLoadedOnce = false;
         let dashboardLoadedOnce = false;
 
@@ -997,6 +1019,28 @@
             document.getElementById('sidebar').classList.remove('open');
         }
 
+        // Part 3 — the AI Configuration screen is one scrollable page with
+        // anchors (sec-personas/sec-engines/sec-skills/sec-aisettings/
+        // sec-users); as the admin scrolls past each section, the matching
+        // sidebar sub-item should light up too — without converting this
+        // into separate routes/pages.
+        (function setupSubsectionHighlighting() {
+            const anchorIds = ['sec-personas', 'sec-engines', 'sec-skills', 'sec-aisettings', 'sec-users'];
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    if (!document.getElementById('setup').classList.contains('active')) return;
+                    document.querySelectorAll('.nav-item[data-view="setup"]').forEach(el => {
+                        el.classList.toggle('active', el.dataset.anchor === entry.target.id);
+                    });
+                });
+            }, { rootMargin: '-20% 0px -70% 0px' });
+            anchorIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) observer.observe(el);
+            });
+        })();
+
         // Task 11 Step 9 — Dashboard. Every number here comes from an
         // existing endpoint (latency-dashboard, ai-configuration, users) —
         // nothing is fabricated. A metric that can't be obtained reliably is
@@ -1039,8 +1083,9 @@
                     <div style="margin-top:10px;"><a href="#" onclick="document.querySelector('[data-view=observability]').click(); return false;" style="color:var(--rose);font-size:12px;">View full Observability dashboard →</a></div>
                 ` : '<div class="empty-state">No exchanges recorded yet.</div>';
             } catch (e) {
-                document.getElementById('dashboardError').style.display = 'block';
-                document.getElementById('dashboardError').textContent = 'Failed to load dashboard: ' + e.message;
+                const errEl = document.getElementById('dashboardError');
+                errEl.style.display = 'block';
+                errEl.innerHTML = `Unable to load dashboard data: ${escapeHtml(e.message)} <button class="secondary" style="margin-left:10px;padding:4px 12px;" onclick="loadDashboard()">Retry</button>`;
             }
         }
 
@@ -1090,17 +1135,17 @@
                 if (!res.ok) throw new Error('Failed to load personas');
                 const data = await res.json();
                 const table = document.querySelector('#personasTable tbody');
-                table.innerHTML = data.personas.map(p => `
+                table.innerHTML = data.personas.length ? data.personas.map(p => `
                     <tr>
-                        <td>${p.displayName}</td>
-                        <td>${p.slug}</td>
-                        <td>${p.status}</td>
+                        <td>${escapeHtml(p.displayName)}</td>
+                        <td>${escapeHtml(p.slug)}</td>
+                        <td>${escapeHtml(p.status)}</td>
                         <td>
-                            <button onclick="selectPersona('${p.id}', '${p.displayName}')" class="secondary">Select</button>
-                            <button onclick="editPersona('${p.id}', '${p.displayName}', '${p.gender}', '${p.orientation}', ${p.apparentAge})" class="secondary">✎ Edit</button>
+                            <button onclick="selectPersona('${p.id}', '${escAttr(p.displayName)}')" class="secondary">Select</button>
+                            <button onclick="editPersona('${p.id}', '${escAttr(p.displayName)}', '${escAttr(p.gender)}', '${escAttr(p.orientation)}', ${p.apparentAge})" class="secondary">✎ Edit</button>
                         </td>
                     </tr>
-                `).join('');
+                `).join('') : emptyRow(4, 'No personas found.');
             } catch (e) {
                 showError('createPersonaError', e.message);
             }
@@ -1194,17 +1239,17 @@
                 if (!res.ok) throw new Error('Failed to load versions');
                 const data = await res.json();
                 const table = document.querySelector('#versionsTable tbody');
-                table.innerHTML = data.versions.map(v => `
+                table.innerHTML = data.versions.length ? data.versions.map(v => `
                     <tr>
                         <td>v${v.version}</td>
-                        <td>${v.status}</td>
+                        <td>${escapeHtml(v.status)}</td>
                         <td>${v.isActive ? '✓' : ''}</td>
                         <td>
                             ${v.status === 'draft' ? `<button onclick="publishVersion('${selectedPersonaId}', '${v.id}')" class="secondary">Publish</button>` : ''}
                             ${v.status === 'published' && !v.isActive ? `<button onclick="activateVersion('${selectedPersonaId}', '${v.id}')" class="secondary">Activate</button>` : ''}
                         </td>
                     </tr>
-                `).join('');
+                `).join('') : emptyRow(4, 'No persona core versions found.');
             } catch (e) {
                 showError('versionError', e.message);
             }
@@ -1262,17 +1307,17 @@
                 if (!res.ok) throw new Error('Failed to load engines');
                 const data = await res.json();
                 const table = document.querySelector('#enginesTable tbody');
-                table.innerHTML = data.engines.map(e => `
+                table.innerHTML = data.engines.length ? data.engines.map(e => `
                     <tr>
                         <td>v${e.version}</td>
-                        <td>${e.status}</td>
+                        <td>${escapeHtml(e.status)}</td>
                         <td>${e.isActive ? '✓' : ''}</td>
                         <td>
                             ${e.status === 'draft' ? `<button onclick="publishEngineVersion('${e.id}')" class="secondary">Publish</button>` : ''}
                             ${e.status === 'published' && !e.isActive ? `<button onclick="activateEngineVersion('${e.id}')" class="secondary">Activate</button>` : ''}
                         </td>
                     </tr>
-                `).join('');
+                `).join('') : emptyRow(4, 'No conversation engine versions found.');
             } catch (e) {
                 showError('engineError', e.message);
             }
@@ -1332,18 +1377,18 @@
                 const data = await res.json();
                 const table = document.querySelector('#skillsTable tbody');
                 const sorted = data.skills.slice().sort((a, b) => a.key.localeCompare(b.key) || a.version - b.version);
-                table.innerHTML = sorted.map(s => `
+                table.innerHTML = sorted.length ? sorted.map(s => `
                     <tr>
-                        <td>${s.key}</td>
+                        <td>${escapeHtml(s.key)}</td>
                         <td>v${s.version}</td>
-                        <td>${s.status}</td>
+                        <td>${escapeHtml(s.status)}</td>
                         <td>${s.isActive ? '✓' : ''}</td>
                         <td>
                             ${s.status === 'draft' ? `<button onclick="publishSkillVersion('${s.id}')" class="secondary">Publish</button>` : ''}
                             ${s.status === 'published' && !s.isActive ? `<button onclick="activateSkillVersion('${s.id}')" class="secondary">Activate</button>` : ''}
                         </td>
                     </tr>
-                `).join('');
+                `).join('') : emptyRow(5, 'No skills found.');
             } catch (e) {
                 showError('skillError', e.message);
             }
@@ -1406,21 +1451,21 @@
                 if (!res.ok) throw new Error('Failed to load memory engines');
                 const data = await res.json();
                 const table = document.querySelector('#memoryEnginesTable tbody');
-                table.innerHTML = data.memoryEngines.map(e => `
+                table.innerHTML = data.memoryEngines.length ? data.memoryEngines.map(e => `
                     <tr>
                         <td>v${e.version}</td>
-                        <td>${e.status}</td>
+                        <td>${escapeHtml(e.status)}</td>
                         <td>${e.isActive ? '✓' : ''}</td>
                         <td>${e.batchSize}</td>
                         <td>${e.relevantMemoryTarget}</td>
-                        <td>${e.createdBy || ''}</td>
-                        <td>${e.changelogNote || ''}</td>
+                        <td>${escapeHtml(e.createdBy) || ''}</td>
+                        <td>${escapeHtml(e.changelogNote) || ''}</td>
                         <td>
                             ${e.status === 'draft' ? `<button onclick="publishMemoryEngineVersion('${e.id}')" class="secondary">Publish</button>` : ''}
                             ${e.status === 'published' && !e.isActive ? `<button onclick="activateMemoryEngineVersion('${e.id}')" class="secondary">Activate</button>` : ''}
                         </td>
                     </tr>
-                `).join('');
+                `).join('') : emptyRow(7, 'No memory engine versions found.');
             } catch (e) {
                 showError('memoryEngineError', e.message);
             }
@@ -1482,19 +1527,20 @@
                 document.getElementById('intentEngineCandidates').textContent =
                     candidates.length ? candidates.join(', ') : 'none — no skills are active, so no skill can be selected';
                 const table = document.querySelector('#intentEnginesTable tbody');
-                table.innerHTML = (data.intentEngines || []).map(e => `
+                const intentEngines = data.intentEngines || [];
+                table.innerHTML = intentEngines.length ? intentEngines.map(e => `
                     <tr>
                         <td>v${e.version}</td>
-                        <td>${e.status}</td>
+                        <td>${escapeHtml(e.status)}</td>
                         <td>${e.isActive ? '✓' : ''}</td>
-                        <td>${e.createdBy || ''}</td>
-                        <td>${e.changelogNote || ''}</td>
+                        <td>${escapeHtml(e.createdBy) || ''}</td>
+                        <td>${escapeHtml(e.changelogNote) || ''}</td>
                         <td>
                             ${e.status === 'draft' ? `<button onclick="publishIntentEngineVersion('${e.id}')" class="secondary">Publish</button>` : ''}
                             ${e.status === 'published' && !e.isActive ? `<button onclick="activateIntentEngineVersion('${e.id}', ${e.version})" class="secondary">Activate</button>` : ''}
                         </td>
                     </tr>
-                `).join('');
+                `).join('') : emptyRow(6, 'No intent engine versions found.');
             } catch (e) {
                 showError('intentEngineError', e.message);
             }
@@ -1855,20 +1901,20 @@
                 adminUsers = data.users || [];
 
                 const table = document.querySelector('#usersTable tbody');
-                table.innerHTML = adminUsers.map(u => `
+                table.innerHTML = adminUsers.length ? adminUsers.map(u => `
                     <tr>
-                        <td>${u.displayName || '(unnamed)'}</td>
-                        <td>${u.gender || '—'}</td>
-                        <td>${u.interest || '—'}</td>
-                        <td>${u.city || '—'}</td>
+                        <td>${escapeHtml(u.displayName) || '(unnamed)'}</td>
+                        <td>${escapeHtml(u.gender) || '—'}</td>
+                        <td>${escapeHtml(u.interest) || '—'}</td>
+                        <td>${escapeHtml(u.city) || '—'}</td>
                         <td>${u.age != null ? u.age : '—'}</td>
                     </tr>
-                `).join('');
+                `).join('') : emptyRow(5, 'No users found.');
 
                 const select = document.getElementById('chatUserSelect');
                 const previousValue = preferredUserId || select.value;
                 select.innerHTML = '<option value="">-- Select User --</option>' +
-                    adminUsers.map(u => `<option value="${u.userId}">${u.displayName || u.userId}</option>`).join('');
+                    adminUsers.map(u => `<option value="${u.userId}">${escapeHtml(u.displayName) || u.userId}</option>`).join('');
                 document.getElementById('noUsersHint').style.display = adminUsers.length === 0 ? 'block' : 'none';
 
                 if (previousValue && adminUsers.some(u => u.userId === previousValue)) {
@@ -2400,6 +2446,27 @@
                 .replace(/'/g, '&#39;');
         }
 
+        // Task 12 — safe for embedding admin-entered free text (persona
+        // names, skill keys, changelog notes, etc.) inside a single-quoted
+        // JS string literal that itself sits inside an onclick="..." HTML
+        // attribute — two escaping contexts at once (JS-string, then HTML
+        // attribute), since innerHTML parses the whole thing as markup.
+        function escAttr(value) {
+            return String(value ?? '')
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        // Task 12 — one consistent "no data" row for every plain admin
+        // table (Personas/Users/Skills/Engines/etc.), matching the same
+        // honest-empty-state convention the Observability tab already uses.
+        function emptyRow(colspan, message) {
+            return `<tr><td colspan="${colspan}" style="text-align:center;color:var(--muted-mauve);padding:24px;">${escapeHtml(message)}</td></tr>`;
+        }
+
         // Task 10 Step 6-8 — each dimension row now carries its own SLA
         // buckets and error rate (DimensionStatsResponse), not just central
         // latency, so "which workload/skill/model/provider is causing the
@@ -2555,22 +2622,22 @@
                     el.innerHTML = '<div class="obs-empty">No turns exceed this threshold for the current filters.</div>';
                     return;
                 }
-                el.innerHTML = `<table>
+                el.innerHTML = `<div class="table-wrap"><table>
                     <thead><tr><th>Time</th><th>Turn</th><th>Total</th><th>Intent</th><th>Generation</th><th>Skill</th><th>Model</th><th>Provider</th><th>Outcome</th><th>Mode</th></tr></thead>
                     <tbody>${data.turns.map(t => `
-                        <tr class="obs-row-click" onclick="openSlowTurn('${t.turnRequestId}')">
+                        <tr class="obs-row-click" onclick="openSlowTurn('${t.turnRequestId}')" title="Click to open the full turn trace">
                             <td>${escapeHtml(t.createdAt)}</td>
-                            <td>${escapeHtml(t.turnRequestId.substring(0, 8))}…</td>
+                            <td title="${escapeHtml(t.turnRequestId)}">${escapeHtml(t.turnRequestId.substring(0, 8))}…</td>
                             <td><b style="color:var(--obs-danger);">${fmtMs(t.onPathLatencyMs)}</b></td>
                             <td>${fmtMs(t.intentLatencyMs)}</td>
                             <td>${fmtMs(t.generationLatencyMs)}</td>
                             <td>${escapeHtml(t.skillKey) || '—'}</td>
-                            <td>${escapeHtml(t.generationModel) || '—'}</td>
+                            <td title="${escapeHtml(t.generationModel)}">${escapeHtml(t.generationModel) || '—'}</td>
                             <td>${escapeHtml(t.generationProvider) || '—'}</td>
                             <td>${outcomeBadge(t.outcome)}</td>
                             <td><span class="obs-badge ${t.isTestChat ? 'testing' : 'muted'}">${t.isTestChat ? 'TEST' : 'PROD'}</span></td>
                         </tr>`).join('')}</tbody>
-                </table>`;
+                </table></div>`;
             } catch (e) {
                 showError('obsSlowTurnsError', 'Failed to load slow turns: ' + e.message);
                 el.innerHTML = '';
@@ -2588,10 +2655,10 @@
             return `
                 <div class="obs-card">
                     <h3>${title}</h3>
-                    <table>
+                    <div class="table-wrap"><table>
                         <thead><tr><th>${title.replace('By ', '')}</th><th>Count</th><th>p50</th><th>p75</th><th>p95</th><th>p99</th><th>Max</th><th>Avg</th><th>≤10s</th><th>&gt;10s</th><th>&gt;20s</th><th>Error rate</th></tr></thead>
                         <tbody>${rows || '<tr><td colspan="11" class="obs-empty">no exchanges match this filter</td></tr>'}</tbody>
-                    </table>
+                    </table></div>
                 </div>
             `;
         }
@@ -2684,11 +2751,11 @@
         }
 
         function exchangeRow(ex) {
-            return `<tr class="obs-row-click" onclick="loadExchangeDetail('${ex.id}')">
-                <td>${escapeHtml(ex.id.substring(0, 8))}…</td>
+            return `<tr class="obs-row-click" onclick="loadExchangeDetail('${ex.id}')" title="Click to open full exchange detail">
+                <td title="${escapeHtml(ex.id)}">${escapeHtml(ex.id.substring(0, 8))}…</td>
                 <td>${escapeHtml(ex.workload)}</td>
                 <td>${escapeHtml(ex.skillKey) || '—'}</td>
-                <td>${escapeHtml(ex.model) || '—'}</td>
+                <td title="${escapeHtml(ex.model)}">${escapeHtml(ex.model) || '—'}</td>
                 <td>${escapeHtml(ex.provider) || '—'}</td>
                 <td>${fmtMs(ex.latencyMs)}</td>
                 <td>${escapeHtml(ex.finishReason) || '—'}</td>
@@ -2699,10 +2766,10 @@
         }
 
         function exchangeTable(exchanges) {
-            return `<table>
+            return `<div class="table-wrap"><table>
                 <thead><tr><th>Exchange</th><th>Workload</th><th>Skill</th><th>Model</th><th>Provider</th><th>Latency</th><th>Finish</th><th>Outcome</th><th>Mode</th><th>Time</th></tr></thead>
                 <tbody>${exchanges.map(exchangeRow).join('')}</tbody>
-            </table>`;
+            </table></div>`;
         }
 
         function renderExchangeList(exchanges) {
