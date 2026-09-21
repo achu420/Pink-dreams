@@ -15,11 +15,21 @@ class LlmGenerator(
     // next message instead of the next deploy. Defaults to the constructor
     // config, so every existing caller and test behaves exactly as before.
     private val configProvider: () -> GenerationConfig = { config },
+    // Task 24 — an ADDITIVE alternative to configProvider that also receives
+    // the turn's requestId, so the resolving lambda (ChatEngineFactory, the one
+    // place that knows each value's resolution SOURCE) can stamp the
+    // configuration onto this turn's attribution record at the exact moment it
+    // is resolved. Null (every existing caller/test) means configProvider is
+    // used exactly as before; the resolved config itself is identical either
+    // way, so generation behavior is unchanged.
+    private val turnAwareConfigProvider: ((java.util.UUID) -> GenerationConfig)? = null,
 ) : Generator {
     override fun generate(request: ChatRequest, context: ChatContext): StageResult<GenerationResponse> {
         // A failure resolving admin settings must never fail generation: fall
         // back to the startup config, which is always valid.
-        val config = runCatching { configProvider() }.getOrDefault(config)
+        val config = runCatching {
+            turnAwareConfigProvider?.invoke(request.requestId) ?: configProvider()
+        }.getOrDefault(config)
         return try {
             val generationRequest = GenerationRequest.from(request, context, config)
             val response = client.generate(generationRequest)

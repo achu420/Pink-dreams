@@ -31,7 +31,9 @@ import com.pinkdreams.persistence.repositories.MemoryEngineRepository
 import com.pinkdreams.persistence.repositories.MemoryFactRepository
 import com.pinkdreams.persistence.repositories.MessageRepository
 import com.pinkdreams.persistence.repositories.PersonaRepository
+import com.pinkdreams.persistence.repositories.FailureIsolatedTurnAttributionRecorder
 import com.pinkdreams.persistence.repositories.SkillRepository
+import com.pinkdreams.persistence.repositories.TurnAttributionRepository
 import com.pinkdreams.persistence.repositories.UserProfileRepository
 import org.jetbrains.exposed.sql.Database
 
@@ -122,7 +124,28 @@ object ChatEngineFactory {
         val llmGenerator = LlmGenerator(
             llmClient,
             config = generationConfig,
-            configProvider = { deps.aiRuntimeSettings.generationConfig() },
+            // Task 24 Part 10 — this lambda is the ONE place that both resolves
+            // primary generation's config and knows where each value came from,
+            // so the attribution stamp happens here, at the moment of
+            // resolution, from a SINGLE resolve() call (no extra DB read). The
+            // config handed back to LlmGenerator is exactly what
+            // aiRuntimeSettings.generationConfig() has always returned.
+            turnAwareConfigProvider = { turnRequestId ->
+                val (config, resolved) = deps.aiRuntimeSettings.generationConfigResolved()
+                com.pinkdreams.observability.TurnAttributionScope.update(turnRequestId) {
+                    it.generationModel = config.model
+                    it.generationModelSource = resolved.modelSource.name
+                    it.generationTemperature = config.temperature
+                    it.generationTemperatureSource = resolved.temperatureSource.name
+                    it.generationMaxOutputTokens = config.maxOutputTokens
+                    it.generationMaxOutputTokensSource = resolved.maxOutputTokensSource.name
+                    it.generationReasoning = config.reasoningEnabled
+                    it.generationJsonMode = config.jsonMode
+                    it.generationProviderSort = config.providerSort
+                    it.generationProviderSortSource = resolved.generationProviderSortSource.name
+                }
+                config
+            },
         )
 
         // Dedicated, measured token budgets for every side-channel call — see
@@ -223,14 +246,31 @@ object ChatEngineFactory {
             // is never affected by an admin changing the DB setting
             // mid-conversation (it already captured the production value at
             // creation-equivalent resolution time via its own fallback).
-            configProvider = {
+            //
+            // Task 24 Part 5 — turn-aware only so the resolution SOURCE of each
+            // value can be stamped onto this turn's attribution record here,
+            // from the same single resolve() call this lambda already made. The
+            // returned GenerationConfig is computed exactly as before; note the
+            // source is reported as CODE_DEFAULT whenever a per-engine pin
+            // (Test Chat's snapshot) short-circuits resolve()'s own answer,
+            // which is the truthful description of where that value came from.
+            turnAwareConfigProvider = { turnRequestId ->
                 val resolved = deps.aiRuntimeSettings.resolve()
-                GenerationConfig(
+                val config = GenerationConfig(
                     model = deps.intentModelOverride ?: resolved.intentModel,
                     maxOutputTokens = deps.intentMaxOutputTokensOverride ?: resolved.intentMaxOutputTokens,
                     jsonMode = deps.intentJsonModeOverride ?: resolved.intentJsonMode,
                     workload = "intent_discovery",
                 )
+                com.pinkdreams.observability.TurnAttributionScope.update(turnRequestId) {
+                    it.intentModelSource =
+                        if (deps.intentModelOverride != null) "CODE_DEFAULT" else resolved.intentModelSource.name
+                    it.intentMaxOutputTokensSource =
+                        if (deps.intentMaxOutputTokensOverride != null) "CODE_DEFAULT" else resolved.intentMaxOutputTokensSource.name
+                    it.intentJsonModeSource =
+                        if (deps.intentJsonModeOverride != null) "CODE_DEFAULT" else resolved.intentJsonModeSource.name
+                }
+                config
             },
             intentEngineRepository = deps.intentEngineRepository,
             exchangeRepository = exchangeRepository,
@@ -265,6 +305,13 @@ object ChatEngineFactory {
             intentDiscovery = intentDiscovery,
             skillContextEnricher = skillContextEnricher,
             memoryContextEnricher = memoryContextEnricher,
+            // Task 24 — one attribution record per turn, for BOTH the production
+            // engine and every Test Chat engine (isTestChat distinguishes them,
+            // exactly as it already does on llm_exchanges). Failure-isolated by
+            // the recorder itself: an attribution write failing can never fail a
+            // chat turn.
+            turnAttributionRecorder = FailureIsolatedTurnAttributionRecorder(TurnAttributionRepository(deps.db)),
+            isTestChat = deps.isTestChat,
         )
     }
 }

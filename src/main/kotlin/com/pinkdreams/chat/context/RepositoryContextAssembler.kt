@@ -120,6 +120,18 @@ class RepositoryContextAssembler(
                 blocks = listOfNotNull(block0, block1, block2, sensitiveBlock, continuityBlock) + historyBlocks(block3Messages) + listOf(blockCurrent),
                 engineVersionId = engine.id,
                 personaCoreVersionId = core.id,
+                // Task 24 — pure attribution carriers, all read off objects this
+                // method already loaded for assembly. No extra query, no change
+                // to any block's content or order.
+                engineVersion = engine.version,
+                personaCoreVersion = core.version,
+                // The memory facts that SURVIVED budget trimming, i.e. the ones
+                // actually rendered into block2 above — identifiers only.
+                memoryIdsUsed = block2Facts.map { it.id },
+                memoryCandidateCount = memories.size,
+                memorySelectionSource = "CONTEXT_ASSEMBLER",
+                userProfilePresent = profile != null,
+                userProfileUpdatedAt = profile?.updatedAt?.toString(),
             ),
         )
     }

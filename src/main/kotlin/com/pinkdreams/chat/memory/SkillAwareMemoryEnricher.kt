@@ -56,7 +56,20 @@ class SkillAwareMemoryEnricher(
 
         val newBlock = ContextBlock("system", MemoryContextFormat.render(selected))
         val newBlocks = context.blocks.toMutableList().apply { set(memoryBlockIndex, newBlock) }
-        return context.copy(blocks = newBlocks)
+        return context.copy(
+            blocks = newBlocks,
+            // Task 24 Part 8 — the four memory populations are genuinely
+            // different and this is the ONLY point where the last one is known:
+            // `candidates` is what was RETRIEVED from MemoryService,
+            // `selector.select(...)` is what was SELECTED, and `selected` after
+            // budget trimming is what is ACTUALLY INJECTED — which is what these
+            // identifiers record. (What is AVAILABLE in total is not attributed:
+            // counting it would need a second, unbudgeted repository query on the
+            // critical path, which Part 18 forbids.) IDs only, never fact text.
+            memoryIdsUsed = selected.map { it.id },
+            memoryCandidateCount = candidates.size,
+            memorySelectionSource = "SKILL_AWARE_SELECTOR",
+        )
     }
 
     companion object {

@@ -176,8 +176,24 @@ class AiRuntimeSettings(
      * maintenance are untouched by this — none of their GenerationConfig
      * construction sites reference this class.
      */
-    fun generationConfig(): GenerationConfig {
+    fun generationConfig(): GenerationConfig = generationConfigFrom(resolve())
+
+    /**
+     * Task 24 Part 10 — the SAME config [generationConfig] returns, plus the
+     * [Resolved] it was built from, so the caller can record which source each
+     * value came from without a SECOND resolve() (which would mean a second DB
+     * read on the critical path, forbidden by Part 18).
+     *
+     * This adds no resolution logic and changes no precedence: [generationConfig]
+     * is now literally `generationConfigFrom(resolve())`, byte-identical to its
+     * previous body.
+     */
+    fun generationConfigResolved(): Pair<GenerationConfig, Resolved> {
         val resolved = resolve()
+        return generationConfigFrom(resolved) to resolved
+    }
+
+    private fun generationConfigFrom(resolved: Resolved): GenerationConfig {
         return GenerationConfig(
             model = resolved.model,
             temperature = resolved.temperature,

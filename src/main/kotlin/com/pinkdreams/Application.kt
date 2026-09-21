@@ -378,6 +378,8 @@ fun Application.module(
             // Task 9 — aiRuntimeSettings.resolve() is now the sole source for
             // Effective Configuration; no separate override fields needed.
             aiRuntimeSettings = aiRuntimeSettings,
+            // Task 24 — per-turn attribution, read-only, for the turn trace.
+            attributionRepository = com.pinkdreams.persistence.repositories.TurnAttributionRepository(db),
         ).register(this)
         // Module 05 — Dashboard activity counters (read-only COUNT(*) only).
         com.pinkdreams.api.admin.AdminStatsRoutes(

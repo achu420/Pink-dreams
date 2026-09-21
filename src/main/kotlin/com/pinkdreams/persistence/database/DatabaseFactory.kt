@@ -68,6 +68,7 @@ object DatabaseFactory {
             Messages,
             ChatRequestExecutions,
             LlmExchanges,
+            TurnAttributions,
         )
     }
 }
@@ -617,6 +618,83 @@ object LlmExchanges : Table("llm_exchanges") {
     val skillKey = varchar("skill_key", 128).nullable()
 
     override val primaryKey = PrimaryKey(id)
+}
+
+/**
+ * Task 24 — Complete Pipeline Attribution. ONE row per conversational turn.
+ *
+ * Why a new table rather than extending an existing one (Task 24 Part 17,
+ * which requires justifying exactly this):
+ *  - `llm_exchanges` is per-CALL (a turn has 2-5 rows); a turn-level fact such
+ *    as "which persona version" would have to be duplicated onto every row,
+ *    and async side-channel rows would carry on-path generation config they
+ *    never used — precisely the fake attribution Part 16 forbids.
+ *  - `messages.metadata` is an unstructured text blob that only exists when
+ *    PERSIST succeeded; Part 20 requires a failed generation to still carry
+ *    attribution.
+ * Everything already recorded elsewhere is NOT repeated here: per-call
+ * model/provider/latency/tokens/outcome/raw bodies stay in `llm_exchanges`
+ * (joined by turn_request_id), stage timings stay in `messages.metadata`, and
+ * memory TEXT is never copied — only IDs and counts.
+ */
+object TurnAttributions : Table("turn_attributions") {
+    val turnRequestId = uuid("turn_request_id")
+    val conversationId = uuid("conversation_id")
+    val userId = uuid("user_id")
+    val isTestChat = bool("is_test_chat").default(false)
+
+    val personaId = uuid("persona_id").nullable()
+    val personaVersionId = uuid("persona_version_id").nullable()
+    val personaVersion = integer("persona_version").nullable()
+
+    val conversationEngineId = uuid("conversation_engine_id").nullable()
+    val conversationEngineVersion = integer("conversation_engine_version").nullable()
+
+    val intentEngineId = uuid("intent_engine_id").nullable()
+    val intentEngineVersion = integer("intent_engine_version").nullable()
+    val intentModel = text("intent_model").nullable()
+    val intentModelSource = varchar("intent_model_source", 32).nullable()
+    val intentJsonMode = bool("intent_json_mode").nullable()
+    val intentJsonModeSource = varchar("intent_json_mode_source", 32).nullable()
+    val intentMaxOutputTokens = integer("intent_max_output_tokens").nullable()
+    val intentMaxOutputTokensSource = varchar("intent_max_output_tokens_source", 32).nullable()
+    val intentOutcome = varchar("intent_outcome", 48).nullable()
+    val intentResultSkillKey = varchar("intent_result_skill_key", 128).nullable()
+
+    val selectedSkillKey = varchar("selected_skill_key", 128).nullable()
+    val skillContextInjected = bool("skill_context_injected").nullable()
+
+    /** JSON array of memory fact UUIDs, in injected order. Never the memory TEXT. */
+    val memoryIdsUsed = text("memory_ids_used").nullable()
+    val memoryCountUsed = integer("memory_count_used").nullable()
+    val memoryCandidateCount = integer("memory_candidate_count").nullable()
+    val memorySelectionSource = varchar("memory_selection_source", 48).nullable()
+
+    val userProfilePresent = bool("user_profile_present").nullable()
+    val userProfileUpdatedAt = varchar("user_profile_updated_at", 64).nullable()
+
+    val generationModel = text("generation_model").nullable()
+    val generationModelSource = varchar("generation_model_source", 32).nullable()
+    val generationTemperature = double("generation_temperature").nullable()
+    val generationTemperatureSource = varchar("generation_temperature_source", 32).nullable()
+    val generationMaxOutputTokens = integer("generation_max_output_tokens").nullable()
+    val generationMaxOutputTokensSource = varchar("generation_max_output_tokens_source", 32).nullable()
+    val generationReasoning = bool("generation_reasoning").nullable()
+    val generationJsonMode = bool("generation_json_mode").nullable()
+    val generationProviderSort = varchar("generation_provider_sort", 64).nullable()
+    val generationProviderSortSource = varchar("generation_provider_sort_source", 32).nullable()
+
+    val regenerationOccurred = bool("regeneration_occurred").default(false)
+    val regenerationCount = integer("regeneration_count").default(0)
+
+    val clientMessageId = uuid("client_message_id").nullable()
+    val assistantMessageId = uuid("assistant_message_id").nullable()
+
+    val outcome = varchar("outcome", 64)
+    val failedStage = varchar("failed_stage", 48).nullable()
+    val createdAt = datetime("created_at")
+
+    override val primaryKey = PrimaryKey(turnRequestId)
 }
 
 fun defaultNow(): LocalDateTime = LocalDateTime.now()

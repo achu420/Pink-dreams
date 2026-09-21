@@ -34,6 +34,13 @@ class LlmIntentDiscovery(
     // Defaults to the constructor config, so every existing caller/test
     // behaves exactly as before.
     private val configProvider: () -> GenerationConfig = { config },
+    // Task 24 — same additive pattern as LlmGenerator's: an optional
+    // turn-aware provider so the resolving lambda in ChatEngineFactory (the
+    // only code that knows each value's resolution SOURCE) can stamp those
+    // sources onto this turn's attribution record from the SAME single
+    // resolve() call it already makes. Null (every existing caller/test) keeps
+    // configProvider's behavior byte-identical.
+    private val turnAwareConfigProvider: ((java.util.UUID) -> GenerationConfig)? = null,
     private val recentHistoryLimit: Int = DEFAULT_RECENT_HISTORY_LIMIT,
     // Phase ADMIN-2: the decision rules now come from the ACTIVE Intent Engine
     // version rather than a Kotlin string. Null (tests, or a deployment with no
@@ -57,13 +64,27 @@ class LlmIntentDiscovery(
         // A failure resolving admin settings must never block skill selection:
         // fall back to the constructor config, which is always valid — same
         // convention as LlmGenerator.generate().
-        val config = runCatching { configProvider() }.getOrDefault(config)
+        val config = runCatching {
+            turnAwareConfigProvider?.invoke(request.requestId) ?: configProvider()
+        }.getOrDefault(config)
+        // Task 24 Part 5 — the configuration ACTUALLY used for THIS request,
+        // recorded at the moment of use. Because it is stamped onto this turn's
+        // record now, a later admin change can never rewrite what this turn
+        // reports. Sources are recorded separately by the resolving lambda in
+        // ChatEngineFactory, which is the only code that knows them.
+        recordIntentConfig(request, config)
         return try {
             val candidateKeys = skillRepository.findAllActiveKeys()
-            if (candidateKeys.isEmpty()) return SkillSelection.None
+            if (candidateKeys.isEmpty()) {
+                recordIntentOutcome(request, "SKIPPED_NO_ACTIVE_SKILLS")
+                return SkillSelection.None
+            }
 
             val recent = recentHistoryBlocks(context, recentHistoryLimit)
-            val baseInstructions = resolveInstructions(candidateKeys) ?: return SkillSelection.None
+            val baseInstructions = resolveInstructions(candidateKeys, request) ?: run {
+                recordIntentOutcome(request, "SKIPPED_NO_ACTIVE_INTENT_ENGINE")
+                return SkillSelection.None
+            }
             // Make Intent Discovery Fast + Reliable phase: appended at
             // request-construction time only — the stored Intent Engine
             // content itself is never modified. Required for two reasons:
@@ -87,8 +108,14 @@ class LlmIntentDiscovery(
                 engineVersionId = context.engineVersionId,
                 personaCoreVersionId = context.personaCoreVersionId,
             )
-            val engineVersionId = discoveryContext.engineVersionId ?: return SkillSelection.None
-            val personaCoreVersionId = discoveryContext.personaCoreVersionId ?: return SkillSelection.None
+            val engineVersionId = discoveryContext.engineVersionId ?: run {
+                recordIntentOutcome(request, "SKIPPED_MISSING_PROVENANCE")
+                return SkillSelection.None
+            }
+            val personaCoreVersionId = discoveryContext.personaCoreVersionId ?: run {
+                recordIntentOutcome(request, "SKIPPED_MISSING_PROVENANCE")
+                return SkillSelection.None
+            }
 
             val generationRequest = GenerationRequest(
                 requestId = request.requestId,
@@ -112,9 +139,21 @@ class LlmIntentDiscovery(
                     // Diagnostics enrichment must never affect routing.
                 }
             }
-            if (selectedKey == null) return SkillSelection.None
-            if (selectedKey !in candidateKeys) return SkillSelection.None
+            if (!foundJsonObject) {
+                recordIntentOutcome(request, "MALFORMED")
+                // Falls through to the same parse result as before — this
+                // records what already happened, it does not change routing.
+            }
+            if (selectedKey == null) {
+                if (foundJsonObject) recordIntentOutcome(request, "NO_SKILL_SELECTED")
+                return SkillSelection.None
+            }
+            if (selectedKey !in candidateKeys) {
+                recordIntentOutcome(request, "UNKNOWN_SKILL_KEY_REJECTED")
+                return SkillSelection.None
+            }
 
+            recordIntentOutcome(request, "SKILL_SELECTED")
             SkillSelection.Selected(selectedKey)
         } catch (e: com.pinkdreams.llm.OpenRouterBudgetExhaustionException) {
             // Live Intent Model Comparison phase: structured diagnostic for the
@@ -126,11 +165,30 @@ class LlmIntentDiscovery(
                     "outcome=BUDGET_EXHAUSTION finishReason=${e.finishReason} completionTokens=${e.completionTokens} " +
                     "reasoningTokens=${e.reasoningTokens}",
             )
+            recordIntentOutcome(request, "BUDGET_EXHAUSTION")
             SkillSelection.None
         } catch (_: Exception) {
             // Intent discovery is best-effort and must never prevent normal generation.
+            recordIntentOutcome(request, "EXCEPTION")
             SkillSelection.None
         }
+    }
+
+    /**
+     * Task 24 Parts 5/6. Best-effort, non-throwing, no I/O — a plain field
+     * write on this turn's in-memory collector (see TurnAttributionScope).
+     * Outside an attributed turn (every existing test) it does nothing at all.
+     */
+    private fun recordIntentConfig(request: ChatRequest, config: GenerationConfig) {
+        com.pinkdreams.observability.TurnAttributionScope.update(request.requestId) {
+            it.intentModel = config.model
+            it.intentJsonMode = config.jsonMode
+            it.intentMaxOutputTokens = config.maxOutputTokens
+        }
+    }
+
+    private fun recordIntentOutcome(request: ChatRequest, outcome: String) {
+        com.pinkdreams.observability.TurnAttributionScope.update(request.requestId) { it.intentOutcome = outcome }
     }
 
     private fun logDiagnostics(request: ChatRequest, metadata: Map<String, String>?, parsedOk: Boolean) {
@@ -192,11 +250,20 @@ class LlmIntentDiscovery(
      * a second, invisible source of prompt truth is precisely what the
      * configuration layer exists to eliminate.
      */
-    private fun resolveInstructions(candidateKeys: List<String>): String? {
+    private fun resolveInstructions(candidateKeys: List<String>, request: ChatRequest): String? {
         val template = if (intentEngineRepository == null) {
+            // No repository configured: the seed text is genuinely in use, but
+            // there is no engine ROW, so no id/version is recorded — never a
+            // fabricated one (Part 16).
             IntentEngineDefaultContent.CONTENT
         } else {
             val active = intentEngineRepository.getActiveEngine()
+            if (active != null) {
+                com.pinkdreams.observability.TurnAttributionScope.update(request.requestId) {
+                    it.intentEngineId = active.id
+                    it.intentEngineVersion = active.version
+                }
+            }
             if (active == null) {
                 System.err.println(
                     "INTENT_ENGINE: no active version — skill selection is disabled until an admin activates one.",

@@ -4483,6 +4483,145 @@
             `;
         }
 
+        // ---- Task 24 — Complete Pipeline Attribution (turn trace) ----------
+        // Every value below is rendered through escapeHtml(). A null/undefined
+        // value renders as the literal NOT CURRENTLY ATTRIBUTED badge, never as
+        // a blank, a zero, or a guess — the whole point of Task 24 is that a
+        // missing link is visibly missing.
+        const NOT_ATTRIBUTED = '<span class="badge muted" title="The application cannot currently prove this value for this turn">NOT CURRENTLY ATTRIBUTED</span>';
+
+        function attrValue(v) {
+            if (v === null || v === undefined || v === '') return NOT_ATTRIBUTED;
+            return escapeHtml(String(v));
+        }
+
+        // An {value, source} pair from the API: the source is the resolution
+        // origin recorded AT THE TIME OF USE, so an old turn keeps reporting the
+        // configuration it actually ran with even after an admin changes it.
+        function attrConfig(av) {
+            if (!av || av.value === null || av.value === undefined) return NOT_ATTRIBUTED;
+            const src = av.source ? ` <span class="badge muted">${escapeHtml(av.source)}</span>` : '';
+            return escapeHtml(String(av.value)) + src;
+        }
+
+        function attrRow(k, v) {
+            return `<div class="obs-kv"><div class="obs-k">${escapeHtml(k)}</div><div class="obs-v">${v}</div></div>`;
+        }
+
+        function attrCard(title, rows) {
+            return `<div class="obs-card" style="background:var(--obs-surface-2);"><h3>${escapeHtml(title)}</h3>${rows}</div>`;
+        }
+
+        function turnAttributionBlocks(d) {
+            if (!d.attributionAvailable) {
+                return `<div class="obs-card" style="background:var(--obs-surface-2);">
+                    <h3>Pipeline attribution</h3>
+                    <div class="obs-subtitle" style="margin-bottom:0;">NOT CURRENTLY ATTRIBUTED for this turn — no attribution record exists
+                    (this turn ran before per-turn attribution was captured, or its record could not be written).
+                    The LLM exchanges below are still fully available.</div></div>`;
+            }
+            const p = d.persona || {}, ce = d.conversationEngine || {}, it = d.intent || {},
+                  sk = d.skill || {}, mem = d.memory || {}, up = d.userProfile || {},
+                  gen = d.generation || {}, rg = d.regeneration || {}, fr = d.finalResponse || {};
+
+            const overview = attrCard('Turn overview',
+                attrRow('Turn ID', attrValue(d.turnRequestId)) +
+                attrRow('Conversation', attrValue(d.conversationId)) +
+                attrRow('User', attrValue(d.userId)) +
+                attrRow('Traffic', d.isTestChat === null || d.isTestChat === undefined ? NOT_ATTRIBUTED
+                    : `<span class="badge ${d.isTestChat ? 'draft' : 'active'}">${d.isTestChat ? 'TEST CHAT' : 'PRODUCTION'}</span>`) +
+                attrRow('On-path latency (Intent + generation)', fmtMs(d.onPathLatencyMs)) +
+                attrRow('Async latency (excluded from SLA)', fmtMs(d.asyncLatencyMs || 0)) +
+                attrRow('Outcome', attrValue(fr.outcome)) +
+                (fr.failedStage ? attrRow('Failed at stage', attrValue(fr.failedStage)) : ''));
+
+            const persona = attrCard('Persona',
+                attrRow('Persona ID', attrValue(p.personaId)) +
+                attrRow('Persona core version', p.personaVersion === null || p.personaVersion === undefined
+                    ? NOT_ATTRIBUTED : 'v' + escapeHtml(p.personaVersion)) +
+                attrRow('Persona version ID', attrValue(p.personaVersionId)));
+
+            const engine = attrCard('Conversation Engine',
+                attrRow('Engine ID', attrValue(ce.engineId)) +
+                attrRow('Engine version', ce.engineVersion === null || ce.engineVersion === undefined
+                    ? NOT_ATTRIBUTED : 'v' + escapeHtml(ce.engineVersion)));
+
+            const intent = attrCard('Intent Discovery',
+                attrRow('Intent Engine version', it.intentEngineVersion === null || it.intentEngineVersion === undefined
+                    ? NOT_ATTRIBUTED : 'v' + escapeHtml(it.intentEngineVersion)) +
+                attrRow('Model (as used for THIS turn)', attrConfig(it.model)) +
+                attrRow('JSON mode', attrConfig(it.jsonMode)) +
+                attrRow('Max output tokens', attrConfig(it.maxOutputTokens)) +
+                attrRow('Result', attrValue(it.outcome)) +
+                attrRow('Selected skill key', attrValue(it.resultSkillKey)));
+
+            const skill = attrCard('Skill',
+                attrRow('Selected skill', attrValue(sk.selectedSkillKey)) +
+                attrRow('Skill context injected into generation', sk.skillContextInjected === null || sk.skillContextInjected === undefined
+                    ? NOT_ATTRIBUTED : (sk.skillContextInjected ? 'yes' : 'no')) +
+                attrRow('Why this skill was selected', NOT_ATTRIBUTED));
+
+            const memIds = (mem.memoryIdsUsed && mem.memoryIdsUsed.length)
+                ? mem.memoryIdsUsed.map(id => `<div class="mono" style="font-size:11px;">${escapeHtml(id)}</div>`).join('')
+                : (mem.memoryIdsUsed ? '<span class="obs-k">none injected</span>' : NOT_ATTRIBUTED);
+            const memory = attrCard('Memory context',
+                attrRow('Memories injected into generation', mem.memoryCountUsed === null || mem.memoryCountUsed === undefined
+                    ? NOT_ATTRIBUTED : escapeHtml(mem.memoryCountUsed)) +
+                attrRow('Candidate pool size', attrValue(mem.memoryCandidateCount)) +
+                attrRow('Selected by', attrValue(mem.selectionSource)) +
+                attrRow('Memory IDs', memIds));
+
+            const profile = attrCard('User profile',
+                attrRow('User ID', attrValue(up.userId)) +
+                attrRow('Profile record present', up.profilePresent === null || up.profilePresent === undefined
+                    ? NOT_ATTRIBUTED : (up.profilePresent ? 'yes' : 'no')) +
+                attrRow('Profile last updated', attrValue(up.profileUpdatedAt)) +
+                attrRow('Profile version', NOT_ATTRIBUTED));
+
+            const generation = attrCard('Generation configuration',
+                attrRow('Model (as used for THIS turn)', attrConfig(gen.model)) +
+                attrRow('Provider actually served by', attrValue(gen.provider)) +
+                attrRow('Temperature', attrConfig(gen.temperature)) +
+                attrRow('Max output tokens', attrConfig(gen.maxOutputTokens)) +
+                attrRow('Reasoning', attrConfig(gen.reasoning)) +
+                attrRow('JSON mode', attrConfig(gen.jsonMode)) +
+                attrRow('Provider sort', attrConfig(gen.providerSort)));
+
+            const attemptRows = (rg.attempts || []).map(at =>
+                `<tr><td>${escapeHtml(at.attempt)}</td><td>${escapeHtml(at.model) || '—'}</td>
+                 <td>${escapeHtml(at.provider) || '—'}</td><td>${fmtMs(at.latencyMs)}</td>
+                 <td>${at.totalTokens ?? '—'}</td><td>${escapeHtml(at.outcome)}</td>
+                 <td>${escapeHtml(at.finishReason) || '—'}</td></tr>`).join('');
+            const regeneration = attrCard('Generation attempts / regeneration',
+                attrRow('Regeneration occurred', rg.regenerationOccurred === null || rg.regenerationOccurred === undefined
+                    ? NOT_ATTRIBUTED : (rg.regenerationOccurred ? 'yes' : 'no')) +
+                attrRow('Regeneration count', rg.regenerationCount === null || rg.regenerationCount === undefined
+                    ? NOT_ATTRIBUTED : escapeHtml(rg.regenerationCount)) +
+                (attemptRows ? `<table style="margin-top:10px;"><thead><tr><th>Attempt</th><th>Model</th><th>Provider</th>
+                    <th>Latency</th><th>Tokens</th><th>Outcome</th><th>Finish</th></tr></thead><tbody>${attemptRows}</tbody></table>`
+                    : '<div class="obs-subtitle" style="margin:10px 0 0;">No primary_generation exchange recorded for this turn.</div>'));
+
+            const finalResp = attrCard('Final response',
+                attrRow('Assistant message ID', attrValue(fr.assistantMessageId)) +
+                attrRow('Client message ID (input reference)', attrValue(fr.clientMessageId)));
+
+            // Part 13 — async work is shown as its own section with its own
+            // latency total, explicitly labelled as excluded from the SLA.
+            const asyncRows = (d.asyncWork || []).map(w =>
+                `<tr><td>${escapeHtml(w.workload)}</td><td>${escapeHtml(w.model) || '—'}</td>
+                 <td>${escapeHtml(w.provider) || '—'}</td><td>${fmtMs(w.latencyMs)}</td>
+                 <td>${w.totalTokens ?? '—'}</td><td>${escapeHtml(w.outcome)}</td></tr>`).join('');
+            const asyncCard = attrCard('Async post-delivery work (NOT part of user-facing latency)',
+                asyncRows ? `<table><thead><tr><th>Workload</th><th>Model</th><th>Provider</th><th>Latency</th>
+                    <th>Tokens</th><th>Outcome</th></tr></thead><tbody>${asyncRows}</tbody></table>`
+                    : '<div class="obs-subtitle" style="margin-bottom:0;">No async workloads recorded against this turn.</div>');
+
+            return `<div class="obs-subtitle" style="margin-top:14px;">Causal chain for this turn — user message → persona → conversation engine →
+                user profile → memory → intent → skill → generation configuration → LLM exchange → final response.
+                Any link the application cannot prove is shown as NOT CURRENTLY ATTRIBUTED.</div>` +
+                overview + persona + engine + profile + memory + intent + skill + generation + regeneration + finalResp + asyncCard;
+        }
+
         async function loadTurnTrace() {
             const turnId = document.getElementById('obsTurnId').value.trim();
             if (!turnId) {
@@ -4505,6 +4644,12 @@
                 }
                 document.getElementById('obsExchangeList').innerHTML =
                     `<div class="obs-subtitle">On-path (user-facing) latency for this turn — Intent + generation, excluding async side-channels: <b style="color:var(--obs-warm-white);">${fmtMs(data.onPathLatencyMs)}</b></div>` +
+                    // Task 24 Part 15 — the attribution chain first (it answers
+                    // "why did the AI respond this way"), then the pre-existing
+                    // exchange table and stage timings, both unchanged. Raw
+                    // request/response bodies remain on-demand only.
+                    turnAttributionBlocks(data) +
+                    `<div class="obs-subtitle" style="margin-top:16px;">LLM exchanges for this turn (click a row for the raw request/response):</div>` +
                     exchangeTable(data.exchanges) +
                     stageTimingsBlock(data.stageTimingsMs);
             } catch (e) {

@@ -576,4 +576,157 @@ class AdminObservabilityRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
     }
+
+    // ---- Task 24 — Complete Pipeline Attribution on the turn trace --------
+
+    @Test
+    fun `turn trace exposes the full attribution chain for an attributed turn`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        val turnId = UUID.randomUUID()
+        repo.record(
+            LlmExchangeRepository.RecordInput(
+                turnRequestId = turnId, conversationId = conversationId, workload = "intent_discovery",
+                isTestChat = false, model = "intent-m", provider = "p", latencyMs = 1000,
+                outcome = LlmExchangeRepository.Outcome.SUCCESS,
+            ),
+        )
+        repo.record(
+            LlmExchangeRepository.RecordInput(
+                turnRequestId = turnId, conversationId = conversationId, workload = "primary_generation",
+                isTestChat = false, model = "gen-m", provider = "deepinfra", latencyMs = 2000,
+                outcome = LlmExchangeRepository.Outcome.SUCCESS, skillKey = "flirting",
+            ),
+        )
+        // Async work: attached to the turn, but must never enter on-path latency.
+        repo.record(
+            LlmExchangeRepository.RecordInput(
+                turnRequestId = turnId, conversationId = conversationId, workload = "memory_extraction",
+                isTestChat = false, model = "m", provider = "p", latencyMs = 9000,
+                outcome = LlmExchangeRepository.Outcome.SUCCESS,
+            ),
+        )
+        val userId = UUID.randomUUID()
+        val personaId = UUID.randomUUID()
+        val memoryId = UUID.randomUUID()
+        com.pinkdreams.persistence.repositories.TurnAttributionRepository(db).record(
+            com.pinkdreams.observability.TurnAttributionRecord(
+                turnRequestId = turnId, conversationId = conversationId, userId = userId, isTestChat = false,
+                personaId = personaId, personaVersionId = UUID.randomUUID(), personaVersion = 4,
+                conversationEngineId = UUID.randomUUID(), conversationEngineVersion = 9,
+                intentEngineId = UUID.randomUUID(), intentEngineVersion = 3, intentModel = "intent-m",
+                intentModelSource = "DATABASE", intentJsonMode = true, intentJsonModeSource = "DATABASE",
+                intentMaxOutputTokens = 600, intentMaxOutputTokensSource = "CODE_DEFAULT",
+                intentOutcome = "SKILL_SELECTED", intentResultSkillKey = "flirting",
+                selectedSkillKey = "flirting", skillContextInjected = true,
+                memoryIdsUsed = listOf(memoryId), memoryCountUsed = 1, memoryCandidateCount = 20,
+                memorySelectionSource = "SKILL_AWARE_SELECTOR", userProfilePresent = true,
+                userProfileUpdatedAt = "2026-09-22T10:00", generationModel = "gen-m",
+                generationModelSource = "DATABASE", generationTemperature = 0.7,
+                generationTemperatureSource = "DATABASE", generationMaxOutputTokens = 1500,
+                generationMaxOutputTokensSource = "ENVIRONMENT_OR_DEFAULT", generationReasoning = false,
+                generationJsonMode = null, generationProviderSort = "latency",
+                generationProviderSortSource = "CODE_DEFAULT", regenerationOccurred = false, regenerationCount = 0,
+                clientMessageId = UUID.randomUUID(), assistantMessageId = UUID.randomUUID(),
+                outcome = "SUCCESS", failedStage = null,
+            ),
+        )
+
+        val response = client.get("/v1/admin/observability/turns/$turnId") { basicAuth(adminId.toString(), "x") }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val body = json(response.bodyAsText())
+        assertTrue(body["attributionAvailable"]!!.jsonPrimitive.content.toBoolean())
+        assertEquals(userId.toString(), body["userId"]!!.jsonPrimitive.content)
+        assertEquals(4, body["persona"]!!.jsonObject["personaVersion"]!!.jsonPrimitive.content.toInt())
+        assertEquals(9, body["conversationEngine"]!!.jsonObject["engineVersion"]!!.jsonPrimitive.content.toInt())
+        val intent = body["intent"]!!.jsonObject
+        assertEquals("intent-m", intent["model"]!!.jsonObject["value"]!!.jsonPrimitive.content)
+        assertEquals("DATABASE", intent["model"]!!.jsonObject["source"]!!.jsonPrimitive.content)
+        assertEquals("SKILL_SELECTED", intent["outcome"]!!.jsonPrimitive.content)
+        assertEquals("flirting", body["skill"]!!.jsonObject["selectedSkillKey"]!!.jsonPrimitive.content)
+        assertEquals(memoryId.toString(), body["memory"]!!.jsonObject["memoryIdsUsed"]!!.jsonArray.single().jsonPrimitive.content)
+        assertEquals("deepinfra", body["generation"]!!.jsonObject["provider"]!!.jsonPrimitive.content)
+        assertEquals(1, body["regeneration"]!!.jsonObject["attempts"]!!.jsonArray.size)
+        assertEquals("SUCCESS", body["finalResponse"]!!.jsonObject["outcome"]!!.jsonPrimitive.content)
+        // Part 13 — async stays separate and OUT of the user-facing figure.
+        assertEquals(3000, body["onPathLatencyMs"]!!.jsonPrimitive.content.toInt())
+        assertEquals(9000, body["asyncLatencyMs"]!!.jsonPrimitive.content.toInt())
+        assertEquals("memory_extraction", body["asyncWork"]!!.jsonArray.single().jsonObject["workload"]!!.jsonPrimitive.content)
+    }
+
+    @Test
+    fun `an unattributed turn reports attribution as unavailable instead of fabricating values`() = testApplication {
+        val db = setup()
+        val turnId = seedExchange(LlmExchangeRepository(db), UUID.randomUUID())
+
+        val response = client.get("/v1/admin/observability/turns/$turnId") { basicAuth(adminId.toString(), "x") }
+
+        val body = json(response.bodyAsText())
+        // Omitted (the serializer drops default values) or explicitly false —
+        // either way the UI treats it as falsy and renders NOT CURRENTLY
+        // ATTRIBUTED. What must never happen is a `true` with empty sections.
+        assertFalse(body["attributionAvailable"]?.jsonPrimitive?.content?.toBoolean() ?: false)
+        assertEquals(null, body["persona"])
+        assertEquals(null, body["intent"])
+        assertEquals(null, body["memory"])
+        // The pre-Task-24 fields are all still present and correct.
+        assertTrue(body.containsKey("exchanges"))
+        assertTrue(body.containsKey("onPathLatencyMs"))
+    }
+
+    @Test
+    fun `regeneration attempts are numbered in the order they actually ran`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        val turnId = UUID.randomUUID()
+        repo.record(
+            LlmExchangeRepository.RecordInput(
+                turnRequestId = turnId, conversationId = conversationId, workload = "primary_generation",
+                isTestChat = false, model = "m1", provider = "p1", latencyMs = 1000,
+                outcome = LlmExchangeRepository.Outcome.SUCCESS,
+            ),
+        )
+        Thread.sleep(5)
+        repo.record(
+            LlmExchangeRepository.RecordInput(
+                turnRequestId = turnId, conversationId = conversationId, workload = "primary_generation",
+                isTestChat = false, model = "m2", provider = "p2", latencyMs = 2000,
+                outcome = LlmExchangeRepository.Outcome.SUCCESS,
+            ),
+        )
+
+        val response = client.get("/v1/admin/observability/turns/$turnId") { basicAuth(adminId.toString(), "x") }
+
+        val attempts = json(response.bodyAsText())["regeneration"]!!.jsonObject["attempts"]!!.jsonArray
+        assertEquals(2, attempts.size)
+        assertEquals("m1", attempts[0].jsonObject["model"]!!.jsonPrimitive.content)
+        assertEquals(1, attempts[0].jsonObject["attempt"]!!.jsonPrimitive.content.toInt())
+        assertEquals("m2", attempts[1].jsonObject["model"]!!.jsonPrimitive.content)
+        assertEquals(2, attempts[1].jsonObject["attempt"]!!.jsonPrimitive.content.toInt())
+    }
+
+    @Test
+    fun `the attributed turn trace is not reachable without admin access`() = testApplication {
+        val db = setup()
+        val turnId = seedExchange(LlmExchangeRepository(db), UUID.randomUUID())
+
+        val response = client.get("/v1/admin/observability/turns/$turnId") { basicAuth(nonAdminId.toString(), "x") }
+
+        assertEquals(HttpStatusCode.Forbidden, response.status)
+    }
+
+    @Test
+    fun `the turn trace never exposes provider credentials`() = testApplication {
+        val db = setup()
+        val turnId = seedExchange(LlmExchangeRepository(db), UUID.randomUUID())
+
+        val body = client.get("/v1/admin/observability/turns/$turnId") { basicAuth(adminId.toString(), "x") }.bodyAsText()
+
+        listOf("Authorization", "Bearer ", "apiKey", "api_key", "sk-or-").forEach {
+            assertFalse(body.contains(it), "The turn trace must never carry '$it'")
+        }
+    }
 }

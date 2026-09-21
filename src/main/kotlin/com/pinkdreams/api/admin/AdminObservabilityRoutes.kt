@@ -199,12 +199,155 @@ data class SlowTurnListResponse(
     val count: Int,
 )
 
+/**
+ * Task 24 — one attributed component of a turn. `value` null means the system
+ * genuinely cannot prove this field for this turn; the UI renders that as
+ * NOT CURRENTLY ATTRIBUTED and never as a guess (Part 16). `source`, when
+ * present, is the AiRuntimeSettings resolution source recorded AT THE TIME OF
+ * USE (DATABASE / CODE_DEFAULT / ENVIRONMENT_OR_DEFAULT / PROVIDER_DEFAULT) —
+ * never re-derived at inspection time, so a later admin change cannot rewrite
+ * a historical turn.
+ */
+@Serializable
+data class AttributedValueResponse(
+    val value: String?,
+    val source: String? = null,
+)
+
+@Serializable
+data class TurnPersonaResponse(
+    val personaId: String?,
+    val personaVersionId: String?,
+    val personaVersion: Int?,
+)
+
+@Serializable
+data class TurnConversationEngineResponse(
+    val engineId: String?,
+    val engineVersion: Int?,
+)
+
+@Serializable
+data class TurnIntentResponse(
+    val intentEngineId: String?,
+    val intentEngineVersion: Int?,
+    val model: AttributedValueResponse,
+    val jsonMode: AttributedValueResponse,
+    val maxOutputTokens: AttributedValueResponse,
+    val outcome: String?,
+    val resultSkillKey: String?,
+)
+
+@Serializable
+data class TurnSkillResponse(
+    val selectedSkillKey: String?,
+    val skillContextInjected: Boolean?,
+    /**
+     * Always null in the current system. Intent Discovery returns only
+     * `{"skillKey": ...}` — no rationale, confidence or score exists anywhere,
+     * and Part 7 forbids inventing one from LLM reasoning or free text.
+     */
+    val selectionRationale: String? = null,
+)
+
+@Serializable
+data class TurnMemoryResponse(
+    val memoryIdsUsed: List<String>?,
+    val memoryCountUsed: Int?,
+    val memoryCandidateCount: Int?,
+    val selectionSource: String?,
+)
+
+@Serializable
+data class TurnUserProfileResponse(
+    val userId: String,
+    val profilePresent: Boolean?,
+    val profileUpdatedAt: String?,
+    /** No profile versioning exists in the schema; never fabricated. */
+    val profileVersion: String? = null,
+)
+
+@Serializable
+data class TurnGenerationResponse(
+    val model: AttributedValueResponse,
+    val temperature: AttributedValueResponse,
+    val maxOutputTokens: AttributedValueResponse,
+    val reasoning: AttributedValueResponse,
+    val jsonMode: AttributedValueResponse,
+    val providerSort: AttributedValueResponse,
+    /** Upstream provider that actually served the final attempt — from llm_exchanges, not config. */
+    val provider: String?,
+)
+
+/** One primary_generation attempt, in the order the attempts actually ran. */
+@Serializable
+data class GenerationAttemptResponse(
+    val attempt: Int,
+    val exchangeId: String,
+    val model: String?,
+    val provider: String?,
+    val latencyMs: Long,
+    val totalTokens: Int?,
+    val outcome: String,
+    val finishReason: String?,
+)
+
+@Serializable
+data class TurnRegenerationResponse(
+    val regenerationOccurred: Boolean?,
+    val regenerationCount: Int?,
+    val attempts: List<GenerationAttemptResponse>,
+)
+
+@Serializable
+data class TurnFinalResponseResponse(
+    val assistantMessageId: String?,
+    val clientMessageId: String?,
+    val outcome: String?,
+    val failedStage: String?,
+)
+
+/**
+ * Async workloads, kept strictly SEPARATE from the on-path figures (Part 13).
+ * Their latency is deliberately reported on its own and is never folded into
+ * [TurnTraceResponse.onPathLatencyMs] or any SLA statistic.
+ */
+@Serializable
+data class TurnAsyncWorkResponse(
+    val workload: String,
+    val exchangeId: String,
+    val model: String?,
+    val provider: String?,
+    val latencyMs: Long,
+    val totalTokens: Int?,
+    val outcome: String,
+)
+
 @Serializable
 data class TurnTraceResponse(
     val turnRequestId: String,
     val conversationId: String,
     val onPathLatencyMs: Long,
     val exchanges: List<ExchangeSummaryResponse>,
+    // --- Task 24 additions. Every one is a NEW optional field with a default,
+    // so any pre-Task-24 consumer of this endpoint keeps working unchanged;
+    // `attributionAvailable=false` means no turn_attributions row exists for
+    // this turn (e.g. a turn that predates this feature), which the UI must
+    // show as NOT CURRENTLY ATTRIBUTED rather than as empty/zero values.
+    val attributionAvailable: Boolean = false,
+    val userId: String? = null,
+    val isTestChat: Boolean? = null,
+    val persona: TurnPersonaResponse? = null,
+    val conversationEngine: TurnConversationEngineResponse? = null,
+    val intent: TurnIntentResponse? = null,
+    val skill: TurnSkillResponse? = null,
+    val memory: TurnMemoryResponse? = null,
+    val userProfile: TurnUserProfileResponse? = null,
+    val generation: TurnGenerationResponse? = null,
+    val regeneration: TurnRegenerationResponse? = null,
+    val finalResponse: TurnFinalResponseResponse? = null,
+    val asyncWork: List<TurnAsyncWorkResponse> = emptyList(),
+    val asyncLatencyMs: Long = 0,
     // Task 8 Part 5/6 — the wall-clock pipeline-stage timings ChatEngine
     // already measures (context_assembly, intent_discovery,
     // memory_context_selection, skill_context_enrichment, generation,
@@ -236,7 +379,17 @@ class AdminObservabilityRoutes(
     // default) — this endpoint is now a pure read of that single source,
     // with no independent precedence logic of its own.
     private val aiRuntimeSettings: com.pinkdreams.config.AiRuntimeSettings? = null,
+    // Task 24 — read-only access to the per-turn attribution record. Optional
+    // so every existing construction site/test keeps compiling; when absent the
+    // turn trace returns exactly its pre-Task-24 shape with
+    // attributionAvailable=false.
+    private val attributionRepository: com.pinkdreams.persistence.repositories.TurnAttributionRepository? = null,
 ) {
+    private companion object {
+        /** Must stay identical to PerformanceMetricsRepository's own on-path set (Part 13). */
+        val ON_PATH_WORKLOADS = setOf("intent_discovery", "primary_generation")
+    }
+
     fun register(route: Route) {
         route.authenticate("session-auth", "dev-auth") {
             get("/v1/admin/observability/latency-dashboard") {
@@ -332,16 +485,7 @@ class AdminObservabilityRoutes(
                     call.respond(HttpStatusCode.NotFound, ErrorResponse(ApiError(ErrorCode.NOT_FOUND, "No exchanges found for this turn", null)))
                     return@get
                 }
-                call.respond(
-                    HttpStatusCode.OK,
-                    TurnTraceResponse(
-                        turnRequestId = breakdown.turnRequestId.toString(),
-                        conversationId = breakdown.conversationId.toString(),
-                        onPathLatencyMs = breakdown.onPathLatencyMs(),
-                        exchanges = breakdown.exchanges.map { it.toSummary() },
-                        stageTimingsMs = metricsRepository.stageTimingsForTurn(turnRequestId),
-                    ),
-                )
+                call.respond(HttpStatusCode.OK, buildTurnTrace(turnRequestId, breakdown))
             }
 
             // Task 10 Step 11 — Slow Turn Explorer. minLatencyMs defaults to
@@ -373,6 +517,133 @@ class AdminObservabilityRoutes(
                 call.respond(HttpStatusCode.OK, buildDashboardResponse(filter))
             }
         }
+    }
+
+    /**
+     * Task 24 Part 14 — the authoritative diagnostic view of ONE turn.
+     *
+     * Assembles three already-existing sources and adds nothing of its own:
+     *  1. `turn_attributions` — the per-turn record written by the pipeline;
+     *  2. `llm_exchanges` — the per-call rows (attempts, async work, provider);
+     *  3. `messages.metadata` — the wall-clock stage timings.
+     * It never derives an attribution value: a missing row or column becomes
+     * null and renders as NOT CURRENTLY ATTRIBUTED (Part 16).
+     */
+    private fun buildTurnTrace(
+        turnRequestId: UUID,
+        breakdown: PerformanceMetricsRepository.TurnLatencyBreakdown,
+    ): TurnTraceResponse {
+        val a = attributionRepository?.let { runCatching { it.findByTurnRequestId(turnRequestId) }.getOrNull() }
+
+        // Attempt numbering comes from the exchange rows themselves, in
+        // creation order — the same ordering findForTurn already guarantees.
+        val generationExchanges = breakdown.exchanges.filter { it.workload == "primary_generation" }
+        val attempts = generationExchanges.mapIndexed { index, e ->
+            GenerationAttemptResponse(
+                attempt = index + 1,
+                exchangeId = e.id.toString(),
+                model = e.model,
+                provider = e.provider,
+                latencyMs = e.latencyMs,
+                totalTokens = e.totalTokens,
+                outcome = e.outcome.name,
+                finishReason = e.finishReason,
+            )
+        }
+        // Part 13 — async workloads stay a SEPARATE list with a SEPARATE total.
+        // onPathLatencyMs below is untouched: it remains
+        // TurnLatencyBreakdown.onPathLatencyMs(), i.e. intent + generation only.
+        val asyncExchanges = breakdown.exchanges.filter { it.workload !in ON_PATH_WORKLOADS }
+        val asyncWork = asyncExchanges.map {
+            TurnAsyncWorkResponse(
+                workload = it.workload,
+                exchangeId = it.id.toString(),
+                model = it.model,
+                provider = it.provider,
+                latencyMs = it.latencyMs,
+                totalTokens = it.totalTokens,
+                outcome = it.outcome.name,
+            )
+        }
+
+        return TurnTraceResponse(
+            turnRequestId = breakdown.turnRequestId.toString(),
+            conversationId = breakdown.conversationId.toString(),
+            onPathLatencyMs = breakdown.onPathLatencyMs(),
+            exchanges = breakdown.exchanges.map { it.toSummary() },
+            stageTimingsMs = metricsRepository.stageTimingsForTurn(turnRequestId),
+            attributionAvailable = a != null,
+            userId = a?.userId?.toString(),
+            isTestChat = a?.isTestChat ?: breakdown.exchanges.firstOrNull()?.isTestChat,
+            persona = a?.let {
+                TurnPersonaResponse(
+                    personaId = it.personaId?.toString(),
+                    personaVersionId = it.personaVersionId?.toString(),
+                    personaVersion = it.personaVersion,
+                )
+            },
+            conversationEngine = a?.let {
+                TurnConversationEngineResponse(
+                    engineId = it.conversationEngineId?.toString(),
+                    engineVersion = it.conversationEngineVersion,
+                )
+            },
+            intent = a?.let {
+                TurnIntentResponse(
+                    intentEngineId = it.intentEngineId?.toString(),
+                    intentEngineVersion = it.intentEngineVersion,
+                    model = AttributedValueResponse(it.intentModel, it.intentModelSource),
+                    jsonMode = AttributedValueResponse(it.intentJsonMode?.toString(), it.intentJsonModeSource),
+                    maxOutputTokens = AttributedValueResponse(it.intentMaxOutputTokens?.toString(), it.intentMaxOutputTokensSource),
+                    outcome = it.intentOutcome,
+                    resultSkillKey = it.intentResultSkillKey,
+                )
+            },
+            skill = a?.let { TurnSkillResponse(it.selectedSkillKey, it.skillContextInjected) },
+            memory = a?.let {
+                TurnMemoryResponse(
+                    memoryIdsUsed = it.memoryIdsUsed?.map(UUID::toString),
+                    memoryCountUsed = it.memoryCountUsed,
+                    memoryCandidateCount = it.memoryCandidateCount,
+                    selectionSource = it.memorySelectionSource,
+                )
+            },
+            userProfile = a?.let {
+                TurnUserProfileResponse(
+                    userId = it.userId.toString(),
+                    profilePresent = it.userProfilePresent,
+                    profileUpdatedAt = it.userProfileUpdatedAt,
+                )
+            },
+            generation = a?.let {
+                TurnGenerationResponse(
+                    model = AttributedValueResponse(it.generationModel, it.generationModelSource),
+                    temperature = AttributedValueResponse(it.generationTemperature?.toString(), it.generationTemperatureSource),
+                    maxOutputTokens = AttributedValueResponse(it.generationMaxOutputTokens?.toString(), it.generationMaxOutputTokensSource),
+                    reasoning = AttributedValueResponse(it.generationReasoning?.toString(), null),
+                    jsonMode = AttributedValueResponse(it.generationJsonMode?.toString(), null),
+                    providerSort = AttributedValueResponse(it.generationProviderSort, it.generationProviderSortSource),
+                    // The provider is what the upstream ACTUALLY served, so it
+                    // comes from the final generation exchange, never from config.
+                    provider = generationExchanges.lastOrNull()?.provider,
+                )
+            },
+            regeneration = TurnRegenerationResponse(
+                regenerationOccurred = a?.regenerationOccurred,
+                regenerationCount = a?.regenerationCount,
+                attempts = attempts,
+            ),
+            finalResponse = a?.let {
+                TurnFinalResponseResponse(
+                    assistantMessageId = it.assistantMessageId?.toString(),
+                    clientMessageId = it.clientMessageId?.toString(),
+                    outcome = it.outcome,
+                    failedStage = it.failedStage,
+                )
+            },
+            asyncWork = asyncWork,
+            asyncLatencyMs = asyncExchanges.sumOf { it.latencyMs },
+        )
     }
 
     private fun buildDashboardResponse(filter: PerformanceMetricsRepository.MetricsFilter): LatencyDashboardResponse =
