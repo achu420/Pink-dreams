@@ -140,7 +140,18 @@ class MemoryService(private val repository: MemoryFactRepository) {
         .trimEnd('.', '!', '?')
 
     private fun enforceHotCapacity(userId: UUID, personaId: UUID) {
-        val hotFacts = repository.findForRelationship(userId, personaId).filter { it.tier == "hot" }
+        // Only facts that can actually be SELECTED occupy hot capacity. A
+        // superseded/removed row keeps tier="hot" (neither supersede() nor
+        // remove() touches the tier — history is preserved in place), but it is
+        // permanently unselectable: selectForContext/selectWorkingSet both
+        // exclude INACTIVE_STATUSES. Counting such dead rows against
+        // MAX_HOT_FACTS therefore evicted *live, selectable* memory to cold to
+        // make room for rows that can never be used again — observed live on
+        // the largest real relationship (17 live + 3 removed rows filling the
+        // 20-slot budget exactly, with 28 facts already pushed to cold).
+        // The threshold itself is unchanged; only which rows are counted is.
+        val hotFacts = repository.findForRelationship(userId, personaId)
+            .filter { it.tier == "hot" && it.status !in INACTIVE_STATUSES }
         hotFacts.sortedWith(evictionComparator())
             .take((hotFacts.size - MAX_HOT_FACTS).coerceAtLeast(0))
             .forEach { repository.moveToCold(userId, personaId, it.id) }

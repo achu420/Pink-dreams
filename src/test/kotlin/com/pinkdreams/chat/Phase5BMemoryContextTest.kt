@@ -113,6 +113,48 @@ class Phase5BMemoryContextTest {
         assertEquals(22, repository.findForRelationship(user, persona).size)
     }
 
+    /**
+     * Task 23 regression. Superseded/removed rows keep tier="hot" (supersede()
+     * and remove() never touch the tier — history is preserved in place) but
+     * are permanently unselectable. Counting them against MAX_HOT_FACTS used to
+     * evict LIVE, selectable memory to cold to make room for dead rows.
+     * Observed live: 17 live + 3 removed rows exactly filling the 20-slot hot
+     * budget on the largest real user/persona relationship.
+     */
+    @Test
+    fun `hot capacity ignores superseded and removed rows so live memory is not evicted for dead rows`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+        val repository = MemoryFactRepository(db)
+        val service = MemoryService(repository)
+        val user = UUID.randomUUID()
+        val persona = UUID.randomUUID()
+        val base = LocalDateTime.of(2026, 1, 1, 0, 0)
+
+        // 17 live hot facts + 3 dead-but-still-hot rows == the old 20-slot budget.
+        repeat(17) { index -> repository.create(user, persona, "live-$index", "habit", "high", learnedAt = base.plusDays(index.toLong())) }
+        val removed = repository.create(user, persona, "dead-removed", "habit", "low", learnedAt = base)
+        repository.remove(removed.id)
+        val supersededA = repository.create(user, persona, "dead-superseded-a", "habit", "low", learnedAt = base)
+        repository.supersede(supersededA.id, "replacement-a")
+        val supersededB = repository.create(user, persona, "dead-superseded-b", "habit", "low", learnedAt = base)
+        repository.supersede(supersededB.id, "replacement-b")
+
+        service.record(user, persona, listOf(MemoryCandidate("brand-new", "habit", "high")))
+
+        val facts = repository.findForRelationship(user, persona)
+        // Nothing live was evicted: every live-* fact, both replacements and the
+        // new fact are still hot (17 + 2 + 1 == 20 live hot rows).
+        assertTrue(facts.filter { it.fact.startsWith("live-") }.all { it.tier == "hot" })
+        assertEquals("hot", facts.single { it.fact == "brand-new" }.tier)
+        assertEquals(20, facts.count { it.tier == "hot" && it.status !in setOf("superseded", "removed") })
+        assertEquals(0, facts.count { it.tier == "cold" })
+        // And the dead rows are still hot-tier history — this fix changes only
+        // what is COUNTED, never what is stored.
+        assertEquals("removed", facts.single { it.fact == "dead-removed" }.status)
+        assertEquals(3, facts.count { it.status in setOf("superseded", "removed") })
+    }
+
     @Test
     fun `selection is hot only limited open first high first and injection does not reference`() {
         val db = DatabaseFactory.connectInMemory()
