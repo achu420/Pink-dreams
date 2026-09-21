@@ -153,37 +153,53 @@ class PerformanceMetricsRepository(private val db: Database) {
     }
 
     fun slaBuckets(filter: MetricsFilter = MetricsFilter()): SlaBuckets = transaction(db) {
-        val latencies = LlmExchanges.select { buildCondition(filter) }.map { it[LlmExchanges.latencyMs] }
-        SlaBuckets(
-            le5s = latencies.count { it <= 5000 }.toLong(),
-            le8s = latencies.count { it <= 8000 }.toLong(),
-            le10s = latencies.count { it <= 10000 }.toLong(),
-            gt10s = latencies.count { it > 10000 }.toLong(),
-            gt20s = latencies.count { it > 20000 }.toLong(),
-            total = latencies.size.toLong(),
-        )
+        toSlaBuckets(LlmExchanges.select { buildCondition(filter) }.map { it[LlmExchanges.latencyMs] })
     }
 
     fun errorRate(filter: MetricsFilter = MetricsFilter()): ErrorRate = transaction(db) {
-        val outcomes = LlmExchanges.select { buildCondition(filter) }.map { it[LlmExchanges.outcome] }
-        ErrorRate(
-            total = outcomes.size.toLong(),
-            success = outcomes.count { it == LlmExchangeRepository.Outcome.SUCCESS.name }.toLong(),
-            malformed = outcomes.count { it == LlmExchangeRepository.Outcome.MALFORMED.name }.toLong(),
-            budgetExhaustion = outcomes.count { it == LlmExchangeRepository.Outcome.BUDGET_EXHAUSTION.name }.toLong(),
-            providerError = outcomes.count { it == LlmExchangeRepository.Outcome.PROVIDER_ERROR.name }.toLong(),
-            exception = outcomes.count { it == LlmExchangeRepository.Outcome.EXCEPTION.name }.toLong(),
-        )
+        toErrorRate(LlmExchanges.select { buildCondition(filter) }.map { it[LlmExchanges.outcome] })
     }
 
+    private fun toSlaBuckets(latencies: List<Long>): SlaBuckets = SlaBuckets(
+        le5s = latencies.count { it <= 5000 }.toLong(),
+        le8s = latencies.count { it <= 8000 }.toLong(),
+        le10s = latencies.count { it <= 10000 }.toLong(),
+        gt10s = latencies.count { it > 10000 }.toLong(),
+        gt20s = latencies.count { it > 20000 }.toLong(),
+        total = latencies.size.toLong(),
+    )
+
+    private fun toErrorRate(outcomes: List<String>): ErrorRate = ErrorRate(
+        total = outcomes.size.toLong(),
+        success = outcomes.count { it == LlmExchangeRepository.Outcome.SUCCESS.name }.toLong(),
+        malformed = outcomes.count { it == LlmExchangeRepository.Outcome.MALFORMED.name }.toLong(),
+        budgetExhaustion = outcomes.count { it == LlmExchangeRepository.Outcome.BUDGET_EXHAUSTION.name }.toLong(),
+        providerError = outcomes.count { it == LlmExchangeRepository.Outcome.PROVIDER_ERROR.name }.toLong(),
+        exception = outcomes.count { it == LlmExchangeRepository.Outcome.EXCEPTION.name }.toLong(),
+    )
+
+    /**
+     * Task 10 — one dimension's (workload/skill/model/provider) full
+     * diagnostic picture, not just central-tendency latency: the same
+     * ≤10s/>10s/>20s buckets and error-rate breakdown already computed
+     * overall, now per-group, so "which workload/skill/model/provider is
+     * actually causing the SLA miss" is answerable directly instead of
+     * requiring a human to eyeball p95 numbers across five separate tables.
+     */
+    data class DimensionStats(
+        val latency: LatencyStats,
+        val sla: SlaBuckets,
+        val errorRate: ErrorRate,
+    )
+
     /** Latency stats grouped by workload (Intent/Generation/Memory/Continuity/Memory-Engine). */
-    fun statsByWorkload(filter: MetricsFilter = MetricsFilter()): Map<String, LatencyStats> =
+    fun statsByWorkload(filter: MetricsFilter = MetricsFilter()): Map<String, DimensionStats> =
         groupedStats(filter) { it[LlmExchanges.workload] }
 
-    fun statsByModel(filter: MetricsFilter = MetricsFilter()): Map<String, LatencyStats> =
+    fun statsByModel(filter: MetricsFilter = MetricsFilter()): Map<String, DimensionStats> =
         groupedStats(filter) { it[LlmExchanges.model] ?: "unknown" }
 
-    fun statsByProvider(filter: MetricsFilter = MetricsFilter()): Map<String, LatencyStats> =
+    fun statsByProvider(filter: MetricsFilter = MetricsFilter()): Map<String, DimensionStats> =
         groupedStats(filter) { it[LlmExchanges.provider] ?: "unknown" }
 
     /**
@@ -193,15 +209,84 @@ class PerformanceMetricsRepository(private val db: Database) {
      * own doc comment), so they are grouped together rather than the
      * dashboard fabricating a distinction the data doesn't support.
      */
-    fun statsBySkill(filter: MetricsFilter = MetricsFilter()): Map<String, LatencyStats> =
+    fun statsBySkill(filter: MetricsFilter = MetricsFilter()): Map<String, DimensionStats> =
         groupedStats(filter) { it[LlmExchanges.skillKey] ?: "none" }
 
-    private fun groupedStats(filter: MetricsFilter, keyOf: (org.jetbrains.exposed.sql.ResultRow) -> String): Map<String, LatencyStats> =
+    private fun groupedStats(filter: MetricsFilter, keyOf: (org.jetbrains.exposed.sql.ResultRow) -> String): Map<String, DimensionStats> =
         transaction(db) {
             LlmExchanges.select { buildCondition(filter) }
                 .groupBy(keyOf)
-                .mapValues { (_, rows) -> toLatencyStats(rows.map { it[LlmExchanges.latencyMs] }.sorted()) }
+                .mapValues { (_, rows) ->
+                    val latencies = rows.map { it[LlmExchanges.latencyMs] }.sorted()
+                    val outcomes = rows.map { it[LlmExchanges.outcome] }
+                    DimensionStats(
+                        latency = toLatencyStats(latencies),
+                        sla = toSlaBuckets(latencies),
+                        errorRate = toErrorRate(outcomes),
+                    )
+                }
         }
+
+    /**
+     * Task 10 Step 11 — one row of the Slow Turn Explorer: enough to decide
+     * "is this turn worth opening" without opening it. `onPathLatencyMs` uses
+     * the exact same on-path workload set as [TurnLatencyBreakdown.onPathLatencyMs]
+     * (intent_discovery + primary_generation) — this is deliberately the
+     * user-facing figure, not the sum of every LLM call including async
+     * side-channels (Task 10 Part 29's own "do not add async latency to the
+     * SLA" rule).
+     */
+    data class SlowTurnSummary(
+        val turnRequestId: UUID,
+        val conversationId: UUID,
+        val onPathLatencyMs: Long,
+        val intentLatencyMs: Long?,
+        val generationLatencyMs: Long?,
+        val skillKey: String?,
+        val intentModel: String?,
+        val generationModel: String?,
+        val generationProvider: String?,
+        val outcome: String,
+        val isTestChat: Boolean,
+        val createdAt: LocalDateTime,
+    )
+
+    /**
+     * Every turn whose ON-PATH latency exceeds [minOnPathLatencyMs], most
+     * recent first. [filter] applies to the underlying exchange rows before
+     * grouping by turn — e.g. filtering by skill/model/provider/outcome
+     * narrows to turns that had at least one matching exchange, which is
+     * the same semantics the exchange list endpoint already uses.
+     */
+    fun slowTurns(filter: MetricsFilter = MetricsFilter(), minOnPathLatencyMs: Long, limit: Int = 200): List<SlowTurnSummary> = transaction(db) {
+        val onPathWorkloads = setOf("intent_discovery", "primary_generation")
+        LlmExchanges.select { buildCondition(filter) }
+            .map(::rowToExchange)
+            .groupBy { it.turnRequestId }
+            .mapNotNull { (turnId, exchanges) ->
+                val onPath = exchanges.filter { it.workload in onPathWorkloads }
+                val totalOnPath = onPath.sumOf { it.latencyMs }
+                if (totalOnPath <= minOnPathLatencyMs) return@mapNotNull null
+                val intent = exchanges.firstOrNull { it.workload == "intent_discovery" }
+                val generation = exchanges.firstOrNull { it.workload == "primary_generation" }
+                SlowTurnSummary(
+                    turnRequestId = turnId,
+                    conversationId = exchanges.first().conversationId,
+                    onPathLatencyMs = totalOnPath,
+                    intentLatencyMs = intent?.latencyMs,
+                    generationLatencyMs = generation?.latencyMs,
+                    skillKey = generation?.skillKey,
+                    intentModel = intent?.model,
+                    generationModel = generation?.model,
+                    generationProvider = generation?.provider,
+                    outcome = (generation ?: intent ?: exchanges.first()).outcome.name,
+                    isTestChat = exchanges.first().isTestChat,
+                    createdAt = exchanges.maxOf { it.createdAt },
+                )
+            }
+            .sortedByDescending { it.onPathLatencyMs }
+            .take(limit)
+    }
 
     /**
      * Reconstructs every LLM call that belonged to one turn, in the order

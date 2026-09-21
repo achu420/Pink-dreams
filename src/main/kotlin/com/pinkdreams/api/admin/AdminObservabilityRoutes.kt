@@ -63,18 +63,48 @@ data class ErrorRateResponse(
  * the spec's own UX requirement ("clear errors, explicit unavailable
  * fields" — a bad filter is not a broken dashboard, it's an ignored one).
  */
+/**
+ * Task 10 — one dimension's (workload/skill/model/provider) full diagnostic
+ * picture: latency percentiles AND the same SLA buckets/error-rate the
+ * overall section already has, so "which workload/skill/model/provider is
+ * driving the SLA miss" is answerable directly from one table row instead
+ * of cross-referencing p95 against a separate overall bucket count.
+ */
+@Serializable
+data class DimensionStatsResponse(
+    val count: Long,
+    val p50: Long?,
+    val p75: Long?,
+    val p95: Long?,
+    val p99: Long?,
+    val max: Long?,
+    val avg: Double?,
+    val le10s: Long,
+    val gt10s: Long,
+    val gt20s: Long,
+    val within10sRatePercent: Double,
+    val errorRatePercent: Double,
+)
+
 @Serializable
 data class LatencyDashboardResponse(
     val overall: LatencyStatsResponse,
     val slaBuckets: SlaBucketsResponse,
     val errorRate: ErrorRateResponse,
-    val byWorkload: Map<String, LatencyStatsResponse>,
-    val byModel: Map<String, LatencyStatsResponse>,
-    val byProvider: Map<String, LatencyStatsResponse>,
+    val byWorkload: Map<String, DimensionStatsResponse>,
+    val byModel: Map<String, DimensionStatsResponse>,
+    val byProvider: Map<String, DimensionStatsResponse>,
     // Task 8 Part 3/4 — "none" covers both a genuine SkillSelection.None
     // outcome and any exchange recorded before skill attribution existed;
     // see MetricsFilter's own doc comment for why those stay merged.
-    val bySkill: Map<String, LatencyStatsResponse>,
+    val bySkill: Map<String, DimensionStatsResponse>,
+    // Task 10 Step 10 — anchors the UI's relative date-range presets ("Last
+    // 1 hour", etc.) to the SERVER's clock, since LlmExchanges.createdAt is
+    // written with the server's LocalDateTime.now() (no timezone). Deriving
+    // "from"/"to" from the browser's own clock instead would silently
+    // misalign the queried window whenever admin and server run in
+    // different timezones — exactly the bug Task 10 was warned against.
+    val serverTimeNow: String,
 )
 
 @Serializable
@@ -146,6 +176,29 @@ data class ExchangeListResponse(
     val count: Int,
 )
 
+/** Task 10 Step 11 — one row of the Slow Turn Explorer table. */
+@Serializable
+data class SlowTurnSummaryResponse(
+    val turnRequestId: String,
+    val conversationId: String,
+    val onPathLatencyMs: Long,
+    val intentLatencyMs: Long?,
+    val generationLatencyMs: Long?,
+    val skillKey: String?,
+    val intentModel: String?,
+    val generationModel: String?,
+    val generationProvider: String?,
+    val outcome: String,
+    val isTestChat: Boolean,
+    val createdAt: String,
+)
+
+@Serializable
+data class SlowTurnListResponse(
+    val turns: List<SlowTurnSummaryResponse>,
+    val count: Int,
+)
+
 @Serializable
 data class TurnTraceResponse(
     val turnRequestId: String,
@@ -189,18 +242,7 @@ class AdminObservabilityRoutes(
             get("/v1/admin/observability/latency-dashboard") {
                 if (requirePrincipal(adminAuthorizationProvider) == null) return@get
                 val filter = parseFilter(call.request.queryParameters)
-                call.respond(
-                    HttpStatusCode.OK,
-                    LatencyDashboardResponse(
-                        overall = metricsRepository.latencyStats(filter).toResponse(),
-                        slaBuckets = metricsRepository.slaBuckets(filter).toResponse(),
-                        errorRate = metricsRepository.errorRate(filter).toResponse(),
-                        byWorkload = metricsRepository.statsByWorkload(filter).mapValues { it.value.toResponse() },
-                        byModel = metricsRepository.statsByModel(filter).mapValues { it.value.toResponse() },
-                        byProvider = metricsRepository.statsByProvider(filter).mapValues { it.value.toResponse() },
-                        bySkill = metricsRepository.statsBySkill(filter).mapValues { it.value.toResponse() },
-                    ),
-                )
+                call.respond(HttpStatusCode.OK, buildDashboardResponse(filter))
             }
 
             // Task 8 Part 2 — read-only report of the config ChatEngineFactory
@@ -292,6 +334,20 @@ class AdminObservabilityRoutes(
                 )
             }
 
+            // Task 10 Step 11 — Slow Turn Explorer. minLatencyMs defaults to
+            // the project's single current SLA measurement point (10s) — not
+            // a formal contractual guarantee, just the one bucket boundary
+            // already established in Task 3 (Step 30's own instruction: use
+            // the existing SLA semantics, don't invent new target numbers).
+            get("/v1/admin/observability/slow-turns") {
+                if (requirePrincipal(adminAuthorizationProvider) == null) return@get
+                val filter = parseFilter(call.request.queryParameters)
+                val minLatencyMs = call.request.queryParameters["minLatencyMs"]?.toLongOrNull() ?: 10_000L
+                val limit = call.request.queryParameters["limit"]?.toIntOrNull()?.coerceIn(1, 500) ?: 100
+                val slowTurns = metricsRepository.slowTurns(filter, minLatencyMs, limit)
+                call.respond(HttpStatusCode.OK, SlowTurnListResponse(slowTurns.map { it.toResponse() }, slowTurns.size))
+            }
+
             // Task 6 — Export/Analysis.
             get("/v1/admin/observability/export/exchanges.csv") {
                 if (requirePrincipal(adminAuthorizationProvider) == null) return@get
@@ -304,21 +360,22 @@ class AdminObservabilityRoutes(
             get("/v1/admin/observability/export/performance.json") {
                 if (requirePrincipal(adminAuthorizationProvider) == null) return@get
                 val filter = parseFilter(call.request.queryParameters)
-                call.respond(
-                    HttpStatusCode.OK,
-                    LatencyDashboardResponse(
-                        overall = metricsRepository.latencyStats(filter).toResponse(),
-                        slaBuckets = metricsRepository.slaBuckets(filter).toResponse(),
-                        errorRate = metricsRepository.errorRate(filter).toResponse(),
-                        byWorkload = metricsRepository.statsByWorkload(filter).mapValues { it.value.toResponse() },
-                        byModel = metricsRepository.statsByModel(filter).mapValues { it.value.toResponse() },
-                        byProvider = metricsRepository.statsByProvider(filter).mapValues { it.value.toResponse() },
-                        bySkill = metricsRepository.statsBySkill(filter).mapValues { it.value.toResponse() },
-                    ),
-                )
+                call.respond(HttpStatusCode.OK, buildDashboardResponse(filter))
             }
         }
     }
+
+    private fun buildDashboardResponse(filter: PerformanceMetricsRepository.MetricsFilter): LatencyDashboardResponse =
+        LatencyDashboardResponse(
+            overall = metricsRepository.latencyStats(filter).toResponse(),
+            slaBuckets = metricsRepository.slaBuckets(filter).toResponse(),
+            errorRate = metricsRepository.errorRate(filter).toResponse(),
+            byWorkload = metricsRepository.statsByWorkload(filter).mapValues { it.value.toResponse() },
+            byModel = metricsRepository.statsByModel(filter).mapValues { it.value.toResponse() },
+            byProvider = metricsRepository.statsByProvider(filter).mapValues { it.value.toResponse() },
+            bySkill = metricsRepository.statsBySkill(filter).mapValues { it.value.toResponse() },
+            serverTimeNow = LocalDateTime.now().toString(),
+        )
 
     /**
      * CSV of exchange SUMMARY fields only — deliberately excludes raw
@@ -474,6 +531,36 @@ class AdminObservabilityRoutes(
     private fun PerformanceMetricsRepository.SlaBuckets.toResponse() = SlaBucketsResponse(le5s, le8s, le10s, gt10s, gt20s, total, within10sRate)
 
     private fun PerformanceMetricsRepository.ErrorRate.toResponse() = ErrorRateResponse(total, success, malformed, budgetExhaustion, providerError, exception, failureRate)
+
+    private fun PerformanceMetricsRepository.SlowTurnSummary.toResponse() = SlowTurnSummaryResponse(
+        turnRequestId = turnRequestId.toString(),
+        conversationId = conversationId.toString(),
+        onPathLatencyMs = onPathLatencyMs,
+        intentLatencyMs = intentLatencyMs,
+        generationLatencyMs = generationLatencyMs,
+        skillKey = skillKey,
+        intentModel = intentModel,
+        generationModel = generationModel,
+        generationProvider = generationProvider,
+        outcome = outcome,
+        isTestChat = isTestChat,
+        createdAt = createdAt.toString(),
+    )
+
+    private fun PerformanceMetricsRepository.DimensionStats.toResponse() = DimensionStatsResponse(
+        count = latency.count,
+        p50 = latency.p50,
+        p75 = latency.p75,
+        p95 = latency.p95,
+        p99 = latency.p99,
+        max = latency.max,
+        avg = latency.avg,
+        le10s = sla.le10s,
+        gt10s = sla.gt10s,
+        gt20s = sla.gt20s,
+        within10sRatePercent = sla.within10sRate,
+        errorRatePercent = errorRate.failureRate,
+    )
 }
 
 private suspend fun io.ktor.util.pipeline.PipelineContext<Unit, io.ktor.server.application.ApplicationCall>.requirePrincipal(

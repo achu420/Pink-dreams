@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /**
  * Task 3 — SLA / Performance Data Model.
@@ -117,10 +118,10 @@ class PerformanceMetricsRepositoryTest {
 
         val byWorkload = metrics.statsByWorkload()
 
-        assertEquals(2L, byWorkload.getValue("intent_discovery").count)
-        assertEquals(2500.0, byWorkload.getValue("intent_discovery").avg)
-        assertEquals(1L, byWorkload.getValue("primary_generation").count)
-        assertEquals(9000L, byWorkload.getValue("primary_generation").p50)
+        assertEquals(2L, byWorkload.getValue("intent_discovery").latency.count)
+        assertEquals(2500.0, byWorkload.getValue("intent_discovery").latency.avg)
+        assertEquals(1L, byWorkload.getValue("primary_generation").latency.count)
+        assertEquals(9000L, byWorkload.getValue("primary_generation").latency.p50)
     }
 
     @Test
@@ -133,8 +134,8 @@ class PerformanceMetricsRepositoryTest {
 
         val byProvider = metrics.statsByProvider()
 
-        assertEquals(1000L, byProvider.getValue("CoreWeave").max)
-        assertEquals(50000L, byProvider.getValue("Wafer").max)
+        assertEquals(1000L, byProvider.getValue("CoreWeave").latency.max)
+        assertEquals(50000L, byProvider.getValue("Wafer").latency.max)
     }
 
     @Test
@@ -197,11 +198,11 @@ class PerformanceMetricsRepositoryTest {
 
         val bySkill = metrics.statsBySkill()
 
-        assertEquals(2, bySkill["flirting"]!!.count)
+        assertEquals(2, bySkill["flirting"]!!.latency.count)
         // nearest-rank over sorted [1000, 3000]: ceil(0.50*2)=1st value=1000
-        assertEquals(1000L, bySkill["flirting"]!!.p50)
-        assertEquals(1, bySkill["emotional_support"]!!.count)
-        assertEquals(1, bySkill["none"]!!.count)
+        assertEquals(1000L, bySkill["flirting"]!!.latency.p50)
+        assertEquals(1, bySkill["emotional_support"]!!.latency.count)
+        assertEquals(1, bySkill["none"]!!.latency.count)
     }
 
     @Test
@@ -292,5 +293,120 @@ class PerformanceMetricsRepositoryTest {
                 it[Messages.createdAt] = defaultNow()
             }
         }
+    }
+
+    // --- Task 10 — per-dimension SLA buckets / error rate ---
+
+    @Test
+    fun `per-dimension stats carry the same SLA buckets and error rate as the overall aggregation`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        record(exchangeRepo, 4000, workload = "primary_generation")
+        record(exchangeRepo, 12000, workload = "primary_generation")
+        record(exchangeRepo, 25000, workload = "primary_generation", outcome = LlmExchangeRepository.Outcome.PROVIDER_ERROR)
+
+        val byWorkload = metrics.statsByWorkload()
+        val dim = byWorkload.getValue("primary_generation")
+
+        assertEquals(3L, dim.latency.count)
+        assertEquals(1L, dim.sla.le5s)
+        assertEquals(2L, dim.sla.gt10s)
+        assertEquals(1L, dim.sla.gt20s)
+        assertEquals(3L, dim.sla.total)
+        assertEquals(1L, dim.errorRate.providerError)
+        // 1 failure out of 3 -> 33.33...%
+        assertTrue(dim.errorRate.failureRate > 33.0 && dim.errorRate.failureRate < 34.0)
+    }
+
+    @Test
+    fun `per-provider stats isolate SLA buckets to that provider only`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        record(exchangeRepo, 15000, provider = "SlowHost")
+        record(exchangeRepo, 1000, provider = "FastHost")
+
+        val byProvider = metrics.statsByProvider()
+
+        assertEquals(1L, byProvider.getValue("SlowHost").sla.gt10s)
+        assertEquals(0L, byProvider.getValue("FastHost").sla.gt10s)
+        assertEquals(1L, byProvider.getValue("FastHost").sla.le5s)
+    }
+
+    // --- Task 10 Step 11 — Slow Turn Explorer ---
+
+    @Test
+    fun `slowTurns returns only turns whose on-path latency exceeds the threshold`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        val slowTurn = UUID.randomUUID()
+        val fastTurn = UUID.randomUUID()
+        record(exchangeRepo, 6000, workload = "intent_discovery", turnRequestId = slowTurn)
+        record(exchangeRepo, 6000, workload = "primary_generation", turnRequestId = slowTurn) // on-path total 12000
+        record(exchangeRepo, 1000, workload = "intent_discovery", turnRequestId = fastTurn)
+        record(exchangeRepo, 1000, workload = "primary_generation", turnRequestId = fastTurn) // on-path total 2000
+
+        val slow = metrics.slowTurns(minOnPathLatencyMs = 10_000)
+
+        assertEquals(1, slow.size)
+        assertEquals(slowTurn, slow.single().turnRequestId)
+        assertEquals(12000L, slow.single().onPathLatencyMs)
+    }
+
+    @Test
+    fun `slowTurns excludes async side-channel latency from the on-path total`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        val turnId = UUID.randomUUID()
+        record(exchangeRepo, 3000, workload = "intent_discovery", turnRequestId = turnId)
+        record(exchangeRepo, 3000, workload = "primary_generation", turnRequestId = turnId) // on-path total 6000
+        record(exchangeRepo, 30000, workload = "memory_extraction", turnRequestId = turnId) // async, must not count
+
+        val slow = metrics.slowTurns(minOnPathLatencyMs = 5_000)
+
+        assertEquals(1, slow.size, "The turn's on-path total (6000ms) exceeds the threshold even though the async call alone is much larger")
+        assertEquals(6000L, slow.single().onPathLatencyMs, "Async memory_extraction latency must never be added to the on-path/SLA figure")
+    }
+
+    @Test
+    fun `slowTurns carries skill and model-provider attribution for the generation exchange`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        val turnId = UUID.randomUUID()
+        exchangeRepo.record(
+            LlmExchangeRepository.RecordInput(
+                turnRequestId = turnId, conversationId = UUID.randomUUID(), workload = "intent_discovery",
+                isTestChat = false, model = "openai/gpt-4o-mini", provider = "OpenAI", latencyMs = 6000,
+                outcome = LlmExchangeRepository.Outcome.SUCCESS,
+            ),
+        )
+        exchangeRepo.record(
+            LlmExchangeRepository.RecordInput(
+                turnRequestId = turnId, conversationId = UUID.randomUUID(), workload = "primary_generation",
+                isTestChat = false, model = "deepseek/deepseek-v4-flash-0731", provider = "CoreWeave", latencyMs = 6000,
+                outcome = LlmExchangeRepository.Outcome.SUCCESS, skillKey = "flirting",
+            ),
+        )
+
+        val slow = metrics.slowTurns(minOnPathLatencyMs = 10_000).single()
+
+        assertEquals("flirting", slow.skillKey)
+        assertEquals("openai/gpt-4o-mini", slow.intentModel)
+        assertEquals("deepseek/deepseek-v4-flash-0731", slow.generationModel)
+        assertEquals("CoreWeave", slow.generationProvider)
+    }
+
+    @Test
+    fun `slowTurns returns an empty list rather than crashing when nothing exceeds the threshold`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        record(exchangeRepo, 1000)
+
+        assertTrue(metrics.slowTurns(minOnPathLatencyMs = 10_000).isEmpty())
     }
 }

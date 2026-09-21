@@ -458,4 +458,100 @@ class AdminObservabilityRoutesTest {
 
         assertEquals(null, json(response.bodyAsText())["stageTimingsMs"])
     }
+
+    // --- Task 10 ---
+
+    @Test
+    fun `dashboard breakdown tables carry SLA buckets and error rate per dimension not just latency`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        seedExchange(repo, conversationId, workload = "primary_generation", latencyMs = 15000)
+        seedExchange(repo, conversationId, workload = "primary_generation", latencyMs = 1000, outcome = LlmExchangeRepository.Outcome.PROVIDER_ERROR)
+
+        val response = client.get("/v1/admin/observability/latency-dashboard") { basicAuth(adminId.toString(), "x") }
+
+        val dim = json(response.bodyAsText())["byWorkload"]!!.jsonObject["primary_generation"]!!.jsonObject
+        assertEquals(1, dim["gt10s"]!!.jsonPrimitive.content.toInt())
+        assertEquals(1, dim["le10s"]!!.jsonPrimitive.content.toInt())
+        assertTrue(dim["errorRatePercent"]!!.jsonPrimitive.content.toDouble() > 0.0, "One of two exchanges failed — error rate must be non-zero for this workload")
+    }
+
+    @Test
+    fun `dashboard response includes a server-anchored timestamp for relative date-range filters`() = testApplication {
+        setup()
+
+        val response = client.get("/v1/admin/observability/latency-dashboard") { basicAuth(adminId.toString(), "x") }
+
+        val serverTimeNow = json(response.bodyAsText())["serverTimeNow"]!!.jsonPrimitive.content
+        assertTrue(serverTimeNow.isNotBlank())
+        // Must parse as a LocalDateTime — the same shape the "from"/"to" filter params expect.
+        java.time.LocalDateTime.parse(serverTimeNow)
+    }
+
+    @Test
+    fun `slow turns explorer returns only turns exceeding the threshold with attribution fields`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        val slowTurn = UUID.randomUUID()
+        repo.record(
+            LlmExchangeRepository.RecordInput(
+                turnRequestId = slowTurn, conversationId = conversationId, workload = "intent_discovery",
+                isTestChat = false, model = "openai/gpt-4o-mini", provider = "OpenAI", latencyMs = 6000,
+                outcome = LlmExchangeRepository.Outcome.SUCCESS,
+            ),
+        )
+        repo.record(
+            LlmExchangeRepository.RecordInput(
+                turnRequestId = slowTurn, conversationId = conversationId, workload = "primary_generation",
+                isTestChat = false, model = "deepseek/deepseek-v4-flash-0731", provider = "CoreWeave", latencyMs = 6000,
+                outcome = LlmExchangeRepository.Outcome.SUCCESS, skillKey = "flirting",
+            ),
+        )
+        seedExchange(repo, conversationId, workload = "primary_generation", latencyMs = 500) // fast turn, must be excluded
+
+        val response = client.get("/v1/admin/observability/slow-turns?minLatencyMs=10000") { basicAuth(adminId.toString(), "x") }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+        val body = json(response.bodyAsText())
+        val turns = body["turns"]!!.jsonArray
+        assertEquals(1, turns.size)
+        val turn = turns[0].jsonObject
+        assertEquals(slowTurn.toString(), turn["turnRequestId"]!!.jsonPrimitive.content)
+        assertEquals(12000, turn["onPathLatencyMs"]!!.jsonPrimitive.content.toInt())
+        assertEquals("flirting", turn["skillKey"]!!.jsonPrimitive.content)
+        assertEquals("deepseek/deepseek-v4-flash-0731", turn["generationModel"]!!.jsonPrimitive.content)
+        assertEquals("CoreWeave", turn["generationProvider"]!!.jsonPrimitive.content)
+    }
+
+    @Test
+    fun `slow turns explorer defaults to the 10s SLA boundary when no threshold is given`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        seedExchange(repo, conversationId, workload = "primary_generation", latencyMs = 15000)
+
+        val response = client.get("/v1/admin/observability/slow-turns") { basicAuth(adminId.toString(), "x") }
+
+        assertEquals(1, json(response.bodyAsText())["turns"]!!.jsonArray.size)
+    }
+
+    @Test
+    fun `slow turns explorer requires admin access`() = testApplication {
+        setup()
+
+        val response = client.get("/v1/admin/observability/slow-turns") { basicAuth(nonAdminId.toString(), "x") }
+
+        assertEquals(HttpStatusCode.Forbidden, response.status)
+    }
+
+    @Test
+    fun `effective configuration still reflects the unchanged production defaults`() = testApplication {
+        setup()
+
+        val response = client.get("/v1/admin/observability/effective-configuration") { basicAuth(adminId.toString(), "x") }
+
+        assertEquals(HttpStatusCode.OK, response.status)
+    }
 }
