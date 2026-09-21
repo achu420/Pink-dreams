@@ -371,6 +371,28 @@ class AdminObservabilityRoutesTest {
         assertEquals("PROVIDER_ERROR", outcomeExchanges[0].jsonObject["outcome"]!!.jsonPrimitive.content)
     }
 
+    // Task 12 audit finding (Category B): workload was silently dropped as a
+    // filter whenever conversationId was also supplied — the exchange list
+    // endpoint's fetch-method branch used it only to decide HOW to fetch,
+    // never to actually filter the conversationId-scoped result set.
+    @Test
+    fun `exchange list combines the conversationId and workload filters instead of dropping workload`() = testApplication {
+        val db = setup()
+        val repo = LlmExchangeRepository(db)
+        val conversationId = UUID.randomUUID()
+        seedExchange(repo, conversationId, workload = "intent_discovery")
+        seedExchange(repo, conversationId, workload = "primary_generation")
+        seedExchange(repo, conversationId, workload = "memory_extraction")
+
+        val response = client.get("/v1/admin/observability/exchanges?conversationId=$conversationId&workload=primary_generation") {
+            basicAuth(adminId.toString(), "x")
+        }
+
+        val exchanges = json(response.bodyAsText())["exchanges"]!!.jsonArray
+        assertEquals(1, exchanges.size, "workload must narrow the conversationId-scoped result set, not be silently ignored")
+        assertEquals("primary_generation", exchanges[0].jsonObject["workload"]!!.jsonPrimitive.content)
+    }
+
     @Test
     fun `an exchange recorded before skill attribution existed has a null skillKey not a guessed one`() = testApplication {
         val db = setup()

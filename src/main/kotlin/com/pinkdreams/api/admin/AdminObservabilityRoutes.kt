@@ -274,10 +274,20 @@ class AdminObservabilityRoutes(
                         return@get
                     }
                 }
-                // skillKey/outcome apply on top of the required conversationId/workload
-                // dimension above (in-memory — this endpoint's result sets are already
-                // capped by `limit`, never a full-table scan).
+                // Task 12 Part 17 audit fix (Category B — small, isolated filter
+                // bug): workload/skillKey/outcome all apply on top of whichever
+                // primary dimension (conversationId or workload) selected the
+                // base result set above. Previously `workload` was silently
+                // DROPPED whenever conversationId was also supplied — the branch
+                // above only used it to pick a fetch method, never as an actual
+                // filter, so `?conversationId=X&workload=Y` silently ignored Y
+                // and returned every workload for that conversation. Filters must
+                // combine consistently everywhere (dashboard/exports already do
+                // this correctly via MetricsFilter); this brings the exchange
+                // list endpoint in line. In-memory — this endpoint's result sets
+                // are already capped by `limit`, never a full-table scan.
                 val filtered = exchanges
+                    .let { list -> if (conversationId != null && workload != null) list.filter { it.workload == workload } else list }
                     .let { list -> if (skillKey != null) list.filter { it.skillKey == skillKey } else list }
                     .let { list -> if (outcome != null) list.filter { it.outcome.name == outcome } else list }
                 call.respond(HttpStatusCode.OK, ExchangeListResponse(filtered.map { it.toSummary() }, filtered.size))
