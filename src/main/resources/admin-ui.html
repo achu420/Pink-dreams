@@ -1359,8 +1359,23 @@
                 <div id="obsEffectiveConfig"><div class="obs-loading">Loading…</div></div>
             </div>
 
-            <div id="obsDashboardError"></div>
-            <div id="obsDashboard"><div class="obs-loading">Loading dashboard…</div></div>
+            <div class="obs-card">
+                <div class="obs-card-head">
+                    <h3 style="margin:0;">Latency &amp; SLA <span class="obs-badge testing">PER LLM EXCHANGE</span></h3>
+                </div>
+                <div class="obs-subtitle">
+                    Every figure below is measured PER LLM EXCHANGE across ALL workloads —
+                    the two user-facing on-path calls (intent discovery, primary generation)
+                    AND the async side-channels (memory extraction, continuity summarization,
+                    memory engine maintenance), which run after the reply is already delivered.
+                    It is therefore not a per-turn user-facing SLA number on its own: async
+                    outliers are included here. For the user-facing split, read the on-path
+                    rows in <em>By Workload</em>; for per-turn on-path latency
+                    (intent + generation only) use <em>Slow Turns</em> below.
+                </div>
+                <div id="obsDashboardError"></div>
+                <div id="obsDashboard"><div class="obs-loading">Loading dashboard…</div></div>
+            </div>
 
             <div class="obs-gap"></div>
 

@@ -9,7 +9,10 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
+import org.jetbrains.exposed.sql.LikePattern
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.lowerCase
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlinx.serialization.json.jsonObject
@@ -332,8 +335,20 @@ class PerformanceMetricsRepository(private val db: Database) {
     private fun buildCondition(filter: MetricsFilter): Op<Boolean> {
         var condition: Op<Boolean> = Op.TRUE
         filter.workload?.let { condition = condition and (LlmExchanges.workload eq it) }
-        filter.model?.let { condition = condition and (LlmExchanges.model eq it) }
-        filter.provider?.let { condition = condition and (LlmExchanges.provider eq it) }
+        // Task 03 audit fix. The admin Observability filter bar labels these two
+        // controls "Model contains" / "Provider contains" and suggests partial
+        // values ("e.g. deepseek"), but both were matched with strict equality —
+        // so the UI's own documented example provably returned zero rows against
+        // a real database full of ids like "deepseek/deepseek-v4-flash-0731".
+        // Matching is now the case-insensitive substring match the control
+        // already advertised. This is a strict WIDENING of the previous
+        // behavior (an exact value still matches itself), applied inside the one
+        // shared condition builder, so the dashboard, slow turns, the exchanges
+        // CSV export and the performance JSON export all stay consistent with
+        // each other. Escapes LIKE's own wildcards so a literal % or _ typed by
+        // an admin is matched as text rather than as a pattern.
+        filter.model?.let { condition = condition and (LlmExchanges.model.lowerCase() like containsPattern(it)) }
+        filter.provider?.let { condition = condition and (LlmExchanges.provider.lowerCase() like containsPattern(it)) }
         filter.conversationId?.let { condition = condition and (LlmExchanges.conversationId eq it) }
         filter.isTestChat?.let { condition = condition and (LlmExchanges.isTestChat eq it) }
         filter.from?.let { condition = condition and (LlmExchanges.createdAt greaterEq it) }
@@ -341,6 +356,21 @@ class PerformanceMetricsRepository(private val db: Database) {
         filter.skillKey?.let { condition = condition and (LlmExchanges.skillKey eq it) }
         filter.outcome?.let { condition = condition and (LlmExchanges.outcome eq it) }
         return condition
+    }
+
+    /**
+     * A case-insensitive "contains" LIKE pattern for [raw]. The value is
+     * lowercased to pair with the column's own `lowerCase()`, and LIKE's
+     * wildcards are escaped with a backslash (declared via ESCAPE by Exposed's
+     * default LikePattern handling) so an admin typing `%` or `_` filters for
+     * that literal character instead of accidentally matching everything.
+     */
+    private fun containsPattern(raw: String): LikePattern {
+        val escaped = raw.lowercase()
+            .replace("\\", "\\\\")
+            .replace("%", "\\%")
+            .replace("_", "\\_")
+        return LikePattern("%$escaped%", escapeChar = '\\')
     }
 
     /** Nearest-rank percentile (ceil(p/100 * n)), 1-indexed into the sorted list — the same definition regardless of DB engine. */

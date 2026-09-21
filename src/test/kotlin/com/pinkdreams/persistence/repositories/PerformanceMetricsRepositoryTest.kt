@@ -409,4 +409,62 @@ class PerformanceMetricsRepositoryTest {
 
         assertTrue(metrics.slowTurns(minOnPathLatencyMs = 10_000).isEmpty())
     }
+
+    /**
+     * Task 03 audit fix. The admin Observability filter bar labels these controls
+     * "Model contains" / "Provider contains" and suggests a partial value
+     * ("e.g. deepseek"), but they were matched with strict equality — so the
+     * control's own documented example returned zero rows against real model ids
+     * like "deepseek/deepseek-v4-flash-0731". These assertions pin the
+     * substring semantics the UI advertises, and pin that an exact value still
+     * matches itself (the change is a strict widening, never a redefinition).
+     */
+    @Test
+    fun `model and provider filters match on substring as the admin UI advertises`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        record(exchangeRepo, 1000, model = "deepseek/deepseek-v4-flash-0731", provider = "CoreWeave")
+        record(exchangeRepo, 2000, model = "deepseek/deepseek-v4-flash-0731", provider = "DeepInfra")
+        record(exchangeRepo, 3000, model = "openai/gpt-4o-mini", provider = "Azure")
+
+        // The UI's own placeholder value must actually select rows.
+        assertEquals(2, metrics.latencyStats(PerformanceMetricsRepository.MetricsFilter(model = "deepseek")).count)
+        // Case-insensitive, as a free-text "contains" box implies.
+        assertEquals(2, metrics.latencyStats(PerformanceMetricsRepository.MetricsFilter(model = "DEEPSEEK")).count)
+        // A full, exact id still matches exactly itself — strict widening.
+        assertEquals(
+            1,
+            metrics.latencyStats(PerformanceMetricsRepository.MetricsFilter(model = "openai/gpt-4o-mini")).count,
+        )
+        // Provider behaves identically.
+        assertEquals(1, metrics.latencyStats(PerformanceMetricsRepository.MetricsFilter(provider = "core")).count)
+        assertEquals(0, metrics.latencyStats(PerformanceMetricsRepository.MetricsFilter(provider = "nosuch")).count)
+        // Combined with another dimension the filters still AND together.
+        assertEquals(
+            1,
+            metrics.latencyStats(
+                PerformanceMetricsRepository.MetricsFilter(model = "deepseek", provider = "DeepInfra"),
+            ).count,
+        )
+    }
+
+    /**
+     * A LIKE wildcard typed into the box must be matched as a literal character,
+     * never as a pattern — otherwise "%" would silently select every row and an
+     * admin would read a filtered dashboard that was not filtered at all.
+     */
+    @Test
+    fun `wildcard characters in a model filter are matched literally`() {
+        val database = db()
+        val exchangeRepo = LlmExchangeRepository(database)
+        val metrics = PerformanceMetricsRepository(database)
+        record(exchangeRepo, 1000, model = "deepseek/deepseek-v4-flash-0731")
+        record(exchangeRepo, 2000, model = "openai/gpt-4o-mini")
+        record(exchangeRepo, 3000, model = "literal%percent")
+
+        assertEquals(1, metrics.latencyStats(PerformanceMetricsRepository.MetricsFilter(model = "%")).count)
+        assertEquals(1, metrics.latencyStats(PerformanceMetricsRepository.MetricsFilter(model = "l%p")).count)
+        assertEquals(0, metrics.latencyStats(PerformanceMetricsRepository.MetricsFilter(model = "_")).count)
+    }
 }
