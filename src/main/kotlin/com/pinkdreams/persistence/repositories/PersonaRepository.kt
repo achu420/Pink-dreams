@@ -74,6 +74,18 @@ open class PersonaRepository(private val db: Database) {
             .singleOrNull()
     }
 
+    /**
+     * Read-only accessor for the persona → persona_identity link. Kept off the
+     * [Persona] model deliberately: every existing caller and response mapper
+     * takes Persona apart field by field, and adding a field there would change
+     * an already-shipped API shape. This is purely additive.
+     */
+    fun findPersonaIdentityId(id: UUID): UUID? = transaction(db) {
+        Personas.select { Personas.id eq id }
+            .map { it[Personas.personaIdentityId] }
+            .singleOrNull()
+    }
+
     fun findAll(): List<Persona> = transaction(db) {
         Personas.selectAll()
             .map(::rowToModel)

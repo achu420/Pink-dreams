@@ -239,7 +239,10 @@ fun Application.module(
         userRepository = userRepo,
     )
 
-    val authProvider = adminAuthProvider ?: AdminAuthorizationProvider()
+    // DB-backed admin allowlist, unioned with the ADMIN_USER_IDS env var. An
+    // explicitly injected provider (tests) is never overridden.
+    val allowlistRepo = com.pinkdreams.persistence.repositories.AdminAllowlistRepository(db)
+    val authProvider = adminAuthProvider ?: AdminAuthorizationProvider(allowlistRepo)
 
     // Admin session gate — layered IN ADDITION to the existing dev-auth
     // basic-auth + AdminAuthorizationProvider mechanism used by every admin
@@ -318,6 +321,24 @@ fun Application.module(
         ConversationHistoryRoutes(conversationRepo, messageRepo, userRepository = userRepo).register(this)
         AdminEngineRoutes(engineRepo, authProvider).register(this)
         AdminPersonaRoutes(personaRepo, coreVersionRepo, authProvider).register(this)
+        // Persona Detail → Visual Identity tab. Strictly read-only; the
+        // ReferenceImageRepository here is only ever asked for DB rows
+        // (findForVersion), never for object content, so it is given an
+        // in-memory storage backend rather than wiring a real blob store.
+        com.pinkdreams.api.admin.AdminPersonaVisualRoutes(
+            personaRepository = personaRepo,
+            personaIdentityRepository = com.pinkdreams.persistence.repositories.PersonaIdentityRepository(db),
+            visualVersionRepository = com.pinkdreams.persistence.repositories.PersonaVisualVersionRepository(db),
+            wardrobeRepository = com.pinkdreams.persistence.repositories.WardrobeRepository(db),
+            referenceImageRepository = com.pinkdreams.persistence.repositories.ReferenceImageRepository(
+                db,
+                com.pinkdreams.storage.InMemoryObjectStorage(),
+            ),
+            imageJobRepository = com.pinkdreams.persistence.repositories.ImageJobRepository(db),
+            generatedCandidateRepository = com.pinkdreams.imaging.orchestration.GeneratedCandidateRepository(db),
+            adminAuthorizationProvider = authProvider,
+        ).register(this)
+        com.pinkdreams.api.admin.AdminAllowlistRoutes(allowlistRepo, authProvider).register(this)
         com.pinkdreams.api.admin.AdminSkillRoutes(skillRepo, authProvider).register(this)
         com.pinkdreams.api.admin.AdminMemoryEngineRoutes(memoryEngineRepo, authProvider).register(this)
         com.pinkdreams.api.admin.AdminIntentEngineRoutes(intentEngineRepo, skillRepo, authProvider).register(this)
@@ -337,6 +358,9 @@ fun Application.module(
             userProfileRepository = userProfileRepo,
             provisioning = com.pinkdreams.persistence.AdminUserProvisioning(db, userRepo, userProfileRepo),
             adminAuthorizationProvider = authProvider,
+            conversationRepository = conversationRepo,
+            memoryFactRepository = memoryFactRepo,
+            personaRepository = personaRepo,
         ).register(this)
         com.pinkdreams.api.admin.AdminTestChatRoutes(
             testChatService = testChatService,

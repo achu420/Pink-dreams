@@ -51,6 +51,7 @@ object DatabaseFactory {
             MemoryEngines,
             IntentEngines,
             AiSettings,
+            AdminAllowlist,
             PersonaIdentity,
             PersonaVisualVersions,
             PersonaVisualWardrobeItems,
@@ -166,6 +167,20 @@ object AiSettings : Table("ai_settings") {
 
     /** The one and only row. Fixed so the table can never grow a second. */
     val SINGLETON_ID: UUID = UUID.fromString("00000000-0000-0000-0000-00000000a151")
+}
+
+// DB-backed admin allowlist. Purely ADDITIVE alongside the ADMIN_USER_IDS
+// environment variable, which keeps working exactly as before: AdminAuthorization
+// Provider takes the UNION of the two, so an empty table reproduces today's
+// behavior for every existing deployment. A brand-new table, so nothing
+// existing is altered.
+object AdminAllowlist : Table("admin_allowlist") {
+    val userId = uuid("user_id")
+    val note = text("note").nullable()
+    val addedBy = text("added_by").nullable()
+    val addedAt = datetime("added_at")
+
+    override val primaryKey = PrimaryKey(userId)
 }
 
 // Phase B — Skill Foundation. Unlike ConversationEngines (one global active

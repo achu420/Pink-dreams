@@ -138,6 +138,18 @@ class MemoryFactRepository(private val db: Database) {
         }.map(::rowToModel)
     }
 
+    /**
+     * Admin User Detail → Memory tab. Every fact learned for this user across
+     * EVERY persona they have talked to — memory itself stays relationship-
+     * scoped (user+persona) row by row; this is only a read that spans the
+     * relationships. Additive: purely a new SELECT, no existing query, write
+     * path or scoping rule is changed, and [findForRelationship] is untouched.
+     */
+    fun findAllForUser(userId: UUID): List<MemoryFact> = transaction(db) {
+        MemoryFacts.select { MemoryFacts.userId eq userId }
+            .map(::rowToModel)
+    }
+
     fun moveToCold(userId: UUID, personaId: UUID, factId: UUID, evictedAt: LocalDateTime = defaultNow()): MemoryFact = transaction(db) {
         val updated = MemoryFacts.update({
             (MemoryFacts.id eq factId) and

@@ -231,6 +231,47 @@ class AdminPersonaRoutes(
                 )
             }
 
+            // GET /v1/admin/personas/{personaId} — single persona, for the
+            // Persona Detail page's Overview tab.
+            get("/v1/admin/personas/{personaId}") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@get
+                }
+
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@get
+                }
+
+                val personaId = try {
+                    UUID.fromString(call.parameters["personaId"])
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid persona ID format", null)),
+                    )
+                    return@get
+                }
+
+                val persona = personaRepository.findById(personaId)
+                if (persona == null) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, "Persona not found", null)),
+                    )
+                    return@get
+                }
+                call.respond(HttpStatusCode.OK, personaResponse(persona))
+            }
+
             // PATCH /v1/admin/personas/{personaId}
             patch("/v1/admin/personas/{personaId}") {
                 val principal = call.principal<UserIdPrincipal>()

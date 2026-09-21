@@ -5,6 +5,9 @@ import com.pinkdreams.common.errors.ApiError
 import com.pinkdreams.common.errors.ErrorCode
 import com.pinkdreams.common.errors.ErrorResponse
 import com.pinkdreams.persistence.AdminUserProvisioning
+import com.pinkdreams.persistence.repositories.ConversationRepository
+import com.pinkdreams.persistence.repositories.MemoryFactRepository
+import com.pinkdreams.persistence.repositories.PersonaRepository
 import com.pinkdreams.persistence.repositories.UserProfileRepository
 import com.pinkdreams.persistence.repositories.UserRepository
 import io.ktor.http.HttpStatusCode
@@ -18,6 +21,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 @Serializable
 data class CreateAdminUserRequest(
@@ -43,6 +47,42 @@ data class AdminUserListResponse(
     val users: List<AdminUserProfileResponse>,
 )
 
+@Serializable
+data class AdminUserConversationResponse(
+    val id: String,
+    val personaId: String,
+    val personaDisplayName: String?,
+    val state: String,
+    val executionMode: String,
+    val lastMessageAt: String?,
+    val createdAt: String,
+)
+
+@Serializable
+data class AdminUserConversationListResponse(
+    val conversations: List<AdminUserConversationResponse>,
+)
+
+@Serializable
+data class AdminUserMemoryFactResponse(
+    val id: String,
+    val personaId: String,
+    val personaDisplayName: String?,
+    val fact: String,
+    val factType: String,
+    val criticality: String,
+    val tier: String,
+    val status: String,
+    val owner: String,
+    val source: String,
+    val learnedAt: String,
+)
+
+@Serializable
+data class AdminUserMemoryListResponse(
+    val memoryFacts: List<AdminUserMemoryFactResponse>,
+)
+
 /**
  * Admin-only test-user creation and listing, for the future Admin Console Chat
  * tab's user-selection loop. Does not create update/delete endpoints (out of
@@ -54,6 +94,13 @@ class AdminUserRoutes(
     private val userProfileRepository: UserProfileRepository,
     private val provisioning: AdminUserProvisioning,
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
+    // User Detail page (Conversations + Memory tabs). Both are read-only and
+    // reuse existing repositories — findAllAdmin already exists for the
+    // Conversations Inspector and takes an arbitrary target user id, so no
+    // admin-specific conversation query had to be added.
+    private val conversationRepository: ConversationRepository? = null,
+    private val memoryFactRepository: MemoryFactRepository? = null,
+    private val personaRepository: PersonaRepository? = null,
 ) {
     fun register(route: Route) {
         route.authenticate("session-auth", "dev-auth") {
@@ -159,6 +206,168 @@ class AdminUserRoutes(
 
                 call.respond(HttpStatusCode.OK, AdminUserListResponse(users))
             }
+
+            // GET /v1/admin/users/{userId}
+            get("/v1/admin/users/{userId}") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@get
+                }
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@get
+                }
+
+                val userId = parseUserId(call.parameters["userId"])
+                if (userId == null) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid user ID format", null)),
+                    )
+                    return@get
+                }
+                if (!userRepository.exists(userId)) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, "User not found", null)),
+                    )
+                    return@get
+                }
+
+                val profile = userProfileRepository.findByUserId(userId)
+                call.respond(
+                    HttpStatusCode.OK,
+                    AdminUserProfileResponse(
+                        userId = userId.toString(),
+                        displayName = profile?.displayName,
+                        gender = profile?.gender,
+                        interest = profile?.interest,
+                        city = profile?.city,
+                        age = profile?.age,
+                    ),
+                )
+            }
+
+            // GET /v1/admin/users/{userId}/conversations
+            get("/v1/admin/users/{userId}/conversations") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@get
+                }
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@get
+                }
+
+                val userId = parseUserId(call.parameters["userId"])
+                if (userId == null) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid user ID format", null)),
+                    )
+                    return@get
+                }
+                val conversations = conversationRepository
+                if (conversations == null) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        ErrorResponse(ApiError(ErrorCode.INTERNAL_SERVER_ERROR, "Conversation lookup is not configured", null)),
+                    )
+                    return@get
+                }
+
+                val personaNames = personaRepository?.findAll()?.associate { it.id.toString() to it.displayName } ?: emptyMap()
+                val rows = conversations.findAllAdmin(limit = 200, offset = 0, userId = userId, personaId = null)
+                    .map { c ->
+                        AdminUserConversationResponse(
+                            id = c.id.toString(),
+                            personaId = c.personaId.toString(),
+                            personaDisplayName = personaNames[c.personaId.toString()],
+                            state = c.state,
+                            executionMode = c.executionMode,
+                            lastMessageAt = c.lastMessageAt?.toString(),
+                            createdAt = c.createdAt.toString(),
+                        )
+                    }
+                call.respond(HttpStatusCode.OK, AdminUserConversationListResponse(rows))
+            }
+
+            // GET /v1/admin/users/{userId}/memory — every memory fact for this
+            // user across every persona they have talked to.
+            get("/v1/admin/users/{userId}/memory") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@get
+                }
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@get
+                }
+
+                val userId = parseUserId(call.parameters["userId"])
+                if (userId == null) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid user ID format", null)),
+                    )
+                    return@get
+                }
+                val memory = memoryFactRepository
+                if (memory == null) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        ErrorResponse(ApiError(ErrorCode.INTERNAL_SERVER_ERROR, "Memory lookup is not configured", null)),
+                    )
+                    return@get
+                }
+
+                val personaNames = personaRepository?.findAll()?.associate { it.id.toString() to it.displayName } ?: emptyMap()
+                val facts = memory.findAllForUser(userId)
+                    .sortedByDescending { it.learnedAt }
+                    .map { f ->
+                        AdminUserMemoryFactResponse(
+                            id = f.id.toString(),
+                            personaId = f.personaId.toString(),
+                            personaDisplayName = personaNames[f.personaId.toString()],
+                            fact = f.fact,
+                            factType = f.factType,
+                            criticality = f.criticality,
+                            tier = f.tier,
+                            status = f.status,
+                            owner = f.owner,
+                            source = f.source,
+                            learnedAt = f.learnedAt.toString(),
+                        )
+                    }
+                call.respond(HttpStatusCode.OK, AdminUserMemoryListResponse(facts))
+            }
         }
+    }
+
+    private fun parseUserId(raw: String?): UUID? = try {
+        UUID.fromString(raw)
+    } catch (e: Exception) {
+        null
     }
 }

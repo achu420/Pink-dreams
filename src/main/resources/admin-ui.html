@@ -243,6 +243,36 @@
         .vh-inner table { margin-top: 6px; }
         .vh-inner .vh-title { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-mauve); font-weight: 700; margin-bottom: 4px; }
         .vh-inner td, .vh-inner th { white-space: normal; }
+        /* Detail-page shell (Persona Detail, User Detail). A persona/user is a
+           big enough entity to deserve its own full-width page with tabs. */
+        .detail-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+        .dp-tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+        .dp-tab { padding: 9px 14px; font-size: 12.5px; cursor: pointer; border: none; background: none;
+                  color: var(--muted-mauve); border-bottom: 2px solid transparent; border-radius: 0; }
+        .dp-tab.active { color: var(--soft-rose); border-bottom-color: var(--soft-rose); font-weight: 600; }
+        .dp-panel { display: none; }
+        .dp-panel.active { display: block; }
+        .kv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+        .kv-item { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; }
+        .kv-item .kv-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted-mauve); font-weight: 700; }
+        .kv-item .kv-value { margin-top: 4px; font-size: 13px; word-break: break-word; }
+        .code-block { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+                      padding: 10px 12px; font-family: 'SF Mono', Consolas, monospace; font-size: 11.5px;
+                      white-space: pre-wrap; word-break: break-word; max-height: 320px; overflow: auto; }
+        /* Split-pane list|detail (Engines, Skills). Deliberately NOT a separate
+           page: these are simple single-prompt versioned entities. */
+        .detail-layout { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 16px; align-items: start; }
+        @media (max-width: 900px) { .detail-layout { grid-template-columns: minmax(0, 1fr); } }
+        .dl-pane { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        .dl-pane-head { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 10.5px;
+                        text-transform: uppercase; letter-spacing: .06em; color: var(--muted-mauve); font-weight: 700; }
+        .dl-body { padding: 12px; }
+        .dl-row { padding: 10px 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
+        .dl-row:last-child { border-bottom: none; }
+        .dl-row:hover { background: var(--surface-2); }
+        .dl-row.selected { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--soft-rose); }
+        .dl-row .dl-row-title { font-size: 13px; font-weight: 600; }
+        .dl-row .dl-row-sub { font-size: 11.5px; color: var(--muted-mauve); margin-top: 3px; }
         .row-actions button { padding: 5px 11px; font-size: 11.5px; margin-right: 6px; }
         .badge.prod { background: rgba(62,213,152,.16); color: var(--success); }
         .badge.draft { background: rgba(205,187,196,.16); color: var(--muted-mauve); }
@@ -557,11 +587,19 @@
                     <div class="filter-count" id="engineFilterCount"></div>
                 </div>
 
-                <div class="vh-title">Version history</div>
-                <div class="table-wrap"><table id="enginesTable">
-                    <thead><tr><th>Version</th><th>Stage</th><th>Status</th><th>Author</th><th>Changelog</th><th>Actions</th></tr></thead>
-                    <tbody></tbody>
-                </table></div>
+                <!-- Split-pane list|detail: engines stay on this view (no page
+                     navigation) — one selected version's full prompt and
+                     actions render in the right pane in place. -->
+                <div class="detail-layout">
+                    <div class="dl-pane">
+                        <div class="dl-pane-head">Versions (never deleted)</div>
+                        <div id="engineListPane"></div>
+                    </div>
+                    <div class="dl-pane">
+                        <div class="dl-pane-head">Selected version</div>
+                        <div class="dl-body" id="engineDetailPane"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="section">
@@ -576,7 +614,7 @@
                 <div class="section-sub">
                     Skills are versioned independently <b>per key</b> — each key has its own
                     Production (active) and Testing (newest published, not yet active) version.
-                    Expand a key for its full version history. Usage share is measured from real
+                    Select a key to see its prompt and full version history. Usage share is measured from real
                     recorded LLM exchanges, never estimated.
                 </div>
                 <div id="skillError"></div>
@@ -608,10 +646,19 @@
                     <div class="filter-count" id="skillFilterCount"></div>
                 </div>
 
-                <div class="table-wrap"><table id="skillsTable">
-                    <thead><tr><th></th><th>Key</th><th>Production</th><th>Testing</th><th>Versions</th><th>Usage share</th><th>Actions</th></tr></thead>
-                    <tbody></tbody>
-                </table></div>
+                <!-- Same split-pane shape as Engines: a skill is a single
+                     versioned prompt per key, so its detail renders in place
+                     on this view rather than on a separate page. -->
+                <div class="detail-layout">
+                    <div class="dl-pane">
+                        <div class="dl-pane-head">Skill keys</div>
+                        <div id="skillListPane"></div>
+                    </div>
+                    <div class="dl-pane">
+                        <div class="dl-pane-head">Selected skill</div>
+                        <div class="dl-body" id="skillDetailPane"></div>
+                    </div>
+                </div>
                 <div class="section-sub" id="skillUsageNote" style="margin-top: 10px;"></div>
             </div>
 
@@ -770,6 +817,36 @@
                     </div>
                     <button onclick="saveAiSettings()">Apply Provider Routing…</button>
                 </div>
+
+                <!-- Security — DB-backed admin allowlist. Additive to the
+                     ADMIN_USER_IDS environment variable, which keeps working
+                     on its own; the two sets are unioned. -->
+                <div class="sub-card">
+                    <h3>Security — Admin Allowlist</h3>
+                    <div class="sub-note">
+                        Admin access is the <b>union</b> of the <code>ADMIN_USER_IDS</code> environment
+                        variable (unchanged, needs a redeploy to edit) and this table (editable here).
+                        The environment ids themselves are never shown — only how many there are.
+                        The last remaining entry cannot be removed while the environment variable is
+                        empty, because that would lock everyone out.
+                    </div>
+                    <div id="allowlistError"></div>
+                    <div class="form-group" style="max-width: 420px;">
+                        <label>User ID (UUID):</label>
+                        <input type="text" id="allowlistUserId" placeholder="00000000-0000-0000-0000-000000000000">
+                    </div>
+                    <div class="form-group" style="max-width: 420px;">
+                        <label>Note (optional):</label>
+                        <input type="text" id="allowlistNote" placeholder="e.g. ops on-call">
+                    </div>
+                    <button onclick="addAllowlistEntry()">Add admin</button>
+                    <button class="secondary" onclick="loadAllowlist()">⟳ Refresh</button>
+                    <div class="section-sub" id="allowlistEnvNote" style="margin-top:10px;"></div>
+                    <div class="table-wrap"><table id="allowlistTable">
+                        <thead><tr><th>User ID</th><th>Note</th><th>Added by</th><th>Added at</th><th>Actions</th></tr></thead>
+                        <tbody></tbody>
+                    </table></div>
+                </div>
             </div>
 
             <div class="section">
@@ -867,6 +944,55 @@
                     <thead><tr><th>Display Name</th><th>Gender</th><th>Interest</th><th>City</th><th>Age</th><th>User ID</th></tr></thead>
                     <tbody></tbody>
                 </table></div>
+            </div>
+        </div>
+
+        <!-- Persona Detail — a full, separate page reached from the Personas
+             list. Tabs are Overview / Persona Core / Visual Identity only:
+             "Posts" and "Analytics" have no backing schema in this system, so
+             they are deliberately absent rather than faked. -->
+        <div id="persona-detail" class="tab-content">
+            <div class="section">
+                <div class="detail-head">
+                    <button class="secondary" onclick="backToPersonasList()">← Personas</button>
+                    <h2 id="pdTitle" style="margin:0;">Persona</h2>
+                    <span id="pdStatus"></span>
+                    <div class="section-actions" style="margin-left:auto;">
+                        <button class="secondary" onclick="if (pdPersonaId) openPersonaDetail(pdPersonaId)">⟳ Refresh</button>
+                    </div>
+                </div>
+                <div id="pdError"></div>
+                <div class="dp-tabs">
+                    <button class="dp-tab active" data-pdtab="overview" onclick="pdShowTab('overview')">Overview</button>
+                    <button class="dp-tab" data-pdtab="core" onclick="pdShowTab('core')">Persona Core</button>
+                    <button class="dp-tab" data-pdtab="visual" onclick="pdShowTab('visual')">Visual Identity</button>
+                </div>
+                <div class="dp-panel active" id="pdPanel-overview"></div>
+                <div class="dp-panel" id="pdPanel-core"></div>
+                <div class="dp-panel" id="pdPanel-visual"></div>
+            </div>
+        </div>
+
+        <!-- User Detail — Overview / Conversations / Memory. No "Transactions"
+             tab: there is no billing schema in this service to back one. -->
+        <div id="user-detail" class="tab-content">
+            <div class="section">
+                <div class="detail-head">
+                    <button class="secondary" onclick="backToUsersList()">← Users</button>
+                    <h2 id="udTitle" style="margin:0;">User</h2>
+                    <div class="section-actions" style="margin-left:auto;">
+                        <button class="secondary" onclick="if (udUserId) openUserDetail(udUserId)">⟳ Refresh</button>
+                    </div>
+                </div>
+                <div id="udError"></div>
+                <div class="dp-tabs">
+                    <button class="dp-tab active" data-udtab="overview" onclick="udShowTab('overview')">Overview</button>
+                    <button class="dp-tab" data-udtab="conversations" onclick="udShowTab('conversations')">Conversations</button>
+                    <button class="dp-tab" data-udtab="memory" onclick="udShowTab('memory')">Memory</button>
+                </div>
+                <div class="dp-panel active" id="udPanel-overview"></div>
+                <div class="dp-panel" id="udPanel-conversations"></div>
+                <div class="dp-panel" id="udPanel-memory"></div>
             </div>
         </div>
 
@@ -1326,6 +1452,7 @@
             dashboard: 'Dashboard', setup: 'AI Configuration', observability: 'Observability',
             chat: 'Conversations', testchat: 'Test Chat', revenue: 'Revenue', transactions: 'Transactions',
             convinspector: 'Conversations Inspector',
+            'persona-detail': 'Persona Detail', 'user-detail': 'User Detail',
         };
 
         function showView(tab) {
@@ -1601,12 +1728,14 @@
                     <tr>
                         <td class="vh-toggle" onclick="togglePersonaVersions('${escAttr(p.id)}')"
                             role="button" tabindex="0" aria-label="Toggle version history for ${escAttr(p.displayName)}">${open ? '▾' : '▸'}</td>
-                        <td>${escapeHtml(p.displayName)}</td>
+                        <td><a href="#persona-detail" onclick="openPersonaDetail('${escAttr(p.id)}'); return false;"
+                               style="color:var(--soft-rose);text-decoration:none;font-weight:600;">${escapeHtml(p.displayName)}</a></td>
                         <td class="mono">${escapeHtml(p.slug)}</td>
                         <td>${statusBadge(p.status, false)}</td>
                         <td>${known ? stageBadge('production', production ? production.version : null) : '<span class="badge muted">unavailable</span>'}</td>
                         <td>${known ? stageBadge('testing', testing ? testing.version : null) : '<span class="badge muted">unavailable</span>'}</td>
                         <td class="row-actions">
+                            <button onclick="openPersonaDetail('${escAttr(p.id)}')" class="secondary">Open →</button>
                             <button onclick="selectPersona('${escAttr(p.id)}', '${escAttr(p.displayName)}')" class="secondary">Versions →</button>
                             <button onclick="editPersona('${escAttr(p.id)}', '${escAttr(p.displayName)}', '${escAttr(p.gender)}', '${escAttr(p.orientation)}', ${Number(p.apparentAge) || 0})" class="secondary">✎ Edit</button>
                         </td>
@@ -1645,6 +1774,173 @@
                             </td>
                         </tr>`).join('')}</tbody>
                 </table>`;
+        }
+
+        /* ---------------------------------------------------------------
+         * Persona Detail page. A genuine page navigation (showView), unlike
+         * Engines/Skills which stay on their list view with a split-pane
+         * detail — a persona carries identity + core + visual identity, which
+         * is far more than fits in a side panel.
+         * Every value rendered here comes from a real endpoint; nothing on
+         * this page is placeholder data.
+         * --------------------------------------------------------------- */
+        let pdPersonaId = '';
+        let pdVisualCache = null;
+
+        function pdShowTab(tab) {
+            document.querySelectorAll('#persona-detail .dp-tab').forEach(el => {
+                el.classList.toggle('active', el.dataset.pdtab === tab);
+            });
+            document.querySelectorAll('#persona-detail .dp-panel').forEach(el => el.classList.remove('active'));
+            const panel = document.getElementById(`pdPanel-${tab}`);
+            if (panel) panel.classList.add('active');
+        }
+
+        function backToPersonasList() {
+            const nav = document.querySelector('.nav-item[data-anchor="sec-personas"]');
+            if (nav) navigate(nav, 'setup', 'sec-personas');
+            else showView('setup');
+        }
+
+        async function openPersonaDetail(personaId) {
+            pdPersonaId = personaId;
+            pdVisualCache = null;
+            showView('persona-detail');
+            pdShowTab('overview');
+            document.getElementById('pdError').innerHTML = '';
+            document.getElementById('pdTitle').textContent = 'Loading…';
+            document.getElementById('pdStatus').innerHTML = '';
+            document.getElementById('pdPanel-overview').innerHTML = '<div class="empty-state" style="padding:20px;">Loading…</div>';
+            document.getElementById('pdPanel-core').innerHTML = '';
+            document.getElementById('pdPanel-visual').innerHTML = '';
+
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(personaId)}`);
+                if (!res.ok) throw new Error('Failed to load persona');
+                const p = await res.json();
+                document.getElementById('pdTitle').textContent = p.displayName || p.slug || 'Persona';
+                document.getElementById('pdStatus').innerHTML = statusBadge(p.status, false);
+                document.getElementById('pdPanel-overview').innerHTML = pdOverviewHtml(p);
+            } catch (e) {
+                document.getElementById('pdTitle').textContent = 'Persona';
+                document.getElementById('pdPanel-overview').innerHTML = '';
+                showError('pdError', e.message);
+                return;
+            }
+
+            // Persona Core tab reuses the EXACT same version-history renderer
+            // the Personas list row uses — no duplicated version logic.
+            try {
+                const vres = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(personaId)}/core-versions`);
+                personaVersionsCache[personaId] = vres.ok ? ((await vres.json()).versions || []) : null;
+            } catch (e) {
+                personaVersionsCache[personaId] = null;
+            }
+            document.getElementById('pdPanel-core').innerHTML = personaVersionHistoryHtml(personaId);
+
+            document.getElementById('pdPanel-visual').innerHTML = '<div class="empty-state" style="padding:20px;">Loading visual identity…</div>';
+            try {
+                const vis = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(personaId)}/visual`);
+                if (!vis.ok) throw new Error('Failed to load visual identity');
+                pdVisualCache = await vis.json();
+                document.getElementById('pdPanel-visual').innerHTML = pdVisualHtml(pdVisualCache);
+            } catch (e) {
+                pdVisualCache = null;
+                document.getElementById('pdPanel-visual').innerHTML =
+                    `<div class="empty-state" style="padding:20px;">Visual identity could not be loaded: ${escapeHtml(e.message)}</div>`;
+            }
+        }
+
+        function kvItem(label, value) {
+            return `<div class="kv-item"><div class="kv-label">${escapeHtml(label)}</div>
+                    <div class="kv-value">${value === null || value === undefined || value === '' ? '—' : escapeHtml(String(value))}</div></div>`;
+        }
+
+        function pdOverviewHtml(p) {
+            const tags = Array.isArray(p.tags) && p.tags.length
+                ? p.tags.map(t => `<span class="badge muted">${escapeHtml(t)}</span>`).join(' ')
+                : '—';
+            return `
+                <div class="kv-grid">
+                    ${kvItem('Slug', p.slug)}
+                    ${kvItem('Display name', p.displayName)}
+                    ${kvItem('Gender', p.gender)}
+                    ${kvItem('Orientation', p.orientation)}
+                    ${kvItem('Apparent age', p.apparentAge)}
+                    ${kvItem('Status', p.status)}
+                    ${kvItem('City', p.city)}
+                    ${kvItem('Occupation', p.occupation)}
+                    ${kvItem('Persona ID', p.id)}
+                </div>
+                <div class="kv-item" style="margin-top:12px;"><div class="kv-label">Bio</div>
+                    <div class="kv-value">${p.bio ? escapeHtml(p.bio) : '—'}</div></div>
+                <div class="kv-item" style="margin-top:12px;"><div class="kv-label">Interests</div>
+                    <div class="kv-value">${p.interests ? escapeHtml(p.interests) : '—'}</div></div>
+                <div class="kv-item" style="margin-top:12px;"><div class="kv-label">Tags</div>
+                    <div class="kv-value">${tags}</div></div>`;
+        }
+
+        function pdVisualHtml(data) {
+            const note = `<div class="section-sub">${escapeHtml(data.note || '')}</div>`;
+            if (!data.hasIdentity) {
+                return `${note}<div class="empty-state" style="padding:20px;">
+                    No visual identity is linked to this persona yet. The visual-identity pipeline
+                    creates and links it; the admin console only reads it.</div>`;
+            }
+            if (!Array.isArray(data.versions) || data.versions.length === 0) {
+                return `${note}<div class="empty-state" style="padding:20px;">
+                    This persona has a visual identity but no visual versions yet.</div>`;
+            }
+            return note + data.versions.slice().sort((a, b) => b.version - a.version).map(v => `
+                <div class="dl-pane" style="margin-bottom:14px;">
+                    <div class="dl-pane-head">Visual version v${Number(v.version) || 0} —
+                        ${v.isActive ? '<span class="badge prod">ACTIVE</span>' : statusBadge(v.status, false)}</div>
+                    <div class="dl-body">
+                        <div class="vh-title">Physical guide (read-only)</div>
+                        <div class="code-block">${escapeHtml(v.physicalGuide) || '—'}</div>
+                        <div class="vh-title" style="margin-top:12px;">Style constraints (read-only)</div>
+                        <div class="code-block">${escapeHtml(v.styleConstraints) || '—'}</div>
+
+                        <div class="vh-title" style="margin-top:14px;">Wardrobe — ${v.wardrobe.length} item(s)</div>
+                        ${v.wardrobe.length ? `<div class="table-wrap"><table>
+                            <thead><tr><th>Name</th><th>Category</th><th>Subcategory</th><th>Color</th><th>Material</th><th>Available</th></tr></thead>
+                            <tbody>${v.wardrobe.map(w => `<tr>
+                                <td>${escapeHtml(w.name)}</td><td>${escapeHtml(w.category)}</td>
+                                <td>${escapeHtml(w.subcategory)}</td><td>${escapeHtml(w.color) || '—'}</td>
+                                <td>${escapeHtml(w.material) || '—'}</td>
+                                <td>${w.isAvailable ? 'yes' : 'no'}</td></tr>`).join('')}</tbody>
+                        </table></div>` : '<div class="filter-count">No wardrobe items.</div>'}
+
+                        <div class="vh-title" style="margin-top:14px;">Reference images — ${v.referenceImages.length}</div>
+                        ${v.referenceImages.length ? `<div class="table-wrap"><table>
+                            <thead><tr><th>Role</th><th>Status</th><th>Source</th><th>Type</th><th>Size</th><th>Dimensions</th><th>Storage key</th></tr></thead>
+                            <tbody>${v.referenceImages.map(r => `<tr>
+                                <td>${escapeHtml(r.role)}</td><td>${escapeHtml(r.status)}</td>
+                                <td>${escapeHtml(r.source)}</td><td>${escapeHtml(r.contentType)}</td>
+                                <td>${Number(r.fileSize) || 0} B</td>
+                                <td>${r.width && r.height ? `${Number(r.width)}×${Number(r.height)}` : '—'}</td>
+                                <td class="mono">${escapeHtml(r.storageKey)}</td></tr>`).join('')}</tbody>
+                        </table></div>` : '<div class="filter-count">No reference images. (Images are not served by the admin console — metadata only.)</div>'}
+
+                        <div class="vh-title" style="margin-top:14px;">Image jobs — ${v.imageJobs.length}</div>
+                        ${v.imageJobs.length ? `<div class="table-wrap"><table>
+                            <thead><tr><th>Status</th><th>Type</th><th>Attempts</th><th>Candidates</th><th>Created</th><th>Last error</th></tr></thead>
+                            <tbody>${v.imageJobs.map(j => `<tr>
+                                <td>${escapeHtml(j.status)}</td><td>${escapeHtml(j.jobType)}</td>
+                                <td>${Number(j.attemptCount) || 0}/${Number(j.maxAttempts) || 0}</td>
+                                <td>${j.candidates.length}</td>
+                                <td class="mono">${escapeHtml(j.createdAt)}</td>
+                                <td>${escapeHtml(j.lastError) || '—'}</td></tr>`).join('')}</tbody>
+                        </table></div>` : '<div class="filter-count">No image jobs for this version.</div>'}
+
+                        <div class="section-sub" style="margin-top:12px;">
+                            <button class="secondary" disabled title="Not wired — view only">Generate images</button>
+                            Triggering generation from the admin console is <b>not wired — view only</b>.
+                            Submitting a job would hand work to a real image-generation provider, so this
+                            console never starts one.
+                        </div>
+                    </div>
+                </div>`).join('');
         }
 
         function togglePersonaVersions(personaId) {
@@ -1852,9 +2148,14 @@
             }
         }
 
+        // Engines use a split-pane list|detail on their own list view (never a
+        // separate page): a conversation engine version is a single prompt, so
+        // an in-place detail panel is the right weight for it.
+        let selectedEngineId = '';
+
         function renderEngines() {
-            const table = document.querySelector('#enginesTable tbody');
-            if (!table) return;
+            const listPane = document.getElementById('engineListPane');
+            if (!listPane) return;
             const { production, testing, latestDraft } = stageOf(enginesCache);
 
             document.getElementById('engineStageCards').innerHTML = `
@@ -1887,21 +2188,57 @@
             document.getElementById('engineFilterCount').textContent =
                 `${rows.length} of ${enginesCache.length} versions`;
 
-            table.innerHTML = rows.length ? rows.map(e => `
-                <tr>
-                    <td class="mono">v${e.version}</td>
-                    <td>${e.isActive ? '<span class="badge prod">PRODUCTION</span>'
-                         : (e.status === 'published' ? '<span class="badge testing">TESTING</span>' : '<span class="badge muted">—</span>')}</td>
-                    <td>${statusBadge(e.status, e.isActive)}</td>
-                    <td>${escapeHtml(e.author || e.createdBy) || '—'}</td>
-                    <td>${escapeHtml(e.changelogNote) || '—'}</td>
-                    <td class="row-actions">
-                        ${e.status === 'draft' ? `<button onclick="publishEngineVersion('${escAttr(e.id)}')" class="secondary">Publish</button>` : ''}
-                        ${e.status === 'published' && !e.isActive ? `<button onclick="activateEngineVersion('${escAttr(e.id)}', ${Number(e.version) || 0})" class="secondary">Activate</button>` : ''}
-                        ${e.status === 'published' && !e.isActive ? `<button onclick="archiveEngineVersion('${escAttr(e.id)}')" class="secondary">Archive</button>` : ''}
-                    </td>
-                </tr>
-            `).join('') : emptyRow(6, enginesCache.length ? 'No versions match this filter.' : 'No conversation engine versions found.');
+            // Keep the selection valid across refreshes/filters; default to the
+            // production version, then whatever is first in the filtered list.
+            if (!rows.some(e => e.id === selectedEngineId)) {
+                const prod = rows.find(e => e.isActive);
+                selectedEngineId = prod ? prod.id : (rows.length ? rows[0].id : '');
+            }
+
+            listPane.innerHTML = rows.length ? rows.map(e => `
+                <div class="dl-row ${e.id === selectedEngineId ? 'selected' : ''}"
+                     role="button" tabindex="0"
+                     onclick="openEngine('${escAttr(e.id)}')">
+                    <div class="dl-row-title">v${Number(e.version) || 0}
+                        ${e.isActive ? '<span class="badge prod">PRODUCTION</span>'
+                         : (e.status === 'published' ? '<span class="badge testing">TESTING</span>' : '')}</div>
+                    <div class="dl-row-sub">${statusBadge(e.status, e.isActive)}
+                        ${escapeHtml(e.changelogNote) || 'no changelog note'}</div>
+                </div>`).join('')
+                : `<div class="empty-state" style="padding:20px;">${enginesCache.length ? 'No versions match this filter.' : 'No conversation engine versions found.'}</div>`;
+
+            renderEngineDetail();
+        }
+
+        function openEngine(engineId) {
+            selectedEngineId = engineId;
+            renderEngines();
+        }
+
+        function renderEngineDetail() {
+            const pane = document.getElementById('engineDetailPane');
+            if (!pane) return;
+            const e = enginesCache.find(x => x.id === selectedEngineId);
+            if (!e) {
+                pane.innerHTML = '<div class="empty-state" style="padding:20px;">Select a version on the left to view its full prompt.</div>';
+                return;
+            }
+            pane.innerHTML = `
+                <div class="kv-grid">
+                    ${kvItem('Version', 'v' + (Number(e.version) || 0))}
+                    ${kvItem('Status', e.status)}
+                    ${kvItem('Stage', e.isActive ? 'PRODUCTION' : (e.status === 'published' ? 'TESTING' : '—'))}
+                    ${kvItem('Author', e.author || e.createdBy)}
+                </div>
+                <div class="kv-item" style="margin-top:12px;"><div class="kv-label">Changelog</div>
+                    <div class="kv-value">${escapeHtml(e.changelogNote) || '—'}</div></div>
+                <div class="vh-title" style="margin-top:14px;">Prompt content</div>
+                <div class="code-block">${escapeHtml(e.content) || '—'}</div>
+                <div class="row-actions" style="margin-top:12px;">
+                    ${e.status === 'draft' ? `<button onclick="publishEngineVersion('${escAttr(e.id)}')" class="secondary">Publish</button>` : ''}
+                    ${e.status === 'published' && !e.isActive ? `<button onclick="activateEngineVersion('${escAttr(e.id)}', ${Number(e.version) || 0})" class="secondary">Activate</button>` : ''}
+                    ${e.status === 'published' && !e.isActive ? `<button onclick="archiveEngineVersion('${escAttr(e.id)}')" class="secondary">Archive</button>` : ''}
+                </div>`;
         }
 
         async function engineAction(engineId, action) {
@@ -1973,7 +2310,6 @@
          */
         let skillsCache = [];
         let skillUsageCounts = null;   // null = not available, {} = available but empty
-        const skillExpanded = {};
 
         function skillsByKey() {
             const groups = {};
@@ -2008,9 +2344,11 @@
             }
         }
 
+        let selectedSkillKey = '';
+
         function renderSkills() {
-            const table = document.querySelector('#skillsTable tbody');
-            if (!table) return;
+            const listPane = document.getElementById('skillListPane');
+            if (!listPane) return;
             const term = (document.getElementById('skillSearch').value || '').trim().toLowerCase();
             const groups = skillsByKey();
             const keys = Object.keys(groups).sort().filter(k => !term || k.toLowerCase().includes(term));
@@ -2027,32 +2365,65 @@
                     ? 'Usage share: no LLM exchanges with a recorded skill key exist yet, so there is nothing to measure. Percentages appear once real traffic is recorded.'
                     : `Usage share measured over ${totalUsage} recorded exchange(s) that carry a skill key (all time, unfiltered).`);
 
-            table.innerHTML = keys.length ? keys.map(key => {
+            if (!keys.includes(selectedSkillKey)) selectedSkillKey = keys.length ? keys[0] : '';
+
+            listPane.innerHTML = keys.length ? keys.map(key => {
                 const versions = groups[key];
                 const { production, testing } = stageOf(versions);
-                const open = !!skillExpanded[key];
                 const count = skillUsageCounts ? (skillUsageCounts[key] || 0) : null;
                 const share = (count !== null && totalUsage > 0) ? (count / totalUsage) * 100 : null;
                 const usageCell = share === null
-                    ? '<span class="filter-count">no data</span>'
-                    : `<span class="usage-bar"><span style="width:${share.toFixed(1)}%"></span></span><span class="mono">${share.toFixed(1)}%</span> <span class="filter-count">(${count})</span>`;
+                    ? '<span class="filter-count">usage: no data</span>'
+                    : `<span class="usage-bar"><span style="width:${share.toFixed(1)}%"></span></span><span class="mono">${share.toFixed(1)}%</span>`;
                 return `
-                    <tr>
-                        <td class="vh-toggle" onclick="toggleSkillVersions('${escAttr(key)}')"
-                            role="button" tabindex="0" aria-label="Toggle version history for ${escAttr(key)}">${open ? '▾' : '▸'}</td>
-                        <td class="mono">${escapeHtml(key)}</td>
-                        <td>${stageBadge('production', production ? production.version : null)}</td>
-                        <td>${stageBadge('testing', testing ? testing.version : null)}</td>
-                        <td>${versions.length}</td>
-                        <td>${usageCell}</td>
-                        <td class="row-actions">
-                            <button class="secondary" onclick="prefillSkillKey('${escAttr(key)}')">+ New draft</button>
-                        </td>
-                    </tr>
-                    <tr class="vh-detail" id="skillVersions-${escAttr(key)}" style="display:${open ? '' : 'none'};">
-                        <td colspan="7"><div class="vh-inner">${skillVersionHistoryHtml(key)}</div></td>
-                    </tr>`;
-            }).join('') : emptyRow(7, skillsCache.length ? 'No skill keys match this search.' : 'No skills found.');
+                    <div class="dl-row ${key === selectedSkillKey ? 'selected' : ''}"
+                         role="button" tabindex="0" onclick="openSkill('${escAttr(key)}')">
+                        <div class="dl-row-title mono">${escapeHtml(key)}</div>
+                        <div class="dl-row-sub">
+                            ${stageBadge('production', production ? production.version : null)}
+                            ${stageBadge('testing', testing ? testing.version : null)}
+                            <span class="filter-count">${versions.length} version(s)</span>
+                        </div>
+                        <div class="dl-row-sub">${usageCell}</div>
+                    </div>`;
+            }).join('')
+                : `<div class="empty-state" style="padding:20px;">${skillsCache.length ? 'No skill keys match this search.' : 'No skills found.'}</div>`;
+
+            renderSkillDetail();
+        }
+
+        function openSkill(key) {
+            selectedSkillKey = key;
+            renderSkills();
+        }
+
+        function renderSkillDetail() {
+            const pane = document.getElementById('skillDetailPane');
+            if (!pane) return;
+            const versions = (skillsByKey()[selectedSkillKey] || []).slice().sort((a, b) => b.version - a.version);
+            if (!selectedSkillKey || versions.length === 0) {
+                pane.innerHTML = '<div class="empty-state" style="padding:20px;">Select a skill key on the left.</div>';
+                return;
+            }
+            const { production, testing } = stageOf(versions);
+            const shown = production || testing || versions[0];
+            const counts = skillUsageCounts;
+            const total = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
+            const used = counts ? (counts[selectedSkillKey] || 0) : null;
+            pane.innerHTML = `
+                <div class="kv-grid">
+                    ${kvItem('Key', selectedSkillKey)}
+                    ${kvItem('Production', production ? 'v' + production.version : 'none')}
+                    ${kvItem('Testing', testing ? 'v' + testing.version : 'none')}
+                    ${kvItem('Measured usage', used === null ? 'unavailable'
+                        : (total > 0 ? `${((used / total) * 100).toFixed(1)}% (${used} of ${total})` : 'no recorded exchanges'))}
+                </div>
+                <div class="vh-title" style="margin-top:14px;">Prompt content — v${Number(shown.version) || 0}</div>
+                <div class="code-block">${escapeHtml(shown.content) || '—'}</div>
+                <div class="row-actions" style="margin-top:12px;">
+                    <button class="secondary" onclick="prefillSkillKey('${escAttr(selectedSkillKey)}')">+ New draft for this key</button>
+                </div>
+                <div style="margin-top:14px;">${skillVersionHistoryHtml(selectedSkillKey)}</div>`;
         }
 
         function skillVersionHistoryHtml(key) {
@@ -2076,11 +2447,6 @@
                             </td>
                         </tr>`).join('')}</tbody>
                 </table>`;
-        }
-
-        function toggleSkillVersions(key) {
-            skillExpanded[key] = !skillExpanded[key];
-            renderSkills();
         }
 
         function prefillSkillKey(key) {
@@ -2779,7 +3145,8 @@
 
             table.innerHTML = rows.length ? rows.map(u => `
                 <tr>
-                    <td>${escapeHtml(u.displayName) || '(unnamed)'}</td>
+                    <td><a href="#user-detail" onclick="openUserDetail('${escAttr(u.userId)}'); return false;"
+                           style="color:var(--soft-rose);text-decoration:none;font-weight:600;">${escapeHtml(u.displayName) || '(unnamed)'}</a></td>
                     <td>${escapeHtml(u.gender) || '—'}</td>
                     <td>${escapeHtml(u.interest) || '—'}</td>
                     <td>${escapeHtml(u.city) || '—'}</td>
@@ -2787,6 +3154,195 @@
                     <td class="mono" title="${escAttr(u.userId)}">${escapeHtml(String(u.userId).slice(0, 8))}…</td>
                 </tr>
             `).join('') : emptyRow(6, adminUsers.length ? 'No users match these filters.' : 'No users found.');
+        }
+
+        /* ---------------------------------------------------------------
+         * User Detail page (Overview / Conversations / Memory). Same
+         * page-navigation shape as Persona Detail. There is no Transactions
+         * tab: this service has no billing schema, so one would be fabricated.
+         * --------------------------------------------------------------- */
+        let udUserId = '';
+
+        function udShowTab(tab) {
+            document.querySelectorAll('#user-detail .dp-tab').forEach(el => {
+                el.classList.toggle('active', el.dataset.udtab === tab);
+            });
+            document.querySelectorAll('#user-detail .dp-panel').forEach(el => el.classList.remove('active'));
+            const panel = document.getElementById(`udPanel-${tab}`);
+            if (panel) panel.classList.add('active');
+        }
+
+        function backToUsersList() {
+            const nav = document.querySelector('.nav-item[data-anchor="sec-users"]');
+            if (nav) navigate(nav, 'setup', 'sec-users');
+            else showView('setup');
+        }
+
+        async function openUserDetail(userId) {
+            udUserId = userId;
+            showView('user-detail');
+            udShowTab('overview');
+            document.getElementById('udError').innerHTML = '';
+            document.getElementById('udTitle').textContent = 'Loading…';
+            document.getElementById('udPanel-overview').innerHTML = '<div class="empty-state" style="padding:20px;">Loading…</div>';
+            document.getElementById('udPanel-conversations').innerHTML = '';
+            document.getElementById('udPanel-memory').innerHTML = '';
+
+            try {
+                const res = await fetch(`${ADMIN_BASE}/users/${encodeURIComponent(userId)}`);
+                if (!res.ok) throw new Error('Failed to load user');
+                const u = await res.json();
+                document.getElementById('udTitle').textContent = u.displayName || '(unnamed user)';
+                document.getElementById('udPanel-overview').innerHTML = `
+                    <div class="kv-grid">
+                        ${kvItem('Display name', u.displayName)}
+                        ${kvItem('Gender', u.gender)}
+                        ${kvItem('Interest', u.interest)}
+                        ${kvItem('City', u.city)}
+                        ${kvItem('Age', u.age)}
+                        ${kvItem('User ID', u.userId)}
+                    </div>`;
+            } catch (e) {
+                document.getElementById('udTitle').textContent = 'User';
+                document.getElementById('udPanel-overview').innerHTML = '';
+                showError('udError', e.message);
+                return;
+            }
+
+            document.getElementById('udPanel-conversations').innerHTML = '<div class="empty-state" style="padding:20px;">Loading…</div>';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/users/${encodeURIComponent(userId)}/conversations`);
+                if (!res.ok) throw new Error('Failed to load conversations');
+                const rows = (await res.json()).conversations || [];
+                document.getElementById('udPanel-conversations').innerHTML = rows.length ? `
+                    <div class="table-wrap"><table>
+                        <thead><tr><th>Persona</th><th>State</th><th>Mode</th><th>Last message</th><th>Created</th><th>Conversation ID</th></tr></thead>
+                        <tbody>${rows.map(c => `<tr>
+                            <td>${escapeHtml(c.personaDisplayName) || '<span class="filter-count">unknown persona</span>'}</td>
+                            <td>${escapeHtml(c.state)}</td>
+                            <td>${escapeHtml(c.executionMode)}</td>
+                            <td class="mono">${escapeHtml(c.lastMessageAt) || '—'}</td>
+                            <td class="mono">${escapeHtml(c.createdAt)}</td>
+                            <td class="mono" title="${escAttr(c.id)}">${escapeHtml(String(c.id).slice(0, 8))}…</td>
+                        </tr>`).join('')}</tbody>
+                    </table></div>`
+                    : '<div class="empty-state" style="padding:20px;">This user has no conversations.</div>';
+            } catch (e) {
+                document.getElementById('udPanel-conversations').innerHTML =
+                    `<div class="empty-state" style="padding:20px;">${escapeHtml(e.message)}</div>`;
+            }
+
+            document.getElementById('udPanel-memory').innerHTML = '<div class="empty-state" style="padding:20px;">Loading…</div>';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/users/${encodeURIComponent(userId)}/memory`);
+                if (!res.ok) throw new Error('Failed to load memory facts');
+                const facts = (await res.json()).memoryFacts || [];
+                document.getElementById('udPanel-memory').innerHTML = `
+                    <div class="section-sub">Memory is always scoped to a user+persona relationship — this
+                    view simply lists every relationship's facts for this user. ${facts.length} fact(s).</div>` +
+                    (facts.length ? `
+                    <div class="table-wrap"><table>
+                        <thead><tr><th>Persona</th><th>Fact</th><th>Type</th><th>Criticality</th><th>Tier</th><th>Status</th><th>Owner</th><th>Source</th><th>Learned</th></tr></thead>
+                        <tbody>${facts.map(f => `<tr>
+                            <td>${escapeHtml(f.personaDisplayName) || '<span class="filter-count">unknown persona</span>'}</td>
+                            <td>${escapeHtml(f.fact)}</td>
+                            <td>${escapeHtml(f.factType)}</td>
+                            <td>${escapeHtml(f.criticality)}</td>
+                            <td>${escapeHtml(f.tier)}</td>
+                            <td>${escapeHtml(f.status)}</td>
+                            <td>${escapeHtml(f.owner)}</td>
+                            <td>${escapeHtml(f.source)}</td>
+                            <td class="mono">${escapeHtml(f.learnedAt)}</td>
+                        </tr>`).join('')}</tbody>
+                    </table></div>`
+                    : '<div class="empty-state" style="padding:20px;">No memory facts recorded for this user yet.</div>');
+            } catch (e) {
+                document.getElementById('udPanel-memory').innerHTML =
+                    `<div class="empty-state" style="padding:20px;">${escapeHtml(e.message)}</div>`;
+            }
+        }
+
+        /* ---------------------------------------------------------------
+         * DB-backed admin allowlist (System Configuration → Security).
+         * Every value shown comes from /v1/admin/allowlist; the environment
+         * ids are deliberately never returned or rendered, only counted.
+         * --------------------------------------------------------------- */
+        let allowlistCache = { entries: [], envAllowlistCount: 0 };
+
+        async function loadAllowlist() {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/allowlist`);
+                if (!res.ok) throw new Error('Failed to load admin allowlist');
+                allowlistCache = await res.json();
+                renderAllowlist();
+            } catch (e) {
+                showError('allowlistError', e.message);
+            }
+        }
+
+        function renderAllowlist() {
+            const table = document.querySelector('#allowlistTable tbody');
+            if (!table) return;
+            const entries = allowlistCache.entries || [];
+            const envCount = Number(allowlistCache.envAllowlistCount) || 0;
+            const lastOneLocked = envCount === 0 && entries.length <= 1;
+
+            document.getElementById('allowlistEnvNote').textContent =
+                `${entries.length} allowlist entry(ies) in the database; ${envCount} admin id(s) from ADMIN_USER_IDS.` +
+                (lastOneLocked ? ' The remaining entry is protected — removing it would lock everyone out.' : '');
+
+            table.innerHTML = entries.length ? entries.map(e => `
+                <tr>
+                    <td class="mono">${escapeHtml(e.userId)}</td>
+                    <td>${escapeHtml(e.note) || '—'}</td>
+                    <td>${escapeHtml(e.addedBy) || '—'}</td>
+                    <td class="mono">${escapeHtml(e.addedAt)}</td>
+                    <td class="row-actions">
+                        <button class="secondary" ${lastOneLocked ? 'disabled title="Cannot remove the last admin"' : ''}
+                            onclick="removeAllowlistEntry('${escAttr(e.userId)}')">Remove</button>
+                    </td>
+                </tr>`).join('')
+                : emptyRow(5, 'No database allowlist entries. Admin access currently comes from ADMIN_USER_IDS only.');
+        }
+
+        async function addAllowlistEntry() {
+            const userId = (document.getElementById('allowlistUserId').value || '').trim();
+            const note = (document.getElementById('allowlistNote').value || '').trim();
+            if (!userId) {
+                showError('allowlistError', 'A user ID (UUID) is required');
+                return;
+            }
+            try {
+                const res = await fetch(`${ADMIN_BASE}/allowlist`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, note: note || null }),
+                });
+                if (!res.ok) {
+                    const body = await res.json().catch(() => null);
+                    throw new Error((body && body.error && body.error.message) || 'Failed to add admin');
+                }
+                document.getElementById('allowlistUserId').value = '';
+                document.getElementById('allowlistNote').value = '';
+                showSuccess('allowlistError', 'Admin added.');
+                loadAllowlist();
+            } catch (e) {
+                showError('allowlistError', e.message);
+            }
+        }
+
+        async function removeAllowlistEntry(userId) {
+            if (!confirm(`Remove admin access for ${userId}?\n\nThey lose access to this console unless ADMIN_USER_IDS still lists them.`)) return;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/allowlist/${encodeURIComponent(userId)}`, { method: 'DELETE' });
+                if (!res.ok && res.status !== 204) {
+                    const body = await res.json().catch(() => null);
+                    throw new Error((body && body.error && body.error.message) || 'Failed to remove admin');
+                }
+                loadAllowlist();
+            } catch (e) {
+                showError('allowlistError', e.message);
+            }
         }
 
         function resetUserFilters() {
@@ -3285,6 +3841,7 @@
         loadMemoryEngines();
         loadIntentEngines();
         loadAiSettings();
+        loadAllowlist();
         loadAiConfiguration();
         loadTestChatOptions();
         (async () => {
