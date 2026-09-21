@@ -3,37 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pink Dreams QA Console</title>
+    <title>AMIA Admin Console</title>
     <style>
+        /* ==================================================================
+           Task 11 — AMIA Admin Console global shell. Palette/tokens mirror
+           the AMIA admin-console prototype (Claude outputs/
+           amia-admin-panel-prototype) — the VISUAL source of truth per this
+           task's own instruction; every screen below still calls the exact
+           same functional JS/API code that already existed (Setup/Chat/
+           Test Chat/Observability's own element IDs and fetch() calls are
+           untouched — only the surrounding chrome and base element styling
+           changed), so no backend/behavior risk from this restyle.
+           ================================================================== */
+        :root {
+            --near-black: #190611;
+            --deep-plum: #2A0B1C;
+            --burgundy: #4A102C;
+            --rose: #E85A88;
+            --soft-rose: #F3A0B7;
+            --blush: #F7D8E1;
+            --warm-white: #FFF8FB;
+            --muted-mauve: #CDBBC4;
+            --surface: #231018;
+            --surface-2: #2C1420;
+            --border: rgba(247,216,225,0.10);
+            --border-strong: rgba(247,216,225,0.18);
+            --success: #3ED598;
+            --warning: #F2B84B;
+            --danger: #F0567A;
+            --radius: 14px;
+            --font-serif: 'Cormorant Garamond', Georgia, serif;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 { color: #333; margin-bottom: 30px; }
-        h2 { color: #555; margin-top: 30px; margin-bottom: 15px; font-size: 18px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-        .section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        html, body { height: 100%; }
+        body { font-family: var(--font-sans); background: var(--near-black); color: var(--warm-white); }
+        h1 { font-family: var(--font-serif); font-weight: 600; }
+        h2 { color: var(--warm-white); font-family: var(--font-serif); font-weight: 600; font-size: 22px; margin: 0 0 16px; border: none; padding: 0; }
+        h3 { color: var(--warm-white); font-family: var(--font-serif); font-weight: 600; font-size: 16px; margin-bottom: 10px; }
+        .section { background: var(--surface); border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; border-radius: var(--radius); }
         .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: 500; margin-bottom: 5px; color: #333; }
-        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit; }
+        label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--muted-mauve); font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+        input, textarea, select {
+            width: 100%; padding: 9px 12px; border: 1px solid var(--border-strong); border-radius: 9px;
+            font-family: inherit; background: var(--surface-2); color: var(--warm-white); font-size: 13px;
+        }
         textarea { resize: vertical; min-height: 100px; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
-        button:hover { background: #0056b3; }
-        button.secondary { background: #6c757d; }
-        button.secondary:hover { background: #5a6268; }
-        .error { color: #d32f2f; padding: 10px; background: #ffebee; border-radius: 4px; margin-bottom: 15px; }
-        .success { color: #388e3c; padding: 10px; background: #e8f5e9; border-radius: 4px; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #f0f0f0; font-weight: 600; }
-        tr:hover { background: #f9f9f9; }
+        button {
+            padding: 9px 18px; background: linear-gradient(135deg, var(--rose), #d43f6d); color: #fff; border: none;
+            border-radius: 9px; cursor: pointer; margin-right: 10px; font-weight: 600; font-size: 13px;
+        }
+        button:hover { filter: brightness(1.08); }
+        button.secondary { background: var(--surface-2); border: 1px solid var(--border-strong); color: var(--warm-white); }
+        button.secondary:hover { background: var(--surface); filter: none; }
+        .error { color: var(--danger); padding: 10px 14px; background: rgba(240,86,122,.1); border: 1px solid rgba(240,86,122,.3); border-radius: 9px; margin-bottom: 15px; }
+        .success { color: var(--success); padding: 10px 14px; background: rgba(62,213,152,.1); border: 1px solid rgba(62,213,152,.3); border-radius: 9px; margin-bottom: 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--muted-mauve); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; }
+        tr:hover { background: rgba(247,216,225,.04); }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .message { padding: 10px; margin: 5px 0; border-radius: 4px; border-left: 4px solid #007bff; }
-        .message.user { background: #e3f2fd; border-left-color: #007bff; }
-        .message.assistant { background: #f3e5f5; border-left-color: #9c27b0; }
-        .tabs { display: flex; gap: 0; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-        .tab-button { padding: 10px 20px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; color: #666; }
-        .tab-button.active { border-bottom-color: #007bff; color: #007bff; }
+        .message { padding: 10px; margin: 5px 0; border-radius: 9px; border-left: 4px solid var(--rose); background: var(--surface-2); }
+        .message.user { border-left-color: var(--rose); }
+        .message.assistant { border-left-color: var(--soft-rose); background: var(--burgundy); }
+
+        /* ---------- App shell: sidebar + topbar + content ---------- */
+        .app { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 240px; flex-shrink: 0; background: var(--deep-plum); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+        }
+        .sidebar-brand { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+        .sidebar-brand .brand-name { font-family: var(--font-serif); font-size: 22px; font-weight: 600; letter-spacing: .03em; }
+        .sidebar-brand .brand-sub { font-size: 9.5px; letter-spacing: .12em; color: var(--muted-mauve); text-transform: uppercase; margin-top: 1px; }
+        .nav-group { padding: 14px 12px 4px; }
+        .nav-group-label { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-mauve); padding: 0 10px; margin-bottom: 6px; font-weight: 700; }
+        .nav-item {
+            display: block; padding: 9px 10px; border-radius: 9px; color: var(--blush); font-size: 13px; font-weight: 500;
+            margin-bottom: 2px; cursor: pointer; transition: background .15s ease, color .15s ease;
+        }
+        .nav-item:hover { background: rgba(247,216,225,0.06); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(232,90,136,.22), rgba(232,90,136,.06)); color: var(--warm-white); }
+        .main { flex: 1; min-width: 0; }
+        .topbar {
+            display: flex; align-items: center; gap: 14px; padding: 14px 24px; border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; background: rgba(25,6,17,.9); backdrop-filter: blur(8px); z-index: 20;
+        }
+        .topbar h1 { font-size: 20px; margin: 0; }
+        .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+        .env-pill { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--border); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .env-pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+        .content { padding: 22px 26px 60px; max-width: 1500px; }
+        .tabs { display: flex; gap: 18px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+        .tab-button { padding: 9px 2px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; color: var(--muted-mauve); font-size: 13px; font-weight: 600; }
+        .tab-button.active { border-bottom-color: var(--rose); color: var(--warm-white); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+
+        /* ---------- KPI / stat cards, badges, empty states (shared globally) ---------- */
+        .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+        .stat-card .stat-label { font-size: 11px; color: var(--muted-mauve); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; margin-bottom: 8px; }
+        .stat-card .stat-value { font-size: 24px; font-weight: 700; font-family: var(--font-serif); }
+        .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; }
+        .badge.success { background: rgba(62,213,152,.14); color: var(--success); }
+        .badge.danger { background: rgba(240,86,122,.14); color: var(--danger); }
+        .badge.muted { background: rgba(205,187,196,.14); color: var(--muted-mauve); }
+        .badge.testing { background: rgba(242,184,75,.16); color: var(--warning); }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--muted-mauve); }
+        .empty-state .icon { font-size: 30px; margin-bottom: 10px; }
+        .coming-soon-card { background: var(--surface); border: 1px dashed var(--border-strong); border-radius: var(--radius); padding: 50px 30px; text-align: center; }
+        .coming-soon-card h2 { margin-bottom: 8px; }
+        .coming-soon-card p { color: var(--muted-mauve); font-size: 13px; max-width: 480px; margin: 0 auto; }
+
+        #sidebarToggle { display: none; }
+        @media (max-width: 900px) {
+            .sidebar { position: fixed; left: -240px; z-index: 50; transition: left .2s ease; box-shadow: 8px 0 24px rgba(0,0,0,.4); top: 0; }
+            .sidebar.open { left: 0; }
+            .content { padding: 16px; }
+            #sidebarToggle { display: inline-block; }
+        }
 
         /* ==================================================================
            Task 7 — Observability tab visual restyle. Scoped entirely under
@@ -124,18 +213,89 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎭 Pink Dreams QA Console</h1>
+<div class="app">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-name">🎭 AMIA</div>
+            <div class="brand-sub">Admin Console</div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-label">Main</div>
+            <div class="nav-item active" data-view="dashboard" onclick="navigate(this,'dashboard')">Dashboard</div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-label">AI Configuration</div>
+            <div class="nav-item" data-view="setup" data-anchor="sec-personas" onclick="navigate(this,'setup','sec-personas')">Personas</div>
+            <div class="nav-item" data-view="setup" data-anchor="sec-engines" onclick="navigate(this,'setup','sec-engines')">Engines</div>
+            <div class="nav-item" data-view="setup" data-anchor="sec-skills" onclick="navigate(this,'setup','sec-skills')">Skills</div>
+            <div class="nav-item" data-view="setup" data-anchor="sec-aisettings" onclick="navigate(this,'setup','sec-aisettings')">AI Settings</div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-label">Operations</div>
+            <div class="nav-item" data-view="observability" onclick="navigate(this,'observability')">Observability</div>
+            <div class="nav-item" data-view="chat" onclick="navigate(this,'chat')">Conversations</div>
+            <div class="nav-item" data-view="testchat" onclick="navigate(this,'testchat')">Test Chat</div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-label">Users</div>
+            <div class="nav-item" data-view="setup" data-anchor="sec-users" onclick="navigate(this,'setup','sec-users')">Users</div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-label">Business</div>
+            <div class="nav-item" data-view="revenue" onclick="navigate(this,'revenue')">Revenue</div>
+            <div class="nav-item" data-view="transactions" onclick="navigate(this,'transactions')">Transactions</div>
+        </div>
+    </aside>
 
-        <div class="tabs">
-            <button class="tab-button active" onclick="switchTab('setup')">Setup</button>
-            <button class="tab-button" onclick="switchTab('chat')">Chat</button>
-            <button class="tab-button" onclick="switchTab('testchat')">Test Chat</button>
-            <button class="tab-button" onclick="switchTab('observability')">Observability</button>
+    <div class="main">
+        <div class="topbar">
+            <button class="secondary" id="sidebarToggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+            <h1 id="topbarTitle">Dashboard</h1>
+            <div class="topbar-right">
+                <div class="env-pill"><span class="dot"></span> <span id="envLabel">Live</span></div>
+            </div>
+        </div>
+        <div class="content">
+
+        <div id="dashboard" class="tab-content active">
+            <div class="section">
+                <h2>System Dashboard</h2>
+                <div class="error" id="dashboardError" style="display:none;"></div>
+                <div id="dashboardStats" class="stat-row"><div class="stat-card"><div class="stat-label">Loading…</div></div></div>
+                <div class="grid">
+                    <div class="section">
+                        <h3>AI Runtime Summary</h3>
+                        <div id="dashboardAiSummary">Loading…</div>
+                    </div>
+                    <div class="section">
+                        <h3>SLA Snapshot</h3>
+                        <div id="dashboardSla">Loading…</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="setup" class="tab-content active">
+        <div id="revenue" class="tab-content">
+            <div class="coming-soon-card">
+                <h2>💰 Revenue</h2>
+                <p>Revenue analytics are not currently connected to the admin data layer.
+                No payments, subscriptions, or transactions schema exists in this backend yet
+                — this screen is a placeholder for when that data model is built, not a
+                fabricated preview of it.</p>
+            </div>
+        </div>
+
+        <div id="transactions" class="tab-content">
+            <div class="coming-soon-card">
+                <h2>🧾 Transactions</h2>
+                <p>Transaction records are not currently connected to the admin data layer.
+                Same reason as Revenue — no backing schema exists yet.</p>
+            </div>
+        </div>
+
+        <div id="setup" class="tab-content">
             <div class="section">
+                <a id="sec-personas"></a>
                 <h2>1. Create Persona</h2>
                 <div id="createPersonaError"></div>
                 <div class="form-group">
@@ -212,6 +372,7 @@
             </div>
 
             <div class="section">
+                <a id="sec-engines"></a>
                 <h2>3. Create & Activate Conversation Engine Version</h2>
                 <div id="engineError"></div>
                 <div class="form-group">
@@ -232,6 +393,7 @@
             </div>
 
             <div class="section">
+                <a id="sec-skills"></a>
                 <h2>4. Skills</h2>
                 <div id="skillError"></div>
                 <div class="form-group">
@@ -314,6 +476,7 @@
             </div>
 
             <div class="section">
+                <a id="sec-aisettings"></a>
                 <h2>7. AI Runtime Settings</h2>
                 <div id="aiSettingsError"></div>
                 <div style="font-size: 12px; color: #666; margin-bottom: 10px;">
@@ -398,6 +561,7 @@
             </div>
 
             <div class="section">
+                <a id="sec-users"></a>
                 <h2>9. Create Test User</h2>
                 <div id="createUserError"></div>
                 <div class="form-group">
@@ -772,7 +936,9 @@
                 </div>
             </div>
         </div>
+        </div>
     </div>
+</div>
 
     <script>
         const API_BASE = '/v1';
@@ -789,16 +955,92 @@
         }
 
         let obsDashboardLoadedOnce = false;
-        function switchTab(tab) {
+        let dashboardLoadedOnce = false;
+
+        // Task 11 — sidebar navigation. Every existing tab-content div/ID and
+        // every existing JS function (loadLatencyDashboard, loadAiSettings,
+        // etc.) is untouched; this only decides which one is visible and
+        // updates the sidebar's active-item/topbar-title chrome around it.
+        const NAV_TITLES = {
+            dashboard: 'Dashboard', setup: 'AI Configuration', observability: 'Observability',
+            chat: 'Conversations', testchat: 'Test Chat', revenue: 'Revenue', transactions: 'Transactions',
+        };
+
+        function showView(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
             document.getElementById(tab).classList.add('active');
-            event.target.classList.add('active');
+            document.getElementById('topbarTitle').textContent = NAV_TITLES[tab] || tab;
+
             if (tab === 'observability' && !obsDashboardLoadedOnce) {
                 obsDashboardLoadedOnce = true;
                 loadLatencyDashboard();
                 loadEffectiveConfiguration();
                 loadSlowTurns();
+            }
+            if (tab === 'dashboard' && !dashboardLoadedOnce) {
+                dashboardLoadedOnce = true;
+                loadDashboard();
+            }
+        }
+
+        function navigate(navEl, tab, anchor) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            navEl.classList.add('active');
+            showView(tab);
+            if (anchor) {
+                // Let the view actually become visible before scrolling to it.
+                setTimeout(() => {
+                    const target = document.getElementById(anchor);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 0);
+            }
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        // Task 11 Step 9 — Dashboard. Every number here comes from an
+        // existing endpoint (latency-dashboard, ai-configuration, users) —
+        // nothing is fabricated. A metric that can't be obtained reliably is
+        // shown as an honest "—", never a fake placeholder value.
+        async function loadDashboard() {
+            document.getElementById('dashboardError').style.display = 'none';
+            try {
+                const [obsRes, configRes, usersRes] = await Promise.all([
+                    fetch(`${ADMIN_BASE}/observability/latency-dashboard`),
+                    fetch(`${ADMIN_BASE}/ai-configuration`),
+                    fetch(`${ADMIN_BASE}/users`),
+                ]);
+                const obs = obsRes.ok ? await obsRes.json() : null;
+                const config = configRes.ok ? await configRes.json() : null;
+                const users = usersRes.ok ? await usersRes.json() : null;
+
+                const overall = obs?.overall;
+                const sla = obs?.slaBuckets;
+                const err = obs?.errorRate;
+                document.getElementById('dashboardStats').innerHTML = `
+                    <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value">${users ? users.users.length : '—'}</div></div>
+                    <div class="stat-card"><div class="stat-label">Recorded Exchanges</div><div class="stat-value">${overall ? overall.count : '—'}</div></div>
+                    <div class="stat-card"><div class="stat-label">p95 Latency</div><div class="stat-value">${overall ? fmtMs(overall.p95) : '—'}</div></div>
+                    <div class="stat-card"><div class="stat-label">≤10s (SLA)</div><div class="stat-value">${sla ? sla.within10sRatePercent.toFixed(1) + '%' : '—'}</div></div>
+                    <div class="stat-card"><div class="stat-label">Error Rate</div><div class="stat-value">${err ? err.failureRatePercent.toFixed(1) + '%' : '—'}</div></div>
+                    <div class="stat-card"><div class="stat-label">Active Skills</div><div class="stat-value">${config ? config.activeSkillCount : '—'}</div></div>
+                `;
+
+                document.getElementById('dashboardAiSummary').innerHTML = config ? `
+                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted-mauve);">Conversation Engine</span><span>v${config.conversationEngine.version ?? '—'}</span></div>
+                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted-mauve);">Intent Engine</span><span>v${config.intentEngine.version ?? '—'}</span></div>
+                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted-mauve);">Memory Engine</span><span>v${config.memoryEngine.version ?? '—'}</span></div>
+                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;"><span style="color:var(--muted-mauve);">Runtime Model</span><span>${escapeHtml(config.runtime.model)}</span></div>
+                ` : '<div class="empty-state">Unable to load — see Observability for detail.</div>';
+
+                document.getElementById('dashboardSla').innerHTML = (obs && overall && overall.count > 0) ? `
+                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted-mauve);">p50</span><span>${fmtMs(overall.p50)}</span></div>
+                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><span style="color:var(--muted-mauve);">p99</span><span>${fmtMs(overall.p99)}</span></div>
+                    <div class="kv-row" style="display:flex;justify-content:space-between;padding:6px 0;"><span style="color:var(--muted-mauve);">&gt;10s turns</span><span>${sla.gt10s}</span></div>
+                    <div style="margin-top:10px;"><a href="#" onclick="document.querySelector('[data-view=observability]').click(); return false;" style="color:var(--rose);font-size:12px;">View full Observability dashboard →</a></div>
+                ` : '<div class="empty-state">No exchanges recorded yet.</div>';
+            } catch (e) {
+                document.getElementById('dashboardError').style.display = 'block';
+                document.getElementById('dashboardError').textContent = 'Failed to load dashboard: ' + e.message;
             }
         }
 
@@ -2116,6 +2358,7 @@
         }
 
         // Initial load
+        loadDashboard();
         loadPersonas();
         loadAdminUsers();
         loadEngines();
