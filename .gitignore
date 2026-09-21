@@ -6,3 +6,8 @@ build/
 out/
 local.properties
 *.iml
+
+# Local secrets — never commit real credentials.
+run-local.secrets.ps1
+.env
+.env.local
