@@ -174,7 +174,7 @@ fun Application.module(
         System.err.println("BASELINE_SEED: failed, continuing without seeding: ${e.javaClass.simpleName}: ${e.message}")
     }
 
-    val llmClient = if (System.getenv("OPENROUTER_API_KEY") != null) {
+    val llmClient = if (!System.getenv("OPENROUTER_API_KEY").isNullOrBlank()) {
         com.pinkdreams.llm.OpenRouterLlmClient(
             apiKey = llmConfig.apiKey,
             endpoint = llmConfig.endpoint,

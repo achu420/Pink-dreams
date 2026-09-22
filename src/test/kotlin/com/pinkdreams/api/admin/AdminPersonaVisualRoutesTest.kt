@@ -111,7 +111,7 @@ class AdminPersonaVisualRoutesTest {
         val body = json(response.bodyAsText())
         assertFalse(body["hasIdentity"]!!.jsonPrimitive.content.toBoolean())
         assertEquals(0, body["versions"]!!.jsonArray.size)
-        assertFalse(body["generationTriggerWired"]!!.jsonPrimitive.content.toBoolean())
+        assertTrue(body["generationTriggerWired"]!!.jsonPrimitive.content.toBoolean())
     }
 
     @Test
@@ -178,7 +178,7 @@ class AdminPersonaVisualRoutesTest {
         assertEquals(1, jobs.size)
         assertEquals("idem-1", jobs[0].jsonObject["idempotencyKey"]!!.jsonPrimitive.content)
         assertEquals(1, jobs[0].jsonObject["candidates"]!!.jsonArray.size)
-        // The admin console never starts a generation job — asserted, not assumed.
-        assertFalse(body["generationTriggerWired"]!!.jsonPrimitive.content.toBoolean())
+        // Generation trigger is wired in Application (admin image jobs + chat enqueue).
+        assertTrue(body["generationTriggerWired"]!!.jsonPrimitive.content.toBoolean())
     }
 }

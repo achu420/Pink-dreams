@@ -57,4 +57,10 @@ tasks.withType<KotlinCompile>().configureEach {
 tasks.test {
     useJUnitPlatform()
     maxHeapSize = "2g"
+    // Keep unit/integration tests on Fake LLM/provider and do not spawn the
+    // background image worker against short-lived H2 databases.
+    environment("IMAGE_WORKER_ENABLED", "false")
+    environment("OPENROUTER_API_KEY", "")
+    environment("IMAGE_LIVE_SMOKE", "false")
+    environment("IMAGE_LIVE_GATE", "false")
 }
