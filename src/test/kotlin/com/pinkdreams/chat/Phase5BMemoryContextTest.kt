@@ -114,6 +114,52 @@ class Phase5BMemoryContextTest {
     }
 
     /**
+     * Task 25F fix 3 regression. Duplicate detection only ever compared a
+     * candidate against HOT facts, so an evicted fact could be re-proposed by
+     * the extractor and inserted again as a brand-new hot row. Observed live:
+     * "user has a best friend" present three times for one relationship, all
+     * cold — created, evicted, recreated, evicted, recreated.
+     */
+    @Test
+    fun `Task 25F - an exact duplicate of a cold fact is not recreated`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+        val repository = MemoryFactRepository(db)
+        val service = MemoryService(repository)
+        val user = UUID.randomUUID()
+        val persona = UUID.randomUUID()
+
+        val original = repository.create(user, persona, "user has a best friend", "interest", "medium")
+        repository.moveToCold(user, persona, original.id)
+
+        // Re-proposed by the extractor on a later turn, in the same normalized
+        // form the dedup rule has always used (case/whitespace/trailing period).
+        val accepted = service.record(user, persona, listOf(MemoryCandidate("User has a best friend.", "interest", "medium")))
+
+        assertEquals(0, accepted.size, "a cold exact duplicate must be dropped, exactly as a hot one is")
+        val facts = repository.findForRelationship(user, persona)
+        assertEquals(1, facts.size)
+        assertEquals("cold", facts.single().tier, "the existing fact is NOT promoted back to hot — that would be a new policy")
+    }
+
+    @Test
+    fun `Task 25F - dedup still does not cross fact types`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+        val repository = MemoryFactRepository(db)
+        val service = MemoryService(repository)
+        val user = UUID.randomUUID()
+        val persona = UUID.randomUUID()
+
+        val original = repository.create(user, persona, "user runs daily", "habit", "medium")
+        repository.moveToCold(user, persona, original.id)
+
+        val accepted = service.record(user, persona, listOf(MemoryCandidate("user runs daily", "interest", "medium")))
+
+        assertEquals(1, accepted.size, "same text under a different factType is not a duplicate — unchanged criteria")
+    }
+
+    /**
      * Task 23 regression. Superseded/removed rows keep tier="hot" (supersede()
      * and remove() never touch the tier — history is preserved in place) but
      * are permanently unselectable. Counting them against MAX_HOT_FACTS used to

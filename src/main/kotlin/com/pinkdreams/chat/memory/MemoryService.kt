@@ -46,13 +46,22 @@ class MemoryService(private val repository: MemoryFactRepository) {
 
     fun record(userId: UUID, personaId: UUID, candidates: List<MemoryCandidate>): List<MemoryFactRepository.MemoryFact> {
         val normalized = candidates.map(::normalizeAndValidate)
-        val existingHot = repository.findForRelationship(userId, personaId)
-            .filter { it.tier == "hot" }
-            .toMutableList()
+        // Task 25F fix 3: duplicate detection used to look at HOT facts only, so
+        // once a fact was evicted to cold the extractor could re-propose it and
+        // a brand-new hot row was created — observed live as "user has a best
+        // friend" existing three times, all cold: created, evicted, recreated,
+        // evicted, recreated. The dedup criteria are deliberately UNCHANGED
+        // (same factType + same normalized text, exact match only — no fuzzy or
+        // semantic equivalence, and never across factTypes); only the set they
+        // are applied to is widened to the whole relationship. A cold duplicate
+        // is treated exactly as a hot one always was — the candidate is dropped
+        // — rather than promoting the cold row back to hot, which would be a new
+        // retrieval policy this code never expressed.
+        val existing = repository.findForRelationship(userId, personaId).toMutableList()
         val accepted = mutableListOf<MemoryFactRepository.MemoryFact>()
 
         normalized.forEach { candidate ->
-            if (existingHot.none { isDuplicate(it, candidate) }) {
+            if (existing.none { isDuplicate(it, candidate) }) {
                 val created = repository.create(
                     userId = userId,
                     personaId = personaId,
@@ -63,7 +72,7 @@ class MemoryService(private val repository: MemoryFactRepository) {
                     source = candidate.source,
                 )
                 accepted += created
-                if (created.tier == "hot") existingHot += created
+                existing += created
                 enforceHotCapacity(userId, personaId)
             }
         }
