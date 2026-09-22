@@ -200,7 +200,7 @@ Invariants: only lease owner renews/completes; lost renew stops heartbeat and lo
 
 ```text
 Branch: cursor/claude-work-followup
-Commit: (set on commit)
+Commit: a0b3104
 Push: no
 ```
 
