@@ -187,6 +187,6 @@ No application code changes (no live defects found / no live runs possible).
 
 ```text
 Branch: cursor/claude-work-followup
-Commit: (set on commit)
+Commit: bcfd9b0
 Push: no
 ```
