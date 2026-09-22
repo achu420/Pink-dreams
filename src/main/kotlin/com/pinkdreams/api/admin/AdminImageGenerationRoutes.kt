@@ -120,12 +120,19 @@ data class WarehouseCandidateHttpResponse(
     val heightPx: Int?,
     val createdAt: String,
     val assetUrl: String,
+    val visualVersionId: String? = null,
+    val modelId: String? = null,
+    val sourceCandidateId: String? = null,
+    val costAvailability: String,
 )
 
 @Serializable
 data class WarehouseHttpResponse(
     val personaId: String,
     val candidates: List<WarehouseCandidateHttpResponse>,
+    val total: Int = 0,
+    val limit: Int = 100,
+    val offset: Int = 0,
 )
 
 @Serializable
@@ -692,11 +699,22 @@ class AdminImageGenerationRoutes(
                     return@get
                 }
                 val limit = call.request.queryParameters["limit"]?.toIntOrNull()?.coerceIn(1, 500) ?: 100
-                val rows = repo.findCandidatesForPersona(personaId, limit)
+                val offset = call.request.queryParameters["offset"]?.toIntOrNull()?.coerceAtLeast(0) ?: 0
+                val statusFilter = call.request.queryParameters["status"]?.let { raw ->
+                    try {
+                        CandidateStatus.valueOf(raw)
+                    } catch (_: Exception) {
+                        null
+                    }
+                }
+                val page = repo.findCandidatesForPersona(personaId, limit, offset, statusFilter)
                 call.respond(
                     WarehouseHttpResponse(
                         personaId = personaId.toString(),
-                        candidates = rows.map { row ->
+                        total = page.total,
+                        limit = page.limit,
+                        offset = page.offset,
+                        candidates = page.candidates.map { row ->
                             WarehouseCandidateHttpResponse(
                                 id = row.candidate.id.toString(),
                                 jobId = row.jobId.toString(),
@@ -711,6 +729,10 @@ class AdminImageGenerationRoutes(
                                 heightPx = row.candidate.heightPx,
                                 createdAt = row.candidate.createdAt.toString(),
                                 assetUrl = "/v1/admin/images/assets/${row.candidate.id}",
+                                visualVersionId = row.personaVisualVersionId.toString(),
+                                modelId = extractModelId(row.requestPayload),
+                                sourceCandidateId = extractSourceCandidateId(row.requestPayload)?.toString(),
+                                costAvailability = "UNAVAILABLE",
                             )
                         },
                     )

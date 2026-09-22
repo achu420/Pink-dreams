@@ -19,24 +19,35 @@ data class WarehouseCandidateRow(
     val requestPayload: String,
 )
 
+data class WarehousePage(
+    val candidates: List<WarehouseCandidateRow>,
+    val total: Int,
+    val limit: Int,
+    val offset: Int,
+)
+
 /**
  * Persona-scoped warehouse listing across all visual versions/jobs.
  */
 class ImageWarehouseRepository(private val db: Database) {
-    fun findCandidatesForPersona(personaId: UUID, limit: Int = 100): List<WarehouseCandidateRow> = transaction(db) {
+    fun findCandidatesForPersona(
+        personaId: UUID,
+        limit: Int = 100,
+        offset: Int = 0,
+        status: CandidateStatus? = null,
+    ): WarehousePage = transaction(db) {
         val identityId = Personas.select { Personas.id eq personaId }
             .map { it[Personas.personaIdentityId] }
             .singleOrNull()
-            ?: return@transaction emptyList()
-        val linkedIdentity = identityId ?: return@transaction emptyList()
+            ?: return@transaction WarehousePage(emptyList(), 0, limit, offset)
+        val linkedIdentity = identityId ?: return@transaction WarehousePage(emptyList(), 0, limit, offset)
 
         val versionIds = PersonaVisualVersions.select { PersonaVisualVersions.personaIdentityId eq linkedIdentity }
             .map { it[PersonaVisualVersions.id] }
-        if (versionIds.isEmpty()) return@transaction emptyList()
+        if (versionIds.isEmpty()) return@transaction WarehousePage(emptyList(), 0, limit, offset)
 
         val jobs = ImageJobs.select { ImageJobs.personaVisualVersionId inList versionIds }
             .orderBy(ImageJobs.createdAt to SortOrder.DESC)
-            .limit(limit)
             .map { row ->
                 Triple(
                     row[ImageJobs.id],
@@ -44,17 +55,17 @@ class ImageWarehouseRepository(private val db: Database) {
                     row[ImageJobs.personaVisualVersionId] to row[ImageJobs.requestPayload],
                 )
             }
-        if (jobs.isEmpty()) return@transaction emptyList()
+        if (jobs.isEmpty()) return@transaction WarehousePage(emptyList(), 0, limit, offset)
 
         val jobIds = jobs.map { it.first }
         val jobMeta = jobs.associate { it.first to it }
 
-        GeneratedCandidates.select { GeneratedCandidates.imageJobId inList jobIds }
+        val allRows = GeneratedCandidates.select { GeneratedCandidates.imageJobId inList jobIds }
             .orderBy(GeneratedCandidates.createdAt to SortOrder.DESC)
             .map { row ->
                 val jobId = row[GeneratedCandidates.imageJobId]
                 val meta = jobMeta[jobId]!!
-                val status = try {
+                val candStatus = try {
                     CandidateStatus.valueOf(row[GeneratedCandidates.status])
                 } catch (_: Exception) {
                     CandidateStatus.GENERATED
@@ -71,7 +82,7 @@ class ImageWarehouseRepository(private val db: Database) {
                         checksum = row[GeneratedCandidates.checksum],
                         candidateIndex = row[GeneratedCandidates.candidateIndex],
                         createdAt = row[GeneratedCandidates.createdAt],
-                        status = status,
+                        status = candStatus,
                         adminRemark = row[GeneratedCandidates.adminRemark],
                     ),
                     jobId = jobId,
@@ -80,5 +91,15 @@ class ImageWarehouseRepository(private val db: Database) {
                     requestPayload = meta.third.second,
                 )
             }
+            .let { list ->
+                if (status != null) list.filter { it.candidate.status == status } else list
+            }
+
+        WarehousePage(
+            candidates = allRows.drop(offset.coerceAtLeast(0)).take(limit.coerceIn(1, 500)),
+            total = allRows.size,
+            limit = limit,
+            offset = offset,
+        )
     }
 }

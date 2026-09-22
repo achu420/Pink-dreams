@@ -2699,57 +2699,78 @@
             }
         }
 
-        async function pdLoadWarehouse(personaId) {
+        let pdWhOffset = 0;
+        async function pdLoadWarehouse(personaId, offset) {
             const panel = document.getElementById('pdPanel-warehouse');
             if (!panel) return;
+            if (typeof offset === 'number') pdWhOffset = offset;
             panel.innerHTML = '<div class="empty-state" style="padding:20px;">Loading warehouse…</div>';
             try {
-                const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(personaId)}/images/warehouse?limit=100`);
+                const status = (document.getElementById('pdWhFilter') || {}).value || '';
+                const qs = new URLSearchParams({ limit: '40', offset: String(pdWhOffset) });
+                if (status) qs.set('status', status);
+                const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(personaId)}/images/warehouse?${qs}`);
                 const body = await res.json().catch(() => ({}));
                 if (!res.ok) throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
                 const candidates = body.candidates || [];
+                const total = body.total != null ? body.total : candidates.length;
+                const filter = `<div class="section-sub" style="margin-bottom:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                    Filter:
+                    <select id="pdWhFilter" onchange="pdWhOffset=0;pdLoadWarehouse(selectedPersonaId,0)">
+                        <option value="">All</option>
+                        <option ${status==='GENERATED'?'selected':''}>GENERATED</option>
+                        <option ${status==='SHORTLISTED'?'selected':''}>SHORTLISTED</option>
+                        <option ${status==='DECLINED'?'selected':''}>DECLINED</option>
+                        <option ${status==='SAVED'?'selected':''}>SAVED</option>
+                        <option ${status==='IDENTITY_MISMATCH'?'selected':''}>IDENTITY_MISMATCH</option>
+                        <option ${status==='POST_READY'?'selected':''}>POST_READY</option>
+                    </select>
+                    <span class="filter-count">${candidates.length} shown · ${total} total · offset ${pdWhOffset}</span>
+                    <button class="secondary" ${pdWhOffset<=0?'disabled':''} onclick="pdLoadWarehouse(selectedPersonaId, Math.max(0,pdWhOffset-40))">Prev</button>
+                    <button class="secondary" ${(pdWhOffset+candidates.length)>=total?'disabled':''} onclick="pdLoadWarehouse(selectedPersonaId, pdWhOffset+40)">Next</button>
+                </div>`;
                 if (!candidates.length) {
-                    panel.innerHTML = '<div class="empty-state" style="padding:20px;">No generated candidates yet for this persona.</div>';
+                    panel.innerHTML = filter + '<div class="empty-state" style="padding:20px;">No candidates for this filter.</div>';
                     return;
                 }
-                const filter = `<div class="section-sub" style="margin-bottom:8px;">
-                    Filter:
-                    <select id="pdWhFilter" onchange="pdFilterWarehouse()">
-                        <option value="">All</option>
-                        <option>GENERATED</option>
-                        <option>SHORTLISTED</option>
-                        <option>DECLINED</option>
-                        <option>SAVED</option>
-                        <option>IDENTITY_MISMATCH</option>
-                    </select>
-                    <span class="filter-count">${candidates.length} total</span>
-                </div>`;
-                panel.innerHTML = filter + `<div id="pdWhGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
-                    ${candidates.map(c => `
-                        <div class="kv-item pd-wh-card" data-status="${escapeHtml(c.status)}" style="padding:8px;border:1px solid #444;">
-                            <div class="kv-label">${escapeHtml(c.status)} · #${Number(c.candidateIndex)+1}</div>
-                            <img src="${escapeHtml(c.assetUrl)}" alt="" style="width:100%;max-height:200px;object-fit:contain;background:#111;margin:6px 0;"/>
-                            <div class="filter-count">${escapeHtml(c.seedPrompt || '')}</div>
-                            <div class="filter-count">${escapeHtml(c.adminRemark || '')}</div>
-                            <div class="filter-count mono">${escapeHtml(c.createdAt)}</div>
-                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
-                                <button class="secondary" onclick="pdCandidateAction('${c.id}','SHORTLISTED')">Shortlist</button>
-                                <button class="secondary" onclick="pdCandidateAction('${c.id}','DECLINED')">Decline</button>
-                                <button class="secondary" onclick="pdCandidateAction('${c.id}','SAVED')">Save</button>
-                                <button class="secondary" onclick="pdCandidateRegenerate('${c.id}')">Regen</button>
-                            </div>
-                        </div>`).join('')}
-                </div>`;
+                const byJob = {};
+                candidates.forEach(c => {
+                    (byJob[c.jobId] = byJob[c.jobId] || []).push(c);
+                });
+                const groups = Object.keys(byJob).map(jobId => {
+                    const list = byJob[jobId];
+                    const head = list[0];
+                    return `<div style="margin-bottom:16px;border-top:1px solid #333;padding-top:10px;">
+                        <div class="vh-title">Generation ${escapeHtml(jobId.slice(0,8))}…</div>
+                        <div class="filter-count">job ${escapeHtml(head.jobStatus)} · model ${escapeHtml(head.modelId || '—')} · identity ${escapeHtml(head.visualVersionId || '—')} · cost ${escapeHtml(head.costAvailability || 'UNAVAILABLE')}</div>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:8px;">
+                        ${list.map(c => `
+                            <div class="kv-item pd-wh-card" data-status="${escapeHtml(c.status)}" style="padding:8px;border:1px solid #444;">
+                                <div class="kv-label">${escapeHtml(c.status)} · #${Number(c.candidateIndex)+1}</div>
+                                <img src="${escapeHtml(c.assetUrl)}" alt="" style="width:100%;max-height:200px;object-fit:contain;background:#111;margin:6px 0;"/>
+                                <div class="filter-count">${escapeHtml(c.seedPrompt || '')}</div>
+                                <div class="filter-count">${escapeHtml(c.adminRemark || '')}</div>
+                                <div class="filter-count mono">${escapeHtml(c.createdAt)}${c.sourceCandidateId ? ' · regen from ' + escapeHtml(c.sourceCandidateId.slice(0,8)) : ''}</div>
+                                <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+                                    <button class="secondary" onclick="pdCandidateAction('${c.id}','SHORTLISTED').then(()=>pdLoadWarehouse(selectedPersonaId,pdWhOffset))">Shortlist</button>
+                                    <button class="secondary" onclick="pdCandidateAction('${c.id}','DECLINED').then(()=>pdLoadWarehouse(selectedPersonaId,pdWhOffset))">Decline</button>
+                                    <button class="secondary" onclick="pdCandidateAction('${c.id}','SAVED').then(()=>pdLoadWarehouse(selectedPersonaId,pdWhOffset))">Save</button>
+                                    <button class="secondary" onclick="pdCandidateAction('${c.id}','POST_READY').then(()=>pdLoadWarehouse(selectedPersonaId,pdWhOffset))">Mark for post</button>
+                                    <button class="secondary" onclick="pdCandidateRegenerate('${c.id}')">Regen</button>
+                                </div>
+                            </div>`).join('')}
+                        </div>
+                    </div>`;
+                }).join('');
+                panel.innerHTML = filter + groups;
             } catch (e) {
                 panel.innerHTML = `<div class="empty-state" style="padding:20px;">Warehouse failed: ${escapeHtml(e.message || e)}</div>`;
             }
         }
 
         function pdFilterWarehouse() {
-            const v = (document.getElementById('pdWhFilter') || {}).value || '';
-            document.querySelectorAll('.pd-wh-card').forEach(card => {
-                card.style.display = (!v || card.getAttribute('data-status') === v) ? '' : 'none';
-            });
+            pdWhOffset = 0;
+            if (selectedPersonaId) pdLoadWarehouse(selectedPersonaId, 0);
         }
 
         async function pdGenerateImages() {
