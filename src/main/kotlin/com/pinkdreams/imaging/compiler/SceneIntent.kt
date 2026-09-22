@@ -102,7 +102,8 @@ data class SceneIntent(
     val composition: Composition = Composition(),
     val appearance: Appearance = Appearance(),
     val moodAndStyle: MoodAndStyle = MoodAndStyle(),
-    val generation: GenerationSpecs = GenerationSpecs()
+    val generation: GenerationSpecs = GenerationSpecs(),
+    val seedPrompt: String? = null,
 ) {
     fun validate(): ValidationResult {
         val errors = mutableListOf<String>()

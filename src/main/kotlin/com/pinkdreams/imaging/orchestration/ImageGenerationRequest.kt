@@ -22,4 +22,7 @@ data class ImageGenerationRequest(
     val conversationId: UUID? = null,
     val turnRequestId: UUID? = null,
     val userId: UUID? = null,
+    val personaId: UUID? = null,
+    val sourceCandidateId: UUID? = null,
+    val adminCorrection: String? = null,
 )

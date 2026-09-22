@@ -16,6 +16,7 @@ import com.pinkdreams.visual.identity.PersonaVisualAdminService
 import com.pinkdreams.visual.identity.PhysicalGuide
 import com.pinkdreams.visual.identity.PrivateVisualGuide
 import com.pinkdreams.visual.identity.ReferenceRole
+import com.pinkdreams.visual.identity.ImagePipelineTestPersonaSeeder
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
@@ -153,6 +154,19 @@ data class AdminEnsureVisualDraftResponse(
     val draftVersion: Int,
     val createdIdentity: Boolean,
     val createdDraft: Boolean,
+)
+
+@Serializable
+data class SeededPersonaHttpResponse(
+    val slug: String,
+    val personaId: String,
+    val referencesUploaded: Int,
+    val created: Boolean,
+)
+
+@Serializable
+data class SeedImageFixturesHttpResponse(
+    val seeded: List<SeededPersonaHttpResponse>,
 )
 
 @Serializable
@@ -309,6 +323,33 @@ class AdminPersonaVisualRoutes(
                             draftVersion = result.draftVersion,
                             createdIdentity = result.createdIdentity,
                             createdDraft = result.createdDraft,
+                        ),
+                    )
+                } catch (e: Exception) {
+                    call.respondMappedVisualError(e)
+                }
+            }
+
+            // POST /v1/admin/personas/seed-image-test-fixtures — Ananya + Richa from docs/23 sept
+            post("/v1/admin/personas/seed-image-test-fixtures") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@post
+                try {
+                    val seeder = ImagePipelineTestPersonaSeeder(
+                        personaRepository = personaRepository,
+                        visualAdminService = visualAdminService,
+                    )
+                    val results = seeder.seedAll()
+                    call.respond(
+                        HttpStatusCode.OK,
+                        SeedImageFixturesHttpResponse(
+                            seeded = results.map {
+                                SeededPersonaHttpResponse(
+                                    slug = it.slug,
+                                    personaId = it.personaId,
+                                    referencesUploaded = it.referencesUploaded,
+                                    created = it.created,
+                                )
+                            },
                         ),
                     )
                 } catch (e: Exception) {

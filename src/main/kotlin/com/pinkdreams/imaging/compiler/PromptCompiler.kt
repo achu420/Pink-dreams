@@ -58,6 +58,10 @@ class PromptCompiler {
         val subjectSection = buildSubjectSection(sceneIntent.subject, physicalGuide, privateGuide)
         if (subjectSection.isNotEmpty()) sections.add(subjectSection)
 
+        sceneIntent.seedPrompt?.takeIf { it.isNotBlank() }?.let { seed ->
+            sections.add("Scene seed: $seed")
+        }
+
         // Appearance
         val appearanceSection = buildAppearanceSection(sceneIntent.appearance)
         if (appearanceSection.isNotEmpty()) sections.add(appearanceSection)

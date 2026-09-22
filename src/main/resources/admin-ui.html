@@ -2009,6 +2009,7 @@
                 if (!vis.ok) throw new Error('Failed to load visual identity');
                 pdVisualCache = await vis.json();
                 document.getElementById('pdPanel-visual').innerHTML = pdVisualHtml(pdVisualCache);
+                pdLoadImageConfig();
             } catch (e) {
                 pdVisualCache = null;
                 document.getElementById('pdPanel-visual').innerHTML =
@@ -2193,8 +2194,19 @@
                         </table></div>` : '<div class="filter-count">No image jobs for this version.</div>'}
 
                         ${isDraft || v.isActive ? `<div class="section-sub" style="margin-top:12px;">
-                            <button class="secondary" id="pdGenerateImagesBtn" onclick="pdGenerateImages()" title="Enqueue image generation job">Generate images</button>
-                            <span id="pdGenerateImagesStatus" class="filter-count" style="margin-left:8px;"></span>
+                            <div class="vh-title">Generate images</div>
+                            <div class="filter-count" id="pdImageConfigLabel">Model: loading…</div>
+                            <label style="display:block;margin-top:8px;">Seed prompt
+                                <textarea id="pdSeedPrompt" rows="3" style="width:100%;" placeholder="e.g. swimming in a yellow bikini at a Goa beach, early morning, facing camera"></textarea>
+                            </label>
+                            <label style="display:inline-block;margin-top:8px;">Candidates
+                                <input id="pdCandidateCount" type="number" min="1" max="4" value="4" style="width:64px;margin-left:6px;"/>
+                            </label>
+                            <div style="margin-top:8px;">
+                                <button class="primary" id="pdGenerateImagesBtn" onclick="pdGenerateImages()">Generate</button>
+                                <span id="pdGenerateImagesStatus" class="filter-count" style="margin-left:8px;"></span>
+                            </div>
+                            <div id="pdCandidateResults" style="margin-top:12px;"></div>
                         </div>` : ''}
                     </div>
                 </div>`;
@@ -2365,12 +2377,26 @@
             }
         }
 
+        async function pdLoadImageConfig() {
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/config`);
+                if (!res.ok) return;
+                const cfg = await res.json();
+                const el = document.getElementById('pdImageConfigLabel');
+                if (el) el.textContent = `Provider: ${cfg.provider || '—'} · Model: ${cfg.model || '—'} · Default count: ${cfg.defaultCandidateCount || 4}`;
+            } catch (_) { /* ignore */ }
+        }
+
         async function pdGenerateImages() {
             if (!selectedPersonaId) return;
             const statusEl = document.getElementById('pdGenerateImagesStatus');
             const btn = document.getElementById('pdGenerateImagesBtn');
+            const resultsEl = document.getElementById('pdCandidateResults');
+            const seed = (document.getElementById('pdSeedPrompt') && document.getElementById('pdSeedPrompt').value) || '';
+            const count = Math.min(4, Math.max(1, Number((document.getElementById('pdCandidateCount') || {}).value) || 4));
             if (btn) btn.disabled = true;
             if (statusEl) statusEl.textContent = 'Enqueueing…';
+            if (resultsEl) resultsEl.innerHTML = '';
             try {
                 const res = await fetch(`${ADMIN_BASE}/images/jobs`, {
                     method: 'POST',
@@ -2378,21 +2404,132 @@
                     body: JSON.stringify({
                         personaId: selectedPersonaId,
                         idempotencyKey: 'admin-' + selectedPersonaId + '-' + Date.now(),
-                        location: 'studio',
-                        presentation: 'candid portrait',
-                        candidateCount: 1,
+                        seedPrompt: seed || null,
+                        location: seed ? null : 'studio',
+                        presentation: seed ? null : 'candid portrait',
+                        candidateCount: count,
                         widthPx: 512,
                         heightPx: 512
                     })
                 });
                 const body = await res.json().catch(() => ({}));
                 if (!res.ok) throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
-                if (statusEl) statusEl.textContent = 'Job ' + (body.jobId || '') + ' — ' + (body.status || 'queued');
-                if (selectedPersonaId) loadPersonaDetail(selectedPersonaId);
+                const jobId = body.jobId;
+                if (statusEl) statusEl.textContent = 'Job ' + jobId + ' — ' + (body.status || 'queued');
+                await pdPollJobResult(jobId, statusEl, resultsEl);
             } catch (e) {
                 if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
             } finally {
                 if (btn) btn.disabled = false;
+            }
+        }
+
+        async function pdPollJobResult(jobId, statusEl, resultsEl) {
+            for (let i = 0; i < 60; i++) {
+                await new Promise(r => setTimeout(r, 1500));
+                const res = await fetch(`${ADMIN_BASE}/images/jobs/${encodeURIComponent(jobId)}/result`);
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
+                if (statusEl) statusEl.textContent = 'Job ' + jobId + ' — ' + body.status + (body.candidates ? ` (${body.candidates.length} candidates)` : '');
+                if (body.status === 'SUCCEEDED' || body.status === 'FAILED' || body.status === 'CANCELLED') {
+                    pdRenderCandidates(body.candidates || [], resultsEl, body);
+                    if (selectedPersonaId) loadPersonaDetail(selectedPersonaId);
+                    return;
+                }
+            }
+            if (statusEl) statusEl.textContent = 'Still running — refresh later. Job ' + jobId;
+        }
+
+        function pdRenderCandidates(candidates, resultsEl) {
+            if (!resultsEl) return;
+            if (!candidates.length) {
+                resultsEl.innerHTML = '<div class="filter-count">No candidates returned.</div>';
+                return;
+            }
+            resultsEl.innerHTML = `<div class="vh-title">Candidates</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+                ${candidates.map(c => `
+                    <div class="kv-item" style="padding:8px;border:1px solid #444;" data-cid="${escapeHtml(c.id)}">
+                        <div class="kv-label">#${Number(c.candidateIndex) + 1} · ${escapeHtml(c.status || 'GENERATED')}</div>
+                        <img src="${escapeHtml(c.assetUrl)}" alt="candidate" style="width:100%;max-height:220px;object-fit:contain;background:#111;margin:6px 0;"/>
+                        <textarea class="pd-cand-remark" rows="2" style="width:100%;" placeholder="Admin remark">${escapeHtml(c.adminRemark || '')}</textarea>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+                            <button class="secondary" onclick="pdCandidateAction('${c.id}','SHORTLISTED')">Shortlist</button>
+                            <button class="secondary" onclick="pdCandidateAction('${c.id}','DECLINED')">Decline</button>
+                            <button class="secondary" onclick="pdCandidateAction('${c.id}','SAVED')">Save</button>
+                            <button class="secondary" onclick="pdCandidateSaveRemark('${c.id}')">Save remark</button>
+                            <button class="secondary" onclick="pdCandidateRegenerate('${c.id}')">Regenerate</button>
+                        </div>
+                        <div class="filter-count pd-cand-status"></div>
+                    </div>`).join('')}
+                </div>`;
+        }
+
+        function pdCandidateCard(id) {
+            return document.querySelector(`[data-cid="${CSS.escape(id)}"]`);
+        }
+
+        async function pdCandidateAction(candidateId, status) {
+            const card = pdCandidateCard(candidateId);
+            const remark = card ? (card.querySelector('.pd-cand-remark') || {}).value : null;
+            const statusEl = card ? card.querySelector('.pd-cand-status') : null;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/candidates/${encodeURIComponent(candidateId)}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, adminRemark: remark || null })
+                });
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
+                if (statusEl) statusEl.textContent = status;
+                if (card) {
+                    const label = card.querySelector('.kv-label');
+                    if (label) label.textContent = label.textContent.replace(/·.*/, '· ' + status);
+                }
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
+            }
+        }
+
+        async function pdCandidateSaveRemark(candidateId) {
+            const card = pdCandidateCard(candidateId);
+            const remark = card ? (card.querySelector('.pd-cand-remark') || {}).value : '';
+            const statusEl = card ? card.querySelector('.pd-cand-status') : null;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/candidates/${encodeURIComponent(candidateId)}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminRemark: remark })
+                });
+                if (!res.ok) {
+                    const body = await res.json().catch(() => ({}));
+                    throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
+                }
+                if (statusEl) statusEl.textContent = 'Remark saved';
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
+            }
+        }
+
+        async function pdCandidateRegenerate(candidateId) {
+            const card = pdCandidateCard(candidateId);
+            const statusEl = card ? card.querySelector('.pd-cand-status') : null;
+            const correction = prompt('Correction for regeneration (optional):', 'Face does not sufficiently match the reference.');
+            if (correction === null) return;
+            try {
+                if (statusEl) statusEl.textContent = 'Regenerating…';
+                const res = await fetch(`${ADMIN_BASE}/images/candidates/${encodeURIComponent(candidateId)}/regenerate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ correction: correction || null, candidateCount: 1 })
+                });
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
+                if (statusEl) statusEl.textContent = 'New job ' + body.jobId + ' — ' + body.status;
+                const resultsEl = document.getElementById('pdCandidateResults');
+                await pdPollJobResult(body.jobId, statusEl, resultsEl);
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
             }
         }
 

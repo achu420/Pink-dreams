@@ -14,4 +14,6 @@ data class GeneratedCandidate(
     val checksum: String,
     val candidateIndex: Int,
     val createdAt: LocalDateTime,
+    val status: CandidateStatus = CandidateStatus.GENERATED,
+    val adminRemark: String? = null,
 )

@@ -39,6 +39,7 @@ class ImageGenerationService(
         val outfit: String? = null,
         val expression: String? = null,
         val presentation: String? = null,
+        val seedPrompt: String? = null,
         val widthPx: Int? = 512,
         val heightPx: Int? = 512,
         val candidateCount: Int = 1,
@@ -50,6 +51,8 @@ class ImageGenerationService(
         val selectedReferenceIds: List<UUID> = emptyList(),
         /** When false (default), PRIVATE reference images are never auto-selected. */
         val includePrivateReferences: Boolean = false,
+        val sourceCandidateId: UUID? = null,
+        val adminCorrection: String? = null,
     )
 
     data class CreateResult(
@@ -121,6 +124,15 @@ class ImageGenerationService(
                 heightPx = command.heightPx,
                 selectedReferences = refs,
             ),
+            seedPrompt = command.seedPrompt?.takeIf { it.isNotBlank() }.let { seed ->
+                val correction = command.adminCorrection?.takeIf { it.isNotBlank() }
+                when {
+                    seed != null && correction != null -> "$seed\nAdmin correction: $correction"
+                    seed != null -> seed
+                    correction != null -> "Admin correction: $correction"
+                    else -> null
+                }
+            },
         )
 
         val validation = scene.validate()
@@ -137,6 +149,9 @@ class ImageGenerationService(
             conversationId = command.conversationId,
             turnRequestId = command.turnRequestId,
             userId = command.userId,
+            personaId = command.personaId,
+            sourceCandidateId = command.sourceCandidateId,
+            adminCorrection = command.adminCorrection,
         )
 
         val job = orchestrator.submit(request)

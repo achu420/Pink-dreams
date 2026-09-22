@@ -307,6 +307,8 @@ object GeneratedCandidates : Table("generated_candidates") {
     val checksum = varchar("checksum", 256)
     val candidateIndex = integer("candidate_index")
     val createdAt = datetime("created_at")
+    val status = varchar("status", 50).default("GENERATED")
+    val adminRemark = text("admin_remark").nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

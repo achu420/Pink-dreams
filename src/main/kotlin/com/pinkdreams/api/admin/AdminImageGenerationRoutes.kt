@@ -6,6 +6,7 @@ import com.pinkdreams.common.errors.ErrorCode
 import com.pinkdreams.common.errors.ErrorResponse
 import com.pinkdreams.imaging.job.ImageJobStatus
 import com.pinkdreams.imaging.observability.ImageGenerationEventRepository
+import com.pinkdreams.imaging.orchestration.CandidateStatus
 import com.pinkdreams.imaging.orchestration.GeneratedCandidateRepository
 import com.pinkdreams.imaging.orchestration.ImageGenerationService
 import com.pinkdreams.persistence.repositories.ImageJobRepository
@@ -23,8 +24,13 @@ import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
+import io.ktor.server.routing.patch
 import io.ktor.server.routing.post
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -36,9 +42,10 @@ data class CreateImageJobHttpRequest(
     val outfit: String? = null,
     val expression: String? = null,
     val presentation: String? = null,
+    val seedPrompt: String? = null,
     val widthPx: Int? = 512,
     val heightPx: Int? = 512,
-    val candidateCount: Int = 1,
+    val candidateCount: Int = 4,
     val visualVersionId: String? = null,
     val conversationId: String? = null,
     val turnRequestId: String? = null,
@@ -69,6 +76,10 @@ data class ImageCandidateHttpResponse(
     val heightPx: Int?,
     val candidateIndex: Int,
     val assetUrl: String,
+    val status: String,
+    val adminRemark: String? = null,
+    val seedPrompt: String? = null,
+    val createdAt: String,
 )
 
 @Serializable
@@ -77,6 +88,26 @@ data class ImageJobResultHttpResponse(
     val status: String,
     val lastError: String?,
     val candidates: List<ImageCandidateHttpResponse>,
+)
+
+@Serializable
+data class PatchImageCandidateHttpRequest(
+    val status: String? = null,
+    val adminRemark: String? = null,
+)
+
+@Serializable
+data class RegenerateCandidateHttpRequest(
+    val correction: String? = null,
+    val candidateCount: Int = 1,
+)
+
+@Serializable
+data class ImageConfigHttpResponse(
+    val provider: String,
+    val model: String,
+    val maxCandidateCount: Int,
+    val defaultCandidateCount: Int,
 )
 
 @Serializable
@@ -163,6 +194,7 @@ class AdminImageGenerationRoutes(
                             outfit = body.outfit,
                             expression = body.expression,
                             presentation = body.presentation,
+                            seedPrompt = body.seedPrompt,
                             widthPx = body.widthPx,
                             heightPx = body.heightPx,
                             candidateCount = body.candidateCount,
@@ -234,6 +266,7 @@ class AdminImageGenerationRoutes(
                     )
                     return@get
                 }
+                val seedPrompt = extractSeedPrompt(job.requestPayload)
                 val candidates = imageGenerationService.getCandidates(jobId).map { c ->
                     ImageCandidateHttpResponse(
                         id = c.id.toString(),
@@ -244,6 +277,10 @@ class AdminImageGenerationRoutes(
                         heightPx = c.heightPx,
                         candidateIndex = c.candidateIndex,
                         assetUrl = "/v1/admin/images/assets/${c.id}",
+                        status = c.status.name,
+                        adminRemark = c.adminRemark,
+                        seedPrompt = seedPrompt,
+                        createdAt = c.createdAt.toString(),
                     )
                 }
                 call.respond(
@@ -396,6 +433,139 @@ class AdminImageGenerationRoutes(
                     )
                 )
             }
+
+            get("/v1/admin/images/config") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@get
+                val envProvider = System.getenv("IMAGE_PROVIDER")?.takeIf { it.isNotBlank() }
+                val provider = envProvider
+                    ?: if (System.getenv("OPENROUTER_API_KEY").isNullOrBlank()) "fake" else "openrouter"
+                val model = System.getenv("OPENROUTER_IMAGE_MODEL")
+                    ?.takeIf { it.isNotBlank() }
+                    ?: "openai/gpt-image-2.5-flare"
+                call.respond(
+                    ImageConfigHttpResponse(
+                        provider = provider,
+                        model = model,
+                        maxCandidateCount = 4,
+                        defaultCandidateCount = 4,
+                    )
+                )
+            }
+
+            patch("/v1/admin/images/candidates/{candidateId}") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@patch
+                val candidateId = call.parseUuid("candidateId") ?: return@patch
+                val body = try {
+                    call.receive<PatchImageCandidateHttpRequest>()
+                } catch (_: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid request body", null)),
+                    )
+                    return@patch
+                }
+                if (body.status == null && body.adminRemark == null) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "status or adminRemark required", null)),
+                    )
+                    return@patch
+                }
+                val parsedStatus = body.status?.let { raw ->
+                    try {
+                        CandidateStatus.valueOf(raw)
+                    } catch (_: Exception) {
+                        null
+                    }
+                }
+                if (body.status != null && parsedStatus == null) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid status: ${body.status}", null)),
+                    )
+                    return@patch
+                }
+                try {
+                    val updated = candidateRepository.updateStatusAndRemark(
+                        id = candidateId,
+                        status = parsedStatus,
+                        remark = body.adminRemark,
+                    )
+                    val job = imageGenerationService.getJob(updated.imageJobId)
+                    val seedPrompt = job?.let { extractSeedPrompt(it.requestPayload) }
+                    call.respond(
+                        ImageCandidateHttpResponse(
+                            id = updated.id.toString(),
+                            storageKey = updated.storageKey,
+                            contentType = updated.contentType,
+                            fileSize = updated.fileSize,
+                            widthPx = updated.widthPx,
+                            heightPx = updated.heightPx,
+                            candidateIndex = updated.candidateIndex,
+                            assetUrl = "/v1/admin/images/assets/${updated.id}",
+                            status = updated.status.name,
+                            adminRemark = updated.adminRemark,
+                            seedPrompt = seedPrompt,
+                            createdAt = updated.createdAt.toString(),
+                        )
+                    )
+                } catch (e: NoSuchElementException) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, e.message ?: "Candidate not found", null)),
+                    )
+                }
+            }
+
+            post("/v1/admin/images/candidates/{candidateId}/regenerate") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@post
+                val candidateId = call.parseUuid("candidateId") ?: return@post
+                val body = try {
+                    call.receive<RegenerateCandidateHttpRequest>()
+                } catch (_: Exception) {
+                    RegenerateCandidateHttpRequest()
+                }
+                try {
+                    val candidate = candidateRepository.findById(candidateId)
+                        ?: throw NoSuchElementException("Candidate not found")
+                    val sourceJob = imageJobRepository.findById(candidate.imageJobId)
+                        ?: throw NoSuchElementException("Source job not found")
+                    val seedPrompt = extractSeedPrompt(sourceJob.requestPayload)
+                    val personaId = extractPersonaId(sourceJob.requestPayload)
+                        ?: throw IllegalStateException("Source job missing personaId — cannot regenerate")
+                    val result = imageGenerationService.create(
+                        ImageGenerationService.CreateCommand(
+                            personaId = personaId,
+                            idempotencyKey = "regen-${candidateId}-${System.currentTimeMillis()}",
+                            seedPrompt = seedPrompt,
+                            candidateCount = body.candidateCount.coerceIn(1, 4),
+                            widthPx = 512,
+                            heightPx = 512,
+                            sourceCandidateId = candidateId,
+                            adminCorrection = body.correction,
+                        )
+                    )
+                    call.respond(
+                        if (result.reusedExisting) HttpStatusCode.OK else HttpStatusCode.Accepted,
+                        toJobResponse(result.job, result.reusedExisting),
+                    )
+                } catch (e: NoSuchElementException) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, e.message ?: "Not found", null)),
+                    )
+                } catch (e: IllegalArgumentException) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, e.message ?: "Validation error", null)),
+                    )
+                } catch (e: IllegalStateException) {
+                    call.respond(
+                        HttpStatusCode.Conflict,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, e.message ?: "Conflict", null)),
+                    )
+                }
+            }
         }
     }
 
@@ -418,6 +588,29 @@ class AdminImageGenerationRoutes(
         if (sorted.isEmpty()) return null
         val idx = ((sorted.size - 1) * p).toInt().coerceIn(0, sorted.size - 1)
         return sorted[idx]
+    }
+
+    companion object {
+        private val payloadJson = Json { ignoreUnknownKeys = true }
+
+        fun extractSeedPrompt(requestPayload: String): String? {
+            return try {
+                val root = payloadJson.parseToJsonElement(requestPayload).jsonObject
+                val scene = root["sceneIntent"]?.jsonObject ?: return null
+                scene["seedPrompt"]?.jsonPrimitive?.contentOrNull?.takeIf { it.isNotBlank() }
+            } catch (_: Exception) {
+                null
+            }
+        }
+
+        fun extractPersonaId(requestPayload: String): UUID? {
+            return try {
+                val root = payloadJson.parseToJsonElement(requestPayload).jsonObject
+                root["personaId"]?.jsonPrimitive?.contentOrNull?.let { UUID.fromString(it) }
+            } catch (_: Exception) {
+                null
+            }
+        }
     }
 }
 

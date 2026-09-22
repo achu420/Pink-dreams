@@ -80,6 +80,9 @@ class ImageGenerationOrchestrator(
 
             put("selectedWardrobeIds", json.encodeToString(request.selectedWardrobeIds.map { it.toString() }))
             put("selectedReferenceIds", json.encodeToString(request.selectedReferenceIds.map { it.toString() }))
+            request.personaId?.let { put("personaId", it.toString()) }
+            request.sourceCandidateId?.let { put("sourceCandidateId", it.toString()) }
+            request.adminCorrection?.let { put("adminCorrection", it) }
 
             put(
                 "references",
@@ -110,6 +113,7 @@ class ImageGenerationOrchestrator(
                 put("presentation", request.sceneIntent.subject.presentation ?: "")
                 put("expression", request.sceneIntent.subject.expression ?: "")
                 put("identity", request.sceneIntent.subject.identity ?: "")
+                request.sceneIntent.seedPrompt?.takeIf { it.isNotBlank() }?.let { put("seedPrompt", it) }
             })
         }
 

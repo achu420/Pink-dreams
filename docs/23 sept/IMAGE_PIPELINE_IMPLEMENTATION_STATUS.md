@@ -1001,14 +1001,17 @@ IMAGE WAREHOUSE
 
 | Task | Verdict | Commit |
 | --- | --- | --- |
-| Task 24 Persona Visual Identity & Reference Images | PASS WITH FINDINGS | (see git) |
+| Task 24 Persona Visual Identity & Reference Images | PASS WITH FINDINGS | f7fcf9e |
+| 23-03 Image Generation + Candidate lifecycle (seed/4/UI/status/regen/seed fixtures) | PASS WITH FINDINGS | (pending) |
 
-Next task files already present under `docs/23 sept/` (pick in product order after commit):
+Next queued MD files under `docs/23 sept/`:
 
-* `IMAGE GENERATION & CANDIDATE CREATION.md`
-* `Candidate Generation, 4-Image Output & Candidate Lifecycle.md`
+* `08_IMAGE_REFERENCE_IMAGE_SYSTEM.md` (may largely be covered by Task 24 — audit then skip/extend)
+* `09_IMAGE_REGENERATION_ADMIN_FEEDBACK.md` (regen endpoint landed; deepen if needed)
+* `10_IMAGE_REVIEW_SHORTLIST_ADMIN_WORKFLOW.md`
 * `IMAGE WAREHOUSE & CANDIDATE LIFECYCLE.md`
 * `Image Model & Provider Configuration.md`
+* `Candidate Generation, 4-Image Output & Candidate Lifecycle.md`
 
 Before implementing new functionality beyond the current task:
 
