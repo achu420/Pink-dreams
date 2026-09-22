@@ -150,8 +150,20 @@ data class ImageSlaSummaryResponse(
     val failureRate: Double?,
     val p50TotalLatencyMs: Long?,
     val p95TotalLatencyMs: Long?,
+    val p99TotalLatencyMs: Long? = null,
     val p50GenerationLatencyMs: Long?,
     val p95GenerationLatencyMs: Long?,
+    val p50QueueLatencyMs: Long? = null,
+    val p95QueueLatencyMs: Long? = null,
+    val candidatesGenerated: Int? = null,
+    val candidatesShortlisted: Int? = null,
+    val candidatesDeclined: Int? = null,
+    val candidatesSaved: Int? = null,
+    val regenerations: Int? = null,
+    val byProvider: Map<String, Int> = emptyMap(),
+    val byModel: Map<String, Int> = emptyMap(),
+    val costAvailability: String = "UNAVAILABLE",
+    val costNote: String = "Provider-reported image cost is not persisted; do not invent pricing.",
     val note: String,
 )
 
@@ -423,6 +435,18 @@ class AdminImageGenerationRoutes(
                 val failure = events.count { it.outcome == "FAILURE" }
                 val totals = events.mapNotNull { it.totalLatencyMs }.sorted()
                 val gens = events.mapNotNull { it.generationLatencyMs }.sorted()
+                val queues = events.mapNotNull { it.queueLatencyMs }.sorted()
+                val byProvider = events.groupingBy { it.provider ?: "unknown" }.eachCount()
+                val byModel = events.groupingBy { it.model ?: "unknown" }.eachCount()
+                val regenerations = events.count { ev ->
+                    try {
+                        val payload = imageJobRepository.findById(ev.imageJobId)?.requestPayload ?: return@count false
+                        payload.contains("\"sourceCandidateId\"")
+                    } catch (_: Exception) {
+                        false
+                    }
+                }
+                val statusCounts = candidateRepository.countByStatusSince(since)
                 call.respond(
                     ImageSlaSummaryResponse(
                         samplePopulation = "image_generation_events",
@@ -434,9 +458,21 @@ class AdminImageGenerationRoutes(
                         failureRate = if (events.isEmpty()) null else failure.toDouble() / events.size,
                         p50TotalLatencyMs = percentile(totals, 0.50),
                         p95TotalLatencyMs = percentile(totals, 0.95),
+                        p99TotalLatencyMs = percentile(totals, 0.99),
                         p50GenerationLatencyMs = percentile(gens, 0.50),
                         p95GenerationLatencyMs = percentile(gens, 0.95),
-                        note = "Not production SLA unless sample is production-only traffic.",
+                        p50QueueLatencyMs = percentile(queues, 0.50),
+                        p95QueueLatencyMs = percentile(queues, 0.95),
+                        candidatesGenerated = statusCounts["GENERATED"],
+                        candidatesShortlisted = statusCounts["SHORTLISTED"],
+                        candidatesDeclined = statusCounts["DECLINED"],
+                        candidatesSaved = statusCounts["SAVED"],
+                        regenerations = regenerations,
+                        byProvider = byProvider,
+                        byModel = byModel,
+                        costAvailability = "UNAVAILABLE",
+                        costNote = "Provider-reported image cost is not persisted; do not invent pricing.",
+                        note = "Image SLA only — separate from LLM observability. Not production SLA unless sample is production-only traffic.",
                     )
                 )
             }

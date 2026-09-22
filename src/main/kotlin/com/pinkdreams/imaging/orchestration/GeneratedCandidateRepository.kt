@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import com.pinkdreams.persistence.database.GeneratedCandidates
@@ -137,4 +138,12 @@ class GeneratedCandidateRepository(private val db: Database) {
         } catch (_: Exception) {
             CandidateStatus.GENERATED
         }
+
+    /** Counts candidates created since [since], grouped by status name. */
+    fun countByStatusSince(since: LocalDateTime): Map<String, Int> = transaction(db) {
+        GeneratedCandidates.select { GeneratedCandidates.createdAt greaterEq since }
+            .map { parseStatus(it[GeneratedCandidates.status]).name }
+            .groupingBy { it }
+            .eachCount()
+    }
 }

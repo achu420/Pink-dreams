@@ -6,7 +6,8 @@
 - `f7fcf9e` — Persona visual identity Admin workflow
 - `b1d28e4` — Seed prompt, 4 candidates, lifecycle, Ananya/Richa fixtures
 - `b20f048` — Morning review brief
-- (pending) — Persona Image Warehouse tab + API
+- `13e4365` — Persona Image Warehouse tab + API
+- (pending) — Image SLA Admin page + enriched SLA API
 
 ---
 
