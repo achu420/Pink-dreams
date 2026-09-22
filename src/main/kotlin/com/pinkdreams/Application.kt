@@ -185,6 +185,94 @@ fun Application.module(
     } else {
         com.pinkdreams.llm.FakeLlmClient()
     }
+
+    // Image pipeline — constructed before ChatEngine so post-delivery enqueue
+    // can reuse the same ImageGenerationService instance as admin/user APIs.
+    val objectStorage: com.pinkdreams.storage.ObjectStorage =
+        when (System.getenv("IMAGE_STORAGE")?.lowercase()) {
+            "memory" -> com.pinkdreams.storage.InMemoryObjectStorage()
+            else -> com.pinkdreams.storage.LocalFileObjectStorage.fromEnv()
+        }
+    val imageJobRepository = com.pinkdreams.persistence.repositories.ImageJobRepository(db)
+    val generatedCandidateRepository = com.pinkdreams.imaging.orchestration.GeneratedCandidateRepository(db)
+    val personaIdentityRepository = com.pinkdreams.persistence.repositories.PersonaIdentityRepository(db)
+    val visualVersionRepository = com.pinkdreams.persistence.repositories.PersonaVisualVersionRepository(db)
+    val wardrobeRepository = com.pinkdreams.persistence.repositories.WardrobeRepository(db)
+    val referenceImageRepository = com.pinkdreams.persistence.repositories.ReferenceImageRepository(
+        db,
+        objectStorage,
+    )
+    val imageProvider: com.pinkdreams.imaging.provider.ImageProvider =
+        when {
+            System.getenv("IMAGE_PROVIDER")?.equals("fake", ignoreCase = true) == true ->
+                com.pinkdreams.imaging.provider.FakeImageProvider()
+            System.getenv("OPENROUTER_API_KEY").isNullOrBlank() ->
+                com.pinkdreams.imaging.provider.FakeImageProvider()
+            else -> {
+                val cfg = com.pinkdreams.config.ImageProviderConfig.from(com.pinkdreams.config.AppConfig.load())
+                com.pinkdreams.imaging.provider.openrouter.OpenRouterImageProvider(
+                    apiKey = cfg.apiKey,
+                    endpoint = cfg.endpoint,
+                    imageModel = cfg.imageModel,
+                    connectTimeoutSeconds = cfg.connectTimeoutSeconds,
+                    readTimeoutSeconds = cfg.readTimeoutSeconds,
+                    outputFormat = cfg.outputFormat,
+                    objectStorage = objectStorage,
+                    referenceImageRepository = referenceImageRepository,
+                )
+            }
+        }
+    val imageGenerationHandler = com.pinkdreams.imaging.orchestration.ImageGenerationHandler(
+        imageProvider = imageProvider,
+        referenceImageRepository = referenceImageRepository,
+        objectStorage = objectStorage,
+        generatedCandidateRepository = generatedCandidateRepository,
+    )
+    val imageEventRepository = com.pinkdreams.imaging.observability.ImageGenerationEventRepository(db)
+    val imageJobHandler: com.pinkdreams.imaging.job.ImageJobHandler =
+        com.pinkdreams.imaging.observability.ObservableImageJobHandler(
+            delegate = com.pinkdreams.imaging.job.BridgingImageJobHandler(imageGenerationHandler),
+            eventRepository = imageEventRepository,
+            providerId = imageProvider.providerId,
+            model = System.getenv("OPENROUTER_IMAGE_MODEL"),
+        )
+    val imageMessageCompletionAttach = com.pinkdreams.chat.imaging.ImageMessageCompletionAttach(
+        messageRepository = messageRepo,
+        candidateRepository = generatedCandidateRepository,
+    )
+    val imageJobWorker = com.pinkdreams.imaging.job.ImageJobWorker(
+        db = db,
+        workerName = System.getenv("IMAGE_WORKER_NAME")?.takeIf { it.isNotBlank() } ?: "app-image-worker",
+        jobHandler = imageJobHandler,
+        jobRepository = imageJobRepository,
+        completionAttach = { job, succeeded ->
+            if (succeeded) imageMessageCompletionAttach.onSucceeded(job)
+            else imageMessageCompletionAttach.onFailed(job)
+        },
+    )
+    val imageWorkerRuntime = com.pinkdreams.imaging.job.ImageJobWorkerRuntime(imageJobWorker)
+    if (System.getenv("IMAGE_WORKER_ENABLED")?.equals("false", ignoreCase = true) != true) {
+        imageWorkerRuntime.start()
+    }
+    val imageOrchestrator = com.pinkdreams.imaging.orchestration.ImageGenerationOrchestrator(
+        compiler = com.pinkdreams.imaging.compiler.PromptCompiler(),
+        jobRepository = imageJobRepository,
+    )
+    val imageGenerationService = com.pinkdreams.imaging.orchestration.ImageGenerationService(
+        personaRepository = personaRepo,
+        visualVersionRepository = visualVersionRepository,
+        wardrobeRepository = wardrobeRepository,
+        referenceImageRepository = referenceImageRepository,
+        orchestrator = imageOrchestrator,
+        jobRepository = imageJobRepository,
+        candidateRepository = generatedCandidateRepository,
+    )
+    com.pinkdreams.imaging.retention.ImageRetentionCleaner(
+        db = db,
+        objectStorage = objectStorage,
+        candidateRepository = generatedCandidateRepository,
+    ).startScheduled()
+
     // Phase ADMIN-3: production and every Test Chat engine now share one
     // construction path (ChatEngineFactory) — see its doc comment. This
     // Dependencies bundle IS the production configuration; Test Chat builds its
@@ -222,6 +310,7 @@ fun Application.module(
         // TestChatService.buildEngineFor().
         intentModelOverride = null,
         intentJsonModeOverride = null,
+        imageGenerationService = imageGenerationService,
     )
 
     // Initialize ChatEngine if not provided
@@ -316,27 +405,45 @@ fun Application.module(
                 call.respond(HttpStatusCode.NotFound, "Admin login page not found")
             }
         }
-        HealthRoutes().register(this)
+        HealthRoutes {
+            val d = com.pinkdreams.imaging.storage.ImageStorageDiagnostics.from(objectStorage)
+            mapOf(
+                "imageStorageMode" to d.mode,
+                "imageStorageMultiInstanceContract" to d.multiInstanceContract,
+                "imageStorageOperatorDeclaredShared" to d.operatorDeclaredShared.toString(),
+            )
+        }.register(this)
         ChatRoutes(engine, conversationRepo, memoryFactRepo).register(this)
         ConversationHistoryRoutes(conversationRepo, messageRepo, userRepository = userRepo).register(this)
         AdminEngineRoutes(engineRepo, authProvider).register(this)
         AdminPersonaRoutes(personaRepo, coreVersionRepo, authProvider).register(this)
-        // Persona Detail → Visual Identity tab. Strictly read-only; the
-        // ReferenceImageRepository here is only ever asked for DB rows
-        // (findForVersion), never for object content, so it is given an
-        // in-memory storage backend rather than wiring a real blob store.
         com.pinkdreams.api.admin.AdminPersonaVisualRoutes(
             personaRepository = personaRepo,
-            personaIdentityRepository = com.pinkdreams.persistence.repositories.PersonaIdentityRepository(db),
-            visualVersionRepository = com.pinkdreams.persistence.repositories.PersonaVisualVersionRepository(db),
-            wardrobeRepository = com.pinkdreams.persistence.repositories.WardrobeRepository(db),
-            referenceImageRepository = com.pinkdreams.persistence.repositories.ReferenceImageRepository(
-                db,
-                com.pinkdreams.storage.InMemoryObjectStorage(),
-            ),
-            imageJobRepository = com.pinkdreams.persistence.repositories.ImageJobRepository(db),
-            generatedCandidateRepository = com.pinkdreams.imaging.orchestration.GeneratedCandidateRepository(db),
+            personaIdentityRepository = personaIdentityRepository,
+            visualVersionRepository = visualVersionRepository,
+            wardrobeRepository = wardrobeRepository,
+            referenceImageRepository = referenceImageRepository,
+            imageJobRepository = imageJobRepository,
+            generatedCandidateRepository = generatedCandidateRepository,
             adminAuthorizationProvider = authProvider,
+            generationTriggerWired = true,
+        ).register(this)
+        com.pinkdreams.api.admin.AdminImageGenerationRoutes(
+            imageGenerationService = imageGenerationService,
+            imageJobRepository = imageJobRepository,
+            candidateRepository = generatedCandidateRepository,
+            objectStorage = objectStorage,
+            eventRepository = imageEventRepository,
+            messageRepository = messageRepo,
+            adminAuthorizationProvider = authProvider,
+            generationTriggerWired = true,
+        ).register(this)
+        com.pinkdreams.api.images.UserImageRoutes(
+            imageGenerationService = imageGenerationService,
+            imageJobRepository = imageJobRepository,
+            candidateRepository = generatedCandidateRepository,
+            conversationRepository = conversationRepo,
+            objectStorage = objectStorage,
         ).register(this)
         com.pinkdreams.api.admin.AdminAllowlistRoutes(allowlistRepo, authProvider).register(this)
         com.pinkdreams.api.admin.AdminSkillRoutes(skillRepo, authProvider).register(this)

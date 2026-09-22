@@ -1,6 +1,7 @@
 package com.pinkdreams.imaging.orchestration
 
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
@@ -10,6 +11,11 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class GeneratedCandidateRepository(private val db: Database) {
+    /** Removes prior candidate rows for a job so retries do not duplicate assets. */
+    fun deleteByImageJob(imageJobId: UUID): Int = transaction(db) {
+        GeneratedCandidates.deleteWhere { GeneratedCandidates.imageJobId eq imageJobId }
+    }
+
     fun create(
         imageJobId: UUID,
         storageKey: String,
@@ -66,5 +72,24 @@ class GeneratedCandidateRepository(private val db: Database) {
                     createdAt = row[GeneratedCandidates.createdAt]
                 )
             }
+    }
+
+    fun findById(id: UUID): GeneratedCandidate? = transaction(db) {
+        GeneratedCandidates.select { GeneratedCandidates.id eq id }
+            .map { row ->
+                GeneratedCandidate(
+                    id = row[GeneratedCandidates.id],
+                    imageJobId = row[GeneratedCandidates.imageJobId],
+                    storageKey = row[GeneratedCandidates.storageKey],
+                    contentType = row[GeneratedCandidates.contentType],
+                    fileSize = row[GeneratedCandidates.fileSize],
+                    widthPx = row[GeneratedCandidates.widthPx],
+                    heightPx = row[GeneratedCandidates.heightPx],
+                    checksum = row[GeneratedCandidates.checksum],
+                    candidateIndex = row[GeneratedCandidates.candidateIndex],
+                    createdAt = row[GeneratedCandidates.createdAt]
+                )
+            }
+            .singleOrNull()
     }
 }

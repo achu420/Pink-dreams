@@ -71,29 +71,46 @@ class ImageGenerationOrchestrator(
             put("personaVisualVersionId", request.personaVisualVersion.id.toString())
             put("prompt", generationRequest.prompt)
             put("candidateCount", generationRequest.candidateCount)
-            put("widthPx", generationRequest.widthPx)
-            put("heightPx", generationRequest.heightPx)
-            put("aspectRatio", generationRequest.aspectRatio)
+            generationRequest.widthPx?.let { put("widthPx", it) }
+            generationRequest.heightPx?.let { put("heightPx", it) }
+            generationRequest.aspectRatio?.let { put("aspectRatio", it) }
             put("idempotencyKey", generationRequest.idempotencyKey)
 
-            // Preserve selected wardrobe IDs
-            put("selectedWardrobeIds", json.encodeToString(request.selectedWardrobeIds))
+            put("selectedWardrobeIds", json.encodeToString(request.selectedWardrobeIds.map { it.toString() }))
+            put("selectedReferenceIds", json.encodeToString(request.selectedReferenceIds.map { it.toString() }))
 
-            // Preserve selected reference IDs with roles
-            put("selectedReferenceIds", json.encodeToString(
-                request.selectedReferenceIds
-            ))
+            put(
+                "references",
+                json.encodeToString(
+                    generationRequest.references.map { ref ->
+                        mapOf(
+                            "referenceImageId" to ref.referenceImageId.toString(),
+                            "role" to ref.role,
+                            "weight" to ref.weight.toString(),
+                        )
+                    }
+                )
+            )
 
-            // Preserve reference inputs (with roles assigned by compiler)
-            put("references", json.encodeToString(generationRequest.references))
+            put("metadata", buildJsonObject {
+                generationRequest.clientMetadata.forEach { (k, v) -> put(k, v) }
+                request.conversationId?.let { put("conversationId", it.toString()) }
+                request.turnRequestId?.let { put("turnRequestId", it.toString()) }
+                request.userId?.let { put("userId", it.toString()) }
+            })
+            request.conversationId?.let { put("conversationId", it.toString()) }
+            request.turnRequestId?.let { put("turnRequestId", it.toString()) }
+            request.userId?.let { put("userId", it.toString()) }
 
-            // Preserve metadata from compilation
-            put("metadata", json.encodeToString(generationRequest.clientMetadata))
-
-            // Preserve original scene intent for reconstruction
-            put("sceneIntent", json.encodeToString(request.sceneIntent))
+            put("sceneIntent", buildJsonObject {
+                put("location", request.sceneIntent.environment.location ?: "")
+                put("outfit", request.sceneIntent.appearance.outfit ?: "")
+                put("presentation", request.sceneIntent.subject.presentation ?: "")
+                put("expression", request.sceneIntent.subject.expression ?: "")
+                put("identity", request.sceneIntent.subject.identity ?: "")
+            })
         }
 
-        return json.encodeToString(payload)
+        return json.encodeToString(JsonObject.serializer(), payload)
     }
 }

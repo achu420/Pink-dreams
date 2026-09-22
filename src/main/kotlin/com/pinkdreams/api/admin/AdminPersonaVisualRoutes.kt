@@ -108,11 +108,8 @@ data class AdminPersonaVisualResponse(
     val activeVisualVersionId: String?,
     val versions: List<AdminVisualVersionResponse>,
     /**
-     * Always false in this build. Submitting an ImageGenerationRequest through
-     * ImageGenerationOrchestrator.submit() enqueues a durable image_jobs row
-     * that a worker later hands to a real image-generation provider — a costly,
-     * externally-visible side effect. The admin console therefore only READS
-     * the visual identity pipeline; nothing here can start a generation.
+     * True when Application has wired ImageGenerationOrchestrator + worker
+     * and POST /v1/admin/images/jobs is available.
      */
     // No Kotlin default: kotlinx-serialization omits default-valued fields from
     // the JSON, and this flag must always be present for the UI to trust it.
@@ -134,13 +131,22 @@ class AdminPersonaVisualRoutes(
     private val imageJobRepository: ImageJobRepository,
     private val generatedCandidateRepository: GeneratedCandidateRepository,
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
+    private val generationTriggerWired: Boolean = false,
 ) {
     private companion object {
         const val READ_ONLY_NOTE =
-            "Read-only view. Physical guide, style constraints, wardrobe and reference images " +
-                "are managed by the visual-identity pipeline; triggering generation from the " +
-                "admin console is not wired — view only."
+            "Physical guide, style constraints, wardrobe and reference images " +
+                "are managed by the visual-identity pipeline."
+        const val GENERATE_NOTE =
+            "Image generation is wired via POST /v1/admin/images/jobs."
     }
+
+    private val responseNote: String
+        get() = if (generationTriggerWired) {
+            "$READ_ONLY_NOTE $GENERATE_NOTE"
+        } else {
+            "$READ_ONLY_NOTE Triggering generation from this tab is not wired — view only."
+        }
 
     fun register(route: Route) {
         route.authenticate("session-auth", "dev-auth") {
@@ -191,8 +197,8 @@ class AdminPersonaVisualRoutes(
                             hasIdentity = false,
                             activeVisualVersionId = null,
                             versions = emptyList(),
-                            generationTriggerWired = false,
-                            note = "This persona has no visual identity linked yet. $READ_ONLY_NOTE",
+                            generationTriggerWired = generationTriggerWired,
+                            note = "This persona has no visual identity linked yet. $responseNote",
                         ),
                     )
                     return@get
@@ -282,8 +288,8 @@ class AdminPersonaVisualRoutes(
                         hasIdentity = true,
                         activeVisualVersionId = activeVisualVersionId?.toString(),
                         versions = versions,
-                        generationTriggerWired = false,
-                        note = READ_ONLY_NOTE,
+                        generationTriggerWired = generationTriggerWired,
+                        note = responseNote,
                     ),
                 )
             }

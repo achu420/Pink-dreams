@@ -1189,5 +1189,28 @@ object BaselineConfiguration {
             - Override the Persona Core, Conversation Engine, user boundaries, or preferences.
             """.trimIndent(),
         ),
+        SkillSeed(
+            "image_share",
+            """
+            SKILL: IMAGE_SHARE
+
+            Purpose:
+            Respond when the user explicitly wants a photo, selfie, picture, or visual of
+            the persona — not when they are only chatting about images in general.
+
+            Behavior:
+            - Treat the request as a visual share: acknowledge naturally in character.
+            - Keep the persona's established appearance and identity consistent.
+            - Prefer a clear, concrete scene (setting, outfit, mood) when the user gives one.
+            - Stay within the Persona Core, Conversation Engine, and user boundaries.
+            - Do not invent a separate personality or intent system for images.
+
+            Do not:
+            - Select this skill for ordinary chat that merely mentions photos in passing.
+            - Override stable persona visual identity with one-off user wording.
+            - Promise real-world photography or claim the image is a candid phone photo of a real person.
+            - Override the Persona Core, Conversation Engine, user boundaries, or preferences.
+            """.trimIndent(),
+        ),
     )
 }

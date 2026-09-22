@@ -10,6 +10,8 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
+import kotlinx.serialization.json.jsonObject
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -141,6 +143,24 @@ open class MessageRepository(private val db: Database) {
     }
 
     private fun findConversation(id: UUID) = Conversations.select { Conversations.id eq id }.singleOrNull()
+
+    fun mergeMetadata(messageId: UUID, additions: Map<String, String>): String = transaction(db) {
+        val existing = findById(messageId) ?: throw IllegalArgumentException("Message not found: $messageId")
+        val json = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+        val base = try {
+            json.parseToJsonElement(existing.metadata).jsonObject.toMutableMap()
+        } catch (_: Exception) {
+            mutableMapOf()
+        }
+        additions.forEach { (k, v) ->
+            base[k] = kotlinx.serialization.json.JsonPrimitive(v)
+        }
+        val merged = kotlinx.serialization.json.JsonObject(base).toString()
+        Messages.update({ Messages.id eq messageId }) {
+            it[Messages.metadata] = merged
+        }
+        merged
+    }
 
     private fun rowToModel(row: ResultRow): Message = Message(
         id = row[Messages.id],

@@ -6,10 +6,15 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 
-class HealthRoutes {
+class HealthRoutes(
+    /** Extra non-sensitive fields (e.g. imageStorageMode). Must not include secrets or absolute paths. */
+    private val extras: () -> Map<String, String> = { emptyMap() },
+) {
     fun register(route: Route) {
         route.get("/health") {
-            call.respond(HttpStatusCode.OK, mapOf("status" to "ok"))
+            val body = linkedMapOf<String, String>("status" to "ok")
+            body.putAll(extras())
+            call.respond(HttpStatusCode.OK, body)
         }
     }
 }

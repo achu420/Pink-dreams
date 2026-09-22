@@ -84,7 +84,7 @@ class PhaseIMG4ImageJobInfrastructureTest {
     }
 
     @Test
-    fun `Job 3 - idempotency prevents duplicate creation`() {
+    fun `Job 3 - idempotency returns existing job on duplicate`() {
         val (_, versionId) = createTestVersion()
         val idempotencyKey = "key-3"
 
@@ -95,17 +95,15 @@ class PhaseIMG4ImageJobInfrastructureTest {
             requestPayload = """{"request":"first"}"""
         )
 
-        try {
-            jobRepository.createJob(
-                personaVisualVersionId = versionId,
-                jobType = ImageJobType.IMAGE_GENERATION,
-                idempotencyKey = idempotencyKey,
-                requestPayload = """{"request":"second"}"""
-            )
-            fail("Should have rejected duplicate idempotency key")
-        } catch (e: Exception) {
-            // Expected: unique constraint violation
-        }
+        val second = jobRepository.createJob(
+            personaVisualVersionId = versionId,
+            jobType = ImageJobType.IMAGE_GENERATION,
+            idempotencyKey = idempotencyKey,
+            requestPayload = """{"request":"second"}"""
+        )
+
+        assertEquals(first.id, second.id)
+        assertEquals(first.requestPayload, second.requestPayload)
     }
 
     @Test
@@ -224,7 +222,7 @@ class PhaseIMG4ImageJobInfrastructureTest {
         )
 
         jobRepository.claimJob(job.id, "worker-1")
-        val completed = jobRepository.completeJobSuccess(job.id)
+        val completed = jobRepository.completeJobSuccess(job.id, "worker-1")!!
 
         assertEquals(ImageJobStatus.SUCCEEDED, completed.status)
         assertNotNull(completed.completedAt)
@@ -249,7 +247,7 @@ class PhaseIMG4ImageJobInfrastructureTest {
         assertNotNull(claimed, "Job claim should succeed")
         assertEquals(ImageJobStatus.RUNNING, claimed.status)
 
-        val failed = jobRepository.completeJobFailure(job.id, "error message", shouldRetry = true)
+        val failed = jobRepository.completeJobFailure(job.id, "worker-1", "error message", shouldRetry = true)!!
 
         assertEquals(ImageJobStatus.RETRY_WAIT, failed.status)
         assertEquals(1, failed.attemptCount)
@@ -274,7 +272,7 @@ class PhaseIMG4ImageJobInfrastructureTest {
         )
 
         jobRepository.claimJob(job.id, "worker-1")
-        val failed = jobRepository.completeJobFailure(job.id, "permanent error", shouldRetry = false)
+        val failed = jobRepository.completeJobFailure(job.id, "worker-1", "permanent error", shouldRetry = false)!!
 
         assertEquals(ImageJobStatus.FAILED, failed.status)
         assertEquals(1, failed.attemptCount)
@@ -309,7 +307,7 @@ class PhaseIMG4ImageJobInfrastructureTest {
         )
 
         jobRepository.claimJob(job.id, "worker-1")
-        jobRepository.completeJobSuccess(job.id)
+        jobRepository.completeJobSuccess(job.id, "worker-1")
 
         try {
             jobRepository.cancelJob(job.id)
@@ -332,7 +330,7 @@ class PhaseIMG4ImageJobInfrastructureTest {
         )
 
         jobRepository.claimJob(job.id, "worker-1")
-        jobRepository.completeJobFailure(job.id, "error", shouldRetry = true)
+        jobRepository.completeJobFailure(job.id, "worker-1", "error", shouldRetry = true)
 
         val requeued = jobRepository.requeueRetry(job.id)
         assertEquals(ImageJobStatus.QUEUED, requeued.status)
@@ -402,7 +400,7 @@ class PhaseIMG4ImageJobInfrastructureTest {
         )
 
         jobRepository.claimJob(job.id, "worker-1")
-        jobRepository.completeJobFailure(job.id, "error", shouldRetry = true)
+        jobRepository.completeJobFailure(job.id, "worker-1", "error", shouldRetry = true)
 
         val updated = jobRepository.findById(job.id)!!
         assertEquals(ImageJobStatus.RETRY_WAIT, updated.status)
@@ -543,7 +541,7 @@ class PhaseIMG4ImageJobInfrastructureTest {
         )
 
         jobRepository.claimJob(job.id, "worker-1")
-        jobRepository.completeJobFailure(job.id, "error", shouldRetry = true)
+        jobRepository.completeJobFailure(job.id, "worker-1", "error", shouldRetry = true)
 
         val fromDb = jobRepository.findById(job.id)!!
         assertEquals(ImageJobStatus.RETRY_WAIT, fromDb.status)
@@ -672,12 +670,39 @@ class PhaseIMG4ImageJobInfrastructureTest {
         assertEquals(ImageJobStatus.QUEUED, recovered.status)
         assertNull(recovered.claimedByWorker)
 
-        try {
-            jobRepository.completeJobSuccess(job.id)
-            fail("Should not allow completion of unclaimed job")
-        } catch (e: IllegalArgumentException) {
-            assertTrue(e.message?.contains("RUNNING") ?: false)
-        }
+        assertNull(
+            jobRepository.completeJobSuccess(job.id, "worker-a"),
+            "Stale worker must not complete after lease release",
+        )
+    }
+
+    @Test
+    fun `Verify 28b - stale worker cannot complete after another worker reclaimed`() {
+        val (_, versionId) = createTestVersion()
+
+        val job = jobRepository.createJob(
+            personaVisualVersionId = versionId,
+            jobType = ImageJobType.IMAGE_GENERATION,
+            idempotencyKey = "key-28b",
+            requestPayload = "{}"
+        )
+
+        assertNotNull(jobRepository.claimJob(job.id, "worker-a"))
+        ImageJobWorker(db, "worker-b", NoOpImageJobHandler(), jobRepository)
+            .recoverStaleLeasedJobs(leaseTimeoutSeconds = 0)
+        assertNotNull(jobRepository.claimJob(job.id, "worker-b"))
+
+        assertNull(
+            jobRepository.completeJobSuccess(job.id, "worker-a"),
+            "Worker A must not complete after Worker B owns the lease",
+        )
+        val current = jobRepository.findById(job.id)!!
+        assertEquals(ImageJobStatus.RUNNING, current.status)
+        assertEquals("worker-b", current.claimedByWorker)
+
+        val completed = jobRepository.completeJobSuccess(job.id, "worker-b")
+        assertNotNull(completed)
+        assertEquals(ImageJobStatus.SUCCEEDED, completed.status)
     }
 
     @Test
@@ -696,7 +721,7 @@ class PhaseIMG4ImageJobInfrastructureTest {
         assertNotNull(claimed, "Job claim should succeed")
         assertEquals(ImageJobStatus.RUNNING, claimed.status)
 
-        jobRepository.completeJobFailure(job.id, "permanent error", shouldRetry = false)
+        jobRepository.completeJobFailure(job.id, "worker-1", "permanent error", shouldRetry = false)
 
         val failed = jobRepository.findById(job.id)!!
         assertEquals(ImageJobStatus.FAILED, failed.status)

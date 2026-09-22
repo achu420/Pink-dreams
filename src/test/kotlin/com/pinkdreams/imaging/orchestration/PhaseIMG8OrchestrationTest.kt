@@ -255,6 +255,35 @@ class PhaseIMG8OrchestrationTest {
         assertEquals(0, candidates.size, "Failed persistence should not create incomplete records")
     }
 
+    @Test
+    fun `retry persist replaces prior candidate rows - no duplicates`() {
+        val jobId = UUID.randomUUID()
+        val bytes1 = ByteArray(50) { 1 }
+        val bytes2 = ByteArray(50) { 2 }
+
+        val first = GenerationResult(
+            status = GenerationStatus.COMPLETED,
+            jobHandle = ProviderJobHandle(externalJobId = "t1", providerIdentifier = "test"),
+            candidates = listOf(
+                GeneratedCandidate(id = UUID.randomUUID(), imageData = bytes1, widthPx = 256, heightPx = 256)
+            )
+        )
+        assertTrue(handler.persistCandidates(jobId, first) is ImageJobResult.Success)
+        assertEquals(1, candidateRepo.findByImageJob(jobId).size)
+
+        val second = GenerationResult(
+            status = GenerationStatus.COMPLETED,
+            jobHandle = ProviderJobHandle(externalJobId = "t2", providerIdentifier = "test"),
+            candidates = listOf(
+                GeneratedCandidate(id = UUID.randomUUID(), imageData = bytes2, widthPx = 256, heightPx = 256)
+            )
+        )
+        assertTrue(handler.persistCandidates(jobId, second) is ImageJobResult.Success)
+        val after = candidateRepo.findByImageJob(jobId)
+        assertEquals(1, after.size, "retry must replace, not duplicate candidate rows")
+        assertEquals(calculateChecksum(bytes2), after.single().checksum)
+    }
+
     // ==================== Test Helpers ====================
 
     private class TestImageProvider : com.pinkdreams.imaging.provider.ImageProvider {

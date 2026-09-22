@@ -109,6 +109,7 @@ object IntentEngineDefaultContent {
         problem_solving         = the user wants help solving a concrete problem or making a plan
         learning                = the user's primary goal is learning or understanding a subject
         entertainment           = the user primarily wants fun: games, jokes, stories, debates, media discussion, or roleplay for its own sake
+        image_share             = the user explicitly wants a photo, selfie, picture, or visual of THIS persona
 
         DO NOT OVER-ESCALATE
         Do not select flirting, romantic_conversation, romantic_intimacy, foreplay, or
@@ -139,6 +140,8 @@ object IntentEngineDefaultContent {
           emotional_support when the immediate need is being heard right now.
         - encouragement vs emotional_support: use encouragement when the user wants
           motivation/celebration around a goal, not comfort for a difficulty.
+        - image_share vs entertainment: image_share = the user wants a visual of the
+          persona now; entertainment = fun/games/stories without requesting an image.
 
         ADDITIONAL DISAMBIGUATION
         - dating vs confidence_building: dating = a specific dating situation/person;

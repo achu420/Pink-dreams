@@ -43,7 +43,26 @@ interface ObjectStorage {
     fun delete(key: String): Boolean
 
     fun exists(key: String): Boolean
+
+    /** Optional readiness probe for ops diagnostics. Default: unsupported. */
+    fun probeReadiness(): StorageReadiness = StorageReadiness(
+        mode = "unknown",
+        rootLabel = null,
+        readable = false,
+        writable = false,
+        probeOk = false,
+        detail = "Probe not implemented for this storage backend",
+    )
 }
+
+data class StorageReadiness(
+    val mode: String,
+    val rootLabel: String?,
+    val readable: Boolean,
+    val writable: Boolean,
+    val probeOk: Boolean,
+    val detail: String,
+)
 
 fun buildStorageKey(personaIdentityId: UUID, visualVersionId: UUID, referenceId: UUID): String {
     return "personas/$personaIdentityId/visual-versions/$visualVersionId/references/$referenceId"

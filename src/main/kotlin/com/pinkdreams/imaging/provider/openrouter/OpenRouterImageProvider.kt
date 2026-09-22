@@ -19,8 +19,8 @@ data class OpenRouterImageRequest(
     val n: Int = 1,
     val resolution: String? = null,
     val aspect_ratio: String? = null,
-    val quality: String = "standard",
-    val output_format: String = "b64_json",
+    val quality: String = "auto",
+    val output_format: String = "png",
     val input_references: List<OpenRouterReference>? = null,
 )
 
@@ -60,7 +60,7 @@ class OpenRouterImageProvider(
     private val imageModel: String = "openai/gpt-image-2.5-flare",
     private val connectTimeoutSeconds: Int = 10,
     private val readTimeoutSeconds: Int = 300,
-    private val outputFormat: String = "b64_json",
+    private val outputFormat: String = "png",
     private val objectStorage: ObjectStorage? = null,
     private val referenceImageRepository: ReferenceImageRepository? = null,
 ) : ImageProvider {
@@ -324,21 +324,51 @@ class OpenRouterImageProvider(
             prompt = request.prompt,
             n = request.candidateCount,
             resolution = determineResolution(request.widthPx, request.heightPx),
-            aspect_ratio = request.aspectRatio,
-            quality = "standard",
-            output_format = outputFormat,
+            aspect_ratio = request.aspectRatio ?: determineAspectRatio(request.widthPx, request.heightPx),
+            quality = "auto",
+            output_format = normalizeOutputFormat(outputFormat),
             input_references = references,
         )
     }
 
+    /**
+     * OpenRouter expects resolution tiers: 512 | 1K | 2K | 4K
+     * (not legacy WxH strings such as 1024x1024).
+     */
     private fun determineResolution(widthPx: Int?, heightPx: Int?): String? {
-        if (widthPx == null || heightPx == null) return null
-
+        if (widthPx == null && heightPx == null) return null
+        val maxSide = maxOf(widthPx ?: 0, heightPx ?: 0)
         return when {
-            widthPx == 1024 && heightPx == 1024 -> "1024x1024"
-            widthPx == 1792 && heightPx == 1024 -> "1792x1024"
-            widthPx == 1024 && heightPx == 1792 -> "1024x1792"
-            else -> "${widthPx}x${heightPx}"
+            maxSide <= 0 -> null
+            maxSide <= 768 -> "512"
+            maxSide <= 1536 -> "1K"
+            maxSide <= 3072 -> "2K"
+            else -> "4K"
+        }
+    }
+
+    private fun determineAspectRatio(widthPx: Int?, heightPx: Int?): String? {
+        if (widthPx == null || heightPx == null || widthPx <= 0 || heightPx <= 0) return null
+        if (widthPx == heightPx) return "1:1"
+        // Prefer a small set of common ratios; otherwise omit and let the provider decide.
+        val ratio = widthPx.toDouble() / heightPx.toDouble()
+        return when {
+            kotlin.math.abs(ratio - 16.0 / 9.0) < 0.08 -> "16:9"
+            kotlin.math.abs(ratio - 9.0 / 16.0) < 0.08 -> "9:16"
+            kotlin.math.abs(ratio - 4.0 / 3.0) < 0.08 -> "4:3"
+            kotlin.math.abs(ratio - 3.0 / 4.0) < 0.08 -> "3:4"
+            kotlin.math.abs(ratio - 3.0 / 2.0) < 0.08 -> "3:2"
+            kotlin.math.abs(ratio - 2.0 / 3.0) < 0.08 -> "2:3"
+            else -> null
+        }
+    }
+
+    private fun normalizeOutputFormat(configured: String): String {
+        return when (configured.lowercase()) {
+            "png", "jpeg", "jpg", "webp", "svg" -> if (configured.equals("jpg", true)) "jpeg" else configured.lowercase()
+            // Legacy config value from earlier OpenRouter drafts; response still uses b64_json payload field.
+            "b64_json" -> "png"
+            else -> "png"
         }
     }
 
