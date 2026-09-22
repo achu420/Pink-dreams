@@ -220,7 +220,7 @@ Evidence:
 
 ```text
 Branch: cursor/claude-work-followup
-Commit: (set on commit)
+Commit: 958e28b
 Push: no
 ```
 
