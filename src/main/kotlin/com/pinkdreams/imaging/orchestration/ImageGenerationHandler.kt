@@ -116,6 +116,9 @@ class ImageGenerationHandler(
         providerResult: com.pinkdreams.imaging.provider.GenerationResult,
     ): ImageJobResult {
         return try {
+            // Retries / partial failures must not leave duplicate candidate rows.
+            generatedCandidateRepository.deleteByImageJob(imageJobId)
+
             val candidates = mutableListOf<String>()
 
             providerResult.candidates.forEachIndexed { index, candidate ->

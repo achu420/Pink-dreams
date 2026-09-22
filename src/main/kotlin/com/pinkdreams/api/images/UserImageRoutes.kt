@@ -3,6 +3,7 @@ package com.pinkdreams.api.images
 import com.pinkdreams.common.errors.ApiError
 import com.pinkdreams.common.errors.ErrorCode
 import com.pinkdreams.common.errors.ErrorResponse
+import com.pinkdreams.imaging.observability.ImageGenerationEventRepository
 import com.pinkdreams.imaging.orchestration.GeneratedCandidateRepository
 import com.pinkdreams.imaging.orchestration.ImageGenerationService
 import com.pinkdreams.persistence.repositories.ConversationRepository
@@ -84,7 +85,7 @@ class UserImageRoutes(
                         status = job.status.name,
                         conversationId = extractConversationId(job.requestPayload)?.toString(),
                         attemptCount = job.attemptCount,
-                        lastError = job.lastError?.take(500),
+                        lastError = ImageGenerationEventRepository.redactSecrets(job.lastError)?.take(500),
                         createdAt = job.createdAt.toString(),
                         completedAt = job.completedAt?.toString(),
                     )
@@ -114,7 +115,7 @@ class UserImageRoutes(
                     UserImageResultResponse(
                         jobId = job.id.toString(),
                         status = job.status.name,
-                        lastError = job.lastError?.take(500),
+                        lastError = ImageGenerationEventRepository.redactSecrets(job.lastError)?.take(500),
                         candidates = candidates,
                     )
                 )

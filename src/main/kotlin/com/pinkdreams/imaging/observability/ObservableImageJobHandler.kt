@@ -3,6 +3,9 @@ package com.pinkdreams.imaging.observability
 import com.pinkdreams.imaging.job.ImageJob
 import com.pinkdreams.imaging.job.ImageJobHandler
 import com.pinkdreams.imaging.job.ImageJobResult
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import java.time.Duration
 import java.time.LocalDateTime
 import java.util.UUID
@@ -16,6 +19,8 @@ class ObservableImageJobHandler(
     private val providerId: String,
     private val model: String?,
 ) : ImageJobHandler {
+
+    private val json = Json { ignoreUnknownKeys = true }
 
     override fun handle(job: ImageJob): ImageJobResult {
         val started = LocalDateTime.now()
@@ -46,13 +51,14 @@ class ObservableImageJobHandler(
                 null,
             )
         }
+        val attribution = extractAttribution(job.requestPayload)
         eventRepository.record(
             ImageGenerationEvent(
                 id = UUID.randomUUID(),
                 imageJobId = job.id,
-                turnRequestId = null,
-                conversationId = null,
-                personaId = null,
+                turnRequestId = attribution.turnRequestId,
+                conversationId = attribution.conversationId,
+                personaId = attribution.personaId,
                 personaVisualVersionId = job.personaVisualVersionId,
                 provider = providerId,
                 model = model,
@@ -71,10 +77,44 @@ class ObservableImageJobHandler(
         )
     }
 
+    private fun extractAttribution(requestPayload: String): Attribution {
+        return try {
+            val root = json.parseToJsonElement(requestPayload).jsonObject
+            val meta = root["metadata"]?.jsonObject
+            fun uuidAt(vararg keys: String): UUID? {
+                for (k in keys) {
+                    val raw = meta?.get(k)?.jsonPrimitive?.content
+                        ?: root[k]?.jsonPrimitive?.content
+                    if (raw != null) {
+                        return try {
+                            UUID.fromString(raw)
+                        } catch (_: Exception) {
+                            null
+                        }
+                    }
+                }
+                return null
+            }
+            Attribution(
+                conversationId = uuidAt("conversationId"),
+                turnRequestId = uuidAt("turnRequestId", "requestId"),
+                personaId = uuidAt("personaId"),
+            )
+        } catch (_: Exception) {
+            Attribution(null, null, null)
+        }
+    }
+
     private fun parseAssetCount(metadata: String): Int? {
         val match = Regex(""""candidateCount"\s*:\s*"?(\d+)""").find(metadata)
         return match?.groupValues?.getOrNull(1)?.toIntOrNull()
     }
+
+    private data class Attribution(
+        val conversationId: UUID?,
+        val turnRequestId: UUID?,
+        val personaId: UUID?,
+    )
 
     private data class Quad<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
 }

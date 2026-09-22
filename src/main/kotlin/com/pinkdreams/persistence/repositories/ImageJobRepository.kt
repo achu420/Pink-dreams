@@ -146,7 +146,7 @@ class ImageJobRepository(private val db: Database) {
             ImageJobs.update({ ImageJobs.id eq jobId }) {
                 it[ImageJobs.status] = ImageJobStatus.RETRY_WAIT.name
                 it[ImageJobs.attemptCount] = nextAttemptCount
-                it[ImageJobs.lastError] = errorMessage
+                it[ImageJobs.lastError] = com.pinkdreams.imaging.observability.ImageGenerationEventRepository.redactSecrets(errorMessage)
                 it[ImageJobs.availableAt] = now.plusSeconds(60)
                 it[ImageJobs.claimedByWorker] = null
                 it[ImageJobs.claimedAt] = null
@@ -155,7 +155,7 @@ class ImageJobRepository(private val db: Database) {
             ImageJobs.update({ ImageJobs.id eq jobId }) {
                 it[ImageJobs.status] = ImageJobStatus.FAILED.name
                 it[ImageJobs.attemptCount] = nextAttemptCount
-                it[ImageJobs.lastError] = errorMessage
+                it[ImageJobs.lastError] = com.pinkdreams.imaging.observability.ImageGenerationEventRepository.redactSecrets(errorMessage)
                 it[ImageJobs.completedAt] = now
                 it[ImageJobs.claimedByWorker] = null
                 it[ImageJobs.claimedAt] = null
