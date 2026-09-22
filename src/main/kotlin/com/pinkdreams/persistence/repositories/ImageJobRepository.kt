@@ -106,11 +106,12 @@ class ImageJobRepository(private val db: Database) {
 
     fun claimJob(jobId: UUID, workerName: String): ImageJob? = transaction(db) {
         val now = LocalDateTime.now()
-
+        // plusSeconds(1) absorbs H2/TIMESTAMP rounding so a just-inserted QUEUED
+        // row remains claimable when availableAt lands slightly ahead of wall clock.
         val updated = ImageJobs.update({
             (ImageJobs.id eq jobId) and
             (ImageJobs.status eq ImageJobStatus.QUEUED.name) and
-            (ImageJobs.availableAt lessEq now)
+            (ImageJobs.availableAt lessEq now.plusSeconds(1))
         }) {
             it[ImageJobs.status] = ImageJobStatus.RUNNING.name
             it[ImageJobs.claimedByWorker] = workerName
@@ -119,6 +120,23 @@ class ImageJobRepository(private val db: Database) {
         }
 
         if (updated > 0) findById(jobId) else null
+    }
+
+    /**
+     * Heartbeat: refreshes [ImageJobs.claimedAt] only while the job remains
+     * RUNNING and leased to [workerName]. Returns false if ownership was lost
+     * or the job is already terminal.
+     */
+    fun renewLease(jobId: UUID, workerName: String): Boolean = transaction(db) {
+        val now = LocalDateTime.now()
+        val updated = ImageJobs.update({
+            (ImageJobs.id eq jobId) and
+                (ImageJobs.status eq ImageJobStatus.RUNNING.name) and
+                (ImageJobs.claimedByWorker eq workerName)
+        }) {
+            it[ImageJobs.claimedAt] = now
+        }
+        updated > 0
     }
 
     /**
@@ -227,7 +245,12 @@ class ImageJobRepository(private val db: Database) {
     }
 
     fun findStaleLeasedJobs(leaseTimeoutSeconds: Long): List<ImageJob> = transaction(db) {
-        val cutoffTime = LocalDateTime.now().minusSeconds(leaseTimeoutSeconds)
+        val cutoffTime = if (leaseTimeoutSeconds <= 0L) {
+            // Immediate reclaim (tests / forced recovery): include current second.
+            LocalDateTime.now().plusSeconds(1)
+        } else {
+            LocalDateTime.now().minusSeconds(leaseTimeoutSeconds)
+        }
         ImageJobs.select {
             (ImageJobs.status eq ImageJobStatus.RUNNING.name) and
             (ImageJobs.claimedAt.isNotNull()) and

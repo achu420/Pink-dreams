@@ -170,9 +170,29 @@ Admin UI: Generate remains wired; storage status is **API-only** (document gap �
 
 1. No cloud object-store adapter (intentional deferral)  
 2. Admin UI does not yet display storage diagnostics (API exists)  
-3. Lease heartbeat for long generations  
-4. OpenRouter live smoke  
-5. Real multi-process Postgres soak  
+3. OpenRouter live smoke  
+4. Real multi-process Postgres soak  
+
+---
+
+## Lease lifecycle & heartbeat
+
+```text
+claimJob → RUNNING + claimedByWorker + claimedAt
+   ↓
+ImageJobLeaseHeartbeat renews claimedAt while provider runs
+   ↓
+completeJobSuccess/Failure only if claimedByWorker still matches
+   ↓
+heartbeat stopped in finally
+```
+
+| Env | Default | Role |
+|-----|---------|------|
+| `IMAGE_WORKER_LEASE_SECONDS` | 300 | Stale if `claimedAt` older than this |
+| `IMAGE_WORKER_HEARTBEAT_SECONDS` | `lease/3` (min 15, max lease-1) | Renew interval during handle; `0` disables |
+
+Invariants: only lease owner renews/completes; lost renew stops heartbeat and logs; stale completion still rejected; terminal jobs are not heartbeated (heartbeat closed after handle).
 
 ---
 
@@ -180,7 +200,7 @@ Admin UI: Generate remains wired; storage status is **API-only** (document gap �
 
 ```text
 Branch: cursor/claude-work-followup
-Commit: 6870b05
+Commit: (set on commit)
 Push: no
 ```
 
@@ -199,4 +219,4 @@ Push: no
 
 ## Next recommended task
 
-After ops confirms a shared volume in the target environment: optional **lease heartbeat**, then gated **OpenRouter live smoke**. Object-store (S3/etc.) only if shared filesystem is not available.
+Gated **OpenRouter live smoke** (when credentials available), or real Postgres multi-process soak with shared `IMAGE_STORAGE_DIR`. Object-store (S3/etc.) only if shared filesystem is not available.

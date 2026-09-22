@@ -10,19 +10,35 @@ class ImageJobWorker(
     private val jobRepository: com.pinkdreams.persistence.repositories.ImageJobRepository =
         com.pinkdreams.persistence.repositories.ImageJobRepository(db),
     private val completionAttach: ((job: ImageJob, succeeded: Boolean) -> Unit)? = null,
+    /**
+     * How often to renew [claimedAt] during provider execution.
+     * Must be less than the lease timeout. `0` disables heartbeat (tests).
+     */
+    private val heartbeatIntervalSeconds: Long =
+        System.getenv("IMAGE_WORKER_HEARTBEAT_SECONDS")?.toLongOrNull()
+            ?: defaultHeartbeatInterval(),
 ) {
 
     fun processPendingJobs(maxBatchSize: Int = 10): Int {
         val pendingJobs = jobRepository.findByStatus(ImageJobStatus.QUEUED, limit = maxBatchSize)
         var processed = 0
+        val now = LocalDateTime.now()
 
         for (job in pendingJobs) {
-            if (LocalDateTime.now() < job.availableAt) {
+            // 1s skew matches claimJob TIMESTAMP rounding tolerance.
+            if (now.plusSeconds(1) < job.availableAt) {
                 continue
             }
 
             val claimed = jobRepository.claimJob(job.id, workerName) ?: continue
+            val heartbeat = ImageJobLeaseHeartbeat(
+                jobRepository = jobRepository,
+                jobId = claimed.id,
+                workerName = workerName,
+                intervalSeconds = heartbeatIntervalSeconds,
+            )
             try {
+                heartbeat.start()
                 val result = jobHandler.handle(claimed)
                 when (result) {
                     is ImageJobResult.Success -> {
@@ -32,7 +48,8 @@ class ImageJobWorker(
                             processed++
                         } else {
                             System.err.println(
-                                "IMAGE_WORKER: lease lost after success job=${claimed.id} worker=$workerName",
+                                "IMAGE_WORKER: lease lost after success job=${claimed.id} worker=$workerName " +
+                                    "heartbeatLost=${heartbeat.hasLostLease()}",
                             )
                         }
                     }
@@ -50,7 +67,8 @@ class ImageJobWorker(
                             processed++
                         } else {
                             System.err.println(
-                                "IMAGE_WORKER: lease lost after failure job=${claimed.id} worker=$workerName",
+                                "IMAGE_WORKER: lease lost after failure job=${claimed.id} worker=$workerName " +
+                                    "heartbeatLost=${heartbeat.hasLostLease()}",
                             )
                         }
                     }
@@ -68,6 +86,8 @@ class ImageJobWorker(
                     }
                     processed++
                 }
+            } finally {
+                heartbeat.close()
             }
         }
 
@@ -131,6 +151,16 @@ class ImageJobWorker(
             System.err.println(
                 "IMAGE_WORKER: completion attach failed job=${job.id}: ${e.message}",
             )
+        }
+    }
+
+    companion object {
+        fun defaultHeartbeatInterval(
+            leaseSeconds: Long = System.getenv("IMAGE_WORKER_LEASE_SECONDS")?.toLongOrNull() ?: 300L,
+        ): Long {
+            // Renew often enough that a healthy worker is never considered stale.
+            val derived = (leaseSeconds / 3).coerceAtLeast(15L)
+            return derived.coerceAtMost(leaseSeconds.coerceAtLeast(1L) - 1L).coerceAtLeast(1L)
         }
     }
 }
