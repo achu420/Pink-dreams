@@ -121,48 +121,64 @@ class ImageJobRepository(private val db: Database) {
         if (updated > 0) findById(jobId) else null
     }
 
-    fun completeJobSuccess(jobId: UUID): ImageJob = transaction(db) {
-        val job = findById(jobId) ?: throw IllegalArgumentException("Job not found: $jobId")
-        require(job.status == ImageJobStatus.RUNNING) { "Only RUNNING jobs can be completed" }
-
+    /**
+     * Completes a job only if it is still RUNNING and leased to [workerName].
+     * Returns null when the lease was lost (stale recovery / another worker).
+     */
+    fun completeJobSuccess(jobId: UUID, workerName: String): ImageJob? = transaction(db) {
         val now = LocalDateTime.now()
-        ImageJobs.update({ ImageJobs.id eq jobId }) {
+        val updated = ImageJobs.update({
+            (ImageJobs.id eq jobId) and
+                (ImageJobs.status eq ImageJobStatus.RUNNING.name) and
+                (ImageJobs.claimedByWorker eq workerName)
+        }) {
             it[ImageJobs.status] = ImageJobStatus.SUCCEEDED.name
             it[ImageJobs.completedAt] = now
             it[ImageJobs.claimedByWorker] = null
+            it[ImageJobs.claimedAt] = null
         }
-
-        findById(jobId)!!
+        if (updated > 0) findById(jobId) else null
     }
 
-    fun completeJobFailure(jobId: UUID, errorMessage: String, shouldRetry: Boolean): ImageJob = transaction(db) {
-        val job = findById(jobId) ?: throw IllegalArgumentException("Job not found: $jobId")
-        require(job.status == ImageJobStatus.RUNNING) { "Only RUNNING jobs can be failed" }
+    /**
+     * Fails a job only if still RUNNING and leased to [workerName].
+     * Returns null when the lease was lost.
+     */
+    fun completeJobFailure(
+        jobId: UUID,
+        workerName: String,
+        errorMessage: String,
+        shouldRetry: Boolean,
+    ): ImageJob? = transaction(db) {
+        val job = findById(jobId) ?: return@transaction null
+        if (job.status != ImageJobStatus.RUNNING || job.claimedByWorker != workerName) {
+            return@transaction null
+        }
 
         val now = LocalDateTime.now()
         val nextAttemptCount = job.attemptCount + 1
+        val redacted = com.pinkdreams.imaging.observability.ImageGenerationEventRepository.redactSecrets(errorMessage)
+        val retry = shouldRetry && nextAttemptCount < job.maxAttempts
 
-        if (shouldRetry && nextAttemptCount < job.maxAttempts) {
-            ImageJobs.update({ ImageJobs.id eq jobId }) {
+        val updated = ImageJobs.update({
+            (ImageJobs.id eq jobId) and
+                (ImageJobs.status eq ImageJobStatus.RUNNING.name) and
+                (ImageJobs.claimedByWorker eq workerName)
+        }) {
+            if (retry) {
                 it[ImageJobs.status] = ImageJobStatus.RETRY_WAIT.name
-                it[ImageJobs.attemptCount] = nextAttemptCount
-                it[ImageJobs.lastError] = com.pinkdreams.imaging.observability.ImageGenerationEventRepository.redactSecrets(errorMessage)
                 it[ImageJobs.availableAt] = now.plusSeconds(60)
-                it[ImageJobs.claimedByWorker] = null
-                it[ImageJobs.claimedAt] = null
-            }
-        } else {
-            ImageJobs.update({ ImageJobs.id eq jobId }) {
+            } else {
                 it[ImageJobs.status] = ImageJobStatus.FAILED.name
-                it[ImageJobs.attemptCount] = nextAttemptCount
-                it[ImageJobs.lastError] = com.pinkdreams.imaging.observability.ImageGenerationEventRepository.redactSecrets(errorMessage)
                 it[ImageJobs.completedAt] = now
-                it[ImageJobs.claimedByWorker] = null
-                it[ImageJobs.claimedAt] = null
             }
+            it[ImageJobs.attemptCount] = nextAttemptCount
+            it[ImageJobs.lastError] = redacted
+            it[ImageJobs.claimedByWorker] = null
+            it[ImageJobs.claimedAt] = null
         }
 
-        findById(jobId)!!
+        if (updated > 0) findById(jobId) else null
     }
 
     fun cancelJob(jobId: UUID): ImageJob = transaction(db) {

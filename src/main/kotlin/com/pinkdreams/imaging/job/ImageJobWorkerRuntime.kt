@@ -11,6 +11,8 @@ class ImageJobWorkerRuntime(
     private val worker: ImageJobWorker,
     private val pollIntervalMs: Long = System.getenv("IMAGE_WORKER_POLL_MS")?.toLongOrNull() ?: 2_000L,
     private val batchSize: Int = System.getenv("IMAGE_WORKER_BATCH")?.toIntOrNull() ?: 5,
+    private val leaseTimeoutSeconds: Long =
+        System.getenv("IMAGE_WORKER_LEASE_SECONDS")?.toLongOrNull() ?: 300L,
 ) {
     private val running = AtomicBoolean(false)
     private val executor = Executors.newSingleThreadScheduledExecutor { r ->
@@ -21,9 +23,10 @@ class ImageJobWorkerRuntime(
         if (!running.compareAndSet(false, true)) return
         executor.scheduleWithFixedDelay({
             try {
-                worker.recoverStaleLeasedJobs()
+                worker.recoverStaleLeasedJobs(leaseTimeoutSeconds)
                 worker.processRetryableJobs(batchSize)
                 worker.processPendingJobs(batchSize)
+                worker.reconcileMessageAttachments(batchSize)
             } catch (e: Exception) {
                 System.err.println("image-job-worker tick failed: ${e.message}")
             }

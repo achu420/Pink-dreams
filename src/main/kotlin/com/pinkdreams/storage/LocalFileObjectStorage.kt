@@ -32,13 +32,28 @@ class LocalFileObjectStorage(
 
         val target = resolveSafe(key)
         target.parent?.createDirectories()
-        Files.write(
-            target,
-            content,
-            StandardOpenOption.CREATE,
-            StandardOpenOption.TRUNCATE_EXISTING,
-            StandardOpenOption.WRITE,
-        )
+        val tmp = Files.createTempFile(target.parent, ".upload-", ".tmp")
+        try {
+            Files.write(
+                tmp,
+                content,
+                StandardOpenOption.WRITE,
+                StandardOpenOption.TRUNCATE_EXISTING,
+            )
+            try {
+                Files.move(
+                    tmp,
+                    target,
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE,
+                )
+            } catch (_: java.nio.file.AtomicMoveNotSupportedException) {
+                Files.move(tmp, target, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+            }
+        } catch (e: Exception) {
+            Files.deleteIfExists(tmp)
+            throw e
+        }
         // Sidecar for content type (simple, no external metadata store required)
         Files.writeString(
             contentTypeSidecar(target),

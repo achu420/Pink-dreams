@@ -2,7 +2,6 @@ package com.pinkdreams.imaging.job
 
 import org.jetbrains.exposed.sql.Database
 import java.time.LocalDateTime
-import java.util.UUID
 
 class ImageJobWorker(
     private val db: Database,
@@ -27,32 +26,48 @@ class ImageJobWorker(
                 val result = jobHandler.handle(claimed)
                 when (result) {
                     is ImageJobResult.Success -> {
-                        val completed = jobRepository.completeJobSuccess(claimed.id)
-                        notifyCompletion(completed, succeeded = true)
-                        processed++
+                        val completed = jobRepository.completeJobSuccess(claimed.id, workerName)
+                        if (completed != null) {
+                            notifyCompletion(completed, succeeded = true)
+                            processed++
+                        } else {
+                            System.err.println(
+                                "IMAGE_WORKER: lease lost after success job=${claimed.id} worker=$workerName",
+                            )
+                        }
                     }
                     is ImageJobResult.Failure -> {
                         val failed = jobRepository.completeJobFailure(
                             claimed.id,
+                            workerName,
                             result.errorMessage,
                             shouldRetry = result.retryable,
                         )
-                        if (failed.status == ImageJobStatus.FAILED) {
-                            notifyCompletion(failed, succeeded = false)
+                        if (failed != null) {
+                            if (failed.status == ImageJobStatus.FAILED) {
+                                notifyCompletion(failed, succeeded = false)
+                            }
+                            processed++
+                        } else {
+                            System.err.println(
+                                "IMAGE_WORKER: lease lost after failure job=${claimed.id} worker=$workerName",
+                            )
                         }
-                        processed++
                     }
                 }
             } catch (e: Exception) {
                 val failed = jobRepository.completeJobFailure(
                     claimed.id,
+                    workerName,
                     "Unexpected error: ${e.message}",
                     shouldRetry = true,
                 )
-                if (failed.status == ImageJobStatus.FAILED) {
-                    notifyCompletion(failed, succeeded = false)
+                if (failed != null) {
+                    if (failed.status == ImageJobStatus.FAILED) {
+                        notifyCompletion(failed, succeeded = false)
+                    }
+                    processed++
                 }
-                processed++
             }
         }
 
@@ -83,6 +98,30 @@ class ImageJobWorker(
         }
 
         return recovered
+    }
+
+    /**
+     * Idempotent re-attach for SUCCEEDED/FAILED conversation-scoped jobs whose
+     * chat metadata may have been lost after a crash between terminal status and attach.
+     */
+    fun reconcileMessageAttachments(maxBatchSize: Int = 10): Int {
+        if (completionAttach == null) return 0
+        var n = 0
+        for (job in jobRepository.findRecent(limit = maxBatchSize * 3)) {
+            if (n >= maxBatchSize) break
+            when (job.status) {
+                ImageJobStatus.SUCCEEDED -> {
+                    notifyCompletion(job, succeeded = true)
+                    n++
+                }
+                ImageJobStatus.FAILED -> {
+                    notifyCompletion(job, succeeded = false)
+                    n++
+                }
+                else -> Unit
+            }
+        }
+        return n
     }
 
     private fun notifyCompletion(job: ImageJob, succeeded: Boolean) {

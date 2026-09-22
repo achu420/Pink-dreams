@@ -74,9 +74,10 @@ class PhaseIMGSecurityAndRetentionTest {
         repo.claimJob(job.id, "w")
         val failed = repo.completeJobFailure(
             job.id,
+            "w",
             "provider rejected Authorization: Bearer sk-abcdefghijklmnop",
             shouldRetry = false,
-        )
+        )!!
         assertFalse(failed.lastError!!.contains("sk-abcdefghijklmnop"))
         assertTrue(failed.lastError!!.contains("REDACTED") || failed.lastError!!.contains("[REDACTED"))
     }
