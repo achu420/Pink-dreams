@@ -52,6 +52,7 @@ class ObservableImageJobHandler(
             )
         }
         val attribution = extractAttribution(job.requestPayload)
+        val resolvedModel = attribution.modelId ?: model
         eventRepository.record(
             ImageGenerationEvent(
                 id = UUID.randomUUID(),
@@ -61,7 +62,7 @@ class ObservableImageJobHandler(
                 personaId = attribution.personaId,
                 personaVisualVersionId = job.personaVisualVersionId,
                 provider = providerId,
-                model = model,
+                model = resolvedModel,
                 attempt = job.attemptCount,
                 outcome = outcome,
                 errorClass = errorClass,
@@ -99,9 +100,11 @@ class ObservableImageJobHandler(
                 conversationId = uuidAt("conversationId"),
                 turnRequestId = uuidAt("turnRequestId", "requestId"),
                 personaId = uuidAt("personaId"),
+                modelId = root["modelId"]?.jsonPrimitive?.content
+                    ?: meta?.get("modelId")?.jsonPrimitive?.content,
             )
         } catch (_: Exception) {
-            Attribution(null, null, null)
+            Attribution(null, null, null, null)
         }
     }
 
@@ -114,6 +117,7 @@ class ObservableImageJobHandler(
         val conversationId: UUID?,
         val turnRequestId: UUID?,
         val personaId: UUID?,
+        val modelId: String?,
     )
 
     private data class Quad<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)

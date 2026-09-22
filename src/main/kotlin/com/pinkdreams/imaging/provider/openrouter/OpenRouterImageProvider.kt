@@ -69,7 +69,9 @@ class OpenRouterImageProvider(
 
     // Verified capability profile for openai/gpt-image-2.5-flare
     // Source: https://openrouter.ai/api/v1/images/models
-    override val capabilities: ProviderCapabilities = when (imageModel) {
+    override val capabilities: ProviderCapabilities = capabilitiesFor(imageModel)
+
+    private fun capabilitiesFor(model: String): ProviderCapabilities = when (model) {
         "openai/gpt-image-2.5-flare", "openai/gpt-image-2.5-sunburst" -> ProviderCapabilities(
             maxCandidateCount = 10,
             supportsReferences = true,
@@ -96,6 +98,9 @@ class OpenRouterImageProvider(
         )
     }
 
+    private fun effectiveModel(request: GenerationRequest): String =
+        request.modelId?.takeIf { it.isNotBlank() } ?: imageModel
+
     private val json = Json { ignoreUnknownKeys = true }
     private val requestCache = mutableMapOf<String, Pair<OpenRouterImageResponse, List<ByteArray>>>()
 
@@ -113,27 +118,28 @@ class OpenRouterImageProvider(
             )
         }
 
-        // Validate candidate count against model capability
-        if (request.candidateCount > capabilities.maxCandidateCount) {
+        // Validate candidate count against model capability (respect per-request model override)
+        val caps = capabilitiesFor(effectiveModel(request))
+        if (request.candidateCount > caps.maxCandidateCount) {
             return GenerationResult(
                 jobHandle = ProviderJobHandle(providerId, "invalid"),
                 status = GenerationStatus.FAILED,
                 error = GenerationError(
                     code = "VALIDATION_ERROR",
-                    message = "Model supports maximum ${capabilities.maxCandidateCount} candidates, but ${request.candidateCount} requested",
+                    message = "Model supports maximum ${caps.maxCandidateCount} candidates, but ${request.candidateCount} requested",
                     retryable = false,
                 ),
             )
         }
 
         // Validate aspect ratio if provided
-        if (request.aspectRatio != null && !capabilities.supportedAspectRatios.contains(request.aspectRatio)) {
+        if (request.aspectRatio != null && !caps.supportedAspectRatios.contains(request.aspectRatio)) {
             return GenerationResult(
                 jobHandle = ProviderJobHandle(providerId, "invalid"),
                 status = GenerationStatus.FAILED,
                 error = GenerationError(
                     code = "VALIDATION_ERROR",
-                    message = "Model does not support aspect ratio '${request.aspectRatio}'. Supported: ${capabilities.supportedAspectRatios.joinToString(", ")}",
+                    message = "Model does not support aspect ratio '${request.aspectRatio}'. Supported: ${caps.supportedAspectRatios.joinToString(", ")}",
                     retryable = false,
                 ),
             )
@@ -141,7 +147,7 @@ class OpenRouterImageProvider(
 
         // Validate references can be resolved if provided
         if (request.references.isNotEmpty()) {
-            if (!capabilities.supportsReferences) {
+            if (!caps.supportsReferences) {
                 return GenerationResult(
                     jobHandle = ProviderJobHandle(providerId, "invalid"),
                     status = GenerationStatus.FAILED,
@@ -320,7 +326,7 @@ class OpenRouterImageProvider(
         }
 
         return OpenRouterImageRequest(
-            model = imageModel,
+            model = effectiveModel(request),
             prompt = request.prompt,
             n = request.candidateCount,
             resolution = determineResolution(request.widthPx, request.heightPx),

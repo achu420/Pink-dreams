@@ -754,6 +754,7 @@ Based on previous implementation reports:
 | Admin job operations       | IMPLEMENTED    |
 | Image observability        | IMPLEMENTED    |
 | Image SLA                  | IMPLEMENTED    |
+| Image model evaluation     | IMPLEMENTED    |
 | Retention                  | IMPLEMENTED    |
 | Chat attachment            | IMPLEMENTED    |
 | End-user ownership APIs    | IMPLEMENTED    |
@@ -1004,13 +1005,14 @@ IMAGE WAREHOUSE
 | Task 24 Persona Visual Identity & Reference Images | PASS WITH FINDINGS | f7fcf9e |
 | 23-03 Image Generation + Candidate lifecycle (seed/4/UI/status/regen/seed fixtures) | PASS WITH FINDINGS | b1d28e4 |
 | 23-04 Image Warehouse tab + API | PASS WITH FINDINGS | 13e4365 |
+| 23-05 Image Cost / SLA Admin | PASS WITH FINDINGS | b2880c8 |
+| 12 Image Model Evaluation | PASS WITH FINDINGS | (this commit) |
 
 Next queued MD files under `docs/23 sept/`:
 
-* `08`–`10` largely covered by generation/warehouse/lifecycle — deepen if acceptance gaps remain
-* `11_IMAGE_COST_SLA_ANALYTICS.md` ← next
-* `12_IMAGE_MODEL_EVALUATION.md`
-* `13_IMAGE_IDENTITY_CONSISTENCY_REFERENCE_MATCHING.md`
+* `13_IMAGE_IDENTITY_CONSISTENCY_REFERENCE_MATCHING.md` ← next
+* `14_IMAGE_GENERATION_ENGINE_SKILL_CONFIGURATION.md`
+* `15_IMAGE_WAREHOUSE_CANDIDATE_MANAGEMENT.md`
 * `Image Model & Provider Configuration.md`
 
 Before implementing new functionality beyond the current task:

@@ -449,6 +449,18 @@ fun Application.module(
             generationTriggerWired = true,
             warehouseRepository = com.pinkdreams.imaging.orchestration.ImageWarehouseRepository(db),
         ).register(this)
+        com.pinkdreams.api.admin.AdminImageEvaluationRoutes(
+            evaluationService = com.pinkdreams.imaging.evaluation.ImageModelEvaluationService(
+                evaluationRepository = com.pinkdreams.imaging.evaluation.ImageEvaluationRepository(db),
+                imageGenerationService = imageGenerationService,
+                personaRepository = personaRepo,
+                visualVersionRepository = visualVersionRepository,
+                jobRepository = imageJobRepository,
+                candidateRepository = generatedCandidateRepository,
+                eventRepository = imageEventRepository,
+            ),
+            adminAuthorizationProvider = authProvider,
+        ).register(this)
         com.pinkdreams.api.images.UserImageRoutes(
             imageGenerationService = imageGenerationService,
             imageJobRepository = imageJobRepository,

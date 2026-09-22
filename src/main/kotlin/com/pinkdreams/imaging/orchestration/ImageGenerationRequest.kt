@@ -25,4 +25,6 @@ data class ImageGenerationRequest(
     val personaId: UUID? = null,
     val sourceCandidateId: UUID? = null,
     val adminCorrection: String? = null,
+    /** Optional model override for evaluation runs; null uses production IMAGE_MODEL. */
+    val modelId: String? = null,
 )

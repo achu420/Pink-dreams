@@ -7,7 +7,8 @@
 - `b1d28e4` — Seed prompt, 4 candidates, lifecycle, Ananya/Richa fixtures
 - `b20f048` — Morning review brief
 - `13e4365` — Persona Image Warehouse tab + API
-- (pending) — Image SLA Admin page + enriched SLA API
+- `b2880c8` — Image SLA Admin page + enriched SLA API
+- (pending) — Image Model Evaluation (2–3 models, comparison UI)
 
 ---
 
@@ -25,19 +26,22 @@
    - `POST /v1/admin/personas/seed-image-test-fixtures`
    - Loads **Ananya** (`ananya_rajput`) + **Richa** (`richa_mehta`) from  
      `docs/23 sept/persona testing data/` (pics + attributes)
+4. **Warehouse + Image SLA** — persona warehouse tab; Image SLA nav (cost = UNAVAILABLE)
+5. **Model Evaluation** — Admin → Model Evaluation: select 2–3 models, same seed/persona, compare candidates + notes (does not change production model)
 
 ---
 
 ## Morning smoke (10–15 min)
 
 ```text
-1. Migrate DB (V011, V012)
+1. Migrate DB (V011, V012, V013)
 2. Run app + image worker (shared IMAGE_STORAGE_DIR, OpenRouter key if live)
 3. POST /v1/admin/personas/seed-image-test-fixtures
 4. Admin → Ananya → Visual Identity → confirm refs
 5. Seed: "swimming in a yellow bikini at Goa beach, early morning, facing camera"
 6. Generate 4 → wait → shortlist one → remark → regenerate with correction
 7. Repeat on Richa with a different seed
+8. Admin → Model Evaluation → pick 2 models → same seed → compare (production model unchanged)
 ```
 
 Fake provider works without OpenRouter (for plumbing). Live face consistency needs OpenRouter.

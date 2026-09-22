@@ -58,6 +58,8 @@ object DatabaseFactory {
             PersonaVisualReferenceImages,
             ImageJobs,
             GeneratedCandidates,
+            ImageEvaluations,
+            ImageEvaluationModels,
             Personas,
             PersonaCoreVersions,
             UserProfiles,
@@ -309,6 +311,43 @@ object GeneratedCandidates : Table("generated_candidates") {
     val createdAt = datetime("created_at")
     val status = varchar("status", 50).default("GENERATED")
     val adminRemark = text("admin_remark").nullable()
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object ImageEvaluations : Table("image_evaluations") {
+    val id = uuid("id")
+    val personaId = uuid("persona_id")
+    val visualVersionId = uuid("visual_version_id")
+    val seedPrompt = text("seed_prompt")
+    val candidateCount = integer("candidate_count").default(4)
+    val status = varchar("status", 50).default("RUNNING")
+    val productionModelSnapshot = varchar("production_model_snapshot", 255).nullable()
+    val createdBy = varchar("created_by", 255).nullable()
+    val createdAt = datetime("created_at")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object ImageEvaluationModels : Table("image_evaluation_models") {
+    val id = uuid("id")
+    val evaluationId = uuid("evaluation_id")
+    val modelId = varchar("model_id", 255)
+    val displayName = varchar("display_name", 255).nullable()
+    val provider = varchar("provider", 100).default("openrouter")
+    val imageJobId = uuid("image_job_id").nullable()
+    val status = varchar("status", 50).default("QUEUED")
+    val sortOrder = integer("sort_order").default(0)
+    val notes = text("notes").nullable()
+    val identityConsistency = integer("identity_consistency").nullable()
+    val sceneAdherence = integer("scene_adherence").nullable()
+    val poseAdherence = integer("pose_adherence").nullable()
+    val wardrobeAdherence = integer("wardrobe_adherence").nullable()
+    val imageQuality = integer("image_quality").nullable()
+    val naturalness = integer("naturalness").nullable()
+    val artifactQuality = integer("artifact_quality").nullable()
+    val providerRestrictionNotes = text("provider_restriction_notes").nullable()
+    val createdAt = datetime("created_at")
 
     override val primaryKey = PrimaryKey(id)
 }

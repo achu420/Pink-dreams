@@ -17,6 +17,8 @@ data class GenerationRequest(
     val aspectRatio: String? = null,
     val idempotencyKey: String,
     val clientMetadata: Map<String, String> = emptyMap(),
+    /** Optional per-request model override (evaluation / A-B). Null = provider default. */
+    val modelId: String? = null,
 ) {
     fun validate(): ValidationResult {
         val errors = mutableListOf<String>()

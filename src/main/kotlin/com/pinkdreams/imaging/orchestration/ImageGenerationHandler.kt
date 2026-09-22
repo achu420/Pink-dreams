@@ -231,6 +231,9 @@ class ImageGenerationHandler(
             metadata[key] = value.jsonPrimitive.content
         }
 
+        val modelId = payload["modelId"]?.jsonPrimitive?.content?.takeIf { it.isNotBlank() }
+            ?: metadata["modelId"]?.takeIf { it.isNotBlank() }
+
         return GenerationRequest(
             prompt = prompt,
             references = references,
@@ -239,7 +242,8 @@ class ImageGenerationHandler(
             heightPx = heightPx,
             aspectRatio = aspectRatio,
             idempotencyKey = idempotencyKey,
-            clientMetadata = metadata
+            clientMetadata = metadata,
+            modelId = modelId,
         )
     }
 

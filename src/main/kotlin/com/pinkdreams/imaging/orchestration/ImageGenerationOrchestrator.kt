@@ -83,6 +83,7 @@ class ImageGenerationOrchestrator(
             request.personaId?.let { put("personaId", it.toString()) }
             request.sourceCandidateId?.let { put("sourceCandidateId", it.toString()) }
             request.adminCorrection?.let { put("adminCorrection", it) }
+            request.modelId?.takeIf { it.isNotBlank() }?.let { put("modelId", it) }
 
             put(
                 "references",

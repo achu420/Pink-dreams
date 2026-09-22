@@ -53,6 +53,8 @@ class ImageGenerationService(
         val includePrivateReferences: Boolean = false,
         val sourceCandidateId: UUID? = null,
         val adminCorrection: String? = null,
+        /** Optional model override; null uses production OPENROUTER_IMAGE_MODEL. Does not change env. */
+        val modelId: String? = null,
     )
 
     data class CreateResult(
@@ -152,6 +154,7 @@ class ImageGenerationService(
             personaId = command.personaId,
             sourceCandidateId = command.sourceCandidateId,
             adminCorrection = command.adminCorrection,
+            modelId = command.modelId?.takeIf { it.isNotBlank() },
         )
 
         val job = orchestrator.submit(request)

@@ -43,6 +43,20 @@ class FakeImageProvider : ImageProvider {
             )
         }
 
+        // Evaluation failure injection: model id containing "force-fail"
+        val effectiveModel = request.modelId ?: "fake-default"
+        if (effectiveModel.contains("force-fail", ignoreCase = true)) {
+            return GenerationResult(
+                jobHandle = ProviderJobHandle("fake-provider", UUID.randomUUID().toString()),
+                status = GenerationStatus.FAILED,
+                error = GenerationError(
+                    code = "PROVIDER_REJECTION",
+                    message = "Forced failure for evaluation model '$effectiveModel'",
+                    retryable = false,
+                ),
+            )
+        }
+
         val externalJobId = UUID.randomUUID().toString()
         val handle = ProviderJobHandle("fake-provider", externalJobId)
 

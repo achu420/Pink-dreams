@@ -403,6 +403,9 @@
             <div class="nav-item" data-view="imagesla" data-nav-label="Image SLA" onclick="navigate(this,'imagesla')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 14h4M7 10h10M7 18h7"/></svg>
                 Image SLA</div>
+            <div class="nav-item" data-view="modeleval" data-nav-label="Model Evaluation" onclick="navigate(this,'modeleval')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h6v6H4zM14 6h6v6h-6zM9 14h6v6H9z"/></svg>
+                Model Evaluation</div>
             <div class="nav-item" data-view="chat" data-nav-label="Conversations" onclick="navigate(this,'chat')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16v10H8l-4 4V5Z"/></svg>
                 Conversations</div>
@@ -1277,6 +1280,26 @@
             <div id="imgSlaBody" class="empty-state" style="padding:20px;">Load to see image pipeline metrics.</div>
         </div>
 
+        <div id="modeleval" class="tab-content">
+            <h2>Image Model Evaluation</h2>
+            <div class="section-sub">Compare 2–3 OpenRouter models on the same persona, identity, references, and seed. Does not change production <code>OPENROUTER_IMAGE_MODEL</code>.</div>
+            <div style="margin:12px 0;display:grid;gap:10px;max-width:720px;">
+                <label>Persona ID <input type="text" id="mePersonaId" placeholder="UUID" style="width:100%;"></label>
+                <label>Seed prompt <textarea id="meSeed" rows="3" style="width:100%;" placeholder="Same seed for all models"></textarea></label>
+                <label>Candidates per model
+                    <select id="meCount"><option value="4" selected>4</option><option value="2">2</option><option value="1">1</option></select>
+                </label>
+                <div id="meModelPick" class="filter-count">Loading candidate models…</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button onclick="meCreateEvaluation()">Start evaluation</button>
+                    <button class="secondary" onclick="meLoadList()">Refresh list</button>
+                    <span id="meStatus" class="filter-count"></span>
+                </div>
+            </div>
+            <div id="meList" class="empty-state" style="padding:16px;">No evaluations yet.</div>
+            <div id="meDetail" style="margin-top:20px;"></div>
+        </div>
+
         <div id="observability" class="tab-content">
             <h2>Observability</h2>
             <div class="obs-subtitle">
@@ -1565,6 +1588,7 @@
         const NAV_TITLES = {
             dashboard: 'Dashboard', setup: 'AI Configuration', observability: 'Observability',
             imagesla: 'Image SLA',
+            modeleval: 'Model Evaluation',
             chat: 'Conversations', testchat: 'Test Chat', revenue: 'Revenue', transactions: 'Transactions',
             convinspector: 'Conversations Inspector',
             'persona-detail': 'Persona Detail', 'user-detail': 'User Detail',
@@ -1583,6 +1607,9 @@
             }
             if (tab === 'imagesla') {
                 loadImageSla();
+            }
+            if (tab === 'modeleval') {
+                meInit();
             }
             if (tab === 'dashboard' && !dashboardLoadedOnce) {
                 dashboardLoadedOnce = true;
@@ -2466,6 +2493,151 @@
             } catch (e) {
                 if (statusEl) statusEl.textContent = 'Failed';
                 if (bodyEl) bodyEl.innerHTML = `<div class="empty-state">Failed: ${escapeHtml(e.message || e)}</div>`;
+            }
+        }
+
+        let meModelsLoaded = false;
+        async function meInit() {
+            if (!meModelsLoaded) {
+                await meLoadCandidateModels();
+                meModelsLoaded = true;
+            }
+            await meLoadList();
+            if (selectedPersonaId) {
+                const el = document.getElementById('mePersonaId');
+                if (el && !el.value) el.value = selectedPersonaId;
+            }
+        }
+
+        async function meLoadCandidateModels() {
+            const box = document.getElementById('meModelPick');
+            if (!box) return;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/evaluation-models`);
+                const models = await res.json().catch(() => []);
+                if (!res.ok) throw new Error('Failed to load models');
+                box.innerHTML = `<div class="vh-title">Select 2–3 models</div>` + models.map((m, i) => `
+                    <label style="display:block;margin:4px 0;">
+                        <input type="checkbox" class="me-model-cb" value="${escapeHtml(m.modelId)}" ${i < 2 ? 'checked' : ''}>
+                        ${escapeHtml(m.displayName || m.modelId)}
+                        <span class="filter-count">(${escapeHtml(m.evaluationStatus)} · ${escapeHtml(m.provider)})</span>
+                    </label>`).join('');
+            } catch (e) {
+                box.innerHTML = `<div class="empty-state">Could not load models: ${escapeHtml(e.message || e)}</div>`;
+            }
+        }
+
+        async function meCreateEvaluation() {
+            const statusEl = document.getElementById('meStatus');
+            const personaId = (document.getElementById('mePersonaId') || {}).value?.trim();
+            const seed = (document.getElementById('meSeed') || {}).value?.trim();
+            const count = parseInt((document.getElementById('meCount') || {}).value || '4', 10);
+            const modelIds = [...document.querySelectorAll('.me-model-cb:checked')].map(cb => cb.value);
+            if (!personaId || !seed) {
+                if (statusEl) statusEl.textContent = 'Persona ID and seed required';
+                return;
+            }
+            if (modelIds.length < 2 || modelIds.length > 3) {
+                if (statusEl) statusEl.textContent = 'Select 2 or 3 models';
+                return;
+            }
+            if (statusEl) statusEl.textContent = 'Submitting…';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/evaluations`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ personaId, seedPrompt: seed, modelIds, candidateCount: count }),
+                });
+                const d = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((d.error && d.error.message) || ('HTTP ' + res.status));
+                if (statusEl) statusEl.textContent = `Started ${d.evaluationId} · production unchanged: ${d.productionModelUnchanged}`;
+                await meLoadList();
+                await meOpenDetail(d.evaluationId);
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
+            }
+        }
+
+        async function meLoadList() {
+            const listEl = document.getElementById('meList');
+            if (!listEl) return;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/evaluations?limit=30`);
+                const rows = await res.json().catch(() => []);
+                if (!res.ok) throw new Error('list failed');
+                if (!rows.length) {
+                    listEl.innerHTML = '<div class="empty-state">No evaluations yet.</div>';
+                    return;
+                }
+                listEl.innerHTML = `<div class="table-wrap"><table>
+                    <thead><tr><th>Created</th><th>Status</th><th>Seed</th><th></th></tr></thead>
+                    <tbody>${rows.map(r => `<tr>
+                        <td>${escapeHtml(r.createdAt)}</td>
+                        <td>${escapeHtml(r.status)}</td>
+                        <td>${escapeHtml((r.seedPrompt || '').slice(0, 80))}</td>
+                        <td><button class="secondary" onclick="meOpenDetail('${escapeHtml(r.evaluationId)}')">Open</button></td>
+                    </tr>`).join('')}</tbody></table></div>`;
+            } catch (e) {
+                listEl.innerHTML = `<div class="empty-state">Failed: ${escapeHtml(e.message || e)}</div>`;
+            }
+        }
+
+        async function meOpenDetail(evaluationId) {
+            const detailEl = document.getElementById('meDetail');
+            if (!detailEl) return;
+            detailEl.innerHTML = '<div class="empty-state">Loading comparison…</div>';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/evaluations/${encodeURIComponent(evaluationId)}`);
+                const d = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((d.error && d.error.message) || ('HTTP ' + res.status));
+                const groups = (d.models || []).map(m => {
+                    const imgs = (m.candidates || []).map(c =>
+                        `<a href="${escapeHtml(c.assetUrl)}" target="_blank" rel="noopener"><img src="${escapeHtml(c.assetUrl)}" alt="c${c.candidateIndex}" style="width:120px;height:120px;object-fit:cover;margin:4px;border-radius:6px;"></a>`
+                    ).join('') || '<span class="filter-count">No candidates yet (job may still be running)</span>';
+                    return `<div style="border-top:1px solid var(--border, #333);padding:12px 0;margin-top:8px;">
+                        <div class="vh-title">${escapeHtml(m.displayName || m.modelId)}</div>
+                        <div class="filter-count">${escapeHtml(m.modelId)} · job ${escapeHtml(m.jobStatus || m.status || '—')} · latency ${m.latencyMs != null ? m.latencyMs + ' ms' : '—'} · cost ${escapeHtml(m.costAvailability || 'UNAVAILABLE')}</div>
+                        ${m.lastError ? `<div class="empty-state" style="padding:8px;">Error: ${escapeHtml(m.lastError)}</div>` : ''}
+                        <div style="display:flex;flex-wrap:wrap;margin-top:8px;">${imgs}</div>
+                        <label style="display:block;margin-top:8px;">Notes
+                            <textarea id="meNote-${escapeHtml(m.id)}" rows="2" style="width:100%;max-width:560px;">${escapeHtml(m.notes || '')}</textarea>
+                        </label>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;align-items:center;">
+                            <label>Identity 1–5 <input type="number" min="1" max="5" id="meId-${escapeHtml(m.id)}" value="${m.identityConsistency ?? ''}" style="width:56px;"></label>
+                            <label>Scene 1–5 <input type="number" min="1" max="5" id="meSc-${escapeHtml(m.id)}" value="${m.sceneAdherence ?? ''}" style="width:56px;"></label>
+                            <label>Quality 1–5 <input type="number" min="1" max="5" id="meQl-${escapeHtml(m.id)}" value="${m.imageQuality ?? ''}" style="width:56px;"></label>
+                            <button class="secondary" onclick="meSaveNotes('${escapeHtml(d.evaluationId)}','${escapeHtml(m.id)}')">Save notes</button>
+                        </div>
+                        ${m.providerRestrictionNotes ? `<div class="filter-count">Restriction notes: ${escapeHtml(m.providerRestrictionNotes)}</div>` : ''}
+                    </div>`;
+                }).join('');
+                detailEl.innerHTML = `
+                    <div class="vh-title">Comparison · ${escapeHtml(d.personaDisplayName || d.personaId)}</div>
+                    <div class="filter-count">Eval ${escapeHtml(d.evaluationId)} · identity ${escapeHtml(d.visualVersionId)} · status ${escapeHtml(d.status)} · production snapshot ${escapeHtml(d.productionModelSnapshot || '—')} · unchanged ${d.productionModelUnchanged}</div>
+                    <div style="margin:8px 0;"><strong>Seed:</strong> ${escapeHtml(d.seedPrompt || '')}</div>
+                    <button class="secondary" onclick="meOpenDetail('${escapeHtml(d.evaluationId)}')">Refresh results</button>
+                    ${groups}`;
+            } catch (e) {
+                detailEl.innerHTML = `<div class="empty-state">Failed: ${escapeHtml(e.message || e)}</div>`;
+            }
+        }
+
+        async function meSaveNotes(evaluationId, modelRowId) {
+            const notes = (document.getElementById('meNote-' + modelRowId) || {}).value;
+            const identityConsistency = parseInt((document.getElementById('meId-' + modelRowId) || {}).value, 10) || null;
+            const sceneAdherence = parseInt((document.getElementById('meSc-' + modelRowId) || {}).value, 10) || null;
+            const imageQuality = parseInt((document.getElementById('meQl-' + modelRowId) || {}).value, 10) || null;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/evaluations/${encodeURIComponent(evaluationId)}/notes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ modelRowId, notes, identityConsistency, sceneAdherence, imageQuality }),
+                });
+                const d = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((d.error && d.error.message) || ('HTTP ' + res.status));
+                await meOpenDetail(evaluationId);
+            } catch (e) {
+                alert('Save notes failed: ' + (e.message || e));
             }
         }
 
