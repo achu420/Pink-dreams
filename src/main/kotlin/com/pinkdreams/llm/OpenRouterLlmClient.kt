@@ -191,11 +191,25 @@ class OpenRouterLlmClient(
             // the fix is a larger max_tokens for that call site — structured
             // so a caller can measure this precisely (see
             // OpenRouterBudgetExhaustionException).
-            throw OpenRouterBudgetExhaustionException(
-                finishReason = choice.finishReason,
-                completionTokens = response.usage.completionTokens,
-                reasoningTokens = response.usage.completionTokensDetails?.reasoningTokens,
-                provider = response.provider,
+            //
+            // Task 25F fix 1: budget exhaustion is specifically "the provider
+            // stopped because it ran out of completion budget", i.e.
+            // finish_reason=length. Throwing it for ANY blank content mislabeled
+            // a normal finish_reason=stop with an empty body as
+            // BUDGET_EXHAUSTION in llm_exchanges (observed live), hiding a
+            // genuinely different provider behavior behind a budget diagnosis.
+            if (choice.finishReason.equals("length", ignoreCase = true)) {
+                throw OpenRouterBudgetExhaustionException(
+                    finishReason = choice.finishReason,
+                    completionTokens = response.usage.completionTokens,
+                    reasoningTokens = response.usage.completionTokensDetails?.reasoningTokens,
+                    provider = response.provider,
+                )
+            }
+            throw IllegalStateException(
+                "OpenRouter returned a completed response with blank content " +
+                    "(finish_reason=${choice.finishReason}, completionTokens=${response.usage.completionTokens}). " +
+                    "This is not budget exhaustion: the provider stopped normally but produced no content.",
             )
         }
 

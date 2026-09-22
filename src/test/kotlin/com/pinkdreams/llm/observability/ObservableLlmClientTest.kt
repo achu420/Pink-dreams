@@ -244,6 +244,59 @@ class ObservableLlmClientTest {
     }
 
     /**
+     * Task 25F fix 1. Reproduces the exact live exchange
+     * cb97b623-5597-42b1-b34a-45720bfc96c4: memory_extraction, HTTP 200,
+     * non-blank content, completion_tokens=1200 against a 1200-token budget,
+     * reasoning_tokens=1229, finish_reason=length. The content came back, so
+     * the old classifier called this a SUCCESS — while the truncated JSON body
+     * parsed to nothing and two valid facts ("Biscuit", "marine biologist")
+     * were silently dropped.
+     */
+    @Test
+    fun `14 - Task 25F - a provider-truncated response is recorded as TRUNCATED, not SUCCESS`() {
+        val repository = repo()
+        val client = LlmClient {
+            LlmResponse(
+                content = """{"facts": [{"fact": "user adopted a golden retriever puppy named Bisc""",
+                provider = "openrouter", model = "test-model",
+                metadata = mapOf(
+                    "finish_reason" to "length",
+                    "completion_tokens" to "1200",
+                    "reasoning_tokens" to "1229",
+                ),
+                providerExchange = exchange(),
+            )
+        }
+        val observable = ObservableLlmClient(client, repository, isTestChat = false)
+        val req = request(workload = "memory_extraction")
+
+        val response = observable.generate(req)
+
+        // The caller still receives exactly what the delegate produced: this fix
+        // changes classification only, never behavior.
+        assertTrue(response.content.startsWith("{\"facts\""))
+        val recorded = repository.findForTurn(req.requestId).single()
+        assertEquals(LlmExchangeRepository.Outcome.TRUNCATED, recorded.outcome)
+        assertEquals("length", recorded.finishReason)
+        assertEquals(1200, recorded.completionTokens)
+        assertEquals(1229, recorded.reasoningTokens)
+    }
+
+    @Test
+    fun `15 - Task 25F - a normally finished response is still SUCCESS`() {
+        val repository = repo()
+        val client = LlmClient {
+            LlmResponse(content = """{"facts": []}""", metadata = mapOf("finish_reason" to "stop"), providerExchange = exchange())
+        }
+        val observable = ObservableLlmClient(client, repository, isTestChat = false)
+        val req = request(workload = "memory_extraction")
+
+        observable.generate(req)
+
+        assertEquals(LlmExchangeRepository.Outcome.SUCCESS, repository.findForTurn(req.requestId).single().outcome)
+    }
+
+    /**
      * A minimal test double implementing both [LlmClient] and
      * [ExchangeCapturing] directly — proves ObservableLlmClient recovers a
      * failed call's raw exchange via the interface, not via a concrete

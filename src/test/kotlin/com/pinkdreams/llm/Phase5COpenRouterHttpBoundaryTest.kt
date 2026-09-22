@@ -199,6 +199,46 @@ class Phase5COpenRouterHttpBoundaryTest {
         }
     }
 
+    /**
+     * Task 25F fix 1: blank content is only budget exhaustion when the provider
+     * actually ran out of completion budget (finish_reason=length). Live data
+     * showed blank-content responses that finished normally (finish_reason=stop)
+     * being recorded as BUDGET_EXHAUSTION, which diagnosed the wrong cause.
+     */
+    @Test
+    fun `blank content with finish_reason length is budget exhaustion`() {
+        val server = startMockServer(responseBody = blankContentBody("length"))
+        try {
+            val client = OpenRouterLlmClient(apiKey = "test", endpoint = "http://localhost:${server.address.port}/api/v1/chat/completions")
+            val thrown = runCatching { client.generate(generationRequest()) }.exceptionOrNull()
+            assertTrue(thrown is OpenRouterBudgetExhaustionException, "Expected budget exhaustion, got $thrown")
+        } finally {
+            server.stop(0)
+        }
+    }
+
+    @Test
+    fun `blank content with finish_reason stop is not budget exhaustion`() {
+        val server = startMockServer(responseBody = blankContentBody("stop"))
+        try {
+            val client = OpenRouterLlmClient(apiKey = "test", endpoint = "http://localhost:${server.address.port}/api/v1/chat/completions")
+            val thrown = runCatching { client.generate(generationRequest()) }.exceptionOrNull()
+            assertTrue(thrown is IllegalStateException, "A blank body must still fail")
+            assertTrue(
+                thrown !is OpenRouterBudgetExhaustionException,
+                "A normally finished blank response must not be diagnosed as budget exhaustion",
+            )
+        } finally {
+            server.stop(0)
+        }
+    }
+
+    private fun blankContentBody(finishReason: String): String =
+        """{"id":"gen-1","model":"test-model","provider":"Wafer",""" +
+            """"choices":[{"message":{"role":"assistant","content":null,"reasoning":"..."},"finish_reason":"$finishReason"}],""" +
+            """"usage":{"prompt_tokens":10,"completion_tokens":1200,"total_tokens":1210,""" +
+            """"completion_tokens_details":{"reasoning_tokens":1229}}}"""
+
     private fun generationRequest(
         config: GenerationConfig = GenerationConfig(),
         context: ChatContext = ChatContext(

@@ -37,6 +37,16 @@ class ObservableLlmClient(
             val latencyMs = (System.nanoTime() - start) / 1_000_000
             persistSafely {
                 val exchange = response.providerExchange
+                val finishReason = response.metadata["finish_reason"]
+                // Task 25F fix 1: a response the provider cut off at the
+                // completion-token limit is not a success, even though the HTTP
+                // call succeeded and content came back. Recording it as SUCCESS
+                // made silent downstream data loss invisible (a truncated
+                // memory_extraction JSON body parses to nothing and is discarded
+                // as "nothing to remember"). This is a classification change
+                // only: the delegate's response is still returned untouched
+                // below, no retry is attempted and no token budget changes.
+                val truncated = finishReason.equals("length", ignoreCase = true)
                 exchangeRepository.record(
                     LlmExchangeRepository.RecordInput(
                         turnRequestId = request.requestId,
@@ -50,9 +60,13 @@ class ObservableLlmClient(
                         completionTokens = response.metadata["completion_tokens"]?.toIntOrNull(),
                         reasoningTokens = response.metadata["reasoning_tokens"]?.toIntOrNull(),
                         totalTokens = response.metadata["total_tokens"]?.toIntOrNull(),
-                        finishReason = response.metadata["finish_reason"],
+                        finishReason = finishReason,
                         httpStatusCode = exchange?.response?.statusCode,
-                        outcome = LlmExchangeRepository.Outcome.SUCCESS,
+                        outcome = if (truncated) {
+                            LlmExchangeRepository.Outcome.TRUNCATED
+                        } else {
+                            LlmExchangeRepository.Outcome.SUCCESS
+                        },
                         requestBody = exchange?.request?.requestBody,
                         responseBody = exchange?.response?.responseBody,
                         skillKey = request.skillKey,

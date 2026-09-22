@@ -24,7 +24,20 @@ import java.util.UUID
  */
 class LlmExchangeRepository(private val db: Database) {
 
-    enum class Outcome { SUCCESS, MALFORMED, BUDGET_EXHAUSTION, PROVIDER_ERROR, EXCEPTION }
+    /**
+     * TRUNCATED (Task 25F fix 1): a completed HTTP call that returned usable
+     * content, but which the provider cut off at the completion-token limit
+     * (`finish_reason == "length"`). It is NOT a SUCCESS — a truncated
+     * memory-extraction response, for example, produces invalid JSON that
+     * LlmMemoryExtractor discards as "nothing to remember", which was
+     * previously indistinguishable in this table from the model legitimately
+     * finding nothing. Observed live on exchange
+     * cb97b623-5597-42b1-b34a-45720bfc96c4 (workload=memory_extraction,
+     * completion_tokens=1200, reasoning_tokens=1229, two valid facts lost).
+     * Purely a classification: the response is still returned to the caller
+     * unchanged, and no budget/retry behavior changes.
+     */
+    enum class Outcome { SUCCESS, TRUNCATED, MALFORMED, BUDGET_EXHAUSTION, PROVIDER_ERROR, EXCEPTION }
 
     data class Exchange(
         val id: UUID,
