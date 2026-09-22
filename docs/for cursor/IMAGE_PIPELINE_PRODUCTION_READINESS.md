@@ -272,7 +272,7 @@ New/updated coverage: retry persist idempotency; `completeJobFailure` redaction;
 
 ```text
 Branch: cursor/claude-work-followup
-Commit: (recorded when this change set is committed)
+Commit: 8c4b03d (fix(images): harden retry persist and lastError redaction)
 Push: no
 ```
 
