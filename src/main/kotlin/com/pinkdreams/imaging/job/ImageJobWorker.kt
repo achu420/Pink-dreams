@@ -8,7 +8,9 @@ class ImageJobWorker(
     private val db: Database,
     private val workerName: String,
     private val jobHandler: ImageJobHandler,
-    private val jobRepository: com.pinkdreams.persistence.repositories.ImageJobRepository = com.pinkdreams.persistence.repositories.ImageJobRepository(db),
+    private val jobRepository: com.pinkdreams.persistence.repositories.ImageJobRepository =
+        com.pinkdreams.persistence.repositories.ImageJobRepository(db),
+    private val completionAttach: ((job: ImageJob, succeeded: Boolean) -> Unit)? = null,
 ) {
 
     fun processPendingJobs(maxBatchSize: Int = 10): Int {
@@ -25,16 +27,31 @@ class ImageJobWorker(
                 val result = jobHandler.handle(claimed)
                 when (result) {
                     is ImageJobResult.Success -> {
-                        jobRepository.completeJobSuccess(claimed.id)
+                        val completed = jobRepository.completeJobSuccess(claimed.id)
+                        notifyCompletion(completed, succeeded = true)
                         processed++
                     }
                     is ImageJobResult.Failure -> {
-                        jobRepository.completeJobFailure(claimed.id, result.errorMessage, shouldRetry = result.retryable)
+                        val failed = jobRepository.completeJobFailure(
+                            claimed.id,
+                            result.errorMessage,
+                            shouldRetry = result.retryable,
+                        )
+                        if (failed.status == ImageJobStatus.FAILED) {
+                            notifyCompletion(failed, succeeded = false)
+                        }
                         processed++
                     }
                 }
             } catch (e: Exception) {
-                jobRepository.completeJobFailure(claimed.id, "Unexpected error: ${e.message}", shouldRetry = true)
+                val failed = jobRepository.completeJobFailure(
+                    claimed.id,
+                    "Unexpected error: ${e.message}",
+                    shouldRetry = true,
+                )
+                if (failed.status == ImageJobStatus.FAILED) {
+                    notifyCompletion(failed, succeeded = false)
+                }
                 processed++
             }
         }
@@ -66,5 +83,15 @@ class ImageJobWorker(
         }
 
         return recovered
+    }
+
+    private fun notifyCompletion(job: ImageJob, succeeded: Boolean) {
+        try {
+            completionAttach?.invoke(job, succeeded)
+        } catch (e: Exception) {
+            System.err.println(
+                "IMAGE_WORKER: completion attach failed job=${job.id}: ${e.message}",
+            )
+        }
     }
 }

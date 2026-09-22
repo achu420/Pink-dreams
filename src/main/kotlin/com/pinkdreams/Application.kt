@@ -236,11 +236,19 @@ fun Application.module(
             providerId = imageProvider.providerId,
             model = System.getenv("OPENROUTER_IMAGE_MODEL"),
         )
+    val imageMessageCompletionAttach = com.pinkdreams.chat.imaging.ImageMessageCompletionAttach(
+        messageRepository = messageRepo,
+        candidateRepository = generatedCandidateRepository,
+    )
     val imageJobWorker = com.pinkdreams.imaging.job.ImageJobWorker(
         db = db,
         workerName = "app-image-worker",
         jobHandler = imageJobHandler,
         jobRepository = imageJobRepository,
+        completionAttach = { job, succeeded ->
+            if (succeeded) imageMessageCompletionAttach.onSucceeded(job)
+            else imageMessageCompletionAttach.onFailed(job)
+        },
     )
     val imageWorkerRuntime = com.pinkdreams.imaging.job.ImageJobWorkerRuntime(imageJobWorker)
     if (System.getenv("IMAGE_WORKER_ENABLED")?.equals("false", ignoreCase = true) != true) {

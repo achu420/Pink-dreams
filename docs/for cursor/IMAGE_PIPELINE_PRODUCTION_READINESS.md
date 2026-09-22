@@ -17,7 +17,7 @@ Not claimed:
 
 - Multi-instance object-store HA (**KNOWN LIMITATION**)
 - Live OpenRouter verification in this run (**NOT LIVE-VERIFIED — credentials unavailable**)
-- Automatic `imageAssetIds` merge onto assistant messages after worker completion (**GAP** — clients poll job result using `imageJobId`)
+- Automatic `imageAssetIds` merge onto assistant messages after worker completion (**IMPLEMENTED** — `ImageMessageCompletionAttach`; clients can still poll job result)
 - Admin UI surface for cancel/requeue/image SLA (**GAP** — APIs exist)
 
 ---
@@ -71,7 +71,7 @@ There is no separate `CLAIMED` / `PROVIDER_CALL` / `ASSET_PERSISTED` enum — cl
 | Timeout | Provider read timeout + poll bound | Config + handler poll | Code | **PASS WITH FINDINGS** (not live-measured) |
 | Asset persistence | LocalFile/InMemory + candidates | Handler persist | PhaseIMG8/E2E | **PASS** |
 | Asset ownership | Same conversation gate as job | User asset GET | Ownership test | **PASS** |
-| Message reference | `imageJobId`/`imageJobStatus` at enqueue | `BestEffortImageEnqueue` | Attribution test | **PASS WITH FINDINGS** (no auto asset IDs) |
+| Message reference | `imageJobId` at enqueue; `imageAssetIds` + status on worker terminal | `BestEffortImageEnqueue` + `ImageMessageCompletionAttach` | Attach + attribution tests | **PASS** |
 | Retention | Terminal + age; skip message UUID refs | `ImageRetentionCleaner` | MessageReferenceTest | **PASS** |
 | Cleanup safety | Skips QUEUED/RUNNING; skips referenced | Cleaner | Retention tests | **PASS** |
 | ChatEngine integration | Post-delivery async enqueue | Factory + engine | Heuristic test + wiring | **PASS** |
@@ -171,8 +171,7 @@ User message → PipelineChatEngine → deliver Success
 
 - Does **not** block chat reply on generation
 - Returns text first; image is async
-- Client uses `imageJobId` from metadata + user retrieve APIs
-- Does **not** auto-attach `imageAssetIds` on completion (**GAP** / **FUTURE ENHANCEMENT**)
+- Writes `imageJobId` / `imageJobStatus` at enqueue; worker completion merges `imageAssetIds`, `imageAssetUrls`, and terminal `imageJobStatus`
 
 ---
 
@@ -205,10 +204,10 @@ Qualitative:
 
 ### Gaps / future enhancement
 
-1. No automatic message `imageAssetIds` after success  
-2. Admin UI: Generate only; no cancel/requeue/result/image-SLA controls  
-3. Admin list DTO does not surface parsed user ownership / retention reason  
-4. Live OpenRouter smoke not run  
+1. Admin UI: Generate only; no cancel/requeue/result/image-SLA controls  
+2. Admin list DTO does not surface parsed user ownership / retention reason  
+3. Live OpenRouter smoke not run  
+4. Lease recovery without heartbeat — long generations can be double-run if lease expires mid-handle  
 
 ---
 
@@ -282,9 +281,9 @@ Push: no
 
 Based only on confirmed evidence:
 
-1. **If deploying multi-instance:** operational task to provision shared storage + document `IMAGE_STORAGE_DIR` / future object-store adapter — do not redesign chat imaging.  
-2. **If product needs completed assets on the message:** small follow-up to merge `imageAssetIds` after `completeJobSuccess` when `imageJobId` is already on assistant metadata.  
-3. **If go-live with OpenRouter:** run gated `IMAGE_LIVE_SMOKE=true` once with real key and attach results to this readiness doc.  
-4. **System Quality Tasks 23–31** may proceed for chat/text quality **if** single-instance + Fake/OpenRouter ops constraints above are accepted.
+1. **If deploying multi-instance:** provision shared storage / document `IMAGE_STORAGE_DIR` (or add object-store adapter later) — do not redesign chat imaging.  
+2. **If go-live with OpenRouter:** run gated `IMAGE_LIVE_SMOKE=true` once with a real key and attach results here.  
+3. **System Quality Tasks 23–31** may proceed for chat/text quality under single-instance + Fake/OpenRouter ops constraints.  
+4. Optional polish: admin UI cancel/requeue/image SLA; retention query scaling; lease heartbeat for long jobs.
 
 Do not treat content-factory / LoRA / social publish as next image work unless explicitly reopened.
