@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-22  
 **Branch:** `cursor/claude-work-followup`  
-**HEAD at gate:** `aa939f9` (pre-commit of this document)  
+**HEAD at gate:** `ef633c3`  
 **Scope:** Operational verification only. No architecture redesign. No content-factory / S3 / LoRA work.
 
 **Related docs:**  
@@ -218,7 +218,7 @@ All remaining gaps are **operational**, not architectural:
 
 ## 18. Git commit
 
-Commit: `8b2eaa2` — docs(images): close final operational gate as pass-with-findings
+Commit: `8b2eaa2` / `ef633c3` â€” docs(images): close final operational gate as pass-with-findings
 
 ---
 
