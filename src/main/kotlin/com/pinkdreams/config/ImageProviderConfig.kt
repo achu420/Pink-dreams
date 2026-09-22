@@ -7,7 +7,7 @@ data class ImageProviderConfig(
     val imageModel: String = "openai/gpt-image-2.5-flare",
     val connectTimeoutSeconds: Int = 10,
     val readTimeoutSeconds: Int = 300,
-    val outputFormat: String = "b64_json",
+    val outputFormat: String = "png",
 ) {
     companion object {
         fun from(appConfig: AppConfig): ImageProviderConfig {
@@ -22,7 +22,7 @@ data class ImageProviderConfig(
                 imageModel = System.getenv("OPENROUTER_IMAGE_MODEL") ?: "openai/gpt-image-2.5-flare",
                 connectTimeoutSeconds = System.getenv("IMAGE_CONNECT_TIMEOUT_SECONDS")?.toIntOrNull() ?: 10,
                 readTimeoutSeconds = System.getenv("IMAGE_READ_TIMEOUT_SECONDS")?.toIntOrNull() ?: 300,
-                outputFormat = System.getenv("OPENROUTER_IMAGE_OUTPUT_FORMAT") ?: "b64_json",
+                outputFormat = System.getenv("OPENROUTER_IMAGE_OUTPUT_FORMAT") ?: "png",
             )
         }
     }

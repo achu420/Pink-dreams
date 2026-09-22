@@ -11,3 +11,6 @@ local.properties
 run-local.secrets.ps1
 .env
 .env.local
+
+# Local verification / shared image storage (never commit artifacts).
+.tmp/

@@ -242,7 +242,7 @@ fun Application.module(
     )
     val imageJobWorker = com.pinkdreams.imaging.job.ImageJobWorker(
         db = db,
-        workerName = "app-image-worker",
+        workerName = System.getenv("IMAGE_WORKER_NAME")?.takeIf { it.isNotBlank() } ?: "app-image-worker",
         jobHandler = imageJobHandler,
         jobRepository = imageJobRepository,
         completionAttach = { job, succeeded ->
