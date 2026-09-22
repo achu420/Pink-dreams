@@ -98,9 +98,9 @@
 
 ## 17. Known gaps
 
-1. OpenRouter live smoke not automated  
-2. Dedicated `image_share` skill not seeded (heuristic works without it; skill key is optional upgrade)  
-3. Content-factory phases (storyline/daily/publish/LoRA) deferred per plan  
+1. OpenRouter live smoke is opt-in only (`IMAGE_LIVE_SMOKE=true` + `OPENROUTER_API_KEY`) — not default CI  
+2. Content-factory phases (storyline/daily/publish/LoRA) deferred per plan  
+3. `image_share` seeds as draft/inactive like other skills — activate in admin to let Intent Discovery select it (text heuristic still works without activation) 
 
 ---
 

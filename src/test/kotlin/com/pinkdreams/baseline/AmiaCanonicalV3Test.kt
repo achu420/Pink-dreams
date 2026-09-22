@@ -25,7 +25,7 @@ import kotlin.test.assertTrue
 
 /**
  * AMIA Canonical AI Behavior Configuration v3 — the expanded skill roster (12
- * -> 25 skills), the model change to deepseek/deepseek-v4-flash-0731, and the
+ * -> 25 skills, plus image_share), the model change to deepseek/deepseek-v4-flash-0731, and the
  * new Conversation Engine product-behavior rules (response length, turn
  * balance, capability discovery, emotional availability).
  *
@@ -43,12 +43,13 @@ class AmiaCanonicalV3Test {
         "sexual_stimulation", "social_practice", "conversation_practice", "flirting_practice",
         "dating_practice", "relationship_guidance", "breakup_support", "confidence_building",
         "encouragement", "advice", "problem_solving", "learning", "entertainment",
+        "image_share",
     )
 
     // ---------- roster completeness ----------
 
     @Test
-    fun `the canonical skill roster contains exactly the 25 v3 skills`() {
+    fun `the canonical skill roster contains exactly the v3 skills including image_share`() {
         assertEquals(v3SkillKeys, BaselineConfiguration.SKILLS.map { it.key }.toSet())
     }
 
