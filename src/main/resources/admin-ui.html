@@ -1039,10 +1039,12 @@
                     <button class="dp-tab active" data-pdtab="overview" onclick="pdShowTab('overview')">Overview</button>
                     <button class="dp-tab" data-pdtab="core" onclick="pdShowTab('core')">Persona Core</button>
                     <button class="dp-tab" data-pdtab="visual" onclick="pdShowTab('visual')">Visual Identity</button>
+                    <button class="dp-tab" data-pdtab="warehouse" onclick="pdShowTab('warehouse')">Image Warehouse</button>
                 </div>
                 <div class="dp-panel active" id="pdPanel-overview"></div>
                 <div class="dp-panel" id="pdPanel-core"></div>
                 <div class="dp-panel" id="pdPanel-visual"></div>
+                <div class="dp-panel" id="pdPanel-warehouse"></div>
             </div>
         </div>
 
@@ -1978,6 +1980,7 @@
             document.getElementById('pdPanel-overview').innerHTML = '<div class="empty-state" style="padding:20px;">Loading…</div>';
             document.getElementById('pdPanel-core').innerHTML = '';
             document.getElementById('pdPanel-visual').innerHTML = '';
+            document.getElementById('pdPanel-warehouse').innerHTML = '';
 
             try {
                 const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(personaId)}`);
@@ -2010,6 +2013,7 @@
                 pdVisualCache = await vis.json();
                 document.getElementById('pdPanel-visual').innerHTML = pdVisualHtml(pdVisualCache);
                 pdLoadImageConfig();
+                pdLoadWarehouse(personaId);
             } catch (e) {
                 pdVisualCache = null;
                 document.getElementById('pdPanel-visual').innerHTML =
@@ -2385,6 +2389,58 @@
                 const el = document.getElementById('pdImageConfigLabel');
                 if (el) el.textContent = `Provider: ${cfg.provider || '—'} · Model: ${cfg.model || '—'} · Default count: ${cfg.defaultCandidateCount || 4}`;
             } catch (_) { /* ignore */ }
+        }
+
+        async function pdLoadWarehouse(personaId) {
+            const panel = document.getElementById('pdPanel-warehouse');
+            if (!panel) return;
+            panel.innerHTML = '<div class="empty-state" style="padding:20px;">Loading warehouse…</div>';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(personaId)}/images/warehouse?limit=100`);
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
+                const candidates = body.candidates || [];
+                if (!candidates.length) {
+                    panel.innerHTML = '<div class="empty-state" style="padding:20px;">No generated candidates yet for this persona.</div>';
+                    return;
+                }
+                const filter = `<div class="section-sub" style="margin-bottom:8px;">
+                    Filter:
+                    <select id="pdWhFilter" onchange="pdFilterWarehouse()">
+                        <option value="">All</option>
+                        <option>GENERATED</option>
+                        <option>SHORTLISTED</option>
+                        <option>DECLINED</option>
+                        <option>SAVED</option>
+                    </select>
+                    <span class="filter-count">${candidates.length} total</span>
+                </div>`;
+                panel.innerHTML = filter + `<div id="pdWhGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+                    ${candidates.map(c => `
+                        <div class="kv-item pd-wh-card" data-status="${escapeHtml(c.status)}" style="padding:8px;border:1px solid #444;">
+                            <div class="kv-label">${escapeHtml(c.status)} · #${Number(c.candidateIndex)+1}</div>
+                            <img src="${escapeHtml(c.assetUrl)}" alt="" style="width:100%;max-height:200px;object-fit:contain;background:#111;margin:6px 0;"/>
+                            <div class="filter-count">${escapeHtml(c.seedPrompt || '')}</div>
+                            <div class="filter-count">${escapeHtml(c.adminRemark || '')}</div>
+                            <div class="filter-count mono">${escapeHtml(c.createdAt)}</div>
+                            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+                                <button class="secondary" onclick="pdCandidateAction('${c.id}','SHORTLISTED')">Shortlist</button>
+                                <button class="secondary" onclick="pdCandidateAction('${c.id}','DECLINED')">Decline</button>
+                                <button class="secondary" onclick="pdCandidateAction('${c.id}','SAVED')">Save</button>
+                                <button class="secondary" onclick="pdCandidateRegenerate('${c.id}')">Regen</button>
+                            </div>
+                        </div>`).join('')}
+                </div>`;
+            } catch (e) {
+                panel.innerHTML = `<div class="empty-state" style="padding:20px;">Warehouse failed: ${escapeHtml(e.message || e)}</div>`;
+            }
+        }
+
+        function pdFilterWarehouse() {
+            const v = (document.getElementById('pdWhFilter') || {}).value || '';
+            document.querySelectorAll('.pd-wh-card').forEach(card => {
+                card.style.display = (!v || card.getAttribute('data-status') === v) ? '' : 'none';
+            });
         }
 
         async function pdGenerateImages() {

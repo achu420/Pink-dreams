@@ -447,6 +447,7 @@ fun Application.module(
             messageRepository = messageRepo,
             adminAuthorizationProvider = authProvider,
             generationTriggerWired = true,
+            warehouseRepository = com.pinkdreams.imaging.orchestration.ImageWarehouseRepository(db),
         ).register(this)
         com.pinkdreams.api.images.UserImageRoutes(
             imageGenerationService = imageGenerationService,

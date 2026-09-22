@@ -9,6 +9,7 @@ import com.pinkdreams.imaging.observability.ImageGenerationEventRepository
 import com.pinkdreams.imaging.orchestration.CandidateStatus
 import com.pinkdreams.imaging.orchestration.GeneratedCandidateRepository
 import com.pinkdreams.imaging.orchestration.ImageGenerationService
+import com.pinkdreams.imaging.orchestration.ImageWarehouseRepository
 import com.pinkdreams.persistence.repositories.ImageJobRepository
 import com.pinkdreams.persistence.repositories.MessageRepository
 import com.pinkdreams.storage.ObjectStorage
@@ -103,6 +104,29 @@ data class RegenerateCandidateHttpRequest(
 )
 
 @Serializable
+data class WarehouseCandidateHttpResponse(
+    val id: String,
+    val jobId: String,
+    val jobStatus: String,
+    val candidateIndex: Int,
+    val status: String,
+    val adminRemark: String?,
+    val seedPrompt: String?,
+    val contentType: String,
+    val fileSize: Long,
+    val widthPx: Int?,
+    val heightPx: Int?,
+    val createdAt: String,
+    val assetUrl: String,
+)
+
+@Serializable
+data class WarehouseHttpResponse(
+    val personaId: String,
+    val candidates: List<WarehouseCandidateHttpResponse>,
+)
+
+@Serializable
 data class ImageConfigHttpResponse(
     val provider: String,
     val model: String,
@@ -164,6 +188,7 @@ class AdminImageGenerationRoutes(
     private val messageRepository: MessageRepository,
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
     private val generationTriggerWired: Boolean = true,
+    private val warehouseRepository: ImageWarehouseRepository? = null,
 ) {
     fun register(route: Route) {
         route.authenticate("session-auth", "dev-auth") {
@@ -448,6 +473,43 @@ class AdminImageGenerationRoutes(
                         model = model,
                         maxCandidateCount = 4,
                         defaultCandidateCount = 4,
+                    )
+                )
+            }
+
+            get("/v1/admin/personas/{personaId}/images/warehouse") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@get
+                val personaId = call.parseUuid("personaId") ?: return@get
+                val repo = warehouseRepository
+                if (repo == null) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        ErrorResponse(ApiError(ErrorCode.INTERNAL_SERVER_ERROR, "Warehouse not wired", null)),
+                    )
+                    return@get
+                }
+                val limit = call.request.queryParameters["limit"]?.toIntOrNull()?.coerceIn(1, 500) ?: 100
+                val rows = repo.findCandidatesForPersona(personaId, limit)
+                call.respond(
+                    WarehouseHttpResponse(
+                        personaId = personaId.toString(),
+                        candidates = rows.map { row ->
+                            WarehouseCandidateHttpResponse(
+                                id = row.candidate.id.toString(),
+                                jobId = row.jobId.toString(),
+                                jobStatus = row.jobStatus,
+                                candidateIndex = row.candidate.candidateIndex,
+                                status = row.candidate.status.name,
+                                adminRemark = row.candidate.adminRemark,
+                                seedPrompt = extractSeedPrompt(row.requestPayload),
+                                contentType = row.candidate.contentType,
+                                fileSize = row.candidate.fileSize,
+                                widthPx = row.candidate.widthPx,
+                                heightPx = row.candidate.heightPx,
+                                createdAt = row.candidate.createdAt.toString(),
+                                assetUrl = "/v1/admin/images/assets/${row.candidate.id}",
+                            )
+                        },
                     )
                 )
             }
