@@ -218,7 +218,7 @@ All remaining gaps are **operational**, not architectural:
 
 ## 18. Git commit
 
-Recorded after commit of this document (see Git section below / commit message).
+Commit: `8b2eaa2` — docs(images): close final operational gate as pass-with-findings
 
 ---
 
