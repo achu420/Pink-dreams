@@ -4,6 +4,7 @@ import com.pinkdreams.imaging.provider.GenerationRequest
 import com.pinkdreams.imaging.provider.ReferenceInput
 import com.pinkdreams.persistence.repositories.PersonaVisualVersionRepository
 import com.pinkdreams.visual.identity.PhysicalGuide
+import com.pinkdreams.visual.identity.PrivateVisualGuide
 import kotlinx.serialization.json.Json
 import java.util.UUID
 
@@ -13,18 +14,22 @@ class PromptCompiler {
     fun compile(
         sceneIntent: SceneIntent,
         visualVersion: PersonaVisualVersionRepository.PersonaVisualVersion,
-        idempotencyKey: String
+        idempotencyKey: String,
+        /** Optional map of referenceId → role name for accurate provider labeling. */
+        referenceRoles: Map<UUID, String> = emptyMap(),
+        includePrivateGuide: Boolean = true,
     ): GenerationRequest {
         val validation = sceneIntent.validate()
         require(validation.valid) { "Invalid scene intent: ${validation.errors.joinToString("; ")}" }
 
         val physicalGuide = parsePhysicalGuide(visualVersion.physicalGuide)
-        val prompt = buildPrompt(sceneIntent, physicalGuide)
+        val privateGuide = if (includePrivateGuide) parsePrivateGuide(visualVersion.privateGuide) else null
+        val prompt = buildPrompt(sceneIntent, physicalGuide, privateGuide, visualVersion.styleConstraints)
 
         val references = sceneIntent.generation.selectedReferences.mapIndexed { index, refId ->
             ReferenceInput(
                 referenceImageId = refId,
-                role = determineReferenceRole(index),
+                role = referenceRoles[refId] ?: determineReferenceRole(index),
                 weight = 1.0f
             )
         }
@@ -41,11 +46,16 @@ class PromptCompiler {
         )
     }
 
-    private fun buildPrompt(sceneIntent: SceneIntent, physicalGuide: PhysicalGuide?): String {
+    private fun buildPrompt(
+        sceneIntent: SceneIntent,
+        physicalGuide: PhysicalGuide?,
+        privateGuide: PrivateVisualGuide?,
+        styleConstraintsJson: String,
+    ): String {
         val sections = mutableListOf<String>()
 
         // Subject with identity priority
-        val subjectSection = buildSubjectSection(sceneIntent.subject, physicalGuide)
+        val subjectSection = buildSubjectSection(sceneIntent.subject, physicalGuide, privateGuide)
         if (subjectSection.isNotEmpty()) sections.add(subjectSection)
 
         // Appearance
@@ -64,10 +74,19 @@ class PromptCompiler {
         val styleSection = buildMoodAndStyleSection(sceneIntent.moodAndStyle)
         if (styleSection.isNotEmpty()) sections.add(styleSection)
 
+        val styleConstraints = styleConstraintsJson.trim()
+        if (styleConstraints.isNotEmpty() && styleConstraints != "{}") {
+            sections.add("Style constraints: $styleConstraints")
+        }
+
         return sections.joinToString(" ")
     }
 
-    private fun buildSubjectSection(subject: Subject, physicalGuide: PhysicalGuide?): String {
+    private fun buildSubjectSection(
+        subject: Subject,
+        physicalGuide: PhysicalGuide?,
+        privateGuide: PrivateVisualGuide?,
+    ): String {
         val parts = mutableListOf<String>()
 
         if (subject.identity != null) {
@@ -79,6 +98,13 @@ class PromptCompiler {
             val physicalDescription = describePhysicalGuide(physicalGuide)
             if (physicalDescription.isNotEmpty()) {
                 parts.add("Physical description: $physicalDescription")
+            }
+        }
+
+        if (privateGuide != null && !privateGuide.isEmpty()) {
+            val privateDescription = describePrivateGuide(privateGuide)
+            if (privateDescription.isNotEmpty()) {
+                parts.add("Private visual details (authorized): $privateDescription")
             }
         }
 
@@ -205,35 +231,78 @@ class PromptCompiler {
         if (guide.face.faceShape != null) {
             parts.add("face shape: ${guide.face.faceShape}")
         }
+        listOfNotNull(guide.face.jawline?.let { "jawline: $it" }, guide.face.cheekbones?.let { "cheekbones: $it" },
+            guide.face.nose?.let { "nose: $it" }, guide.face.lips?.let { "lips: $it" })
+            .forEach { parts.add(it) }
 
-        if (guide.eyes.color != null || guide.eyes.shape != null) {
+        if (guide.eyes.color != null || guide.eyes.shape != null || guide.eyes.eyebrows != null) {
             val eyeDesc = listOfNotNull(
                 guide.eyes.color?.let { "$it eyes" },
-                guide.eyes.shape?.let { "shape: $it" }
+                guide.eyes.shape?.let { "shape: $it" },
+                guide.eyes.size?.let { "size: $it" },
+                guide.eyes.eyebrows?.let { "eyebrows: $it" },
             ).joinToString(", ")
             if (eyeDesc.isNotEmpty()) parts.add(eyeDesc)
         }
 
-        if (guide.hair.color != null || guide.hair.length != null) {
+        if (guide.hair.color != null || guide.hair.length != null || guide.hair.style != null || guide.hair.texture != null) {
             val hairDesc = listOfNotNull(
                 guide.hair.color,
-                guide.hair.length?.let { "$it hair" }
+                guide.hair.length,
+                guide.hair.texture,
+                guide.hair.style,
             ).joinToString(" ")
-            if (hairDesc.isNotEmpty()) parts.add(hairDesc)
+            if (hairDesc.isNotEmpty()) parts.add("$hairDesc hair")
         }
 
         if (guide.skin.tone != null) {
             parts.add("${guide.skin.tone} skin")
         }
+        guide.skin.undertone?.let { parts.add("undertone: $it") }
 
-        if (guide.body.build != null) {
-            parts.add("${guide.body.build} build")
+        listOfNotNull(
+            guide.body.height?.let { "height $it" },
+            guide.body.weight?.let { "weight $it" },
+            guide.body.build?.let { "$it build" },
+            guide.body.muscularity?.let { "muscularity: $it" },
+            guide.body.proportions?.let { "proportions: $it" },
+            guide.body.overallDescription,
+        ).forEach { parts.add(it) }
+
+        listOfNotNull(
+            guide.anatomy.chest?.let { "chest: $it" },
+            guide.anatomy.shoulders?.let { "shoulders: $it" },
+            guide.anatomy.waist?.let { "waist: $it" },
+            guide.anatomy.hips?.let { "hips: $it" },
+            guide.anatomy.belly?.let { "belly: $it" },
+            guide.anatomy.legs?.let { "legs: $it" },
+            guide.anatomy.other,
+        ).forEach { parts.add(it) }
+
+        val marks = (guide.marks.asFlatList() + guide.distinctiveFeatures).distinct()
+        if (marks.isNotEmpty()) {
+            parts.add("distinctive: ${marks.joinToString(", ")}")
         }
 
-        if (guide.distinctiveFeatures.isNotEmpty()) {
-            parts.add("distinctive: ${guide.distinctiveFeatures.joinToString(", ")}")
+        if (guide.appearanceConstraints.isNotEmpty()) {
+            parts.add("constraints: ${guide.appearanceConstraints.joinToString(", ")}")
         }
 
+        guide.notes?.takeIf { it.isNotBlank() }?.let { parts.add("notes: $it") }
+
+        return parts.joinToString(", ")
+    }
+
+    private fun describePrivateGuide(guide: PrivateVisualGuide): String {
+        if (guide.isEmpty()) return ""
+        val parts = listOfNotNull(
+            guide.breastDescription?.let { "breast: $it" },
+            guide.nippleDescription?.let { "nipple: $it" },
+            guide.chestDescription?.let { "private chest: $it" },
+            guide.buttDescription?.let { "butt: $it" },
+            guide.genitalDescription?.let { "genital: $it" },
+            guide.otherPrivateNotes,
+        )
         return parts.joinToString(", ")
     }
 
@@ -267,6 +336,18 @@ class PromptCompiler {
                 null
             } else {
                 json.decodeFromString<PhysicalGuide>(physicalGuideJson)
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun parsePrivateGuide(privateGuideJson: String): PrivateVisualGuide? {
+        return try {
+            if (privateGuideJson.isBlank() || privateGuideJson == "{}") {
+                null
+            } else {
+                json.decodeFromString(PrivateVisualGuide.serializer(), privateGuideJson)
             }
         } catch (e: Exception) {
             null

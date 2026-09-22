@@ -20,6 +20,7 @@ class PersonaVisualVersionRepository(private val db: Database) {
         val version: Int,
         val physicalGuide: String,
         val styleConstraints: String,
+        val privateGuide: String = "{}",
         val status: String,
         val changelogNote: String?,
         val author: String?,
@@ -30,6 +31,7 @@ class PersonaVisualVersionRepository(private val db: Database) {
         version: Int,
         physicalGuide: String = "{}",
         styleConstraints: String = "{}",
+        privateGuide: String = "{}",
         status: String = "draft",
         changelogNote: String? = null,
         author: String? = null,
@@ -41,6 +43,7 @@ class PersonaVisualVersionRepository(private val db: Database) {
             it[PersonaVisualVersions.version] = version
             it[PersonaVisualVersions.physicalGuide] = physicalGuide
             it[PersonaVisualVersions.styleConstraints] = styleConstraints
+            it[PersonaVisualVersions.privateGuide] = privateGuide
             it[PersonaVisualVersions.status] = status
             it[PersonaVisualVersions.changelogNote] = changelogNote
             it[PersonaVisualVersions.author] = author
@@ -99,6 +102,21 @@ class PersonaVisualVersionRepository(private val db: Database) {
         findById(versionId) ?: throw IllegalStateException("Failed to reload version $versionId")
     }
 
+    fun updatePrivateGuide(versionId: UUID, newPrivateGuide: String): PersonaVisualVersion = transaction(db) {
+        val version = findById(versionId) ?: throw IllegalArgumentException("Version not found: $versionId")
+        require(version.status == "draft") { "Published or archived visual versions are immutable" }
+
+        PersonaVisualVersions.update({ PersonaVisualVersions.id eq versionId }) {
+            it[PersonaVisualVersions.privateGuide] = newPrivateGuide
+        }
+
+        findById(versionId) ?: throw IllegalStateException("Failed to reload version $versionId")
+    }
+
+    fun nextVersionNumber(personaIdentityId: UUID): Int = transaction(db) {
+        findForPersonaIdentity(personaIdentityId).maxOfOrNull { it.version }?.plus(1) ?: 1
+    }
+
     fun publishVisualVersion(versionId: UUID): PersonaVisualVersion = transaction(db) {
         val version = findById(versionId) ?: throw IllegalArgumentException("Version not found: $versionId")
         require(version.status == "draft") { "Only draft versions can be published" }
@@ -146,6 +164,7 @@ class PersonaVisualVersionRepository(private val db: Database) {
         version = row[PersonaVisualVersions.version],
         physicalGuide = row[PersonaVisualVersions.physicalGuide],
         styleConstraints = row[PersonaVisualVersions.styleConstraints],
+        privateGuide = row[PersonaVisualVersions.privateGuide],
         status = row[PersonaVisualVersions.status],
         changelogNote = row[PersonaVisualVersions.changelogNote],
         author = row[PersonaVisualVersions.author],

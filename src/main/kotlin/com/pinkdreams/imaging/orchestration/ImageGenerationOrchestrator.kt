@@ -42,7 +42,9 @@ class ImageGenerationOrchestrator(
         val generationRequest = compiler.compile(
             sceneIntent = request.sceneIntent,
             visualVersion = request.personaVisualVersion,
-            idempotencyKey = request.idempotencyKey
+            idempotencyKey = request.idempotencyKey,
+            referenceRoles = request.referenceRoles,
+            includePrivateGuide = true,
         )
 
         // Validate the compiled request

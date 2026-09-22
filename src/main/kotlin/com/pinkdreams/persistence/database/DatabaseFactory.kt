@@ -224,6 +224,8 @@ object PersonaVisualVersions : Table("persona_visual_versions") {
     val version = integer("version")
     val physicalGuide = text("physical_guide").default("{}")
     val styleConstraints = text("style_constraints").default("{}")
+    /** Admin-only / generation-authorized intimate attributes. Never return via public APIs. */
+    val privateGuide = text("private_guide").default("{}")
     val status = varchar("status", 50).default("draft")
     val changelogNote = text("changelog_note").nullable()
     val author = text("author").nullable()

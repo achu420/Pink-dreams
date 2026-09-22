@@ -2047,64 +2047,322 @@
 
         function pdVisualHtml(data) {
             const note = `<div class="section-sub">${escapeHtml(data.note || '')}</div>`;
-            if (!data.hasIdentity) {
+            if (!data.hasIdentity || !Array.isArray(data.versions) || data.versions.length === 0) {
                 return `${note}<div class="empty-state" style="padding:20px;">
-                    No visual identity is linked to this persona yet. The visual-identity pipeline
-                    creates and links it; the admin console only reads it.</div>`;
+                    No visual identity draft yet for this persona.
+                    <div style="margin-top:12px;">
+                        <button class="primary" onclick="pdEnsureVisualDraft()">Create / ensure draft</button>
+                        <span id="pdVisualActionStatus" class="filter-count" style="margin-left:8px;"></span>
+                    </div>
+                </div>`;
             }
-            if (!Array.isArray(data.versions) || data.versions.length === 0) {
-                return `${note}<div class="empty-state" style="padding:20px;">
-                    This persona has a visual identity but no visual versions yet.</div>`;
-            }
-            return note + data.versions.slice().sort((a, b) => b.version - a.version).map(v => `
+            const draft = data.versions.find(v => v.status === 'draft') || null;
+            const versionsHtml = data.versions.slice().sort((a, b) => b.version - a.version).map(v => {
+                const isDraft = v.status === 'draft';
+                let guide = {};
+                let privateGuide = {};
+                try { guide = JSON.parse(v.physicalGuide || '{}') || {}; } catch (_) { guide = {}; }
+                try { privateGuide = JSON.parse(v.privateGuide || '{}') || {}; } catch (_) { privateGuide = {}; }
+                const age = (guide.agePresentation && guide.agePresentation.apparentAge) || 25;
+                const body = guide.body || {};
+                const face = guide.face || {};
+                const eyes = guide.eyes || {};
+                const hair = guide.hair || {};
+                const skin = guide.skin || {};
+                const anatomy = guide.anatomy || {};
+                const marks = guide.marks || {};
+                const distinctive = Array.isArray(guide.distinctiveFeatures) ? guide.distinctiveFeatures.join(', ') : '';
+                const slots = ['FRONT','FACE_CLOSE','LEFT_PROFILE','RIGHT_PROFILE','BACK','PRIVATE'];
+                const activeRefs = (v.referenceImages || []).filter(r => r.status !== 'ARCHIVED');
+                const slotHtml = slots.map(role => {
+                    const ref = activeRefs.find(r => r.role === role);
+                    const privateBadge = role === 'PRIVATE' ? ' <span class="badge" style="background:#7a2e2e;">PRIVATE</span>' : '';
+                    if (ref) {
+                        const img = ref.assetUrl
+                            ? `<img src="${escapeHtml(ref.assetUrl)}" alt="${role}" style="max-width:140px;max-height:140px;display:block;margin:6px 0;border:1px solid #333;"/>`
+                            : '';
+                        return `<div class="kv-item" style="margin-bottom:10px;padding:8px;border:1px solid #333;">
+                            <div class="kv-label">${role}${privateBadge} — ${escapeHtml(ref.status)}</div>
+                            ${img}
+                            <div class="filter-count">${escapeHtml(ref.notes || '')}</div>
+                            ${isDraft ? `<div style="margin-top:6px;">
+                                <label class="secondary" style="cursor:pointer;padding:4px 8px;border:1px solid #555;">Replace
+                                    <input type="file" accept="image/*" style="display:none" onchange="pdUploadReference('${role}', this)"/>
+                                </label>
+                                <button class="secondary" onclick="pdDeleteReference('${ref.id}')">Remove</button>
+                            </div>` : ''}
+                        </div>`;
+                    }
+                    return `<div class="kv-item" style="margin-bottom:10px;padding:8px;border:1px dashed #444;">
+                        <div class="kv-label">${role}${privateBadge} — empty</div>
+                        ${isDraft ? `<label class="secondary" style="cursor:pointer;padding:4px 8px;border:1px solid #555;">Upload
+                            <input type="file" accept="image/*" style="display:none" onchange="pdUploadReference('${role}', this)"/>
+                        </label>` : '<div class="filter-count">No image</div>'}
+                    </div>`;
+                }).join('');
+
+                const editForm = isDraft ? `
+                    <div class="vh-title">Physical attributes (draft — editable)</div>
+                    <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <label>Apparent age <input id="pdAge" type="number" min="18" max="100" value="${Number(age)}"/></label>
+                        <label>Height <input id="pdHeight" value="${escapeHtml(body.height || '')}"/></label>
+                        <label>Weight <input id="pdWeight" value="${escapeHtml(body.weight || '')}"/></label>
+                        <label>Build <input id="pdBuild" value="${escapeHtml(body.build || '')}"/></label>
+                        <label>Muscularity <input id="pdMuscularity" value="${escapeHtml(body.muscularity || '')}"/></label>
+                        <label>Proportions <input id="pdProportions" value="${escapeHtml(body.proportions || '')}"/></label>
+                        <label>Skin tone <input id="pdSkinTone" value="${escapeHtml(skin.tone || '')}"/></label>
+                        <label>Eye color <input id="pdEyeColor" value="${escapeHtml(eyes.color || '')}"/></label>
+                        <label>Eye shape <input id="pdEyeShape" value="${escapeHtml(eyes.shape || '')}"/></label>
+                        <label>Hair color <input id="pdHairColor" value="${escapeHtml(hair.color || '')}"/></label>
+                        <label>Hair length <input id="pdHairLength" value="${escapeHtml(hair.length || '')}"/></label>
+                        <label>Hair style <input id="pdHairStyle" value="${escapeHtml(hair.style || '')}"/></label>
+                        <label>Hair texture <input id="pdHairTexture" value="${escapeHtml(hair.texture || '')}"/></label>
+                        <label>Face shape <input id="pdFaceShape" value="${escapeHtml(face.faceShape || '')}"/></label>
+                        <label>Chest/bust <input id="pdChest" value="${escapeHtml(anatomy.chest || '')}"/></label>
+                        <label>Waist <input id="pdWaist" value="${escapeHtml(anatomy.waist || '')}"/></label>
+                        <label>Hips <input id="pdHips" value="${escapeHtml(anatomy.hips || '')}"/></label>
+                        <label>Belly <input id="pdBelly" value="${escapeHtml(anatomy.belly || '')}"/></label>
+                    </div>
+                    <label style="display:block;margin-top:8px;">Overall body description
+                        <textarea id="pdOverall" rows="2" style="width:100%;">${escapeHtml(body.overallDescription || '')}</textarea>
+                    </label>
+                    <label style="display:block;margin-top:8px;">Distinctive features (comma-separated)
+                        <input id="pdDistinctive" style="width:100%;" value="${escapeHtml(distinctive)}"/>
+                    </label>
+                    <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+                        <label>Birthmarks <input id="pdBirthmarks" value="${escapeHtml((marks.birthmarks||[]).join(', '))}"/></label>
+                        <label>Moles <input id="pdMoles" value="${escapeHtml((marks.moles||[]).join(', '))}"/></label>
+                        <label>Scars <input id="pdScars" value="${escapeHtml((marks.scars||[]).join(', '))}"/></label>
+                        <label>Tattoos <input id="pdTattoos" value="${escapeHtml((marks.tattoos||[]).join(', '))}"/></label>
+                    </div>
+                    <div class="vh-title" style="margin-top:14px;color:#c98;">Private visual details (admin-only)</div>
+                    <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <label>Breast <input id="pdPrivBreast" value="${escapeHtml(privateGuide.breastDescription || '')}"/></label>
+                        <label>Nipple <input id="pdPrivNipple" value="${escapeHtml(privateGuide.nippleDescription || '')}"/></label>
+                        <label>Butt <input id="pdPrivButt" value="${escapeHtml(privateGuide.buttDescription || '')}"/></label>
+                        <label>Chest (private) <input id="pdPrivChest" value="${escapeHtml(privateGuide.chestDescription || '')}"/></label>
+                    </div>
+                    <label style="display:block;margin-top:8px;">Genital / other private notes
+                        <textarea id="pdPrivGenital" rows="2" style="width:100%;">${escapeHtml(privateGuide.genitalDescription || '')}</textarea>
+                    </label>
+                    <label style="display:block;margin-top:8px;">Other private notes
+                        <textarea id="pdPrivOther" rows="2" style="width:100%;">${escapeHtml(privateGuide.otherPrivateNotes || '')}</textarea>
+                    </label>
+                    <label style="display:block;margin-top:8px;">Style constraints (JSON)
+                        <textarea id="pdStyleConstraints" rows="3" style="width:100%;font-family:monospace;">${escapeHtml(v.styleConstraints || '{}')}</textarea>
+                    </label>
+                    <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+                        <button class="primary" onclick="pdSaveVisualDraft()">Save draft</button>
+                        <button class="secondary" onclick="pdPublishActivateVisual()">Publish &amp; activate</button>
+                        <button class="secondary" onclick="pdEnsureVisualDraft()">Refresh / ensure draft</button>
+                        <span id="pdVisualActionStatus" class="filter-count"></span>
+                    </div>
+                ` : `
+                    <div class="vh-title">Physical guide</div>
+                    <div class="code-block">${escapeHtml(v.physicalGuide) || '—'}</div>
+                    <div class="vh-title" style="margin-top:12px;">Private guide</div>
+                    <div class="code-block">${escapeHtml(v.privateGuide) || '—'}</div>
+                    <div class="vh-title" style="margin-top:12px;">Style constraints</div>
+                    <div class="code-block">${escapeHtml(v.styleConstraints) || '—'}</div>
+                `;
+
+                return `
                 <div class="dl-pane" style="margin-bottom:14px;">
                     <div class="dl-pane-head">Visual version v${Number(v.version) || 0} —
                         ${v.isActive ? '<span class="badge prod">ACTIVE</span>' : statusBadge(v.status, false)}</div>
                     <div class="dl-body">
-                        <div class="vh-title">Physical guide (read-only)</div>
-                        <div class="code-block">${escapeHtml(v.physicalGuide) || '—'}</div>
-                        <div class="vh-title" style="margin-top:12px;">Style constraints (read-only)</div>
-                        <div class="code-block">${escapeHtml(v.styleConstraints) || '—'}</div>
+                        ${editForm}
+                        <div class="vh-title" style="margin-top:14px;">Reference image slots</div>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;">${slotHtml}</div>
 
                         <div class="vh-title" style="margin-top:14px;">Wardrobe — ${v.wardrobe.length} item(s)</div>
                         ${v.wardrobe.length ? `<div class="table-wrap"><table>
-                            <thead><tr><th>Name</th><th>Category</th><th>Subcategory</th><th>Color</th><th>Material</th><th>Available</th></tr></thead>
+                            <thead><tr><th>Name</th><th>Category</th><th>Color</th></tr></thead>
                             <tbody>${v.wardrobe.map(w => `<tr>
                                 <td>${escapeHtml(w.name)}</td><td>${escapeHtml(w.category)}</td>
-                                <td>${escapeHtml(w.subcategory)}</td><td>${escapeHtml(w.color) || '—'}</td>
-                                <td>${escapeHtml(w.material) || '—'}</td>
-                                <td>${w.isAvailable ? 'yes' : 'no'}</td></tr>`).join('')}</tbody>
+                                <td>${escapeHtml(w.color) || '—'}</td></tr>`).join('')}</tbody>
                         </table></div>` : '<div class="filter-count">No wardrobe items.</div>'}
-
-                        <div class="vh-title" style="margin-top:14px;">Reference images — ${v.referenceImages.length}</div>
-                        ${v.referenceImages.length ? `<div class="table-wrap"><table>
-                            <thead><tr><th>Role</th><th>Status</th><th>Source</th><th>Type</th><th>Size</th><th>Dimensions</th><th>Storage key</th></tr></thead>
-                            <tbody>${v.referenceImages.map(r => `<tr>
-                                <td>${escapeHtml(r.role)}</td><td>${escapeHtml(r.status)}</td>
-                                <td>${escapeHtml(r.source)}</td><td>${escapeHtml(r.contentType)}</td>
-                                <td>${Number(r.fileSize) || 0} B</td>
-                                <td>${r.width && r.height ? `${Number(r.width)}×${Number(r.height)}` : '—'}</td>
-                                <td class="mono">${escapeHtml(r.storageKey)}</td></tr>`).join('')}</tbody>
-                        </table></div>` : '<div class="filter-count">No reference images. (Images are not served by the admin console — metadata only.)</div>'}
 
                         <div class="vh-title" style="margin-top:14px;">Image jobs — ${v.imageJobs.length}</div>
                         ${v.imageJobs.length ? `<div class="table-wrap"><table>
-                            <thead><tr><th>Status</th><th>Type</th><th>Attempts</th><th>Candidates</th><th>Created</th><th>Last error</th></tr></thead>
+                            <thead><tr><th>Status</th><th>Candidates</th><th>Created</th></tr></thead>
                             <tbody>${v.imageJobs.map(j => `<tr>
-                                <td>${escapeHtml(j.status)}</td><td>${escapeHtml(j.jobType)}</td>
-                                <td>${Number(j.attemptCount) || 0}/${Number(j.maxAttempts) || 0}</td>
+                                <td>${escapeHtml(j.status)}</td>
                                 <td>${j.candidates.length}</td>
-                                <td class="mono">${escapeHtml(j.createdAt)}</td>
-                                <td>${escapeHtml(j.lastError) || '—'}</td></tr>`).join('')}</tbody>
+                                <td class="mono">${escapeHtml(j.createdAt)}</td></tr>`).join('')}</tbody>
                         </table></div>` : '<div class="filter-count">No image jobs for this version.</div>'}
 
-                        <div class="section-sub" style="margin-top:12px;">
+                        ${isDraft || v.isActive ? `<div class="section-sub" style="margin-top:12px;">
                             <button class="secondary" id="pdGenerateImagesBtn" onclick="pdGenerateImages()" title="Enqueue image generation job">Generate images</button>
                             <span id="pdGenerateImagesStatus" class="filter-count" style="margin-left:8px;"></span>
-                            Uses POST /v1/admin/images/jobs (Fake provider when OPENROUTER_API_KEY is unset).
-                        </div>
+                        </div>` : ''}
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
+            return note + (draft ? '' : `<div class="section-sub" style="margin-bottom:8px;">
+                No draft version — <button class="secondary" onclick="pdEnsureVisualDraft()">Create draft from active</button>
+                <span id="pdVisualActionStatus" class="filter-count"></span>
+            </div>`) + versionsHtml;
+        }
+
+        function pdSplitList(s) {
+            return String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+        }
+
+        async function pdEnsureVisualDraft() {
+            if (!selectedPersonaId) return;
+            const statusEl = document.getElementById('pdVisualActionStatus');
+            if (statusEl) statusEl.textContent = 'Ensuring draft…';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(selectedPersonaId)}/visual/ensure`, { method: 'POST' });
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
+                if (statusEl) statusEl.textContent = 'Draft v' + body.draftVersion;
+                await loadPersonaDetail(selectedPersonaId);
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
+            }
+        }
+
+        async function pdSaveVisualDraft() {
+            if (!selectedPersonaId) return;
+            const statusEl = document.getElementById('pdVisualActionStatus');
+            if (statusEl) statusEl.textContent = 'Saving…';
+            try {
+                await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(selectedPersonaId)}/visual/ensure`, { method: 'POST' });
+                const physicalGuide = {
+                    agePresentation: { apparentAge: Number(document.getElementById('pdAge').value) || 25, adult: true },
+                    face: { faceShape: document.getElementById('pdFaceShape').value || null },
+                    eyes: {
+                        color: document.getElementById('pdEyeColor').value || null,
+                        shape: document.getElementById('pdEyeShape').value || null
+                    },
+                    hair: {
+                        color: document.getElementById('pdHairColor').value || null,
+                        length: document.getElementById('pdHairLength').value || null,
+                        style: document.getElementById('pdHairStyle').value || null,
+                        texture: document.getElementById('pdHairTexture').value || null
+                    },
+                    skin: { tone: document.getElementById('pdSkinTone').value || null },
+                    body: {
+                        height: document.getElementById('pdHeight').value || null,
+                        weight: document.getElementById('pdWeight').value || null,
+                        build: document.getElementById('pdBuild').value || null,
+                        muscularity: document.getElementById('pdMuscularity').value || null,
+                        proportions: document.getElementById('pdProportions').value || null,
+                        overallDescription: document.getElementById('pdOverall').value || null
+                    },
+                    anatomy: {
+                        chest: document.getElementById('pdChest').value || null,
+                        waist: document.getElementById('pdWaist').value || null,
+                        hips: document.getElementById('pdHips').value || null,
+                        belly: document.getElementById('pdBelly').value || null
+                    },
+                    distinctiveFeatures: pdSplitList(document.getElementById('pdDistinctive').value),
+                    marks: {
+                        birthmarks: pdSplitList(document.getElementById('pdBirthmarks').value),
+                        moles: pdSplitList(document.getElementById('pdMoles').value),
+                        scars: pdSplitList(document.getElementById('pdScars').value),
+                        tattoos: pdSplitList(document.getElementById('pdTattoos').value)
+                    },
+                    appearanceConstraints: [],
+                    notes: null
+                };
+                const privateGuide = {
+                    breastDescription: document.getElementById('pdPrivBreast').value || null,
+                    nippleDescription: document.getElementById('pdPrivNipple').value || null,
+                    buttDescription: document.getElementById('pdPrivButt').value || null,
+                    chestDescription: document.getElementById('pdPrivChest').value || null,
+                    genitalDescription: document.getElementById('pdPrivGenital').value || null,
+                    otherPrivateNotes: document.getElementById('pdPrivOther').value || null
+                };
+                let styleRaw = document.getElementById('pdStyleConstraints').value || '{}';
+                try { JSON.parse(styleRaw); } catch (_) { styleRaw = '{}'; }
+                const putGuide = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(selectedPersonaId)}/visual/physical-guide`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(physicalGuide)
+                });
+                if (!putGuide.ok) {
+                    const b = await putGuide.json().catch(() => ({}));
+                    throw new Error((b.error && b.error.message) || 'physical-guide failed');
+                }
+                const putPriv = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(selectedPersonaId)}/visual/private-guide`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(privateGuide)
+                });
+                if (!putPriv.ok) {
+                    const b = await putPriv.json().catch(() => ({}));
+                    throw new Error((b.error && b.error.message) || 'private-guide failed');
+                }
+                const putStyle = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(selectedPersonaId)}/visual/style-constraints`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ styleConstraints: styleRaw })
+                });
+                if (!putStyle.ok) {
+                    const b = await putStyle.json().catch(() => ({}));
+                    throw new Error((b.error && b.error.message) || 'style-constraints failed');
+                }
+                if (statusEl) statusEl.textContent = 'Saved';
+                await loadPersonaDetail(selectedPersonaId);
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
+            }
+        }
+
+        async function pdPublishActivateVisual() {
+            if (!selectedPersonaId) return;
+            const statusEl = document.getElementById('pdVisualActionStatus');
+            if (statusEl) statusEl.textContent = 'Publishing…';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(selectedPersonaId)}/visual/publish-activate`, { method: 'POST' });
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
+                if (statusEl) statusEl.textContent = 'Active v' + body.version;
+                await loadPersonaDetail(selectedPersonaId);
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
+            }
+        }
+
+        async function pdUploadReference(role, input) {
+            if (!selectedPersonaId || !input.files || !input.files[0]) return;
+            const statusEl = document.getElementById('pdVisualActionStatus');
+            if (statusEl) statusEl.textContent = 'Uploading ' + role + '…';
+            try {
+                await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(selectedPersonaId)}/visual/ensure`, { method: 'POST' });
+                const fd = new FormData();
+                fd.append('file', input.files[0]);
+                fd.append('role', role);
+                fd.append('finalize', 'true');
+                const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(selectedPersonaId)}/visual/references`, {
+                    method: 'POST', body: fd
+                });
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
+                if (statusEl) statusEl.textContent = 'Uploaded ' + role;
+                await loadPersonaDetail(selectedPersonaId);
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
+            } finally {
+                input.value = '';
+            }
+        }
+
+        async function pdDeleteReference(referenceId) {
+            if (!selectedPersonaId || !referenceId) return;
+            if (!confirm('Remove this reference image from the draft?')) return;
+            const statusEl = document.getElementById('pdVisualActionStatus');
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(selectedPersonaId)}/visual/references/${encodeURIComponent(referenceId)}`, {
+                    method: 'DELETE'
+                });
+                if (!res.ok && res.status !== 204) {
+                    const body = await res.json().catch(() => ({}));
+                    throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
+                }
+                if (statusEl) statusEl.textContent = 'Removed';
+                await loadPersonaDetail(selectedPersonaId);
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
+            }
         }
 
         async function pdGenerateImages() {

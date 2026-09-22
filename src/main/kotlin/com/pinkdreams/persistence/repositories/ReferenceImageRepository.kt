@@ -179,9 +179,45 @@ class ReferenceImageRepository(
         }
     }
 
+    /**
+     * For standard identity slots (and PRIVATE), archive prior non-archived refs of the same role
+     * on the draft version so only one active slot remains after upload.
+     */
+    fun archiveActiveForRole(personaVisualVersionId: UUID, role: ReferenceRole) = transaction(db) {
+        if (!role.isStandardIdentitySlot() && role != ReferenceRole.PRIVATE) return@transaction
+        val version = PersonaVisualVersionRepository(db).findById(personaVisualVersionId)
+            ?: throw IllegalArgumentException("Visual version not found: $personaVisualVersionId")
+        require(version.status == "draft") { "References can only be modified on draft versions" }
+        findByRole(personaVisualVersionId, role)
+            .filter { it.status != ReferenceStatus.ARCHIVED }
+            .forEach { ref ->
+                PersonaVisualReferenceImages.update({ PersonaVisualReferenceImages.id eq ref.id }) {
+                    it[PersonaVisualReferenceImages.status] = ReferenceStatus.ARCHIVED.name
+                }
+            }
+    }
+
+    fun updateNotes(referenceId: UUID, notes: String?): ReferenceImage = transaction(db) {
+        val reference = findById(referenceId)
+            ?: throw IllegalArgumentException("Reference not found: $referenceId")
+        val version = PersonaVisualVersionRepository(db).findById(reference.personaVisualVersionId)
+            ?: throw IllegalStateException("Visual version not found: ${reference.personaVisualVersionId}")
+        require(version.status == "draft") { "References can only be updated on draft versions" }
+        PersonaVisualReferenceImages.update({ PersonaVisualReferenceImages.id eq referenceId }) {
+            it[PersonaVisualReferenceImages.notes] = notes
+        }
+        findById(referenceId)!!
+    }
+
     fun retrieveContent(referenceId: UUID): ByteArray? = transaction(db) {
         val reference = findById(referenceId) ?: return@transaction null
         objectStorage.retrieve(reference.storageKey)?.content
+    }
+
+    fun retrieveContentWithMeta(referenceId: UUID): Pair<ReferenceImage, ByteArray>? = transaction(db) {
+        val reference = findById(referenceId) ?: return@transaction null
+        val bytes = objectStorage.retrieve(reference.storageKey)?.content ?: return@transaction null
+        reference to bytes
     }
 
     private fun rowToModel(row: ResultRow): ReferenceImage = ReferenceImage(

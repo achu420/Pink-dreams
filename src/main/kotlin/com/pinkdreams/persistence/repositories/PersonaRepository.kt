@@ -86,6 +86,24 @@ open class PersonaRepository(private val db: Database) {
             .singleOrNull()
     }
 
+    /**
+     * Link a persona to a visual identity root. Idempotent if already linked to the same id.
+     * Refuses to silently switch an existing different identity.
+     */
+    fun linkPersonaIdentity(personaId: UUID, identityId: UUID): Unit = transaction(db) {
+        val row = Personas.select { Personas.id eq personaId }.singleOrNull()
+            ?: throw IllegalArgumentException("Persona not found: $personaId")
+        val current = row[Personas.personaIdentityId]
+        if (current != null && current != identityId) {
+            throw IllegalStateException("Persona already linked to a different visual identity")
+        }
+        if (current == identityId) return@transaction
+        Personas.update({ Personas.id eq personaId }) {
+            it[Personas.personaIdentityId] = identityId
+            it[Personas.updatedAt] = defaultNow()
+        }
+    }
+
     fun findAll(): List<Persona> = transaction(db) {
         Personas.selectAll()
             .map(::rowToModel)

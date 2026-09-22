@@ -202,6 +202,14 @@ fun Application.module(
         db,
         objectStorage,
     )
+    val personalGuideRepository = com.pinkdreams.persistence.repositories.PersonalGuideRepository(db)
+    val personaVisualAdminService = com.pinkdreams.visual.identity.PersonaVisualAdminService(
+        personaRepository = personaRepo,
+        personaIdentityRepository = personaIdentityRepository,
+        visualVersionRepository = visualVersionRepository,
+        personalGuideRepository = personalGuideRepository,
+        referenceImageRepository = referenceImageRepository,
+    )
     val imageProvider: com.pinkdreams.imaging.provider.ImageProvider =
         when {
             System.getenv("IMAGE_PROVIDER")?.equals("fake", ignoreCase = true) == true ->
@@ -425,6 +433,8 @@ fun Application.module(
             referenceImageRepository = referenceImageRepository,
             imageJobRepository = imageJobRepository,
             generatedCandidateRepository = generatedCandidateRepository,
+            personalGuideRepository = personalGuideRepository,
+            visualAdminService = personaVisualAdminService,
             adminAuthorizationProvider = authProvider,
             generationTriggerWired = true,
         ).register(this)

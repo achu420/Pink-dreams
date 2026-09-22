@@ -15,6 +15,8 @@ data class ImageGenerationRequest(
     val sceneIntent: SceneIntent,
     val selectedWardrobeIds: List<UUID> = emptyList(),
     val selectedReferenceIds: List<UUID> = emptyList(),
+    /** Optional role labels keyed by reference image id for prompt/provider metadata. */
+    val referenceRoles: Map<UUID, String> = emptyMap(),
     val candidateCount: Int = sceneIntent.generation.candidateCount,
     val idempotencyKey: String,
     val conversationId: UUID? = null,

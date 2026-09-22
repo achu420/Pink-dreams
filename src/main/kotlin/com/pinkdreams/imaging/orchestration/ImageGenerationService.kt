@@ -48,6 +48,8 @@ class ImageGenerationService(
         val userId: UUID? = null,
         val selectedWardrobeIds: List<UUID> = emptyList(),
         val selectedReferenceIds: List<UUID> = emptyList(),
+        /** When false (default), PRIVATE reference images are never auto-selected. */
+        val includePrivateReferences: Boolean = false,
     )
 
     data class CreateResult(
@@ -84,15 +86,20 @@ class ImageGenerationService(
 
         val existing = jobRepository.findByIdempotencyKey(version.id, command.idempotencyKey)
 
-        val refs = if (command.selectedReferenceIds.isNotEmpty()) {
-            command.selectedReferenceIds
+        val selectedRefModels = if (command.selectedReferenceIds.isNotEmpty()) {
+            command.selectedReferenceIds.mapNotNull { referenceImageRepository.findById(it) }
+                .filter { !it.role.isPrivate() || command.includePrivateReferences }
         } else {
             referenceImageRepository.findForVersion(version.id)
-                .filter { it.status == com.pinkdreams.visual.identity.ReferenceStatus.FINALIZED ||
-                    it.status == com.pinkdreams.visual.identity.ReferenceStatus.UPLOADED }
-                .take(3)
-                .map { it.id }
+                .filter {
+                    it.status == com.pinkdreams.visual.identity.ReferenceStatus.FINALIZED ||
+                        it.status == com.pinkdreams.visual.identity.ReferenceStatus.UPLOADED
+                }
+                .filter { command.includePrivateReferences || !it.role.isPrivate() }
+                .let { preferStandardSlots(it) }
         }
+        val refs = selectedRefModels.map { it.id }
+        val referenceRoles = selectedRefModels.associate { it.id to it.role.name }
 
         val wardrobeIds = if (command.selectedWardrobeIds.isNotEmpty()) {
             command.selectedWardrobeIds
@@ -124,6 +131,7 @@ class ImageGenerationService(
             sceneIntent = scene,
             selectedWardrobeIds = wardrobeIds,
             selectedReferenceIds = refs,
+            referenceRoles = referenceRoles,
             candidateCount = command.candidateCount,
             idempotencyKey = command.idempotencyKey,
             conversationId = command.conversationId,
@@ -133,6 +141,28 @@ class ImageGenerationService(
 
         val job = orchestrator.submit(request)
         return CreateResult(job = job, reusedExisting = existing != null && existing.id == job.id)
+    }
+
+    private fun preferStandardSlots(
+        refs: List<com.pinkdreams.visual.identity.ReferenceImage>,
+    ): List<com.pinkdreams.visual.identity.ReferenceImage> {
+        val byRole = linkedMapOf<com.pinkdreams.visual.identity.ReferenceRole, com.pinkdreams.visual.identity.ReferenceImage>()
+        for (slot in com.pinkdreams.visual.identity.ReferenceRole.STANDARD_SLOTS) {
+            refs.filter { it.role == slot }
+                .sortedByDescending { it.status == com.pinkdreams.visual.identity.ReferenceStatus.FINALIZED }
+                .firstOrNull()
+                ?.let { byRole[slot] = it }
+        }
+        val selected = byRole.values.toMutableList()
+        if (selected.size < 3) {
+            for (r in refs.sortedByDescending { it.status == com.pinkdreams.visual.identity.ReferenceStatus.FINALIZED }) {
+                if (r.role.isPrivate()) continue
+                if (selected.any { it.id == r.id }) continue
+                selected.add(r)
+                if (selected.size >= 5) break
+            }
+        }
+        return selected.take(5)
     }
 
     fun getJob(jobId: UUID): ImageJob? = jobRepository.findById(jobId)

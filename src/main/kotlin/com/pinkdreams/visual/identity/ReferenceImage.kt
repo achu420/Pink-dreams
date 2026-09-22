@@ -2,8 +2,43 @@ package com.pinkdreams.visual.identity
 
 import java.util.UUID
 
+/**
+ * Identity reference roles.
+ *
+ * Product standard slots: [FRONT], [FACE_CLOSE], [LEFT_PROFILE], [RIGHT_PROFILE], [BACK],
+ * optional [PRIVATE], [OTHER].
+ *
+ * Legacy roles ([FACE], [FULL_BODY], etc.) retained for existing data / wardrobe-style refs.
+ */
 enum class ReferenceRole {
-    FACE, FULL_BODY, BODY, HAIR, WARDROBE, STYLE, GENERAL_IDENTITY
+    FRONT,
+    FACE_CLOSE,
+    LEFT_PROFILE,
+    RIGHT_PROFILE,
+    BACK,
+    PRIVATE,
+    OTHER,
+    // Legacy
+    FACE,
+    FULL_BODY,
+    BODY,
+    HAIR,
+    WARDROBE,
+    STYLE,
+    GENERAL_IDENTITY;
+
+    fun isPrivate(): Boolean = this == PRIVATE
+
+    fun isStandardIdentitySlot(): Boolean = when (this) {
+        FRONT, FACE_CLOSE, LEFT_PROFILE, RIGHT_PROFILE, BACK -> true
+        else -> false
+    }
+
+    companion object {
+        val STANDARD_SLOTS: List<ReferenceRole> = listOf(
+            FRONT, FACE_CLOSE, LEFT_PROFILE, RIGHT_PROFILE, BACK
+        )
+    }
 }
 
 enum class ReferenceStatus {
