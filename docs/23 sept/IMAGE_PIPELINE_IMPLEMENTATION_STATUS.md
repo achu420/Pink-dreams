@@ -1013,12 +1013,13 @@ IMAGE WAREHOUSE
 | 13 Identity Consistency & Reference Matching | PASS WITH FINDINGS | 298ebaf |
 | 14 Image Engine / Model Admin Configuration | PASS WITH FINDINGS | 185d0b3 |
 | 15 Image Warehouse Candidate Management (deepen) | PASS WITH FINDINGS | 77625db |
-| 16 Image Cost/SLA Ops Admin (deepen) | PASS WITH FINDINGS | (this commit) |
+| 16 Image Cost/SLA Ops Admin (deepen) | PASS WITH FINDINGS | ccd4ee7 |
+| 17 E2E Release Gate report | CONDITIONAL PASS | (this commit) |
 
 Next queued MD files under `docs/23 sept/`:
 
-* `17_IMAGE_PIPELINE_END_TO_END_PRODUCTION_TEST_RELEASE_GATE.md` ← next
-* `18`–`27` (audit overlaps; prioritize unique gaps)
+* `18`–`27` — mostly overlap; prioritize `27_REAL_PERSONA_IMAGE_GENERATION_ACCEPTANCE_TEST.md` for live morning run
+* Posts/social still deferred
 
 Before implementing new functionality beyond the current task:
 
