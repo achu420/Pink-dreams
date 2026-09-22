@@ -30,6 +30,7 @@ class ImageGenerationService(
     private val orchestrator: ImageGenerationOrchestrator,
     private val jobRepository: ImageJobRepository,
     private val candidateRepository: GeneratedCandidateRepository,
+    private val imageRuntimeConfig: com.pinkdreams.imaging.config.ImageRuntimeConfig? = null,
 ) {
 
     data class CreateCommand(
@@ -168,11 +169,22 @@ class ImageGenerationService(
             personaId = command.personaId,
             sourceCandidateId = command.sourceCandidateId,
             adminCorrection = command.adminCorrection,
-            modelId = command.modelId?.takeIf { it.isNotBlank() },
+            modelId = resolveModelId(command.modelId),
         )
 
         val job = orchestrator.submit(request)
         return CreateResult(job = job, reusedExisting = existing != null && existing.id == job.id)
+    }
+
+    private fun resolveModelId(explicit: String?): String {
+        val cfg = imageRuntimeConfig
+        return if (cfg != null) {
+            cfg.resolve(explicit).modelId
+        } else {
+            explicit?.takeIf { it.isNotBlank() }
+                ?: System.getenv("OPENROUTER_IMAGE_MODEL")?.takeIf { it.isNotBlank() }
+                ?: com.pinkdreams.imaging.config.ImageRuntimeConfig.DEFAULT_MODEL
+        }
     }
 
     private fun preferStandardSlots(

@@ -60,6 +60,7 @@ object DatabaseFactory {
             GeneratedCandidates,
             ImageEvaluations,
             ImageEvaluationModels,
+            ImageProviderSettings,
             Personas,
             PersonaCoreVersions,
             UserProfiles,
@@ -350,6 +351,20 @@ object ImageEvaluationModels : Table("image_evaluation_models") {
     val createdAt = datetime("created_at")
 
     override val primaryKey = PrimaryKey(id)
+}
+
+object ImageProviderSettings : Table("image_provider_settings") {
+    val id = uuid("id")
+    val provider = varchar("provider", 100).nullable()
+    val modelId = varchar("model_id", 255).nullable()
+    val enabled = bool("enabled").default(true)
+    val notes = text("notes").nullable()
+    val updatedAt = datetime("updated_at")
+    val updatedBy = varchar("updated_by", 255).nullable()
+
+    override val primaryKey = PrimaryKey(id)
+
+    val SINGLETON_ID: java.util.UUID = java.util.UUID.fromString("00000000-0000-0000-0000-00000000a1c6")
 }
 
 object Personas : Table("personas") {

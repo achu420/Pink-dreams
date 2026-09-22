@@ -266,6 +266,8 @@ fun Application.module(
         compiler = com.pinkdreams.imaging.compiler.PromptCompiler(),
         jobRepository = imageJobRepository,
     )
+    val imageProviderSettingsRepository = com.pinkdreams.imaging.config.ImageProviderSettingsRepository(db)
+    val imageRuntimeConfig = com.pinkdreams.imaging.config.ImageRuntimeConfig(imageProviderSettingsRepository)
     val imageGenerationService = com.pinkdreams.imaging.orchestration.ImageGenerationService(
         personaRepository = personaRepo,
         visualVersionRepository = visualVersionRepository,
@@ -274,6 +276,7 @@ fun Application.module(
         orchestrator = imageOrchestrator,
         jobRepository = imageJobRepository,
         candidateRepository = generatedCandidateRepository,
+        imageRuntimeConfig = imageRuntimeConfig,
     )
     com.pinkdreams.imaging.retention.ImageRetentionCleaner(
         db = db,
@@ -449,6 +452,8 @@ fun Application.module(
             generationTriggerWired = true,
             warehouseRepository = com.pinkdreams.imaging.orchestration.ImageWarehouseRepository(db),
             referenceImageRepository = referenceImageRepository,
+            imageRuntimeConfig = imageRuntimeConfig,
+            imageProviderSettingsRepository = imageProviderSettingsRepository,
         ).register(this)
         com.pinkdreams.api.admin.AdminImageEvaluationRoutes(
             evaluationService = com.pinkdreams.imaging.evaluation.ImageModelEvaluationService(

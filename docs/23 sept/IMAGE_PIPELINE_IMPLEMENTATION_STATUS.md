@@ -756,6 +756,7 @@ Based on previous implementation reports:
 | Image SLA                  | IMPLEMENTED    |
 | Image model evaluation     | IMPLEMENTED    |
 | Identity consistency review| IMPLEMENTED    |
+| Image provider/model Admin | IMPLEMENTED    |
 | Retention                  | IMPLEMENTED    |
 | Chat attachment            | IMPLEMENTED    |
 | End-user ownership APIs    | IMPLEMENTED    |
@@ -1008,15 +1009,15 @@ IMAGE WAREHOUSE
 | 23-04 Image Warehouse tab + API | PASS WITH FINDINGS | 13e4365 |
 | 23-05 Image Cost / SLA Admin | PASS WITH FINDINGS | b2880c8 |
 | 12 Image Model Evaluation | PASS WITH FINDINGS | 8e5944c |
-| 13 Identity Consistency & Reference Matching | PASS WITH FINDINGS | (this commit) |
+| 13 Identity Consistency & Reference Matching | PASS WITH FINDINGS | 298ebaf |
+| 14 Image Engine / Model Admin Configuration | PASS WITH FINDINGS | (this commit) |
 
 Next queued MD files under `docs/23 sept/`:
 
-* `14_IMAGE_GENERATION_ENGINE_SKILL_CONFIGURATION.md` ← next
-* `15_IMAGE_WAREHOUSE_CANDIDATE_MANAGEMENT.md`
+* `15_IMAGE_WAREHOUSE_CANDIDATE_MANAGEMENT.md` ← next
 * `16_IMAGE_COST_SLA_OBSERVABILITY_ADMIN.md`
 * `17_IMAGE_PIPELINE_END_TO_END_PRODUCTION_TEST_RELEASE_GATE.md`
-* `Image Model & Provider Configuration.md`
+* `18`–`21` (newer uploads — re-scan for overlap)
 
 Before implementing new functionality beyond the current task:
 

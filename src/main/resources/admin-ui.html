@@ -1282,7 +1282,21 @@
 
         <div id="modeleval" class="tab-content">
             <h2>Image Model Evaluation</h2>
-            <div class="section-sub">Compare 2–3 OpenRouter models on the same persona, identity, references, and seed. Does not change production <code>OPENROUTER_IMAGE_MODEL</code>.</div>
+            <div class="section-sub">Compare 2–3 OpenRouter models on the same persona, identity, references, and seed. Does not change production <code>OPENROUTER_IMAGE_MODEL</code> unless you save a new default below.</div>
+            <div id="meProdConfig" class="kv-item" style="margin:12px 0;max-width:720px;">
+                <div class="vh-title">Production image model</div>
+                <div class="filter-count" id="meProdConfigLabel">Loading…</div>
+                <label style="display:block;margin-top:8px;">Default model ID
+                    <input type="text" id="meProdModel" style="width:100%;" placeholder="openai/gpt-image-2.5-flare">
+                </label>
+                <label style="display:block;margin-top:6px;">Provider
+                    <input type="text" id="meProdProvider" style="width:100%;" placeholder="openrouter">
+                </label>
+                <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                    <button class="secondary" onclick="meSaveProdConfig()">Save as Admin default</button>
+                    <button class="secondary" onclick="meClearProdConfig()">Clear Admin override (use env)</button>
+                </div>
+            </div>
             <div style="margin:12px 0;display:grid;gap:10px;max-width:720px;">
                 <label>Persona ID <input type="text" id="mePersonaId" placeholder="UUID" style="width:100%;"></label>
                 <label>Seed prompt <textarea id="meSeed" rows="3" style="width:100%;" placeholder="Same seed for all models"></textarea></label>
@@ -2502,11 +2516,55 @@
                 await meLoadCandidateModels();
                 meModelsLoaded = true;
             }
+            await meLoadProdConfig();
             await meLoadList();
             if (selectedPersonaId) {
                 const el = document.getElementById('mePersonaId');
                 if (el && !el.value) el.value = selectedPersonaId;
             }
+        }
+
+        async function meLoadProdConfig() {
+            const label = document.getElementById('meProdConfigLabel');
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/config`);
+                const d = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((d.error && d.error.message) || ('HTTP ' + res.status));
+                if (label) {
+                    label.textContent = `Effective: ${d.provider} / ${d.model} (model source ${d.modelSource || '—'} · precedence: ${d.precedence || 'request > database > environment > default'})`;
+                }
+                const m = document.getElementById('meProdModel');
+                const p = document.getElementById('meProdProvider');
+                if (m) m.value = d.adminConfiguredModel || d.model || '';
+                if (p) p.value = d.provider || 'openrouter';
+            } catch (e) {
+                if (label) label.textContent = 'Config load failed: ' + (e.message || e);
+            }
+        }
+
+        async function meSaveProdConfig() {
+            const model = (document.getElementById('meProdModel') || {}).value?.trim();
+            const provider = (document.getElementById('meProdProvider') || {}).value?.trim() || 'openrouter';
+            if (!model) { alert('Model ID required'); return; }
+            const res = await fetch(`${ADMIN_BASE}/images/config`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model, provider, enabled: true }),
+            });
+            const d = await res.json().catch(() => ({}));
+            if (!res.ok) { alert((d.error && d.error.message) || ('HTTP ' + res.status)); return; }
+            await meLoadProdConfig();
+        }
+
+        async function meClearProdConfig() {
+            const res = await fetch(`${ADMIN_BASE}/images/config`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clearOverrides: true }),
+            });
+            const d = await res.json().catch(() => ({}));
+            if (!res.ok) { alert((d.error && d.error.message) || ('HTTP ' + res.status)); return; }
+            await meLoadProdConfig();
         }
 
         async function meLoadCandidateModels() {

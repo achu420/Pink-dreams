@@ -134,6 +134,23 @@ data class ImageConfigHttpResponse(
     val model: String,
     val maxCandidateCount: Int,
     val defaultCandidateCount: Int,
+    val providerSource: String? = null,
+    val modelSource: String? = null,
+    val adminConfiguredModel: String? = null,
+    val environmentModel: String? = null,
+    val enabled: Boolean = true,
+    val notes: String? = null,
+    val precedence: String = "request > database > environment > default",
+)
+
+@Serializable
+data class PatchImageConfigHttpRequest(
+    val provider: String? = null,
+    val model: String? = null,
+    val enabled: Boolean? = null,
+    val notes: String? = null,
+    /** When true, clears DB overrides so env/default apply. */
+    val clearOverrides: Boolean = false,
 )
 
 @Serializable
@@ -224,6 +241,8 @@ class AdminImageGenerationRoutes(
     private val generationTriggerWired: Boolean = true,
     private val warehouseRepository: ImageWarehouseRepository? = null,
     private val referenceImageRepository: com.pinkdreams.persistence.repositories.ReferenceImageRepository? = null,
+    private val imageRuntimeConfig: com.pinkdreams.imaging.config.ImageRuntimeConfig? = null,
+    private val imageProviderSettingsRepository: com.pinkdreams.imaging.config.ImageProviderSettingsRepository? = null,
 ) {
     fun register(route: Route) {
         route.authenticate("session-auth", "dev-auth") {
@@ -561,20 +580,104 @@ class AdminImageGenerationRoutes(
 
             get("/v1/admin/images/config") {
                 if (!call.requireAdmin(adminAuthorizationProvider)) return@get
-                val envProvider = System.getenv("IMAGE_PROVIDER")?.takeIf { it.isNotBlank() }
-                val provider = envProvider
-                    ?: if (System.getenv("OPENROUTER_API_KEY").isNullOrBlank()) "fake" else "openrouter"
-                val model = System.getenv("OPENROUTER_IMAGE_MODEL")
-                    ?.takeIf { it.isNotBlank() }
-                    ?: "openai/gpt-image-2.5-flare"
-                call.respond(
-                    ImageConfigHttpResponse(
-                        provider = provider,
-                        model = model,
-                        maxCandidateCount = 4,
-                        defaultCandidateCount = 4,
+                val resolved = imageRuntimeConfig?.resolve()
+                if (resolved != null) {
+                    val stored = imageProviderSettingsRepository?.get()
+                    call.respond(
+                        ImageConfigHttpResponse(
+                            provider = resolved.provider,
+                            model = resolved.modelId,
+                            maxCandidateCount = 4,
+                            defaultCandidateCount = 4,
+                            providerSource = resolved.providerSource.name,
+                            modelSource = resolved.modelSource.name,
+                            adminConfiguredModel = resolved.adminConfiguredModel,
+                            environmentModel = resolved.environmentModel,
+                            enabled = resolved.enabled,
+                            notes = stored?.notes,
+                            precedence = "request > database > environment > default",
+                        )
                     )
-                )
+                } else {
+                    val envProvider = System.getenv("IMAGE_PROVIDER")?.takeIf { it.isNotBlank() }
+                    val provider = envProvider
+                        ?: if (System.getenv("OPENROUTER_API_KEY").isNullOrBlank()) "fake" else "openrouter"
+                    val model = System.getenv("OPENROUTER_IMAGE_MODEL")
+                        ?.takeIf { it.isNotBlank() }
+                        ?: "openai/gpt-image-2.5-flare"
+                    call.respond(
+                        ImageConfigHttpResponse(
+                            provider = provider,
+                            model = model,
+                            maxCandidateCount = 4,
+                            defaultCandidateCount = 4,
+                            modelSource = "ENVIRONMENT",
+                            environmentModel = model,
+                        )
+                    )
+                }
+            }
+
+            patch("/v1/admin/images/config") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@patch
+                val repo = imageProviderSettingsRepository
+                if (repo == null) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        ErrorResponse(ApiError(ErrorCode.INTERNAL_SERVER_ERROR, "Image config not wired", null)),
+                    )
+                    return@patch
+                }
+                val body = try {
+                    call.receive<PatchImageConfigHttpRequest>()
+                } catch (_: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid request body", null)),
+                    )
+                    return@patch
+                }
+                try {
+                    val current = repo.get()
+                    val saved = if (body.clearOverrides) {
+                        repo.save(
+                            provider = null,
+                            modelId = null,
+                            enabled = true,
+                            notes = null,
+                            updatedBy = call.principal<UserIdPrincipal>()?.name,
+                        )
+                    } else {
+                        repo.save(
+                            provider = body.provider ?: current.provider,
+                            modelId = body.model ?: current.modelId,
+                            enabled = body.enabled ?: current.enabled,
+                            notes = body.notes ?: current.notes,
+                            updatedBy = call.principal<UserIdPrincipal>()?.name,
+                        )
+                    }
+                    val resolved = imageRuntimeConfig?.resolve()
+                        ?: com.pinkdreams.imaging.config.ImageRuntimeConfig(repo).resolve()
+                    call.respond(
+                        ImageConfigHttpResponse(
+                            provider = resolved.provider,
+                            model = resolved.modelId,
+                            maxCandidateCount = 4,
+                            defaultCandidateCount = 4,
+                            providerSource = resolved.providerSource.name,
+                            modelSource = resolved.modelSource.name,
+                            adminConfiguredModel = saved.modelId,
+                            environmentModel = resolved.environmentModel,
+                            enabled = saved.enabled,
+                            notes = saved.notes,
+                        )
+                    )
+                } catch (e: IllegalArgumentException) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, e.message ?: "Validation error", null)),
+                    )
+                }
             }
 
             get("/v1/admin/personas/{personaId}/images/warehouse") {
