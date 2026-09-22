@@ -180,7 +180,7 @@ Admin UI: Generate remains wired; storage status is **API-only** (document gap â
 
 ```text
 Branch: cursor/claude-work-followup
-Commit: (set on commit)
+Commit: 6870b05
 Push: no
 ```
 
