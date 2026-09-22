@@ -2500,9 +2500,28 @@
                         <div class="table-wrap"><table><thead><tr><th>Provider</th><th>Events</th></tr></thead><tbody>${providerRows}</tbody></table></div>
                         <div class="table-wrap"><table><thead><tr><th>Model</th><th>Events</th></tr></thead><tbody>${modelRows}</tbody></table></div>
                     </div>
+                    <div class="vh-title" style="margin-top:16px;">Operations</div>
+                    <div class="kv-grid">
+                        <div class="kv-item"><div class="kv-label">Queued jobs</div><div class="kv-value">${d.queuedJobs ?? '—'}</div></div>
+                        <div class="kv-item"><div class="kv-label">Running jobs</div><div class="kv-value">${d.runningJobs ?? '—'}</div></div>
+                        <div class="kv-item"><div class="kv-label">Stuck (stale lease)</div><div class="kv-value">${d.stuckRunningJobs ?? '—'}</div></div>
+                        <div class="kv-item"><div class="kv-label">Storage probe</div><div class="kv-value">${d.storageProbeOk == null ? '—' : (d.storageProbeOk ? 'OK' : 'FAIL')}</div></div>
+                    </div>
+                    <div class="filter-count">${escapeHtml(d.storageDetail || '')}</div>
                     <div class="vh-title" style="margin-top:16px;">Cost</div>
                     <div class="kv-item"><div class="kv-label">${escapeHtml(d.costAvailability || 'UNAVAILABLE')}</div>
                         <div class="kv-value">${escapeHtml(d.costNote || '')}</div></div>
+                    <div class="vh-title" style="margin-top:16px;">Recent failures</div>
+                    <div class="table-wrap"><table>
+                        <thead><tr><th>When</th><th>Job</th><th>Model</th><th>Error</th></tr></thead>
+                        <tbody>${(d.recentFailures || []).map(f => `<tr>
+                            <td>${escapeHtml(f.createdAt || '')}</td>
+                            <td class="mono">${escapeHtml((f.jobId || '').slice(0,8))}</td>
+                            <td>${escapeHtml(f.model || f.provider || '—')}</td>
+                            <td>${escapeHtml(f.errorMessage || '')}</td>
+                        </tr>`).join('') || '<tr><td colspan="4">No failures in window</td></tr>'}
+                        </tbody>
+                    </table></div>
                     <div class="section-sub" style="margin-top:12px;">${escapeHtml(d.note || '')}</div>`;
             } catch (e) {
                 if (statusEl) statusEl.textContent = 'Failed';

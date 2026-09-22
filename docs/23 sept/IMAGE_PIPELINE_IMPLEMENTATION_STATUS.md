@@ -1012,13 +1012,13 @@ IMAGE WAREHOUSE
 | 12 Image Model Evaluation | PASS WITH FINDINGS | 8e5944c |
 | 13 Identity Consistency & Reference Matching | PASS WITH FINDINGS | 298ebaf |
 | 14 Image Engine / Model Admin Configuration | PASS WITH FINDINGS | 185d0b3 |
-| 15 Image Warehouse Candidate Management (deepen) | PASS WITH FINDINGS | (this commit) |
+| 15 Image Warehouse Candidate Management (deepen) | PASS WITH FINDINGS | 77625db |
+| 16 Image Cost/SLA Ops Admin (deepen) | PASS WITH FINDINGS | (this commit) |
 
 Next queued MD files under `docs/23 sept/`:
 
-* `16_IMAGE_COST_SLA_OBSERVABILITY_ADMIN.md` ← next (may overlap 23-05)
-* `17_IMAGE_PIPELINE_END_TO_END_PRODUCTION_TEST_RELEASE_GATE.md`
-* `18`–`25` (newer uploads — audit for gaps vs already-implemented)
+* `17_IMAGE_PIPELINE_END_TO_END_PRODUCTION_TEST_RELEASE_GATE.md` ← next
+* `18`–`27` (audit overlaps; prioritize unique gaps)
 
 Before implementing new functionality beyond the current task:
 

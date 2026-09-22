@@ -166,6 +166,16 @@ data class AttachImageToMessageRequest(
 )
 
 @Serializable
+data class ImageSlaFailureItem(
+    val jobId: String,
+    val outcome: String,
+    val errorMessage: String?,
+    val model: String?,
+    val provider: String?,
+    val createdAt: String,
+)
+
+@Serializable
 data class ImageSlaSummaryResponse(
     val samplePopulation: String,
     val windowHours: Int,
@@ -191,6 +201,12 @@ data class ImageSlaSummaryResponse(
     val costAvailability: String = "UNAVAILABLE",
     val costNote: String = "Provider-reported image cost is not persisted; do not invent pricing.",
     val note: String,
+    val queuedJobs: Int? = null,
+    val runningJobs: Int? = null,
+    val stuckRunningJobs: Int? = null,
+    val storageProbeOk: Boolean? = null,
+    val storageDetail: String? = null,
+    val recentFailures: List<ImageSlaFailureItem> = emptyList(),
 )
 
 @Serializable
@@ -537,6 +553,25 @@ class AdminImageGenerationRoutes(
                     }
                 }
                 val statusCounts = candidateRepository.countByStatusSince(since)
+                val queuedJobs = imageJobRepository.findByStatus(ImageJobStatus.QUEUED, limit = 500).size
+                val runningJobs = imageJobRepository.findByStatus(ImageJobStatus.RUNNING, limit = 500)
+                val leaseSeconds = System.getenv("IMAGE_WORKER_LEASE_SECONDS")?.toLongOrNull() ?: 120L
+                val stuckRunningJobs = imageJobRepository.findStaleLeasedJobs(leaseSeconds).size
+                val storage = com.pinkdreams.imaging.storage.ImageStorageDiagnostics.from(objectStorage)
+                val recentFailures = events
+                    .filter { it.outcome == "FAILURE" }
+                    .sortedByDescending { it.createdAt }
+                    .take(20)
+                    .map {
+                        ImageSlaFailureItem(
+                            jobId = it.imageJobId.toString(),
+                            outcome = it.outcome,
+                            errorMessage = ImageGenerationEventRepository.redactSecrets(it.errorMessage),
+                            model = it.model,
+                            provider = it.provider,
+                            createdAt = it.createdAt.toString(),
+                        )
+                    }
                 call.respond(
                     ImageSlaSummaryResponse(
                         samplePopulation = "image_generation_events",
@@ -563,6 +598,12 @@ class AdminImageGenerationRoutes(
                         costAvailability = "UNAVAILABLE",
                         costNote = "Provider-reported image cost is not persisted; do not invent pricing.",
                         note = "Image SLA only — separate from LLM observability. Not production SLA unless sample is production-only traffic.",
+                        queuedJobs = queuedJobs,
+                        runningJobs = runningJobs.size,
+                        stuckRunningJobs = stuckRunningJobs,
+                        storageProbeOk = storage.probe.probeOk,
+                        storageDetail = storage.probe.detail,
+                        recentFailures = recentFailures,
                     )
                 )
             }
