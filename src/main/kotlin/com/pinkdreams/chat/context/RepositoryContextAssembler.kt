@@ -187,6 +187,19 @@ class RepositoryContextAssembler(
         lastMessageAt: java.time.LocalDateTime?,
     ): String = buildString {
         append(com.pinkdreams.chat.memory.MemoryContextFormat.render(facts))
+        // DEAD IN PRODUCTION (documented by Task 25F fix 5, deliberately left
+        // in place rather than removed or rewired). SkillAwareMemoryEnricher
+        // replaces this whole block wholesale with its own re-ranked
+        // MemoryContextFormat.render(selected), which carries no continuity
+        // suffix — and that enricher is configured on every production path, so
+        // this line never reaches the model. Verified against real traffic:
+        // "continuity: Last message at" appears in 0 of 40 stored
+        // primary_generation request bodies, while "RETRIEVED MEMORY:" appears
+        // in all 40. No test anywhere asserts this string in a FINAL prompt, and
+        // nothing documents an intent that it survive enrichment, so the wiring
+        // was NOT changed: making it reach the model would be a new prompt
+        // change, not a repair. It still renders in the assembler's own output,
+        // which remains the fail-open fallback if enrichment throws.
         if (lastMessageAt != null) append("continuity: Last message at ").append(lastMessageAt)
     }
 

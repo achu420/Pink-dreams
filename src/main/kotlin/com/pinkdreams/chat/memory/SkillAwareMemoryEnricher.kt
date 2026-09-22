@@ -16,6 +16,14 @@ import com.pinkdreams.chat.skill.SkillSelection
  * skill-aware selector, and REPLACES the assembler's already-built
  * "RETRIEVED MEMORY:" block with the re-ranked result.
  *
+ * That replacement is wholesale: anything the assembler appended AFTER its
+ * rendered memory list is dropped too. Today that is exactly one thing — the
+ * "continuity: Last message at <timestamp>" suffix in
+ * RepositoryContextAssembler.block2Content — which therefore never reaches the
+ * model in production (Task 25F fix 5; see that method's own comment for the
+ * live evidence). Documented, not changed: restoring it would be a new prompt
+ * change, not a repair.
+ *
  * Never deletes canonical memory: MemoryFactRepository/MemoryService are
  * never written here, only read. "Not selected" means "not sent this turn."
  *
