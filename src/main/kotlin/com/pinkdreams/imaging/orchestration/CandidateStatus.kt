@@ -5,6 +5,8 @@ enum class CandidateStatus {
     SHORTLISTED,
     DECLINED,
     SAVED,
+    /** Admin marked face/body identity as not matching references. */
+    IDENTITY_MISMATCH,
     POST_READY,
     POSTED,
     FAILED,

@@ -448,6 +448,7 @@ fun Application.module(
             adminAuthorizationProvider = authProvider,
             generationTriggerWired = true,
             warehouseRepository = com.pinkdreams.imaging.orchestration.ImageWarehouseRepository(db),
+            referenceImageRepository = referenceImageRepository,
         ).register(this)
         com.pinkdreams.api.admin.AdminImageEvaluationRoutes(
             evaluationService = com.pinkdreams.imaging.evaluation.ImageModelEvaluationService(

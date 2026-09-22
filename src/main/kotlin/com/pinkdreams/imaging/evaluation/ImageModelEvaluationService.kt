@@ -125,6 +125,7 @@ class ImageModelEvaluationService(
                         candidateCount = command.candidateCount,
                         visualVersionId = version.id,
                         modelId = modelId,
+                        requireStandardReferences = true,
                     )
                 )
                 evaluationRepository.updateModelJob(

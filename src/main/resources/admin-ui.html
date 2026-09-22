@@ -2662,6 +2662,7 @@
                         <option>SHORTLISTED</option>
                         <option>DECLINED</option>
                         <option>SAVED</option>
+                        <option>IDENTITY_MISMATCH</option>
                     </select>
                     <span class="filter-count">${candidates.length} total</span>
                 </div>`;
@@ -2746,13 +2747,15 @@
             if (statusEl) statusEl.textContent = 'Still running — refresh later. Job ' + jobId;
         }
 
-        function pdRenderCandidates(candidates, resultsEl) {
+        function pdRenderCandidates(candidates, resultsEl, jobMeta) {
             if (!resultsEl) return;
             if (!candidates.length) {
                 resultsEl.innerHTML = '<div class="filter-count">No candidates returned.</div>';
                 return;
             }
+            const jobId = jobMeta && jobMeta.jobId ? jobMeta.jobId : '';
             resultsEl.innerHTML = `<div class="vh-title">Candidates</div>
+                <div id="pdIdentityContext" class="filter-count" style="margin-bottom:8px;">${jobId ? 'Loading identity context…' : ''}</div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
                 ${candidates.map(c => `
                     <div class="kv-item" style="padding:8px;border:1px solid #444;" data-cid="${escapeHtml(c.id)}">
@@ -2763,12 +2766,36 @@
                             <button class="secondary" onclick="pdCandidateAction('${c.id}','SHORTLISTED')">Shortlist</button>
                             <button class="secondary" onclick="pdCandidateAction('${c.id}','DECLINED')">Decline</button>
                             <button class="secondary" onclick="pdCandidateAction('${c.id}','SAVED')">Save</button>
+                            <button class="secondary" onclick="pdCandidateAction('${c.id}','IDENTITY_MISMATCH')">Identity mismatch</button>
                             <button class="secondary" onclick="pdCandidateSaveRemark('${c.id}')">Save remark</button>
                             <button class="secondary" onclick="pdCandidateRegenerate('${c.id}')">Regenerate</button>
                         </div>
                         <div class="filter-count pd-cand-status"></div>
                     </div>`).join('')}
                 </div>`;
+            if (jobId) pdLoadIdentityContext(jobId);
+        }
+
+        async function pdLoadIdentityContext(jobId) {
+            const el = document.getElementById('pdIdentityContext');
+            if (!el) return;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/jobs/${encodeURIComponent(jobId)}/identity`);
+                const d = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((d.error && d.error.message) || ('HTTP ' + res.status));
+                const thumbs = (d.references || []).map(r =>
+                    `<div style="display:inline-block;margin:4px;text-align:center;">
+                        <div class="filter-count">${escapeHtml(r.role)}</div>
+                        <img src="${escapeHtml(r.assetUrl)}" alt="${escapeHtml(r.role)}" style="width:72px;height:72px;object-fit:cover;border:1px solid #444;"/>
+                    </div>`
+                ).join('') || '<span class="filter-count">No references bound to this job</span>';
+                el.innerHTML = `<div class="vh-title">Identity used (read-only)</div>
+                    <div class="filter-count">Version ${escapeHtml(d.visualVersionId)} · refs ${(d.referenceImageIds || []).length} · model ${escapeHtml(d.modelId || 'production default')}</div>
+                    <div style="display:flex;flex-wrap:wrap;align-items:flex-start;">${thumbs}</div>
+                    <div class="filter-count" style="margin-top:4px;">Compare reference face/front against candidates below. Mark IDENTITY_MISMATCH when face/body does not match.</div>`;
+            } catch (e) {
+                el.textContent = 'Identity context unavailable: ' + (e.message || e);
+            }
         }
 
         function pdCandidateCard(id) {

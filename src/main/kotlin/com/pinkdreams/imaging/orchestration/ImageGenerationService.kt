@@ -51,6 +51,8 @@ class ImageGenerationService(
         val selectedReferenceIds: List<UUID> = emptyList(),
         /** When false (default), PRIVATE reference images are never auto-selected. */
         val includePrivateReferences: Boolean = false,
+        /** When true (Admin default), require FRONT/FACE_CLOSE/L/R profile/BACK references. */
+        val requireStandardReferences: Boolean = false,
         val sourceCandidateId: UUID? = null,
         val adminCorrection: String? = null,
         /** Optional model override; null uses production OPENROUTER_IMAGE_MODEL. Does not change env. */
@@ -103,6 +105,18 @@ class ImageGenerationService(
                 .filter { command.includePrivateReferences || !it.role.isPrivate() }
                 .let { preferStandardSlots(it) }
         }
+
+        if (command.requireStandardReferences) {
+            val present = selectedRefModels.map { it.role }.toSet()
+            val missing = com.pinkdreams.visual.identity.ReferenceRole.STANDARD_SLOTS.filter { it !in present }
+            if (missing.isNotEmpty()) {
+                throw IllegalArgumentException(
+                    "Missing required identity references: ${missing.joinToString(", ") { it.name }}. " +
+                        "Upload FRONT, FACE_CLOSE, LEFT_PROFILE, RIGHT_PROFILE, and BACK before generating.",
+                )
+            }
+        }
+
         val refs = selectedRefModels.map { it.id }
         val referenceRoles = selectedRefModels.associate { it.id to it.role.name }
 

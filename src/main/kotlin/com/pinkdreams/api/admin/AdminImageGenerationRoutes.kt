@@ -50,6 +50,8 @@ data class CreateImageJobHttpRequest(
     val visualVersionId: String? = null,
     val conversationId: String? = null,
     val turnRequestId: String? = null,
+    /** When true, reject generation if standard reference slots are incomplete. Default true for Admin. */
+    val requireStandardReferences: Boolean = true,
 )
 
 @Serializable
@@ -191,6 +193,26 @@ data class ImageJobListItem(
     val completedAt: String?,
 )
 
+@Serializable
+data class JobIdentityReferenceHttpResponse(
+    val id: String,
+    val role: String,
+    val status: String,
+    val assetUrl: String,
+)
+
+@Serializable
+data class JobIdentityContextHttpResponse(
+    val jobId: String,
+    val personaId: String?,
+    val visualVersionId: String,
+    val seedPrompt: String?,
+    val modelId: String?,
+    val referenceImageIds: List<String>,
+    val references: List<JobIdentityReferenceHttpResponse>,
+    val sourceCandidateId: String?,
+)
+
 class AdminImageGenerationRoutes(
     private val imageGenerationService: ImageGenerationService,
     private val imageJobRepository: ImageJobRepository,
@@ -201,6 +223,7 @@ class AdminImageGenerationRoutes(
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
     private val generationTriggerWired: Boolean = true,
     private val warehouseRepository: ImageWarehouseRepository? = null,
+    private val referenceImageRepository: com.pinkdreams.persistence.repositories.ReferenceImageRepository? = null,
 ) {
     fun register(route: Route) {
         route.authenticate("session-auth", "dev-auth") {
@@ -238,6 +261,7 @@ class AdminImageGenerationRoutes(
                             visualVersionId = body.visualVersionId?.let(UUID::fromString),
                             conversationId = body.conversationId?.let(UUID::fromString),
                             turnRequestId = body.turnRequestId?.let(UUID::fromString),
+                            requireStandardReferences = body.requireStandardReferences,
                         )
                     )
                     call.respond(
@@ -291,6 +315,46 @@ class AdminImageGenerationRoutes(
                     return@get
                 }
                 call.respond(toJobResponse(job, reusedExisting = false))
+            }
+
+            get("/v1/admin/images/jobs/{jobId}/identity") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@get
+                val jobId = call.parseUuid("jobId") ?: return@get
+                val job = imageGenerationService.getJob(jobId) ?: run {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, "Job not found", null)),
+                    )
+                    return@get
+                }
+                val personaId = extractPersonaId(job.requestPayload)
+                val refIds = extractReferenceIds(job.requestPayload)
+                val refs = refIds.mapNotNull { id ->
+                    val ref = referenceImageRepository?.findById(id) ?: return@mapNotNull null
+                    val assetUrl = if (personaId != null) {
+                        "/v1/admin/personas/$personaId/visual/references/${ref.id}/content"
+                    } else {
+                        "/v1/admin/images/assets/${ref.id}"
+                    }
+                    JobIdentityReferenceHttpResponse(
+                        id = ref.id.toString(),
+                        role = ref.role.name,
+                        status = ref.status.name,
+                        assetUrl = assetUrl,
+                    )
+                }
+                call.respond(
+                    JobIdentityContextHttpResponse(
+                        jobId = job.id.toString(),
+                        personaId = personaId?.toString(),
+                        visualVersionId = job.personaVisualVersionId.toString(),
+                        seedPrompt = extractSeedPrompt(job.requestPayload),
+                        modelId = extractModelId(job.requestPayload),
+                        referenceImageIds = refIds.map { it.toString() },
+                        references = refs,
+                        sourceCandidateId = extractSourceCandidateId(job.requestPayload)?.toString(),
+                    )
+                )
             }
 
             get("/v1/admin/images/jobs/{jobId}/result") {
@@ -631,6 +695,7 @@ class AdminImageGenerationRoutes(
                     val seedPrompt = extractSeedPrompt(sourceJob.requestPayload)
                     val personaId = extractPersonaId(sourceJob.requestPayload)
                         ?: throw IllegalStateException("Source job missing personaId — cannot regenerate")
+                    val referenceIds = extractReferenceIds(sourceJob.requestPayload)
                     val result = imageGenerationService.create(
                         ImageGenerationService.CreateCommand(
                             personaId = personaId,
@@ -639,8 +704,12 @@ class AdminImageGenerationRoutes(
                             candidateCount = body.candidateCount.coerceIn(1, 4),
                             widthPx = 512,
                             heightPx = 512,
+                            visualVersionId = sourceJob.personaVisualVersionId,
+                            selectedReferenceIds = referenceIds,
+                            requireStandardReferences = false,
                             sourceCandidateId = candidateId,
                             adminCorrection = body.correction,
+                            modelId = extractModelId(sourceJob.requestPayload),
                         )
                     )
                     call.respond(
@@ -705,6 +774,41 @@ class AdminImageGenerationRoutes(
             return try {
                 val root = payloadJson.parseToJsonElement(requestPayload).jsonObject
                 root["personaId"]?.jsonPrimitive?.contentOrNull?.let { UUID.fromString(it) }
+            } catch (_: Exception) {
+                null
+            }
+        }
+
+        fun extractReferenceIds(requestPayload: String): List<UUID> {
+            return try {
+                val root = payloadJson.parseToJsonElement(requestPayload).jsonObject
+                val raw = root["selectedReferenceIds"]?.jsonPrimitive?.contentOrNull ?: return emptyList()
+                payloadJson.decodeFromString<List<String>>(raw).mapNotNull {
+                    try {
+                        UUID.fromString(it)
+                    } catch (_: Exception) {
+                        null
+                    }
+                }
+            } catch (_: Exception) {
+                emptyList()
+            }
+        }
+
+        fun extractModelId(requestPayload: String): String? {
+            return try {
+                val root = payloadJson.parseToJsonElement(requestPayload).jsonObject
+                root["modelId"]?.jsonPrimitive?.contentOrNull?.takeIf { it.isNotBlank() }
+                    ?: root["metadata"]?.jsonObject?.get("modelId")?.jsonPrimitive?.contentOrNull
+            } catch (_: Exception) {
+                null
+            }
+        }
+
+        fun extractSourceCandidateId(requestPayload: String): UUID? {
+            return try {
+                val root = payloadJson.parseToJsonElement(requestPayload).jsonObject
+                root["sourceCandidateId"]?.jsonPrimitive?.contentOrNull?.let { UUID.fromString(it) }
             } catch (_: Exception) {
                 null
             }
