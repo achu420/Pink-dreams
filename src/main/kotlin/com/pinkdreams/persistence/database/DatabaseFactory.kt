@@ -70,6 +70,10 @@ object DatabaseFactory {
             LlmExchanges,
             TurnAttributions,
         )
+        // Image observability table (IMG-12) — also created via V009 for Postgres.
+        SchemaUtils.createMissingTablesAndColumns(
+            com.pinkdreams.imaging.observability.ImageGenerationEvents,
+        )
     }
 }
 

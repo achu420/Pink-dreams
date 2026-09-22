@@ -11,6 +11,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import java.time.LocalDateTime
@@ -18,6 +19,10 @@ import java.util.UUID
 
 class ImageJobRepository(private val db: Database) {
 
+    /**
+     * Creates a job, or returns the existing job for the same
+     * (personaVisualVersionId, idempotencyKey). Safe for client retries.
+     */
     fun createJob(
         personaVisualVersionId: UUID,
         jobType: ImageJobType,
@@ -25,23 +30,52 @@ class ImageJobRepository(private val db: Database) {
         requestPayload: String,
         maxAttempts: Int = 3,
     ): ImageJob = transaction(db) {
+        findByIdempotencyKey(personaVisualVersionId, idempotencyKey)?.let { return@transaction it }
+
         val id = UUID.randomUUID()
         val now = LocalDateTime.now()
 
-        ImageJobs.insert {
-            it[ImageJobs.id] = id
-            it[ImageJobs.personaVisualVersionId] = personaVisualVersionId
-            it[ImageJobs.jobType] = jobType.name
-            it[ImageJobs.status] = ImageJobStatus.QUEUED.name
-            it[ImageJobs.idempotencyKey] = idempotencyKey
-            it[ImageJobs.requestPayload] = requestPayload
-            it[ImageJobs.attemptCount] = 0
-            it[ImageJobs.maxAttempts] = maxAttempts
-            it[ImageJobs.availableAt] = now
-            it[ImageJobs.createdAt] = now
+        try {
+            ImageJobs.insert {
+                it[ImageJobs.id] = id
+                it[ImageJobs.personaVisualVersionId] = personaVisualVersionId
+                it[ImageJobs.jobType] = jobType.name
+                it[ImageJobs.status] = ImageJobStatus.QUEUED.name
+                it[ImageJobs.idempotencyKey] = idempotencyKey
+                it[ImageJobs.requestPayload] = requestPayload
+                it[ImageJobs.attemptCount] = 0
+                it[ImageJobs.maxAttempts] = maxAttempts
+                it[ImageJobs.availableAt] = now
+                it[ImageJobs.createdAt] = now
+            }
+            findById(id)!!
+        } catch (e: Exception) {
+            // Concurrent duplicate insert — return the winner
+            findByIdempotencyKey(personaVisualVersionId, idempotencyKey)
+                ?: throw e
         }
+    }
 
-        findById(id)!!
+    fun adminRequeueFailed(jobId: UUID): ImageJob = transaction(db) {
+        val job = findById(jobId) ?: throw IllegalArgumentException("Job not found: $jobId")
+        require(job.status == ImageJobStatus.FAILED || job.status == ImageJobStatus.RETRY_WAIT) {
+            "Only FAILED or RETRY_WAIT jobs can be admin-requeued (status=${job.status})"
+        }
+        ImageJobs.update({ ImageJobs.id eq jobId }) {
+            it[ImageJobs.status] = ImageJobStatus.QUEUED.name
+            it[ImageJobs.availableAt] = LocalDateTime.now()
+            it[ImageJobs.claimedByWorker] = null
+            it[ImageJobs.claimedAt] = null
+            it[ImageJobs.completedAt] = null
+        }
+        findById(jobId)!!
+    }
+
+    fun findRecent(limit: Int = 50): List<ImageJob> = transaction(db) {
+        ImageJobs.selectAll()
+            .orderBy(ImageJobs.createdAt to org.jetbrains.exposed.sql.SortOrder.DESC)
+            .limit(limit)
+            .map(::rowToModel)
     }
 
     fun findById(id: UUID): ImageJob? = transaction(db) {

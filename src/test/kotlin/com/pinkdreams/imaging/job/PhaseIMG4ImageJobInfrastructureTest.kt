@@ -84,7 +84,7 @@ class PhaseIMG4ImageJobInfrastructureTest {
     }
 
     @Test
-    fun `Job 3 - idempotency prevents duplicate creation`() {
+    fun `Job 3 - idempotency returns existing job on duplicate`() {
         val (_, versionId) = createTestVersion()
         val idempotencyKey = "key-3"
 
@@ -95,17 +95,15 @@ class PhaseIMG4ImageJobInfrastructureTest {
             requestPayload = """{"request":"first"}"""
         )
 
-        try {
-            jobRepository.createJob(
-                personaVisualVersionId = versionId,
-                jobType = ImageJobType.IMAGE_GENERATION,
-                idempotencyKey = idempotencyKey,
-                requestPayload = """{"request":"second"}"""
-            )
-            fail("Should have rejected duplicate idempotency key")
-        } catch (e: Exception) {
-            // Expected: unique constraint violation
-        }
+        val second = jobRepository.createJob(
+            personaVisualVersionId = versionId,
+            jobType = ImageJobType.IMAGE_GENERATION,
+            idempotencyKey = idempotencyKey,
+            requestPayload = """{"request":"second"}"""
+        )
+
+        assertEquals(first.id, second.id)
+        assertEquals(first.requestPayload, second.requestPayload)
     }
 
     @Test

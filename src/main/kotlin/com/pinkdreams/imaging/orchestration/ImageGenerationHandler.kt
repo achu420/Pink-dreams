@@ -59,23 +59,25 @@ class ImageGenerationHandler(
             val generationRequest = reconstructGenerationRequestWithActualRoles(payload)
 
             // Submit to configured provider
-            val providerResult = imageProvider.submit(generationRequest)
+            var providerResult = imageProvider.submit(generationRequest)
+
+            // Poll deferred providers until terminal (bounded)
+            if (providerResult.status == GenerationStatus.QUEUED ||
+                providerResult.status == GenerationStatus.RUNNING
+            ) {
+                providerResult = pollUntilTerminal(providerResult)
+            }
 
             // Handle provider result
             when (providerResult.status) {
                 GenerationStatus.QUEUED, GenerationStatus.RUNNING -> {
-                    // Provider accepted the request, job will poll for updates
-                    ImageJobResult.Success(
-                        metadata = buildMetadata(
-                            providerJobHandle = providerResult.jobHandle.externalJobId,
-                            providerIdentifier = providerResult.jobHandle.providerIdentifier,
-                            candidateCount = generationRequest.candidateCount
-                        )
+                    ImageJobResult.Failure(
+                        errorMessage = "Provider still pending after poll timeout",
+                        retryable = true
                     )
                 }
 
                 GenerationStatus.COMPLETED -> {
-                    // Provider returned immediate result - persist candidates to storage
                     if (providerResult.candidates.isEmpty()) {
                         ImageJobResult.Failure(
                             errorMessage = "Provider returned no candidates",
@@ -242,5 +244,26 @@ class ImageGenerationHandler(
         val digest = MessageDigest.getInstance("SHA-256")
         val hash = digest.digest(data)
         return hash.joinToString("") { "%02x".format(it) }
+    }
+
+    private suspend fun pollUntilTerminal(
+        initial: com.pinkdreams.imaging.provider.GenerationResult,
+        maxAttempts: Int = 30,
+        delayMs: Long = 1_000,
+    ): com.pinkdreams.imaging.provider.GenerationResult {
+        var current = initial
+        var attempts = 0
+        while (
+            (current.status == GenerationStatus.QUEUED || current.status == GenerationStatus.RUNNING) &&
+            attempts < maxAttempts
+        ) {
+            kotlinx.coroutines.delay(delayMs)
+            current = imageProvider.getStatus(current.jobHandle)
+            attempts++
+        }
+        if (current.status == GenerationStatus.COMPLETED) {
+            return imageProvider.getResult(current.jobHandle)
+        }
+        return current
     }
 }

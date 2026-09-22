@@ -67,4 +67,23 @@ class GeneratedCandidateRepository(private val db: Database) {
                 )
             }
     }
+
+    fun findById(id: UUID): GeneratedCandidate? = transaction(db) {
+        GeneratedCandidates.select { GeneratedCandidates.id eq id }
+            .map { row ->
+                GeneratedCandidate(
+                    id = row[GeneratedCandidates.id],
+                    imageJobId = row[GeneratedCandidates.imageJobId],
+                    storageKey = row[GeneratedCandidates.storageKey],
+                    contentType = row[GeneratedCandidates.contentType],
+                    fileSize = row[GeneratedCandidates.fileSize],
+                    widthPx = row[GeneratedCandidates.widthPx],
+                    heightPx = row[GeneratedCandidates.heightPx],
+                    checksum = row[GeneratedCandidates.checksum],
+                    candidateIndex = row[GeneratedCandidates.candidateIndex],
+                    createdAt = row[GeneratedCandidates.createdAt]
+                )
+            }
+            .singleOrNull()
+    }
 }

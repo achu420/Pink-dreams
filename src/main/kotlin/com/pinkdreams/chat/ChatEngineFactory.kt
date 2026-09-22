@@ -106,6 +106,9 @@ object ChatEngineFactory {
         // exchange row records which traffic it came from without needing to
         // sniff repository types.
         val isTestChat: Boolean = false,
+        // Image pipeline — optional so existing tests that construct Dependencies
+        // without an image service keep working (noop: no image enqueue hook).
+        val imageGenerationService: com.pinkdreams.imaging.orchestration.ImageGenerationService? = null,
     )
 
     fun build(deps: Dependencies): PipelineChatEngine {
@@ -193,9 +196,20 @@ object ChatEngineFactory {
             memoryScopeResolver = deps.memoryScopeResolver,
         )
 
-        val postDeliveryMemoryExtraction = CompositePostDeliveryHook(
-            listOf(memoryExtractionHook, continuitySummarizationHook, memoryEngineMaintenanceHook),
+        val postDeliveryHooks = mutableListOf(
+            memoryExtractionHook,
+            continuitySummarizationHook,
+            memoryEngineMaintenanceHook,
         )
+        deps.imageGenerationService?.let { imageService ->
+            postDeliveryHooks.add(
+                com.pinkdreams.chat.imaging.BestEffortImageEnqueue(
+                    imageGenerationService = imageService,
+                    messageRepository = deps.messageRepository,
+                )
+            )
+        }
+        val postDeliveryMemoryExtraction = CompositePostDeliveryHook(postDeliveryHooks)
 
         // Runtime Quality + Latency Verification phase — investigated and
         // REVERTED: reasoningEnabled=false (and, tried as a mitigation,

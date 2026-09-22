@@ -17,4 +17,7 @@ data class ImageGenerationRequest(
     val selectedReferenceIds: List<UUID> = emptyList(),
     val candidateCount: Int = sceneIntent.generation.candidateCount,
     val idempotencyKey: String,
+    val conversationId: UUID? = null,
+    val turnRequestId: UUID? = null,
+    val userId: UUID? = null,
 )

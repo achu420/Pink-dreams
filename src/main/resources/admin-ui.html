@@ -2099,13 +2099,43 @@
                         </table></div>` : '<div class="filter-count">No image jobs for this version.</div>'}
 
                         <div class="section-sub" style="margin-top:12px;">
-                            <button class="secondary" disabled title="Not wired — view only">Generate images</button>
-                            Triggering generation from the admin console is <b>not wired — view only</b>.
-                            Submitting a job would hand work to a real image-generation provider, so this
-                            console never starts one.
+                            <button class="secondary" id="pdGenerateImagesBtn" onclick="pdGenerateImages()" title="Enqueue image generation job">Generate images</button>
+                            <span id="pdGenerateImagesStatus" class="filter-count" style="margin-left:8px;"></span>
+                            Uses POST /v1/admin/images/jobs (Fake provider when OPENROUTER_API_KEY is unset).
                         </div>
                     </div>
                 </div>`).join('');
+        }
+
+        async function pdGenerateImages() {
+            if (!selectedPersonaId) return;
+            const statusEl = document.getElementById('pdGenerateImagesStatus');
+            const btn = document.getElementById('pdGenerateImagesBtn');
+            if (btn) btn.disabled = true;
+            if (statusEl) statusEl.textContent = 'Enqueueing…';
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/jobs`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        personaId: selectedPersonaId,
+                        idempotencyKey: 'admin-' + selectedPersonaId + '-' + Date.now(),
+                        location: 'studio',
+                        presentation: 'candid portrait',
+                        candidateCount: 1,
+                        widthPx: 512,
+                        heightPx: 512
+                    })
+                });
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error((body.error && body.error.message) || ('HTTP ' + res.status));
+                if (statusEl) statusEl.textContent = 'Job ' + (body.jobId || '') + ' — ' + (body.status || 'queued');
+                if (selectedPersonaId) loadPersonaDetail(selectedPersonaId);
+            } catch (e) {
+                if (statusEl) statusEl.textContent = 'Failed: ' + (e.message || e);
+            } finally {
+                if (btn) btn.disabled = false;
+            }
         }
 
         function togglePersonaVersions(personaId) {
