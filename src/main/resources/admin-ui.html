@@ -2508,6 +2508,9 @@
                         <div class="kv-item"><div class="kv-label">Storage probe</div><div class="kv-value">${d.storageProbeOk == null ? '—' : (d.storageProbeOk ? 'OK' : 'FAIL')}</div></div>
                     </div>
                     <div class="filter-count">${escapeHtml(d.storageDetail || '')}</div>
+                    <div class="vh-title" style="margin-top:16px;">SLA target</div>
+                    <div class="kv-item"><div class="kv-label">${escapeHtml(d.slaTarget || 'Not configured')}</div>
+                        <div class="kv-value">${escapeHtml(d.slaTargetNote || '')}</div></div>
                     <div class="vh-title" style="margin-top:16px;">Cost</div>
                     <div class="kv-item"><div class="kv-label">${escapeHtml(d.costAvailability || 'UNAVAILABLE')}</div>
                         <div class="kv-value">${escapeHtml(d.costNote || '')}</div></div>

@@ -56,19 +56,25 @@ class ImageModelEvaluationService(
             ?.map { it.trim() }
             ?.filter { it.isNotBlank() }
             .orEmpty()
+        val selected = com.pinkdreams.imaging.provider.openrouter.OpenRouterImageModelCatalog.SELECTED_FOR_EVALUATION
         val defaults = listOf(
             production,
             "openai/gpt-image-2.5-flare",
             "openai/gpt-image-2.5-sunburst",
+            "bytedance-seed/seedream-5-0-pro",
         )
-        return (fromEnv + defaults)
+        return (fromEnv + selected + defaults)
             .distinct()
             .map { id ->
                 mapOf(
                     "provider" to (System.getenv("IMAGE_PROVIDER") ?: "openrouter"),
                     "modelId" to id,
                     "displayName" to id.substringAfterLast('/'),
-                    "evaluationStatus" to if (id == production) "production" else "candidate",
+                    "evaluationStatus" to when {
+                        id == production -> "production"
+                        id in selected -> "selected_for_eval"
+                        else -> "candidate"
+                    },
                     "enabled" to "true",
                 )
             }

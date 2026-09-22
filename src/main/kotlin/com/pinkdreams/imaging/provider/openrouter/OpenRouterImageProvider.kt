@@ -71,31 +71,53 @@ class OpenRouterImageProvider(
     // Source: https://openrouter.ai/api/v1/images/models
     override val capabilities: ProviderCapabilities = capabilitiesFor(imageModel)
 
-    private fun capabilitiesFor(model: String): ProviderCapabilities = when (model) {
-        "openai/gpt-image-2.5-flare", "openai/gpt-image-2.5-sunburst" -> ProviderCapabilities(
-            maxCandidateCount = 10,
-            supportsReferences = true,
-            supportsMultipleReferences = true,
-            supportedAspectRatios = listOf("1:1", "3:2", "2:3", "4:3", "3:4", "16:9", "9:16", "21:9"),
-            minWidthPx = 256,
-            maxWidthPx = 2048,
-            minHeightPx = 256,
-            maxHeightPx = 2048,
-            supportsCancellation = false,
-            supportsIdempotency = true,
-        )
-        else -> ProviderCapabilities(
-            maxCandidateCount = 1,
-            supportsReferences = false,
-            supportsMultipleReferences = false,
-            supportedAspectRatios = listOf("1:1"),
-            minWidthPx = 256,
-            maxWidthPx = 2048,
-            minHeightPx = 256,
-            maxHeightPx = 2048,
-            supportsCancellation = false,
-            supportsIdempotency = false,
-        )
+    private fun capabilitiesFor(model: String): ProviderCapabilities {
+        // Prefer known verified profiles; for other models assume conservative defaults
+        // unless the model family is known to accept image inputs (gpt-image / seedream / gemini image).
+        return when {
+            model == "openai/gpt-image-2.5-flare" || model == "openai/gpt-image-2.5-sunburst" -> ProviderCapabilities(
+                maxCandidateCount = 10,
+                supportsReferences = true,
+                supportsMultipleReferences = true,
+                supportedAspectRatios = listOf("1:1", "3:2", "2:3", "4:3", "3:4", "16:9", "9:16", "21:9"),
+                minWidthPx = 256,
+                maxWidthPx = 2048,
+                minHeightPx = 256,
+                maxHeightPx = 2048,
+                supportsCancellation = false,
+                supportsIdempotency = true,
+            )
+            model.startsWith("openai/gpt-image") ||
+                model.contains("seedream", ignoreCase = true) ||
+                model.contains("gemini", ignoreCase = true) && model.contains("image", ignoreCase = true) ||
+                model.startsWith("qwen/qwen-image") ||
+                model.startsWith("microsoft/mai-image") ||
+                model.startsWith("meta/muse") ||
+                model.startsWith("x-ai/grok-imagine") -> ProviderCapabilities(
+                maxCandidateCount = 4,
+                supportsReferences = true,
+                supportsMultipleReferences = true,
+                supportedAspectRatios = listOf("1:1", "3:2", "2:3", "4:3", "3:4", "16:9", "9:16"),
+                minWidthPx = 256,
+                maxWidthPx = 2048,
+                minHeightPx = 256,
+                maxHeightPx = 2048,
+                supportsCancellation = false,
+                supportsIdempotency = false,
+            )
+            else -> ProviderCapabilities(
+                maxCandidateCount = 1,
+                supportsReferences = false,
+                supportsMultipleReferences = false,
+                supportedAspectRatios = listOf("1:1"),
+                minWidthPx = 256,
+                maxWidthPx = 2048,
+                minHeightPx = 256,
+                maxHeightPx = 2048,
+                supportsCancellation = false,
+                supportsIdempotency = false,
+            )
+        }
     }
 
     private fun effectiveModel(request: GenerationRequest): String =

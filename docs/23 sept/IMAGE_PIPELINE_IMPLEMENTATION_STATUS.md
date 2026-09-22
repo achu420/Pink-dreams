@@ -1014,12 +1014,13 @@ IMAGE WAREHOUSE
 | 14 Image Engine / Model Admin Configuration | PASS WITH FINDINGS | 185d0b3 |
 | 15 Image Warehouse Candidate Management (deepen) | PASS WITH FINDINGS | 77625db |
 | 16 Image Cost/SLA Ops Admin (deepen) | PASS WITH FINDINGS | ccd4ee7 |
-| 17 E2E Release Gate report | CONDITIONAL PASS | (this commit) |
+| 17 E2E Release Gate report | CONDITIONAL PASS | fc9c29d |
+| 18–25 Overlap validation | DONE / LIVE PENDING | see 23-00_FULL_TASK_CROSS_VALIDATION.md |
+| 26 Model discovery & selection | PASS WITH FINDINGS | (this commit) |
+| 23 SLA target polish | PASS | (this commit) |
+| 27 Real persona acceptance | PENDING LIVE | fixtures ready |
 
-Next queued MD files under `docs/23 sept/`:
-
-* `18`–`27` — mostly overlap; prioritize `27_REAL_PERSONA_IMAGE_GENERATION_ACCEPTANCE_TEST.md` for live morning run
-* Posts/social still deferred
+Next: operator live Tasks **25** + **27** (OpenRouter + browser). No further overnight code required for overlapping docs 18–24.
 
 Before implementing new functionality beyond the current task:
 

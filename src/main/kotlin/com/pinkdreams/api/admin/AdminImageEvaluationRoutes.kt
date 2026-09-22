@@ -112,6 +112,26 @@ data class EvaluationCandidateModelHttpResponse(
     val enabled: Boolean,
 )
 
+@Serializable
+data class ImageModelDiscoveryItemHttpResponse(
+    val modelId: String,
+    val displayName: String,
+    val description: String?,
+    val acceptsImageInput: Boolean,
+    val referenceLikelySupported: Boolean,
+    val selectedForEvaluation: Boolean,
+)
+
+@Serializable
+data class ImageModelDiscoveryHttpResponse(
+    val catalogCheckedAt: String,
+    val catalogSource: String,
+    val modelCount: Int,
+    val selectedForEvaluation: List<String>,
+    val models: List<ImageModelDiscoveryItemHttpResponse>,
+    val note: String,
+)
+
 class AdminImageEvaluationRoutes(
     private val evaluationService: ImageModelEvaluationService,
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
@@ -131,6 +151,55 @@ class AdminImageEvaluationRoutes(
                         )
                     }
                 )
+            }
+
+            get("/v1/admin/images/models/discovery") {
+                if (!call.requireAdminEval(adminAuthorizationProvider)) return@get
+                val key = System.getenv("OPENROUTER_API_KEY")?.takeIf { it.isNotBlank() }
+                if (key == null) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        ErrorResponse(
+                            ApiError(
+                                ErrorCode.INTERNAL_SERVER_ERROR,
+                                "OPENROUTER_API_KEY required for live catalog discovery",
+                                null,
+                            ),
+                        ),
+                    )
+                    return@get
+                }
+                try {
+                    val catalog = com.pinkdreams.imaging.provider.openrouter.OpenRouterImageModelCatalog(key)
+                    val models = catalog.fetch()
+                    val selected = com.pinkdreams.imaging.provider.openrouter.OpenRouterImageModelCatalog.SELECTED_FOR_EVALUATION
+                    call.respond(
+                        ImageModelDiscoveryHttpResponse(
+                            catalogCheckedAt = java.time.Instant.now().toString(),
+                            catalogSource = "https://openrouter.ai/api/v1/images/models",
+                            modelCount = models.size,
+                            selectedForEvaluation = selected,
+                            models = models.map {
+                                ImageModelDiscoveryItemHttpResponse(
+                                    modelId = it.modelId,
+                                    displayName = it.displayName,
+                                    description = it.description,
+                                    acceptsImageInput = it.acceptsImageInput,
+                                    referenceLikelySupported = it.referenceLikelySupported,
+                                    selectedForEvaluation = it.modelId in selected,
+                                )
+                            },
+                            note = "Live catalog. Selection for Task 25 is fixed in OpenRouterImageModelCatalog.SELECTED_FOR_EVALUATION until Admin changes OPENROUTER_EVAL_MODELS.",
+                        )
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadGateway,
+                        ErrorResponse(
+                            ApiError(ErrorCode.INTERNAL_SERVER_ERROR, e.message?.take(300) ?: "Catalog fetch failed", null),
+                        ),
+                    )
+                }
             }
 
             post("/v1/admin/images/evaluations") {
