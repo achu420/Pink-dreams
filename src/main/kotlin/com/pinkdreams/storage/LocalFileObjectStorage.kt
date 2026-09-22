@@ -109,6 +109,60 @@ class LocalFileObjectStorage(
         return results
     }
 
+    /** Basename-only label for diagnostics (never the full absolute path). */
+    fun rootLabel(): String = root.fileName?.toString()?.ifBlank { "storage-root" } ?: "storage-root"
+
+    override fun probeReadiness(): StorageReadiness {
+        val label = rootLabel()
+        return try {
+            if (!Files.exists(root) || !Files.isDirectory(root)) {
+                return StorageReadiness(
+                    mode = "local",
+                    rootLabel = label,
+                    readable = false,
+                    writable = false,
+                    probeOk = false,
+                    detail = "Storage root missing or not a directory",
+                )
+            }
+            val readable = Files.isReadable(root)
+            val writable = Files.isWritable(root)
+            if (!readable || !writable) {
+                return StorageReadiness(
+                    mode = "local",
+                    rootLabel = label,
+                    readable = readable,
+                    writable = writable,
+                    probeOk = false,
+                    detail = "Storage root permission check failed",
+                )
+            }
+            val probeKey = ".health-probe/${java.util.UUID.randomUUID()}.bin"
+            val payload = byteArrayOf(1, 2, 3, 4)
+            store(probeKey, payload, "application/octet-stream")
+            val got = retrieve(probeKey)
+            delete(probeKey)
+            val ok = got != null && got.content.contentEquals(payload)
+            StorageReadiness(
+                mode = "local",
+                rootLabel = label,
+                readable = true,
+                writable = true,
+                probeOk = ok,
+                detail = if (ok) "Write/read/delete probe succeeded" else "Probe round-trip failed",
+            )
+        } catch (e: Exception) {
+            StorageReadiness(
+                mode = "local",
+                rootLabel = label,
+                readable = false,
+                writable = false,
+                probeOk = false,
+                detail = "Probe error: ${e.javaClass.simpleName}",
+            )
+        }
+    }
+
     private fun contentTypeSidecar(file: Path): Path =
         file.resolveSibling(file.fileName.toString() + ".contentType")
 

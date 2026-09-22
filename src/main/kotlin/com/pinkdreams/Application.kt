@@ -405,7 +405,14 @@ fun Application.module(
                 call.respond(HttpStatusCode.NotFound, "Admin login page not found")
             }
         }
-        HealthRoutes().register(this)
+        HealthRoutes {
+            val d = com.pinkdreams.imaging.storage.ImageStorageDiagnostics.from(objectStorage)
+            mapOf(
+                "imageStorageMode" to d.mode,
+                "imageStorageMultiInstanceContract" to d.multiInstanceContract,
+                "imageStorageOperatorDeclaredShared" to d.operatorDeclaredShared.toString(),
+            )
+        }.register(this)
         ChatRoutes(engine, conversationRepo, memoryFactRepo).register(this)
         ConversationHistoryRoutes(conversationRepo, messageRepo, userRepository = userRepo).register(this)
         AdminEngineRoutes(engineRepo, authProvider).register(this)

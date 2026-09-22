@@ -101,6 +101,19 @@ data class ImageSlaSummaryResponse(
 )
 
 @Serializable
+data class ImageStorageStatusResponse(
+    val mode: String,
+    val multiInstanceContract: String,
+    val operatorDeclaredShared: Boolean,
+    val rootLabel: String?,
+    val readable: Boolean,
+    val writable: Boolean,
+    val probeOk: Boolean,
+    val detail: String,
+    val guidance: String,
+)
+
+@Serializable
 data class ImageJobListItem(
     val jobId: String,
     val status: String,
@@ -362,6 +375,24 @@ class AdminImageGenerationRoutes(
                         p50GenerationLatencyMs = percentile(gens, 0.50),
                         p95GenerationLatencyMs = percentile(gens, 0.95),
                         note = "Not production SLA unless sample is production-only traffic.",
+                    )
+                )
+            }
+
+            get("/v1/admin/images/storage") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@get
+                val d = com.pinkdreams.imaging.storage.ImageStorageDiagnostics.from(objectStorage)
+                call.respond(
+                    ImageStorageStatusResponse(
+                        mode = d.mode,
+                        multiInstanceContract = d.multiInstanceContract,
+                        operatorDeclaredShared = d.operatorDeclaredShared,
+                        rootLabel = d.probe.rootLabel,
+                        readable = d.probe.readable,
+                        writable = d.probe.writable,
+                        probeOk = d.probe.probeOk,
+                        detail = d.probe.detail,
+                        guidance = d.guidance,
                     )
                 )
             }

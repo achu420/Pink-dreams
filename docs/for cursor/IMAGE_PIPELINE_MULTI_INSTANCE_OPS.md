@@ -1,255 +1,202 @@
-# Image Pipeline — Multi-Instance Storage, Recovery & Production Operations
+# Image Pipeline — Multi-Instance Storage & Operational Readiness
 
 **Date:** 2026-09-22  
 **Branch:** `cursor/claude-work-followup`  
-**Basis:** Current implementation + concrete fixes (no redesign)
+**Task:** Shared storage / multi-instance operational readiness (verification + contract)
 
 ---
 
-## 1. Executive Result
+## 1. Result
 
 **PASS WITH FINDINGS**
 
-Job claiming was already atomic; a real lease-ownership hole on completion was found and fixed. Message attachment after crash now has idempotent reconciliation. Local disk storage remains **instance-local** by design.
+Independent verification confirms:
 
-**Multi-instance verdict: B — SAFE FOR MULTI-INSTANCE WITH SHARED STORAGE** (not C; not A-only after lease fix, with shared storage + shared DB).
+- Worker lease-bound completion remains intact  
+- Atomic local writes + path/MIME/size guards remain intact  
+- Asset keys are portable (`jobs/{jobId}/candidates/{i}`)  
+- **Shared storage root:** Instance B can read Instance A assets (TEST VERIFIED)  
+- **Independent storage roots:** Instance B returns missing asset (null / API 404), no false success (TEST VERIFIED)  
+- Storage diagnostics exposed (health mode fields + admin probe)
+
+**Verdict unchanged:** **B — SAFE FOR MULTI-INSTANCE WITH SHARED STORAGE**
 
 ---
 
-## 2. Current Architecture Verified
+## 2. Storage architecture — what is actually supported?
+
+### Supported deployment
 
 ```text
-createJob (idempotent) → QUEUED
-  → claimJob (CAS: QUEUED→RUNNING + claimedByWorker)
-  → provider + persistCandidates (delete-before-insert)
-  → completeJobSuccess/Failure ONLY if claimedByWorker matches
-  → completionAttach / reconcileMessageAttachments
-  → assistant metadata: imageJobId, imageJobStatus, imageAssetIds, imageAssetUrls
+Instance A ─┐
+Instance B ─┼── shared PostgreSQL
+Instance C ─┘
+      │
+      └── shared IMAGE_STORAGE_DIR (same mount / volume)
 ```
 
-Worker tick (`ImageJobWorkerRuntime`): recover stale leases → requeue RETRY_WAIT → process QUEUED → reconcile terminal message attachments.
+Requirements:
 
----
+| Requirement | Detail |
+|-------------|--------|
+| Database | One shared Postgres (or equivalent) for all instances |
+| Storage mode | `IMAGE_STORAGE` unset or not `memory` → `LocalFileObjectStorage` |
+| Storage dir | **Identical** `IMAGE_STORAGE_DIR` on every instance (default `data/object-storage`) |
+| Permissions | Directory must be readable + writable by the app user; created automatically if missing |
+| Operator flag | Set `IMAGE_STORAGE_SHARED=true` **after** verifying the shared mount (diagnostics only; does not change code paths) |
+| Workers | Each instance may run a worker; claim + lease-bound complete prevent double-terminalization |
 
-## 3. Job Concurrency
-
-| Check | Result |
-|-------|--------|
-| Atomic claim | **PASS** — conditional UPDATE status=QUEUED |
-| Two workers same job | **PASS** — second claim null; concurrent test 8 threads → 1 winner |
-| Complete without lease | **FIXED** — requires `claimedByWorker == workerName` |
-| Stale worker after B reclaim | **FIXED** — A’s complete returns null; B remains owner (Verify 28b) |
-| Concurrent idempotent create | **PASS** — unique key + catch duplicate |
-
-**Code change:** `completeJobSuccess` / `completeJobFailure` now take `workerName` and use conditional UPDATE; return `null` on lease loss. Worker ignores lease-lost results (does not fail another worker’s job).
-
----
-
-## 4. Crash / Lease Recovery
-
-| Crash point | Behavior |
-|-------------|----------|
-| Before provider | Remains RUNNING until lease timeout → QUEUED |
-| During provider | Same; may re-run provider after recovery (**KNOWN LIMITATION**: no heartbeat) |
-| After provider, before/after persist | Retryable path; candidates replaced on retry |
-| After candidates, before SUCCEEDED | Lease recover → re-process; persist replaces rows |
-| After SUCCEEDED, before attach | **FIXED** — `reconcileMessageAttachments` re-merges metadata |
-
-Lease timeout: `IMAGE_WORKER_LEASE_SECONDS` (default 300), now passed from runtime.
-
-Stuck forever? Only if worker never runs and lease recovery never runs (`IMAGE_WORKER_ENABLED=false`) — operational.
-
----
-
-## 5. Message Attachment Recovery
-
-Previously: one-shot `completionAttach` only. Crash between SUCCEEDED and attach could leave `imageJobStatus=QUEUED` without assets.
-
-**Fix:** `ImageJobWorker.reconcileMessageAttachments` each tick (idempotent merge via `ImageMessageCompletionAttach`).
-
-**Test:** complete without attach → reconcile → assets present.
-
-Relationship job → assets remains in DB (`generated_candidates`) even if metadata lag; reconcile restores chat link.
-
----
-
-## 6. Storage Safety
-
-| Check | Result |
-|-------|--------|
-| Path traversal | Rejected (`..`, escape root) |
-| MIME / size | Validated |
-| Atomic write | **IMPROVED** — temp file + move (ATOMIC_MOVE when supported) |
-| Missing file | retrieve → null → API 404 |
-| Two instances, different disks | **BREAKS** asset GET unless shared volume |
+### Unsupported deployment
 
 ```text
-Local filesystem is the default.
-Production multi-instance deployment REQUIRES shared/object storage
-(or a shared IMAGE_STORAGE_DIR mount) plus a shared database.
+Instance A → local disk A (IMAGE_STORAGE_DIR=/var/a)
+Instance B → local disk B (IMAGE_STORAGE_DIR=/var/b)
 ```
 
-No object-store adapter invented this task.
+Why unsupported:
+
+1. Job rows live in the shared DB (Instance B can see SUCCEEDED + candidate metadata).  
+2. Bytes live only under Instance A’s disk.  
+3. Instance B `objectStorage.retrieve(storageKey)` returns **null** → asset API **404**.  
+4. This is not data corruption or silent regeneration; it is a **missing file** failure. Chat metadata may still list `imageAssetIds` that B cannot serve.
+
+`IMAGE_STORAGE=memory` is **single-process / test-only** — never multi-instance safe.
+
+Object stores (S3/GCS/R2) are **not implemented**. Do not claim them.
 
 ---
 
-## 7. Retention Safety
+## 3. Multi-instance verification
 
-Unchanged logic (already message-ref protected): skips QUEUED/RUNNING; skips metadata UUID refs; deletes old terminal + blobs.
+| Scenario | Evidence |
+|----------|----------|
+| Shared root A write → B read | `SharedStorageMultiInstanceTest` — same temp dir, two `LocalFileObjectStorage` instances, Fake worker on A, B retrieves bytes |
+| Separate roots A write → B miss | Same test class — `retrieve`/`exists` false on B |
+| Asset identity portable | Key scheme `jobs/{uuid}/candidates/{index}`; no JVM-local handles |
+| Diagnostics | `ImageStorageDiagnostics` + `GET /v1/admin/images/storage`; health extras for mode/contract |
 
-Tests: prior `ImageRetentionMessageReferenceTest` retained. No code change required this section.
-
-**FINDING:** full `Messages` scan — operational cost at scale.
-
----
-
-## 8. Provider Failure Matrix
-
-| Failure | Expected | Actual |
-|---------|----------|--------|
-| Provider timeout | retryable | yes (OpenRouter normalize / handler) |
-| Provider 5xx | retryable | yes |
-| Auth / invalid_request | permanent | yes |
-| Empty completed candidates | permanent | yes |
-| Unsupported MIME on store | fail persist → retryable | yes |
-| Asset too large | fail persist → retryable | yes |
-| Storage write failure | retryable | yes |
-| Candidate DB retry | replace rows | yes (prior fix) |
-| Message attach failure | recoverable | yes (reconcile) |
-| Worker crash | lease recovery | yes |
-| Duplicate worker | no double claim | yes |
-| Stale complete | no steal | **fixed** |
-| Retention race | reference-safe | yes (skip if metadata contains id) |
+Live Postgres multi-process: **NOT RUN** this task (H2 + Fake used).
 
 ---
 
-## 9. Security
+## 4. Worker safety (re-verified)
 
-Prior ownership tests still apply (User A 200 / B 403 / anon 401). Secrets redacted in `lastError` and events. Storage paths not returned as filesystem paths (API asset URLs only).
+| Check | Status |
+|-------|--------|
+| Lease ownership persisted | YES (`claimedByWorker`, `claimedAt`) |
+| Complete requires matching worker | YES (`completeJobSuccess/Failure(jobId, workerName)`) |
+| Stale worker after reclaim | Rejected (null complete); newer owner intact |
+| Terminal reconciliation | `reconcileMessageAttachments` each worker tick |
 
-No weakening of auth this task.
-
----
-
-## 10. Observability
-
-Events capture job id, provider, model, attempt, outcome, latencies; conversation/turn/persona from payload when present. Obs failure does not fail the job (`record` catch).
-
----
-
-## 11. Admin Operations
-
-| Capability | Status |
-|------------|--------|
-| Generate | UI + API wired |
-| List/detail/result/asset | API |
-| Cancel / requeue / attach-message | API only (no UI) |
-| Image SLA | API only (admin-ui SLA cards are chat-turn metrics) |
-
-No fake Generate button. Unavailable UI controls are absent, not silent no-ops.
+No worker redesign this task.
 
 ---
 
-## 12. Tests
+## 5. Retention safety
+
+`ImageRetentionCleaner`: skips active jobs; skips message-referenced UUIDs; deletes terminal aged jobs + files under configured root.
+
+Multi-instance note: all instances sharing DB+storage should run at most one retention schedule or accept idempotent deletes. Current design is idempotent (missing file delete is fine). No retention behavior change this task.
+
+---
+
+## 6. Configuration
+
+| Variable | Default | Production note |
+|----------|---------|-----------------|
+| `IMAGE_STORAGE` | local file (if unset / not `memory`) | Never use `memory` in prod multi-instance |
+| `IMAGE_STORAGE_DIR` | `data/object-storage` | **Must be shared mount** for multi-instance |
+| `IMAGE_STORAGE_MAX_BYTES` | 20MB | Per-object cap |
+| `IMAGE_STORAGE_SHARED` | unset/false | Operator attestation for diagnostics only |
+| `IMAGE_WORKER_*` | see prior ops doc | Lease default 300s |
+| `IMAGE_RETENTION_DAYS` | 30 | Shared DB semantics |
+
+Path normalization: relative keys only; `..` rejected; resolved path must stay under root. Directory auto-created on storage construction.
+
+Restart required for env changes. Not runtime-reloadable.
+
+### Diagnostics
+
+| Surface | Exposes |
+|---------|---------|
+| `GET /health` | `imageStorageMode`, `imageStorageMultiInstanceContract`, `imageStorageOperatorDeclaredShared` (no absolute path) |
+| `GET /v1/admin/images/storage` | mode, contract, root **label** (basename), probe r/w/ok, guidance |
+
+Admin UI: Generate remains wired; storage status is **API-only** (document gap — no fake UI metric).
+
+---
+
+## 7. Tests
 
 | Metric | Value |
 |--------|-------|
-| Filter result | **BUILD SUCCESSFUL** |
-| Total | **204** |
+| Imaging filter | **BUILD SUCCESSFUL** |
+| Total | **208** |
 | Failed | **0** |
 | Errors | **0** |
 | Skipped | **1** (live OpenRouter) |
-| New tests | concurrent claim; concurrent idempotent create; lease steal blocked (28b); attach reconcile |
-| PhaseIMG1–8 | preserved |
-| Live Postgres E2E this run | **NOT RUN** |
+| New tests | shared success; independent miss; probe/diagnostics |
 | New failures | none |
+
 ---
 
-## 13. Live Verification
+## 8. Live verification
 
-| Mode | Status |
+| Item | Status |
 |------|--------|
-| Unit / integration (H2 + Fake) | **VERIFIED** |
-| Real Postgres | **NOT VERIFIED** this run |
-| Fake provider | **VERIFIED** |
-| OpenRouter | **NOT LIVE-VERIFIED** — credentials unavailable |
+| Fake provider + H2 shared-storage contract | **VERIFIED** |
+| Real Postgres | **NOT VERIFIED** |
+| OpenRouter | **NOT LIVE-VERIFIED** |
 
 ---
 
-## 14. Multi-Instance Verdict
-
-**B. SAFE FOR MULTI-INSTANCE WITH SHARED STORAGE**
-
-Evidence:
-
-- Shared DB + atomic claim + lease-bound completion → safe job processing across instances  
-- LocalFileObjectStorage without shared mount → assets not visible across instances → **not C**  
-- Single-instance remains safe (**A** also true as a subset)
-
-**Not D** — defects that allowed cross-worker completion steal are fixed and tested.
-
----
-
-## 15. Remaining Production Gaps
-
-1. Shared/object storage adapter (or documented NFS/SMB mount) for true multi-instance assets  
-2. Lease heartbeat for generations longer than lease timeout (avoids duplicate provider spend)  
-3. OpenRouter live smoke when credentials available  
-4. Admin UI for cancel/requeue/image SLA  
-5. Retention query scaling (indexed metadata search)  
-6. Real Postgres multi-process soak test  
-
----
-
-## 16. Files Changed
+## 9. Files changed (this task)
 
 | File | Change |
 |------|--------|
-| `ImageJobRepository.kt` | Lease-bound complete success/failure |
-| `ImageJobWorker.kt` | Pass workerName; lease-lost handling; reconcile attachments |
-| `ImageJobWorkerRuntime.kt` | Configurable lease; call reconcile |
-| `LocalFileObjectStorage.kt` | Temp+atomic move writes |
-| `PhaseIMG4ImageJobInfrastructureTest.kt` | Lease steal tests + API updates |
-| `ImageJobMultiInstanceHardeningTest.kt` | **new** |
-| `PhaseIMGSecurityAndRetentionTest.kt` | completeJobFailure signature |
-| `IMAGE_PIPELINE_MULTI_INSTANCE_OPS.md` | this report |
+| `ObjectStorage.kt` | `probeReadiness` / `StorageReadiness` |
+| `LocalFileObjectStorage.kt` | probe implementation; root label |
+| `InMemoryObjectStorage.kt` | probe (single-process warning) |
+| `ImageStorageDiagnostics.kt` | **new** ops view |
+| `HealthRoutes.kt` | optional non-secret extras |
+| `Application.kt` | health image storage fields |
+| `AdminImageGenerationRoutes.kt` | `GET /v1/admin/images/storage` |
+| `SharedStorageMultiInstanceTest.kt` | **new** |
+| `IMAGE_PIPELINE_MULTI_INSTANCE_OPS.md` | this update |
 
 ---
 
-## 17. Git
+## 10. Remaining gaps
+
+1. No cloud object-store adapter (intentional deferral)  
+2. Admin UI does not yet display storage diagnostics (API exists)  
+3. Lease heartbeat for long generations  
+4. OpenRouter live smoke  
+5. Real multi-process Postgres soak  
+
+---
+
+## 11. Git
 
 ```text
 Branch: cursor/claude-work-followup
-Commit: 958e28b
+Commit: (set on commit)
 Push: no
 ```
 
 ---
 
-## Configuration Reference (Part 6)
+## Failure modes & recovery
 
-| Key | Default | Reload | Admin |
-|-----|---------|--------|-------|
-| `IMAGE_PROVIDER` | openrouter (Fake if no key / fake) | restart | no |
-| `OPENROUTER_API_KEY` | — | restart | no |
-| `OPENROUTER_IMAGE_MODEL` | gpt-image-2.5-flare | restart | no |
-| `OPENROUTER_IMAGE_ENDPOINT` | openrouter images API | restart | no |
-| `IMAGE_CONNECT/READ_TIMEOUT_SECONDS` | 10 / 300 | restart | no |
-| `IMAGE_STORAGE` | local (≠ memory) | restart | no |
-| `IMAGE_STORAGE_DIR` | data/object-storage | restart | no |
-| `IMAGE_STORAGE_MAX_BYTES` | 20MB | restart | no |
-| `IMAGE_WORKER_ENABLED` | true | restart | no |
-| `IMAGE_WORKER_POLL_MS` | 2000 | restart | no |
-| `IMAGE_WORKER_BATCH` | 5 | restart | no |
-| `IMAGE_WORKER_LEASE_SECONDS` | 300 | restart | no |
-| `IMAGE_RETENTION_DAYS` | 30 | restart | no |
-| Retry delay | 60s hardcoded | code | no |
-| maxAttempts | 3 default | per job | no |
-
-Effective values: not exposed in Admin UI; infer from env + job `lastError` / events.
+| Failure | Operator action |
+|---------|-----------------|
+| Asset 404 on some instances | Verify shared mount + identical `IMAGE_STORAGE_DIR`; check admin storage probe |
+| Probe not writable | Fix permissions / disk full |
+| `memory` mode in prod | Switch to local + shared dir |
+| Job SUCCEEDED, metadata missing assets | Worker reconcile will re-attach; or admin attach-message |
 
 ---
 
-## Next recommended Image Pipeline task
+## Next recommended task
 
-**Shared storage / object-store adapter (or production runbook for shared `IMAGE_STORAGE_DIR`)** plus optional lease heartbeat — only after ops chooses multi-instance topology. Until then, single-instance or multi-instance-with-shared-volume is the supported path; OpenRouter live smoke remains the other gated verification.
+After ops confirms a shared volume in the target environment: optional **lease heartbeat**, then gated **OpenRouter live smoke**. Object-store (S3/etc.) only if shared filesystem is not available.

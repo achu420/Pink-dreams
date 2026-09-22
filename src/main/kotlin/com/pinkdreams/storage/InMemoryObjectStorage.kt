@@ -26,6 +26,23 @@ class InMemoryObjectStorage : ObjectStorage {
         return storage.containsKey(key)
     }
 
+    override fun probeReadiness(): StorageReadiness {
+        val key = ".health-probe/inmem"
+        val payload = byteArrayOf(9, 8, 7)
+        store(key, payload, "application/octet-stream")
+        val got = retrieve(key)
+        delete(key)
+        val ok = got != null && got.content.contentEquals(payload)
+        return StorageReadiness(
+            mode = "memory",
+            rootLabel = null,
+            readable = true,
+            writable = true,
+            probeOk = ok,
+            detail = "In-memory storage is single-process only; not multi-instance safe",
+        )
+    }
+
     fun clear() {
         storage.clear()
     }
