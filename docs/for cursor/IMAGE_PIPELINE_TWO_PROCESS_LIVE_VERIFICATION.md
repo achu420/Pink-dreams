@@ -230,7 +230,7 @@ Note: not production traffic; sample size is small.
 
 ## 18. Git
 
-Recorded after commit.
+Commit: `b7acfc8`
 
 ---
 
