@@ -8,26 +8,27 @@
 - `b20f048` — Morning review brief
 - `13e4365` — Persona Image Warehouse tab + API
 - `b2880c8` — Image SLA Admin page + enriched SLA API
-- (pending) — Image Model Evaluation (2–3 models, comparison UI)
+- `8e5944c` — Image Model Evaluation (2–3 models)
+- `298ebaf` — Identity context + required refs + IDENTITY_MISMATCH
+- `185d0b3` — Admin-editable image provider/model config
+- `77625db` — Warehouse deepen (filter/pagination/metadata)
+- `ccd4ee7` — Image SLA ops deepen (queue/stuck/storage/failures)
 
 ---
 
 ## What works now (testable)
 
-1. **Visual Identity (Admin → Persona → Visual Identity)**
-   - Ensure draft, edit physical + private fields, style JSON
-   - Upload/replace/remove FRONT / FACE_CLOSE / L/R profile / BACK / PRIVATE
-   - Publish & activate
-2. **Generate**
-   - Seed prompt box + candidate count (default 4)
-   - Polls job → shows candidate previews
-   - Shortlist / Decline / Save / remark / Regenerate (with correction)
-3. **Test fixtures**
-   - `POST /v1/admin/personas/seed-image-test-fixtures`
-   - Loads **Ananya** (`ananya_rajput`) + **Richa** (`richa_mehta`) from  
-     `docs/23 sept/persona testing data/` (pics + attributes)
-4. **Warehouse + Image SLA** — persona warehouse tab; Image SLA nav (cost = UNAVAILABLE)
-5. **Model Evaluation** — Admin → Model Evaluation: select 2–3 models, same seed/persona, compare candidates + notes (does not change production model)
+1. **Visual Identity** — draft/edit/upload slots/publish
+2. **Generate** — seed + 4 candidates, shortlist/decline/save/mismatch/regen
+3. **Fixtures** — Ananya + Richa seed endpoint
+4. **Warehouse** — grouped by generation, filters, pagination, mark-for-post
+5. **Model Evaluation** — 2–3 models, comparison UI, notes/ratings
+6. **Image config** — Admin default model (request > DB > env > default)
+7. **Image SLA** — latency, candidates, queue/stuck, storage probe, recent failures; cost = UNAVAILABLE
+
+## Morning smoke
+
+Migrate V011–V015, seed fixtures, Generate 4, Warehouse, Model Evaluation, Image SLA.
 
 ---
 
