@@ -107,6 +107,71 @@ class Phase5FMemoryExtractionTest {
         assertFalse(extractionCalled)
     }
 
+    /**
+     * Task 25F fix 4 regression. The memory-reference write path was
+     * structurally dead: MemoryFactRepository.markReferenced and
+     * MemoryService.markReferenced both existed, but their only caller was
+     * gated on ExtractionResult.referencedFactIds, which no extractor ever
+     * populates — 0 of 280 real memory_facts rows had last_referenced_at set,
+     * so both the eviction comparator's recency tiebreak and the selector's
+     * recency term degraded to learnedAt alone. The facts actually injected
+     * into the turn are already known as ChatContext.memoryIdsUsed.
+     */
+    @Test
+    fun `Task 25F - memories injected into the turn are marked as referenced`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+        val repository = MemoryFactRepository(db)
+        val memoryService = MemoryService(repository)
+        val userId = UUID.randomUUID()
+        val personaId = UUID.randomUUID()
+        val injected = repository.create(userId, personaId, "user lives in Goa", "interest", "high")
+        val notInjected = repository.create(userId, personaId, "user likes tea", "interest", "low")
+
+        val request = request(userId, personaId)
+        val engine = engine(
+            request = request,
+            context = context().copy(memoryIdsUsed = listOf(injected.id)),
+            extraction = BestEffortMemoryExtraction(
+                extractor = MemoryExtractor { ExtractionResult(emptyList()) },
+                memoryService = memoryService,
+                executor = Executor { it.run() },
+            ),
+        )
+
+        assertIs<ChatResult.Success>(engine.process(request))
+
+        assertTrue(repository.findById(injected.id)!!.lastReferencedAt != null, "an injected memory must be marked as referenced")
+        assertEquals(null, repository.findById(notInjected.id)!!.lastReferencedAt, "a memory that was not injected must not be marked")
+    }
+
+    @Test
+    fun `Task 25F - an unmarkable memory id never breaks extraction`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+        val repository = MemoryFactRepository(db)
+        val memoryService = MemoryService(repository)
+        val userId = UUID.randomUUID()
+        val personaId = UUID.randomUUID()
+
+        val request = request(userId, personaId)
+        val engine = engine(
+            request = request,
+            // A stale id (e.g. a fact evicted between selection and extraction):
+            // markReferenced rejects it, and extraction must still complete.
+            context = context().copy(memoryIdsUsed = listOf(UUID.randomUUID())),
+            extraction = BestEffortMemoryExtraction(
+                extractor = MemoryExtractor { ExtractionResult(listOf(MemoryCandidate("user is a marine biologist", "interest", "high"))) },
+                memoryService = memoryService,
+                executor = Executor { it.run() },
+            ),
+        )
+
+        assertIs<ChatResult.Success>(engine.process(request))
+
+        assertEquals(1, repository.findForRelationship(userId, personaId).size, "extraction still recorded its fact")
+    }
+
     private fun engine(
         request: ChatRequest,
         context: ChatContext = context(),

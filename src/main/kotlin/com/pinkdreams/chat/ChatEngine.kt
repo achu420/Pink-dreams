@@ -469,7 +469,13 @@ class PipelineChatEngine(
         }
         attribution?.succeeded()
         try {
-            postDeliveryMemoryExtraction.dispatch(CompletedTurn(request, context, persisted))
+            // Task 25F fix 4: the FINAL context — the one generation actually
+            // ran on — not the assembler's pre-enrichment draft. Nothing reads
+            // CompletedTurn.context's blocks (its consumers read only
+            // engineVersionId/personaCoreVersionId, identical on both), but
+            // skillEnrichedContext carries the true injected memoryIdsUsed,
+            // which is what BestEffortMemoryExtraction marks as referenced.
+            postDeliveryMemoryExtraction.dispatch(CompletedTurn(request, skillEnrichedContext, persisted))
         } catch (_: Exception) {
             // Memory extraction is best-effort and isolated from the main result
         }

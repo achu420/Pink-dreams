@@ -52,6 +52,25 @@ class BestEffortMemoryExtraction(
             val queueDelayMs = (startedAtNanos - dispatchedAtNanos) / 1_000_000
             try {
                 val scopedPersonaId = memoryScopeResolver.resolve(turn.request.userId, turn.request.personaId, turn.request.conversationId)
+                // Task 25F fix 4: the write side of memory-reference tracking was
+                // structurally dead — MemoryFactRepository.markReferenced existed
+                // and MemoryService.markReferenced existed, but the only caller
+                // was gated on ExtractionResult.referencedFactIds, which no
+                // MemoryExtractor ever populates. Result: 0 of 280 real rows had
+                // last_referenced_at set, so the eviction comparator's
+                // "keep recently used memory" tiebreak and the selector's recency
+                // term both silently degraded to learnedAt alone.
+                //
+                // The facts actually INJECTED into this turn's prompt are already
+                // known: ChatContext.memoryIdsUsed (recorded for Task 24's turn
+                // attribution). Marking those is the originally intended write —
+                // no new ranking algorithm, no new query on the hot path, and no
+                // change to the comparator/selector that consume the signal.
+                // Runs here, on the existing best-effort async extraction path,
+                // and in its own try/catch so a fact that is no longer hot (a
+                // repository precondition) cannot abort extraction itself. Done
+                // BEFORE record(), so this turn's own eviction cannot race it.
+                markInjectedAsReferenced(turn, scopedPersonaId)
                 val result = extractor.extract(turn)
                 val candidates = result.newFacts.map {
                     it.copy(source = "llm_extracted", tier = "hot")
@@ -82,5 +101,23 @@ class BestEffortMemoryExtraction(
                 )
             }
         }, executor)
+    }
+
+    private fun markInjectedAsReferenced(turn: CompletedTurn, scopedPersonaId: UUID) {
+        val injected = turn.context.memoryIdsUsed.orEmpty()
+        if (injected.isEmpty()) return
+        val now = LocalDateTime.now()
+        injected.forEach { factId ->
+            try {
+                memoryService.markReferenced(turn.request.userId, scopedPersonaId, listOf(factId), now)
+            } catch (e: Exception) {
+                // Per-fact isolation: a fact that was evicted or removed between
+                // selection and now is simply not marked, and never affects the
+                // rest of the set or the extraction that follows.
+                System.err.println(
+                    "MEMORY_REFERENCE: could not mark fact as referenced conversation=${turn.request.conversationId}: ${e.javaClass.simpleName}",
+                )
+            }
+        }
     }
 }
