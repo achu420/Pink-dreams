@@ -167,4 +167,51 @@ class MemoryEngineChangeApplierTest {
         assertEquals(1, outcome.skipped)
         assertEquals("updated", repo.findById(valid.id)!!.fact)
     }
+
+    /**
+     * Task 25F fix 2. Mirrors the real over-capacity relationship
+     * (user 36d344df…, persona 378b82c0…): 15 llm_extracted hot facts already
+     * present plus Memory Engine ADDs on top, which previously bypassed
+     * MemoryService.record() and therefore MAX_HOT_FACTS entirely, reaching 22
+     * live hot facts against a limit of 20.
+     */
+    @Test
+    fun `Task 25F - Memory Engine ADD is subject to MAX_HOT_FACTS`() {
+        val (repo, applier) = fixture()
+        val userId = UUID.randomUUID()
+        val personaId = UUID.randomUUID()
+        repeat(15) { i -> repo.create(userId, personaId, "extracted fact $i", "interest", "medium", source = "llm_extracted") }
+
+        val outcome = applier.apply(
+            userId, personaId, "USER",
+            (0 until 7).map { i ->
+                MemoryChange(MemoryChangeAction.ADD, memoryType = "interest", content = "engine fact $i", criticality = "medium")
+            },
+        )
+
+        assertEquals(7, outcome.applied, "every valid ADD must still be applied")
+        val liveHot = repo.findForRelationship(userId, personaId)
+            .filter { it.tier == "hot" && it.status !in setOf("superseded", "removed") }
+        assertEquals(
+            com.pinkdreams.chat.memory.MemoryService.MAX_HOT_FACTS,
+            liveHot.size,
+            "hot capacity must be enforced regardless of which write path created the fact",
+        )
+        assertEquals(22, repo.findForRelationship(userId, personaId).size, "nothing is deleted — the excess is evicted to cold")
+    }
+
+    @Test
+    fun `Task 25F - a batch with no hot-tier write leaves tiers untouched`() {
+        val (repo, applier) = fixture()
+        val userId = UUID.randomUUID()
+        val personaId = UUID.randomUUID()
+        repeat(25) { i -> repo.create(userId, personaId, "pre-existing $i", "interest", "medium") }
+
+        applier.apply(userId, personaId, "USER", listOf(MemoryChange(MemoryChangeAction.KEEP)))
+
+        // No hot row was added, so this pre-existing (already over-capacity)
+        // state is deliberately not rebalanced: the fix enforces capacity on
+        // write, it does not introduce a background compactor.
+        assertEquals(25, repo.findForRelationship(userId, personaId).count { it.tier == "hot" })
+    }
 }

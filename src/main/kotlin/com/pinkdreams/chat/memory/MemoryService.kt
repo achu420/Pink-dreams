@@ -139,7 +139,15 @@ class MemoryService(private val repository: MemoryFactRepository) {
         .replace(Regex("\\s+"), " ")
         .trimEnd('.', '!', '?')
 
-    private fun enforceHotCapacity(userId: UUID, personaId: UUID) {
+    /**
+     * Task 25F fix 2: MAX_HOT_FACTS must hold regardless of which code path
+     * created a hot fact. [record] (the extraction path) has always enforced it,
+     * but MemoryEngineChangeApplier writes to MemoryFactRepository directly, so
+     * its ADD/SUPERSEDE rows never counted — leaving 22 live hot facts on one
+     * real relationship against a limit of 20. Exposed (rather than duplicated)
+     * so there is still exactly ONE capacity policy in the codebase.
+     */
+    fun enforceHotCapacity(userId: UUID, personaId: UUID) {
         // Only facts that can actually be SELECTED occupy hot capacity. A
         // superseded/removed row keeps tier="hot" (neither supersede() nor
         // remove() touches the tier — history is preserved in place), but it is

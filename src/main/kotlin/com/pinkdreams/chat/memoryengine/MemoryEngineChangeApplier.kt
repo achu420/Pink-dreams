@@ -11,7 +11,12 @@ import java.util.UUID
  * malformed ID can only ever be silently skipped, never cross a user/persona
  * boundary. One invalid change never aborts the rest of the batch.
  */
-class MemoryEngineChangeApplier(private val repository: MemoryFactRepository) {
+class MemoryEngineChangeApplier(
+    private val repository: MemoryFactRepository,
+    // Task 25F fix 2: the ONE existing owner of the hot-capacity policy. Default
+    // wraps the same repository, so no existing call site changes.
+    private val memoryService: MemoryService = MemoryService(repository),
+) {
 
     data class ApplyOutcome(val applied: Int, val skipped: Int)
 
@@ -19,6 +24,7 @@ class MemoryEngineChangeApplier(private val repository: MemoryFactRepository) {
         require(owner in MemoryService.OWNERS) { "Invalid memory owner: $owner" }
         var applied = 0
         var skipped = 0
+        var createdHotFact = false
         changes.forEach { change ->
             val ok = try {
                 applyOne(userId, personaId, owner, change)
@@ -27,6 +33,26 @@ class MemoryEngineChangeApplier(private val repository: MemoryFactRepository) {
                 false
             }
             if (ok) applied++ else skipped++
+            if (ok && change.action in TIER_AFFECTING_ACTIONS) createdHotFact = true
+        }
+        // Task 25F fix 2: this applier writes through MemoryFactRepository
+        // directly, bypassing MemoryService.record() — the only place
+        // MAX_HOT_FACTS was ever enforced. A real relationship therefore reached
+        // 22 live hot facts (15 llm_extracted + 7 memory_engine) against the
+        // 20-slot limit. Enforce the SAME existing policy after a batch that
+        // added hot rows, rather than restating the limit here: the threshold,
+        // the eviction comparator and the Memory Engine's own ADD/UPDATE/
+        // SUPERSEDE/REMOVE/KEEP/IGNORE decisions are all unchanged. Once per
+        // batch, not per change — capacity is a property of the resulting set,
+        // and eviction reads the post-batch state either way. Best-effort, in
+        // keeping with every other write in this class: a failure here must not
+        // turn applied changes into a reported failure.
+        if (createdHotFact) {
+            try {
+                memoryService.enforceHotCapacity(userId, personaId)
+            } catch (e: Exception) {
+                System.err.println("MEMORY_ENGINE: hot capacity enforcement failed: ${e.javaClass.simpleName}")
+            }
         }
         return ApplyOutcome(applied, skipped)
     }
@@ -85,6 +111,13 @@ class MemoryEngineChangeApplier(private val repository: MemoryFactRepository) {
             }
         }
         MemoryChangeAction.KEEP, MemoryChangeAction.IGNORE -> true // explicit no-op, not a failure
+    }
+
+    private companion object {
+        // ADD inserts a new hot row; SUPERSEDE inserts a replacement row at the
+        // target's tier (which is hot for any fact the engine can see). UPDATE,
+        // REMOVE, KEEP and IGNORE never add to the hot set.
+        val TIER_AFFECTING_ACTIONS = setOf(MemoryChangeAction.ADD, MemoryChangeAction.SUPERSEDE)
     }
 
     /** Re-validates the target belongs to this exact user+persona+owner relationship before any mutation. */
