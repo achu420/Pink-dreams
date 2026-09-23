@@ -374,7 +374,7 @@ class OpenRouterImageProvider(
             model = effectiveModel(request),
             prompt = prompt,
             n = request.candidateCount,
-            resolution = determineResolution(request.widthPx, request.heightPx),
+            resolution = determineResolution(effectiveModel(request), request.widthPx, request.heightPx),
             aspect_ratio = request.aspectRatio ?: determineAspectRatio(request.widthPx, request.heightPx),
             quality = "auto",
             output_format = normalizeOutputFormat(outputFormat),
@@ -385,17 +385,24 @@ class OpenRouterImageProvider(
     /**
      * OpenRouter expects resolution tiers: 512 | 1K | 2K | 4K
      * (not legacy WxH strings such as 1024x1024).
+     * Seedream rejects 512 — bump to the lowest accepted tier (1K).
      */
-    private fun determineResolution(widthPx: Int?, heightPx: Int?): String? {
-        if (widthPx == null && heightPx == null) return null
+    private fun determineResolution(modelId: String, widthPx: Int?, heightPx: Int?): String? {
+        if (widthPx == null && heightPx == null) {
+            return if (modelId.contains("seedream", ignoreCase = true)) "1K" else null
+        }
         val maxSide = maxOf(widthPx ?: 0, heightPx ?: 0)
-        return when {
+        val tier = when {
             maxSide <= 0 -> null
             maxSide <= 768 -> "512"
             maxSide <= 1536 -> "1K"
             maxSide <= 3072 -> "2K"
             else -> "4K"
         }
+        if (modelId.contains("seedream", ignoreCase = true) && (tier == null || tier == "512")) {
+            return "1K"
+        }
+        return tier
     }
 
     private fun determineAspectRatio(widthPx: Int?, heightPx: Int?): String? {

@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-23  
 **Branch:** `QA`  
-**Method:** Code + tests + live OpenRouter generation on 2026-09-23. See `23-25_LIVE_MODEL_EVALUATION.md` and `23-27_LIVE_ACCEPTANCE_REPORT.md`.
+**Method:** Code + tests + live OpenRouter generation on 2026-09-23. See `23-25`, `23-27`, `23-28_IMAGE_MODEL_CONTROLLED_COMPARISON.md`.
 
 | Task | Verdict | Evidence / notes |
 |------|---------|------------------|
@@ -27,13 +27,14 @@
 | 25 Model×persona evaluation | LIVE WITH FINDINGS | eval `094b2a03-8542-47ca-9003-3eaaa66e2d06`; flare and sunburst succeeded; Seedream rejected resolution 512; no winner |
 | 26 Model discovery | DONE | live catalog 53 models; 3 selected; discovery API |
 | 27 Real persona acceptance | LIVE WITH FINDINGS | 8 real jobs; bathroom and cafe stored; night and sea safety-blocked; Ananya regen succeeded; Richa regen safety-blocked |
+| 28 Controlled model comparison | COMPLETE | flare/sunburst/seedream × 2 personas × 4 prompts; Seedream 1K; prod unchanged — see 23-28 |
 
 ## Explicitly deferred
 - Posts / social publishing
 - Invented cost pricing
 
 ## Still open
-1. Optional Seedream resolution mapping (`512` → `1K`/`2K`)
-2. Richa regeneration provider safety blocks on stored bathroom/cafe candidates
+1. Product-owner production-model decision from Task 28 evidence
+2. Optional cost ingestion / SLA target configuration
 3. Posts / social publishing remain deferred
-4. Cost ingestion / SLA target configuration (product decision)
+4. Richa OpenAI regen often safety-blocked (Seedream regen worked in Task 28)

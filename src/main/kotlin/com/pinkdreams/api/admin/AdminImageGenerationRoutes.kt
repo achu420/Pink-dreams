@@ -52,6 +52,8 @@ data class CreateImageJobHttpRequest(
     val turnRequestId: String? = null,
     /** When true, reject generation if standard reference slots are incomplete. Default true for Admin. */
     val requireStandardReferences: Boolean = true,
+    /** Optional per-job model override. Does not change production Admin/env defaults. */
+    val modelId: String? = null,
 )
 
 @Serializable
@@ -306,6 +308,7 @@ class AdminImageGenerationRoutes(
                             conversationId = body.conversationId?.let(UUID::fromString),
                             turnRequestId = body.turnRequestId?.let(UUID::fromString),
                             requireStandardReferences = body.requireStandardReferences,
+                            modelId = body.modelId?.takeIf { it.isNotBlank() },
                         )
                     )
                     call.respond(
