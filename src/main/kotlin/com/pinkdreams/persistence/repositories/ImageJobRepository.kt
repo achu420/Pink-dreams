@@ -144,6 +144,11 @@ class ImageJobRepository(private val db: Database) {
     /**
      * Completes a job only if it is still RUNNING and leased to [workerName].
      * Returns null when the lease was lost (stale recovery / another worker).
+     *
+     * Sets [ImageJobs.providerCostSource] to "UNAVAILABLE" because the OpenRouter
+     * image API does not expose per-request cost in its response body. When OpenRouter
+     * adds cost to image responses, update this method to accept and persist the
+     * actual cost values (see the TODO in OpenRouterImageProvider / OpenRouterImageResponse).
      */
     fun completeJobSuccess(jobId: UUID, workerName: String): ImageJob? = transaction(db) {
         val now = LocalDateTime.now()
@@ -157,6 +162,8 @@ class ImageJobRepository(private val db: Database) {
             it[ImageJobs.lastError] = null
             it[ImageJobs.claimedByWorker] = null
             it[ImageJobs.claimedAt] = null
+            // TODO: replace with actual cost values when OpenRouter exposes cost in image responses
+            it[ImageJobs.providerCostSource] = "UNAVAILABLE"
         }
         if (updated > 0) findById(jobId) else null
     }
@@ -278,5 +285,8 @@ class ImageJobRepository(private val db: Database) {
         createdAt = row[ImageJobs.createdAt],
         startedAt = row[ImageJobs.startedAt],
         completedAt = row[ImageJobs.completedAt],
+        providerCostRaw = row[ImageJobs.providerCostRaw],
+        providerCostCurrency = row[ImageJobs.providerCostCurrency],
+        providerCostSource = row[ImageJobs.providerCostSource],
     )
 }

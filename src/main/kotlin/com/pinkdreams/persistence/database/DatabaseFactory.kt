@@ -292,6 +292,11 @@ object ImageJobs : Table("image_jobs") {
     val createdAt = datetime("created_at")
     val startedAt = datetime("started_at").nullable()
     val completedAt = datetime("completed_at").nullable()
+    // V016: provider cost capture (set to "UNAVAILABLE" until OpenRouter exposes
+    // cost in image API responses; see OpenRouterImageProvider for the TODO).
+    val providerCostRaw = decimal("provider_cost_raw", 18, 8).nullable()
+    val providerCostCurrency = text("provider_cost_currency").nullable()
+    val providerCostSource = text("provider_cost_source").nullable()
 
     override val primaryKey = PrimaryKey(id)
     init {

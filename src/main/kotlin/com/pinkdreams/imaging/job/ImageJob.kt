@@ -1,5 +1,6 @@
 package com.pinkdreams.imaging.job
 
+import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -19,6 +20,12 @@ data class ImageJob(
     val createdAt: LocalDateTime,
     val startedAt: LocalDateTime?,
     val completedAt: LocalDateTime?,
+    // V016: provider cost capture — null until the provider starts returning cost data.
+    // providerCostSource is written as "UNAVAILABLE" for OpenRouter image jobs since
+    // the image API does not expose per-request cost in its response body.
+    val providerCostRaw: BigDecimal? = null,
+    val providerCostCurrency: String? = null,
+    val providerCostSource: String? = null,
 ) {
     fun validate(): ValidationResult {
         val errors = mutableListOf<String>()
