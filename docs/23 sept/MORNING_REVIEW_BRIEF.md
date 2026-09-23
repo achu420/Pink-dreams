@@ -26,6 +26,10 @@
 6. **Image config** — Admin default model (request > DB > env > default)
 7. **Image SLA** — latency, candidates, queue/stuck, storage probe, recent failures; cost = UNAVAILABLE
 
+## Live run (2026-09-23)
+
+OpenRouter flare stored Ananya bathroom and cafe images (4 each) and Richa bathroom and cafe images (1 each). Night and sea prompts were safety-blocked for both personas. Ananya regeneration succeeded. Richa regeneration was safety-blocked. Model comparison `094b2a03-8542-47ca-9003-3eaaa66e2d06` returned flare and sunburst images; Seedream rejected resolution 512. Production model stayed flare. Cost stayed UNAVAILABLE. Details: `23-25_LIVE_MODEL_EVALUATION.md`, `23-27_LIVE_ACCEPTANCE_REPORT.md`.
+
 ## Morning smoke
 
 Migrate V011–V015, seed fixtures, Generate 4, Warehouse, Model Evaluation, Image SLA.

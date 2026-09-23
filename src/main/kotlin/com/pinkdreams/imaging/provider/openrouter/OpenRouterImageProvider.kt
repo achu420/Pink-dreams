@@ -6,11 +6,22 @@ import com.pinkdreams.storage.ObjectStorage
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import java.awt.Color
+import java.awt.RenderingHints
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.imageio.IIOImage
+import javax.imageio.ImageIO
+import javax.imageio.ImageWriteParam
 
 @Serializable
 data class OpenRouterImageRequest(
@@ -47,7 +58,8 @@ data class OpenRouterImageData(
 
 @Serializable
 data class OpenRouterImageError(
-    val code: String? = null,
+    /** OpenRouter sends this as a string or a numeric HTTP code. */
+    val code: JsonElement? = null,
     val message: String? = null,
     val type: String? = null,
 )
@@ -328,6 +340,7 @@ class OpenRouterImageProvider(
                 throw ReferenceResolutionException("Reference images provided but ObjectStorage/ReferenceImageRepository not available")
             }
 
+            val perImageBudget = REFERENCE_PAYLOAD_CHAR_BUDGET / request.references.size.coerceAtLeast(1)
             request.references.map { ref ->
                 val refImage = referenceImageRepository.findById(ref.referenceImageId)
                     ?: throw ReferenceResolutionException("Reference image not found: ${ref.referenceImageId}")
@@ -335,8 +348,13 @@ class OpenRouterImageProvider(
                 val storageObj = objectStorage.retrieve(refImage.storageKey)
                     ?: throw ReferenceResolutionException("Reference object not found in storage: ${refImage.storageKey}")
 
-                val base64Data = Base64.getEncoder().encodeToString(storageObj.content)
-                val dataUrl = "data:${storageObj.contentType};base64,$base64Data"
+                val (fitted, fittedType) = fitReferenceBytesForProvider(
+                    storageObj.content,
+                    storageObj.contentType,
+                    maxRawBytes = (perImageBudget * 3) / 4,
+                )
+                val base64Data = Base64.getEncoder().encodeToString(fitted)
+                val dataUrl = "data:$fittedType;base64,$base64Data"
 
                 OpenRouterReference(
                     type = ref.role.lowercase(),
@@ -347,9 +365,14 @@ class OpenRouterImageProvider(
             null
         }
 
+        val roleNote = request.references.mapIndexed { index, ref ->
+            "Reference image ${index + 1} is the ${ref.role} identity photo"
+        }.joinToString(". ")
+        val prompt = if (roleNote.isBlank()) request.prompt else request.prompt + "\n" + roleNote
+
         return OpenRouterImageRequest(
             model = effectiveModel(request),
-            prompt = request.prompt,
+            prompt = prompt,
             n = request.candidateCount,
             resolution = determineResolution(request.widthPx, request.heightPx),
             aspect_ratio = request.aspectRatio ?: determineAspectRatio(request.widthPx, request.heightPx),
@@ -424,7 +447,17 @@ class OpenRouterImageProvider(
                 connection.errorStream?.bufferedReader()?.readText() ?: "Unknown error"
             }
 
-            return json.decodeFromString<OpenRouterImageResponse>(responseBody)
+            return try {
+                json.decodeFromString<OpenRouterImageResponse>(responseBody)
+            } catch (e: Exception) {
+                if (statusCode in 200..299) throw e
+                OpenRouterImageResponse(
+                    error = OpenRouterImageError(
+                        code = JsonPrimitive(statusCode),
+                        message = responseBody.take(1500),
+                    ),
+                )
+            }
         } finally {
             connection.disconnect()
         }
@@ -447,7 +480,7 @@ class OpenRouterImageProvider(
         if (request.input_references != null && request.input_references.isNotEmpty()) {
             sb.append(",\"input_references\":[")
             sb.append(request.input_references.joinToString(",") { ref ->
-                "{\"type\":\"${ref.type}\",\"content\":\"${escapeJson(ref.content)}\"}"
+                "{\"type\":\"image_url\",\"image_url\":{\"url\":\"${escapeJson(ref.content)}\"}}"
             })
             sb.append("]")
         }
@@ -482,8 +515,14 @@ class OpenRouterImageProvider(
         }
     }
 
+    private fun errorCodeText(error: OpenRouterImageError): String? {
+        val code = error.code ?: return null
+        val primitive = code as? JsonPrimitive ?: return code.toString()
+        return primitive.contentOrNull ?: primitive.toString()
+    }
+
     private fun normalizeError(error: OpenRouterImageError): GenerationError {
-        return when (error.code?.lowercase()) {
+        return when (errorCodeText(error)?.lowercase()) {
             "authentication_error", "invalid_api_key", "invalid_request_error" ->
                 GenerationError(
                     code = "AUTH_FAILED",
@@ -508,12 +547,90 @@ class OpenRouterImageProvider(
                     message = error.message ?: "Request timeout",
                     retryable = true,
                 )
-            else ->
+            else -> {
+                val codeText = errorCodeText(error) ?: "UNKNOWN_ERROR"
+                val numeric = codeText.toIntOrNull()
                 GenerationError(
-                    code = error.code ?: "UNKNOWN_ERROR",
+                    code = codeText,
                     message = error.message ?: "Unknown error",
-                    retryable = true,
+                    retryable = numeric == null || numeric >= 500,
                 )
+            }
+        }
+    }
+
+    companion object {
+        /** Stay under OpenRouter's 8 MB total text-input limit, leaving room for the prompt. */
+        const val REFERENCE_PAYLOAD_CHAR_BUDGET = 6_000_000
+
+        /**
+         * Shrink a reference so its base64 form fits the provider text budget.
+         * Identity is preserved at a smaller pixel size; the original stored file is unchanged.
+         */
+        internal fun fitReferenceBytesForProvider(
+            bytes: ByteArray,
+            contentType: String,
+            maxRawBytes: Int,
+        ): Pair<ByteArray, String> {
+            if (bytes.size <= maxRawBytes && contentType.contains("jpeg", ignoreCase = true)) {
+                return bytes to contentType
+            }
+            val decoded = try {
+                ImageIO.read(ByteArrayInputStream(bytes))
+            } catch (_: Exception) {
+                null
+            } ?: return bytes to contentType
+
+            var maxSide = 1024
+            var quality = 0.72f
+            var best = bytes
+            repeat(6) {
+                val scaled = scaleToRgb(decoded, maxSide)
+                val jpeg = writeJpeg(scaled, quality)
+                best = jpeg
+                if (jpeg.size <= maxRawBytes) return jpeg to "image/jpeg"
+                maxSide = (maxSide * 0.72).toInt().coerceAtLeast(320)
+                quality = (quality * 0.85f).coerceAtLeast(0.45f)
+            }
+            return best to "image/jpeg"
+        }
+
+        private fun scaleToRgb(source: BufferedImage, maxSide: Int): BufferedImage {
+            val longest = maxOf(source.width, source.height).coerceAtLeast(1)
+            val scale = if (longest <= maxSide) 1.0 else maxSide.toDouble() / longest
+            val w = (source.width * scale).toInt().coerceAtLeast(1)
+            val h = (source.height * scale).toInt().coerceAtLeast(1)
+            val out = BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
+            val g = out.createGraphics()
+            try {
+                g.color = Color.WHITE
+                g.fillRect(0, 0, w, h)
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+                g.drawImage(source, 0, 0, w, h, null)
+            } finally {
+                g.dispose()
+            }
+            return out
+        }
+
+        private fun writeJpeg(image: BufferedImage, quality: Float): ByteArray {
+            val writers = ImageIO.getImageWritersByFormatName("jpeg")
+            val writer = writers.next()
+            val out = ByteArrayOutputStream()
+            val stream = ImageIO.createImageOutputStream(out)
+            writer.output = stream
+            try {
+                val param = writer.defaultWriteParam
+                if (param.canWriteCompressed()) {
+                    param.compressionMode = ImageWriteParam.MODE_EXPLICIT
+                    param.compressionQuality = quality
+                }
+                writer.write(null, IIOImage(image, null, null), param)
+            } finally {
+                stream.close()
+                writer.dispose()
+            }
+            return out.toByteArray()
         }
     }
 }

@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-23  
 **Branch:** `QA`  
-**Method:** Code + tests + live OpenRouter catalog fetch (key present). Browser Admin smoke and full Persona matrix still operator-gated.
+**Method:** Code + tests + live OpenRouter generation on 2026-09-23. See `23-25_LIVE_MODEL_EVALUATION.md` and `23-27_LIVE_ACCEPTANCE_REPORT.md`.
 
 | Task | Verdict | Evidence / notes |
 |------|---------|------------------|
@@ -23,17 +23,17 @@
 | 21 Engine/skill config | DONE W/ FINDINGS (overlap 14) | settings singleton; no separate Skills row (intentional) |
 | 22 E2E QA runbook | DOC + CONDITIONAL | runbook exists; operator fill pending |
 | 23 Cost/SLA observability | DONE W/ FINDINGS (overlap 11/16) | slaTarget label added |
-| 24 Production hardening / go-live | HARDENING DONE; GO-LIVE PENDING | lease/storage tests exist; live soak pending |
-| 25 Model×persona evaluation | INFRA DONE; LIVE PENDING | needs Task 26 selection + live run |
+| 24 Production hardening / go-live | PARTIAL LIVE | startup, DB, worker, one-process storage, flare generation verified; two-process soak and chat attachment not verified |
+| 25 Model×persona evaluation | LIVE WITH FINDINGS | eval `094b2a03-8542-47ca-9003-3eaaa66e2d06`; flare and sunburst succeeded; Seedream rejected resolution 512; no winner |
 | 26 Model discovery | DONE | live catalog 53 models; 3 selected; discovery API |
-| 27 Real persona acceptance | FIXTURES READY; LIVE PENDING | Ananya/Richa seeder; OpenRouter matrix not executed |
+| 27 Real persona acceptance | LIVE WITH FINDINGS | 8 real jobs; bathroom and cafe stored; night and sea safety-blocked; Ananya regen succeeded; Richa regen safety-blocked |
 
 ## Explicitly deferred
 - Posts / social publishing
 - Invented cost pricing
 
-## Operator must still run
-1. Morning smoke (MORNING_REVIEW_BRIEF)
-2. Task 25 live eval with selected 3 models
-3. Task 27 Richa/Ananya 4-prompt matrix
-4. Sign Task 24 go-live after soak
+## Still open
+1. Task 24 two-process shared-storage soak, and chat attachment
+2. Signed-in Admin browser click-through
+3. Richa regeneration is provider-blocked on the stored bathroom and cafe candidates
+4. Posts / social publishing remain deferred

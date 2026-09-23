@@ -64,6 +64,8 @@ class ImageJobRepository(private val db: Database) {
         ImageJobs.update({ ImageJobs.id eq jobId }) {
             it[ImageJobs.status] = ImageJobStatus.QUEUED.name
             it[ImageJobs.availableAt] = LocalDateTime.now()
+            it[ImageJobs.attemptCount] = 0
+            it[ImageJobs.lastError] = null
             it[ImageJobs.claimedByWorker] = null
             it[ImageJobs.claimedAt] = null
             it[ImageJobs.completedAt] = null
@@ -152,6 +154,7 @@ class ImageJobRepository(private val db: Database) {
         }) {
             it[ImageJobs.status] = ImageJobStatus.SUCCEEDED.name
             it[ImageJobs.completedAt] = now
+            it[ImageJobs.lastError] = null
             it[ImageJobs.claimedByWorker] = null
             it[ImageJobs.claimedAt] = null
         }

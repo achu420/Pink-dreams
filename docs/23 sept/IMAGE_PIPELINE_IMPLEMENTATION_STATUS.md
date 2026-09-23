@@ -1016,11 +1016,13 @@ IMAGE WAREHOUSE
 | 16 Image Cost/SLA Ops Admin (deepen) | PASS WITH FINDINGS | ccd4ee7 |
 | 17 E2E Release Gate report | CONDITIONAL PASS | fc9c29d |
 | 18–25 Overlap validation | DONE / LIVE PENDING | see 23-00_FULL_TASK_CROSS_VALIDATION.md |
-| 26 Model discovery & selection | PASS WITH FINDINGS | (this commit) |
-| 23 SLA target polish | PASS | (this commit) |
-| 27 Real persona acceptance | PENDING LIVE | fixtures ready |
+| 26 Model discovery & selection | PASS WITH FINDINGS | ff6d30f |
+| 23 SLA target polish | PASS | ff6d30f |
+| 25 Live model × persona evaluation | LIVE WITH FINDINGS | see 23-25_LIVE_MODEL_EVALUATION.md |
+| 27 Real persona acceptance | LIVE WITH FINDINGS | see 23-27_LIVE_ACCEPTANCE_REPORT.md |
+| 24 Go-live soak | PARTIAL | one-process live path verified; two-process soak not run |
 
-Next: operator live Tasks **25** + **27** (OpenRouter + browser). No further overnight code required for overlapping docs 18–24.
+Live OpenRouter evidence is in the 23-25 and 23-27 reports. Night and sea prompts were safety-blocked and were not rewritten.
 
 Before implementing new functionality beyond the current task:
 
