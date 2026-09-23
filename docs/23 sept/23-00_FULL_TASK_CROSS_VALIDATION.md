@@ -28,13 +28,16 @@
 | 26 Model discovery | DONE | live catalog 53 models; 3 selected; discovery API |
 | 27 Real persona acceptance | LIVE WITH FINDINGS | 8 real jobs; bathroom and cafe stored; night and sea safety-blocked; Ananya regen succeeded; Richa regen safety-blocked |
 | 28 Controlled model comparison | COMPLETE | flare/sunburst/seedream × 2 personas × 4 prompts; Seedream 1K; prod unchanged — see 23-28 |
+| 29 Extended capability test + artifact retention | COMPLETE WITH FINDINGS | 18 original jobs + 6 Seedream corrected; Test A safety-blocked all models; Tests B/C Seedream ACCEPTED for both personas; Seedream maxCandidateCount bug fixed (4→1); artifact retention 100%; regen PASS; admin UI PASS — see 23-29 |
 
 ## Explicitly deferred
 - Posts / social publishing
 - Invented cost pricing
 
 ## Still open
-1. Product-owner production-model decision from Task 28 evidence
+1. Product-owner production-model decision from Task 28 evidence (Seedream most permissive, best for adult content)
 2. Optional cost ingestion / SLA target configuration
 3. Posts / social publishing remain deferred
-4. Richa OpenAI regen often safety-blocked (Seedream regen worked in Task 28)
+4. Richa OpenAI regen often safety-blocked (Seedream regen worked in Task 28 and 29)
+5. Richa FACE_CLOSE image-content issue (on-image caption "Aanya Rajput" — requires re-seeding)
+6. Two-process HTTP live verification blocked by Gradle daemon model; filesystem verification confirmed

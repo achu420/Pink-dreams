@@ -45,6 +45,15 @@ data class OpenRouterReference(
 data class OpenRouterImageResponse(
     val data: List<OpenRouterImageData>? = null,
     val error: OpenRouterImageError? = null,
+    // TODO: OpenRouter image API does not expose per-request cost in the response body
+    //   (unlike the text-completion API which returns usage/cost fields).
+    //   Cost is only available via the OpenRouter billing dashboard / usage API.
+    //   When OpenRouter adds cost fields to image responses, capture them here
+    //   (e.g. `val usage: OpenRouterImageUsage? = null`) and propagate them
+    //   through to ImageJobRepository.completeJobSuccess so they can be persisted
+    //   in `image_jobs.provider_cost_raw / provider_cost_currency`.
+    //   Until then, provider_cost_source is recorded as "UNAVAILABLE" on every
+    //   completed job (see ImageJobRepository.completeJobSuccess).
 )
 
 @Serializable
@@ -99,8 +108,20 @@ class OpenRouterImageProvider(
                 supportsCancellation = false,
                 supportsIdempotency = true,
             )
+            // Seedream-family: provider enforces n=1 (confirmed Task 29)
+            model.contains("seedream", ignoreCase = true) -> ProviderCapabilities(
+                maxCandidateCount = 1,
+                supportsReferences = true,
+                supportsMultipleReferences = true,
+                supportedAspectRatios = listOf("1:1", "3:2", "2:3", "4:3", "3:4", "16:9", "9:16"),
+                minWidthPx = 256,
+                maxWidthPx = 2048,
+                minHeightPx = 256,
+                maxHeightPx = 2048,
+                supportsCancellation = false,
+                supportsIdempotency = false,
+            )
             model.startsWith("openai/gpt-image") ||
-                model.contains("seedream", ignoreCase = true) ||
                 model.contains("gemini", ignoreCase = true) && model.contains("image", ignoreCase = true) ||
                 model.startsWith("qwen/qwen-image") ||
                 model.startsWith("microsoft/mai-image") ||
@@ -385,24 +406,17 @@ class OpenRouterImageProvider(
     /**
      * OpenRouter expects resolution tiers: 512 | 1K | 2K | 4K
      * (not legacy WxH strings such as 1024x1024).
-     * Seedream rejects 512 — bump to the lowest accepted tier (1K).
+     * Delegates per-model mapping to [mapResolutionForModel].
      */
     private fun determineResolution(modelId: String, widthPx: Int?, heightPx: Int?): String? {
+        // When no dimensions are specified, only seedream requires an explicit tier;
+        // all other models can omit the resolution field (provider picks a default).
         if (widthPx == null && heightPx == null) {
             return if (modelId.contains("seedream", ignoreCase = true)) "1K" else null
         }
         val maxSide = maxOf(widthPx ?: 0, heightPx ?: 0)
-        val tier = when {
-            maxSide <= 0 -> null
-            maxSide <= 768 -> "512"
-            maxSide <= 1536 -> "1K"
-            maxSide <= 3072 -> "2K"
-            else -> "4K"
-        }
-        if (modelId.contains("seedream", ignoreCase = true) && (tier == null || tier == "512")) {
-            return "1K"
-        }
-        return tier
+        if (maxSide <= 0) return null
+        return mapResolutionForModel(modelId, maxSide)
     }
 
     private fun determineAspectRatio(widthPx: Int?, heightPx: Int?): String? {
@@ -569,6 +583,42 @@ class OpenRouterImageProvider(
     companion object {
         /** Stay under OpenRouter's 8 MB total text-input limit, leaving room for the prompt. */
         const val REFERENCE_PAYLOAD_CHAR_BUDGET = 6_000_000
+
+        /**
+         * Maps a requested pixel size to the OpenRouter resolution tier string for [modelId].
+         *
+         * Seedream models only accept "1K" and "2K" — they reject "512".
+         *   - null or any size ≤ 1024 → "1K"
+         *   - size > 1024            → "2K"
+         *
+         * All other models use the standard 512 | 1K | 2K | 4K ladder.
+         *   - null or size ≤ 768  → "512"
+         *   - size ≤ 1536         → "1K"
+         *   - size ≤ 3072         → "2K"
+         *   - size > 3072         → "4K"
+         *
+         * @param modelId       OpenRouter model identifier (e.g. "bytedance-seed/seedream-5-0-pro")
+         * @param requestedSize the larger pixel dimension, or null when not specified
+         * @return              resolution tier string to send in the request body
+         */
+        internal fun mapResolutionForModel(modelId: String, requestedSize: Int?): String {
+            return if (modelId.contains("seedream", ignoreCase = true)) {
+                // Seedream only supports 1K / 2K — never send "512"
+                when {
+                    requestedSize == null -> "1K"
+                    requestedSize <= 1024 -> "1K"
+                    else -> "2K"
+                }
+            } else {
+                // Standard OpenRouter resolution tiers
+                when {
+                    requestedSize == null || requestedSize <= 768 -> "512"
+                    requestedSize <= 1536 -> "1K"
+                    requestedSize <= 3072 -> "2K"
+                    else -> "4K"
+                }
+            }
+        }
 
         /**
          * Shrink a reference so its base64 form fits the provider text budget.

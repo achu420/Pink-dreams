@@ -1021,8 +1021,9 @@ IMAGE WAREHOUSE
 | 25 Live model × persona evaluation | LIVE WITH FINDINGS | see 23-25_LIVE_MODEL_EVALUATION.md |
 | 27 Real persona acceptance | LIVE WITH FINDINGS | see 23-27_LIVE_ACCEPTANCE_REPORT.md |
 | 28 Controlled model comparison | COMPLETE | see 23-28_IMAGE_MODEL_CONTROLLED_COMPARISON.md |
+| 29 Extended capability test + artifact retention | COMPLETE WITH FINDINGS | see 23-29_TASK29_CAPABILITY_REPORT.md |
 
-Live OpenRouter evidence is in the 23-25, 23-27, and 23-28 reports. Night and sea prompts were safety-blocked on OpenAI models and were not rewritten; Seedream accepted them at 1K.
+Live OpenRouter evidence is in the 23-25, 23-27, 23-28, and 23-29 reports. Night and sea prompts were safety-blocked on OpenAI models and were not rewritten; Seedream accepted them at 1K.
 
 Before implementing new functionality beyond the current task:
 
