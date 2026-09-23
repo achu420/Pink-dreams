@@ -164,8 +164,31 @@ open class PersonaRepository(private val db: Database) {
         findById(id) ?: throw IllegalStateException("Failed to reload persona $id")
     }
 
+    /**
+     * Transition a draft persona to active so it becomes visible to users.
+     * Only draft → active is permitted; use [retirePersona] for active → retired.
+     */
+    fun activatePersona(personaId: UUID): Persona = transaction(db) {
+        val persona = findById(personaId) ?: throw IllegalArgumentException("Persona not found: $personaId")
+        if (persona.status != "draft") {
+            throw IllegalStateException(
+                "Only draft personas can be activated (current status: ${persona.status})",
+            )
+        }
+        Personas.update({ Personas.id eq personaId }) {
+            it[Personas.status] = "active"
+            it[Personas.updatedAt] = defaultNow()
+        }
+        findById(personaId) ?: throw IllegalStateException("Failed to reload persona $personaId")
+    }
+
     fun retirePersona(personaId: UUID): Persona = transaction(db) {
         val persona = findById(personaId) ?: throw IllegalArgumentException("Persona not found: $personaId")
+        if (persona.status != "active") {
+            throw IllegalStateException(
+                "Only active personas can be retired (current status: ${persona.status})",
+            )
+        }
         Personas.update({ Personas.id eq personaId }) {
             it[Personas.status] = "retired"
             it[Personas.updatedAt] = defaultNow()

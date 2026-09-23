@@ -593,6 +593,94 @@ class AdminPersonaRoutes(
                 }
             }
 
+            // POST /v1/admin/personas/{personaId}/activate — transition draft → active
+            post("/v1/admin/personas/{personaId}/activate") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@post
+                }
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@post
+                }
+
+                val personaId = try {
+                    UUID.fromString(call.parameters["personaId"])
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid persona ID format", null)),
+                    )
+                    return@post
+                }
+
+                try {
+                    val persona = personaRepository.activatePersona(personaId)
+                    call.respond(HttpStatusCode.OK, personaResponse(persona))
+                } catch (e: IllegalArgumentException) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, e.message ?: "Persona not found", null)),
+                    )
+                } catch (e: IllegalStateException) {
+                    call.respond(
+                        HttpStatusCode.Conflict,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_FAILED, e.message ?: "Invalid state transition", null)),
+                    )
+                }
+            }
+
+            // POST /v1/admin/personas/{personaId}/retire — transition active → retired
+            post("/v1/admin/personas/{personaId}/retire") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@post
+                }
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@post
+                }
+
+                val personaId = try {
+                    UUID.fromString(call.parameters["personaId"])
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid persona ID format", null)),
+                    )
+                    return@post
+                }
+
+                try {
+                    val persona = personaRepository.retirePersona(personaId)
+                    call.respond(HttpStatusCode.OK, personaResponse(persona))
+                } catch (e: IllegalArgumentException) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, e.message ?: "Persona not found", null)),
+                    )
+                } catch (e: IllegalStateException) {
+                    call.respond(
+                        HttpStatusCode.Conflict,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_FAILED, e.message ?: "Invalid state transition", null)),
+                    )
+                }
+            }
+
             // POST /v1/admin/personas/{personaId}/core-versions/{versionId}/archive
             post("/v1/admin/personas/{personaId}/core-versions/{versionId}/archive") {
                 val principal = call.principal<UserIdPrincipal>()

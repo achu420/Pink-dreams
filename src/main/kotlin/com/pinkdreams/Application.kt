@@ -532,5 +532,10 @@ fun Application.module(
             conversationEngineRepository = engineRepo,
             adminAuthorizationProvider = authProvider,
         ).register(this)
+        com.pinkdreams.api.admin.AdminMemoryFactsRoutes(
+            memoryFactRepository = memoryFactRepo,
+            personaRepository = personaRepo,
+            adminAuthorizationProvider = authProvider,
+        ).register(this)
     }
 }
