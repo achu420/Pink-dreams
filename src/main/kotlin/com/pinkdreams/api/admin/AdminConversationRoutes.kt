@@ -58,7 +58,7 @@ data class AdminMessageResponse(
 )
 
 @Serializable
-data class AdminMemoryFactResponse(
+data class AdminConversationMemoryFactResponse(
     val id: String,
     val fact: String,
     val factType: String,
@@ -78,7 +78,7 @@ data class AdminConversationDetailResponse(
     // relationship-scoped, not conversation-scoped (see MemoryFactRepository).
     // Surfaced so an admin debugging a conversation can see what the Memory
     // Engine believes about this user/persona pair while reading the transcript.
-    val memoryFacts: List<AdminMemoryFactResponse>,
+    val memoryFacts: List<AdminConversationMemoryFactResponse>,
 )
 
 @Serializable
@@ -318,7 +318,7 @@ class AdminConversationRoutes(
         )
     }
 
-    private fun MemoryFactRepository.MemoryFact.toResponse(): AdminMemoryFactResponse = AdminMemoryFactResponse(
+    private fun MemoryFactRepository.MemoryFact.toResponse(): AdminConversationMemoryFactResponse = AdminConversationMemoryFactResponse(
         id = id.toString(),
         fact = fact,
         factType = factType,

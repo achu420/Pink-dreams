@@ -98,6 +98,9 @@ class Phase6CComprehensiveTest {
         )
         val personaId = persona.id
 
+        // Persona must be active before it can be retired
+        personaRepo.activatePersona(personaId)
+
         // Retire the persona
         val retired = personaRepo.retirePersona(personaId)
         assertEquals("retired", retired.status)

@@ -225,6 +225,8 @@ class Phase3PersonaEngineLifecycleTest {
         val v1 = versionRepo.create(persona.id, 1, "old", "draft")
         val published = versionRepo.publishCoreVersion(v1.id)
         personaRepo.activateCoreVersion(persona.id, published.id)
+        // Persona must be active before it can be retired
+        personaRepo.activatePersona(persona.id)
         personaRepo.retirePersona(persona.id)
 
         val stored = personaRepo.findById(persona.id)

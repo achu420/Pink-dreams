@@ -113,6 +113,23 @@ class MemoryFactRepository(private val db: Database) {
     }
 
     /**
+     * Admin PATCH action — change only the status field (e.g. open → resolved).
+     * Complementary to [updateContent], which changes only the fact text.
+     * Valid target statuses: "open", "resolved", "removed".
+     */
+    fun updateStatus(factId: UUID, newStatus: String, updatedAt: LocalDateTime = defaultNow()): MemoryFact = transaction(db) {
+        require(newStatus in setOf("open", "resolved", "removed")) {
+            "Invalid status '$newStatus'; allowed: open, resolved, removed"
+        }
+        val updated = MemoryFacts.update({ MemoryFacts.id eq factId }) {
+            it[MemoryFacts.status] = newStatus
+            it[MemoryFacts.updatedAt] = updatedAt
+        }
+        require(updated == 1) { "Memory fact not found: $factId" }
+        findById(factId)!!
+    }
+
+    /**
      * Memory Engine REMOVE action: a soft, auditable state change
      * (status="removed") — never a SQL DELETE. Distinct from context-selection
      * "not selected this turn," which never touches the database at all.
