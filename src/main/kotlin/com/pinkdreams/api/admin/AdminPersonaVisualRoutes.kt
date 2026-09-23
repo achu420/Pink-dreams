@@ -7,6 +7,7 @@ import com.pinkdreams.common.errors.ErrorResponse
 import com.pinkdreams.imaging.orchestration.GeneratedCandidateRepository
 import com.pinkdreams.persistence.repositories.ImageJobRepository
 import com.pinkdreams.persistence.repositories.PersonaIdentityRepository
+import com.pinkdreams.persistence.repositories.PersonaCoreVersionRepository
 import com.pinkdreams.persistence.repositories.PersonaRepository
 import com.pinkdreams.persistence.repositories.PersonaVisualVersionRepository
 import com.pinkdreams.persistence.repositories.PersonalGuideRepository
@@ -17,6 +18,7 @@ import com.pinkdreams.visual.identity.PhysicalGuide
 import com.pinkdreams.visual.identity.PrivateVisualGuide
 import com.pinkdreams.visual.identity.ReferenceRole
 import com.pinkdreams.visual.identity.ImagePipelineTestPersonaSeeder
+import com.pinkdreams.visual.identity.SourcePersonaPackageSeeder
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.PartData
@@ -227,6 +229,7 @@ class AdminPersonaVisualRoutes(
     private val visualAdminService: PersonaVisualAdminService,
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
     private val generationTriggerWired: Boolean = false,
+    private val coreVersionRepository: PersonaCoreVersionRepository? = null,
 ) {
     // Kept for constructor parity with Application wiring / future direct guide reads.
     @Suppress("unused")
@@ -323,6 +326,42 @@ class AdminPersonaVisualRoutes(
                             draftVersion = result.draftVersion,
                             createdIdentity = result.createdIdentity,
                             createdDraft = result.createdDraft,
+                        ),
+                    )
+                } catch (e: Exception) {
+                    call.respondMappedVisualError(e)
+                }
+            }
+
+            post("/v1/admin/personas/seed-source-packages") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@post
+                val cores = coreVersionRepository
+                if (cores == null) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        ErrorResponse(ApiError(ErrorCode.INTERNAL_SERVER_ERROR, "Core version repository not wired", null)),
+                    )
+                    return@post
+                }
+                try {
+                    val seeder = SourcePersonaPackageSeeder(
+                        personaRepository = personaRepository,
+                        coreVersionRepository = cores,
+                        visualAdminService = visualAdminService,
+                        referenceImageRepository = referenceImageRepository,
+                    )
+                    val results = seeder.seedAll()
+                    call.respond(
+                        HttpStatusCode.OK,
+                        SeedImageFixturesHttpResponse(
+                            seeded = results.map {
+                                SeededPersonaHttpResponse(
+                                    slug = it.slug,
+                                    personaId = it.personaId,
+                                    referencesUploaded = it.imagesUsable,
+                                    created = it.created,
+                                )
+                            },
                         ),
                     )
                 } catch (e: Exception) {

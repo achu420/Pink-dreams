@@ -150,7 +150,13 @@ class ImageJobRepository(private val db: Database) {
      * adds cost to image responses, update this method to accept and persist the
      * actual cost values (see the TODO in OpenRouterImageProvider / OpenRouterImageResponse).
      */
-    fun completeJobSuccess(jobId: UUID, workerName: String): ImageJob? = transaction(db) {
+    fun completeJobSuccess(
+        jobId: UUID,
+        workerName: String,
+        costRaw: java.math.BigDecimal? = null,
+        costCurrency: String? = null,
+        costSource: String = "UNAVAILABLE",
+    ): ImageJob? = transaction(db) {
         val now = LocalDateTime.now()
         val updated = ImageJobs.update({
             (ImageJobs.id eq jobId) and
@@ -162,8 +168,9 @@ class ImageJobRepository(private val db: Database) {
             it[ImageJobs.lastError] = null
             it[ImageJobs.claimedByWorker] = null
             it[ImageJobs.claimedAt] = null
-            // TODO: replace with actual cost values when OpenRouter exposes cost in image responses
-            it[ImageJobs.providerCostSource] = "UNAVAILABLE"
+            it[ImageJobs.providerCostRaw] = costRaw
+            it[ImageJobs.providerCostCurrency] = if (costRaw != null) (costCurrency ?: "USD") else null
+            it[ImageJobs.providerCostSource] = if (costRaw != null) costSource else "UNAVAILABLE"
         }
         if (updated > 0) findById(jobId) else null
     }

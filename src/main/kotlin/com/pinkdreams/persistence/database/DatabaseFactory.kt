@@ -61,6 +61,11 @@ object DatabaseFactory {
             ImageEvaluations,
             ImageEvaluationModels,
             ImageProviderSettings,
+            BenchmarkRuns,
+            BenchmarkModels,
+            BenchmarkPrompts,
+            BenchmarkExecutions,
+            BenchmarkEvaluations,
             Personas,
             PersonaCoreVersions,
             UserProfiles,
@@ -370,6 +375,85 @@ object ImageProviderSettings : Table("image_provider_settings") {
     override val primaryKey = PrimaryKey(id)
 
     val SINGLETON_ID: java.util.UUID = java.util.UUID.fromString("00000000-0000-0000-0000-00000000a1c6")
+}
+
+object BenchmarkRuns : Table("benchmark_run") {
+    val id = uuid("id")
+    val name = varchar("name", 255)
+    val status = varchar("status", 50).default("DRAFT")
+    val notes = text("notes").nullable()
+    val createdBy = varchar("created_by", 255).nullable()
+    val createdAt = datetime("created_at")
+    val startedAt = datetime("started_at").nullable()
+    val completedAt = datetime("completed_at").nullable()
+    override val primaryKey = PrimaryKey(id)
+}
+
+object BenchmarkModels : Table("benchmark_model") {
+    val id = uuid("id")
+    val benchmarkRunId = uuid("benchmark_run_id")
+    val slotKey = varchar("slot_key", 100)
+    val modelId = varchar("model_id", 255).nullable()
+    val provider = varchar("provider", 100).default("openrouter")
+    val displayName = varchar("display_name", 255)
+    val capabilitySnapshot = text("capability_snapshot").nullable()
+    val pricingSnapshot = text("pricing_snapshot").nullable()
+    val status = varchar("status", 50)
+    val sortOrder = integer("sort_order").default(0)
+    override val primaryKey = PrimaryKey(id)
+}
+
+object BenchmarkPrompts : Table("benchmark_prompt") {
+    val id = uuid("id")
+    val benchmarkRunId = uuid("benchmark_run_id")
+    val promptId = varchar("prompt_id", 50)
+    val promptText = text("prompt_text")
+    val category = varchar("category", 100)
+    override val primaryKey = PrimaryKey(id)
+}
+
+object BenchmarkExecutions : Table("benchmark_execution") {
+    val id = uuid("id")
+    val benchmarkRunId = uuid("benchmark_run_id")
+    val personaId = uuid("persona_id")
+    val visualIdentityVersionId = uuid("visual_identity_version_id")
+    val promptId = varchar("prompt_id", 50)
+    val modelId = varchar("model_id", 255).nullable()
+    val slotKey = varchar("slot_key", 100)
+    val referencesAvailable = text("references_available").nullable()
+    val referencesSent = text("references_sent").nullable()
+    val referencesOmitted = text("references_omitted").nullable()
+    val referenceOmitReason = text("reference_omit_reason").nullable()
+    val requestedCandidates = integer("requested_candidates").nullable()
+    val actualCandidates = integer("actual_candidates").nullable()
+    val requestedResolution = varchar("requested_resolution", 50).nullable()
+    val actualResolution = varchar("actual_resolution", 50).nullable()
+    val resolutionDeviation = text("resolution_deviation").nullable()
+    val jobId = uuid("job_id").nullable()
+    val providerRequestId = varchar("provider_request_id", 255).nullable()
+    val status = varchar("status", 50).default("PLANNED")
+    val providerFailureType = varchar("provider_failure_type", 80).nullable()
+    val providerFailureMessage = text("provider_failure_message").nullable()
+    val actualCost = decimal("actual_cost", 18, 8).nullable()
+    val currency = varchar("currency", 20).nullable()
+    val createdAt = datetime("created_at")
+    val completedAt = datetime("completed_at").nullable()
+    override val primaryKey = PrimaryKey(id)
+}
+
+object BenchmarkEvaluations : Table("benchmark_evaluation") {
+    val id = uuid("id")
+    val executionId = uuid("execution_id")
+    val candidateId = uuid("candidate_id").nullable()
+    val identityRating = integer("identity_rating").nullable()
+    val identityRemarks = text("identity_remarks").nullable()
+    val realismRating = integer("realism_rating").nullable()
+    val realismRemarks = text("realism_remarks").nullable()
+    val adminDecision = varchar("admin_decision", 80).nullable()
+    val adminRemarks = text("admin_remarks").nullable()
+    val evaluatedAt = datetime("evaluated_at")
+    val evaluatedBy = varchar("evaluated_by", 255).nullable()
+    override val primaryKey = PrimaryKey(id)
 }
 
 object Personas : Table("personas") {

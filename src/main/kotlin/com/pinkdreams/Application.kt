@@ -440,6 +440,7 @@ fun Application.module(
             visualAdminService = personaVisualAdminService,
             adminAuthorizationProvider = authProvider,
             generationTriggerWired = true,
+            coreVersionRepository = coreVersionRepo,
         ).register(this)
         com.pinkdreams.api.admin.AdminImageGenerationRoutes(
             imageGenerationService = imageGenerationService,
@@ -454,6 +455,20 @@ fun Application.module(
             referenceImageRepository = referenceImageRepository,
             imageRuntimeConfig = imageRuntimeConfig,
             imageProviderSettingsRepository = imageProviderSettingsRepository,
+        ).register(this)
+        com.pinkdreams.api.admin.AdminImageBenchmarkRoutes(
+            service = com.pinkdreams.imaging.benchmark.ImageModelBenchmarkService(
+                repository = com.pinkdreams.imaging.benchmark.BenchmarkRepository(db),
+                imageGenerationService = imageGenerationService,
+                personaRepository = personaRepo,
+                visualVersionRepository = visualVersionRepository,
+                referenceImageRepository = referenceImageRepository,
+                personalGuideRepository = personalGuideRepository,
+                jobRepository = imageJobRepository,
+                candidateRepository = generatedCandidateRepository,
+                objectStorage = objectStorage,
+            ),
+            adminAuthorizationProvider = authProvider,
         ).register(this)
         com.pinkdreams.api.admin.AdminImageEvaluationRoutes(
             evaluationService = com.pinkdreams.imaging.evaluation.ImageModelEvaluationService(

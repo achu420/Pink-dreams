@@ -406,6 +406,9 @@
             <div class="nav-item" data-view="modeleval" data-nav-label="Model Evaluation" onclick="navigate(this,'modeleval')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h6v6H4zM14 6h6v6h-6zM9 14h6v6H9z"/></svg>
                 Model Evaluation</div>
+            <div class="nav-item" data-view="imgbench" data-nav-label="Image Model Benchmark" onclick="navigate(this,'imgbench')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Image Model Benchmark</div>
             <div class="nav-item" data-view="chat" data-nav-label="Conversations" onclick="navigate(this,'chat')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16v10H8l-4 4V5Z"/></svg>
                 Conversations</div>
@@ -1314,6 +1317,28 @@
             <div id="meDetail" style="margin-top:20px;"></div>
         </div>
 
+        <div id="imgbench" class="tab-content">
+            <h2>Image Model Benchmark</h2>
+            <div class="section-sub">Prepare a controlled comparison across models. Same Persona, visual identity, prompt; model is the only variable. Evaluates identity, realism, restriction, and actual cost only. Does not change production <code>OPENROUTER_IMAGE_MODEL</code>. Do not start until Personas are seeded.</div>
+            <div id="ibReady" class="kv-item" style="margin:12px 0;"></div>
+            <div style="display:grid;gap:10px;max-width:960px;">
+                <label>Run name <input type="text" id="ibName" style="width:100%;" placeholder="Task 30 prep"></label>
+                <label>Notes <input type="text" id="ibNotes" style="width:100%;"></label>
+                <div id="ibPersonas" class="filter-count">Loading personas…</div>
+                <div id="ibModels" class="filter-count">Loading models…</div>
+                <div id="ibPrompts" class="filter-count">Loading prompts…</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button onclick="ibCreateRun(false)">Create run (no generation)</button>
+                    <button class="secondary" onclick="ibCreateRun(true)">Start benchmark</button>
+                    <button class="secondary" onclick="ibRefresh()">Refresh</button>
+                    <span id="ibStatus" class="filter-count"></span>
+                </div>
+            </div>
+            <div id="ibList" class="empty-state" style="padding:16px;margin-top:12px;">No runs yet.</div>
+            <div id="ibDetail" style="margin-top:20px;"></div>
+            <div id="ibCompare" style="margin-top:20px;"></div>
+        </div>
+
         <div id="observability" class="tab-content">
             <h2>Observability</h2>
             <div class="obs-subtitle">
@@ -1603,6 +1628,7 @@
             dashboard: 'Dashboard', setup: 'AI Configuration', observability: 'Observability',
             imagesla: 'Image SLA',
             modeleval: 'Model Evaluation',
+            imgbench: 'Image Model Benchmark',
             chat: 'Conversations', testchat: 'Test Chat', revenue: 'Revenue', transactions: 'Transactions',
             convinspector: 'Conversations Inspector',
             'persona-detail': 'Persona Detail', 'user-detail': 'User Detail',
@@ -1624,6 +1650,9 @@
             }
             if (tab === 'modeleval') {
                 meInit();
+            }
+            if (tab === 'imgbench') {
+                ibInit();
             }
             if (tab === 'dashboard' && !dashboardLoadedOnce) {
                 dashboardLoadedOnce = true;
@@ -2544,6 +2573,159 @@
                 const el = document.getElementById('mePersonaId');
                 if (el && !el.value) el.value = selectedPersonaId;
             }
+        }
+
+        let ibLoaded = false;
+        async function ibInit() {
+            await ibRefresh();
+            ibLoaded = true;
+        }
+        async function ibRefresh() {
+            await Promise.all([ibLoadReady(), ibLoadPersonas(), ibLoadModels(), ibLoadPrompts(), ibLoadRuns()]);
+        }
+        async function ibLoadReady() {
+            const el = document.getElementById('ibReady');
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/benchmarks/readiness`);
+                const d = await res.json();
+                el.innerHTML = `<div class="vh-title">Readiness: ${escapeHtml(d.status || '')}</div>
+                    <div class="filter-count">Production model (unchanged): ${escapeHtml(d.productionModel || '')}</div>
+                    <div class="filter-count">${escapeHtml((d.reasons || []).join('; ') || 'No blockers')}</div>`;
+            } catch (e) {
+                el.textContent = 'Readiness failed: ' + (e.message || e);
+            }
+        }
+        async function ibLoadPersonas() {
+            const el = document.getElementById('ibPersonas');
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/benchmarks/personas`);
+                const rows = await res.json();
+                el.innerHTML = '<div class="vh-title">Personas (select eligible only)</div>' + (rows || []).map(p =>
+                    `<label style="display:block;"><input type="checkbox" class="ibPersona" value="${p.personaId}" ${p.eligible ? '' : 'disabled'}>
+                    ${escapeHtml(p.displayName)} ${p.eligible ? 'ELIGIBLE' : 'NOT ELIGIBLE'} ${(p.reasons || []).join(', ')}</label>`
+                ).join('') || 'No personas';
+            } catch (e) { el.textContent = e.message || e; }
+        }
+        async function ibLoadModels() {
+            const el = document.getElementById('ibModels');
+            try {
+                const res = await fetch(`${ADMIN_BASE}/images/benchmarks/models`);
+                const rows = await res.json();
+                if (!res.ok) throw new Error((rows.error && rows.error.message) || 'models unavailable');
+                el.innerHTML = '<div class="vh-title">Models (live discovery)</div>' + (rows || []).map(m =>
+                    `<label style="display:block;"><input type="checkbox" class="ibSlot" value="${m.slotKey}" ${m.available ? 'checked' : 'disabled'}>
+                    ${escapeHtml(m.displayName)} — ${escapeHtml(String(m.modelId))} refs=${m.maxReferences ?? 'UNKNOWN'} n=${m.maxCandidates ?? 'UNKNOWN'} res=${(m.supportedResolutions||[]).join('/') || 'UNKNOWN'} price=${escapeHtml(m.pricingSource)}</label>`
+                ).join('');
+            } catch (e) { el.textContent = 'Model discovery: ' + (e.message || e); }
+        }
+        async function ibLoadPrompts() {
+            const el = document.getElementById('ibPrompts');
+            const res = await fetch(`${ADMIN_BASE}/images/benchmarks/prompts`);
+            const rows = await res.json();
+            el.innerHTML = '<div class="vh-title">Prompts</div>' + (rows || []).map(p =>
+                `<label style="display:block;"><input type="checkbox" class="ibPrompt" value="${p.promptId}" checked>
+                ${escapeHtml(p.promptId)} — ${escapeHtml(p.category)}</label>`
+            ).join('');
+        }
+        async function ibLoadRuns() {
+            const el = document.getElementById('ibList');
+            const res = await fetch(`${ADMIN_BASE}/images/benchmarks`);
+            const rows = await res.json();
+            if (!rows.length) { el.innerHTML = 'No runs yet.'; return; }
+            el.innerHTML = rows.map(r =>
+                `<div class="kv-item" style="cursor:pointer;margin-bottom:8px;" onclick="ibOpen('${r.id}')">
+                    <strong>${escapeHtml(r.name)}</strong> — ${escapeHtml(r.status)} <span class="filter-count">${escapeHtml(r.createdAt || '')}</span>
+                </div>`
+            ).join('');
+        }
+        async function ibCreateRun(start) {
+            const name = (document.getElementById('ibName').value || '').trim() || ('Benchmark ' + new Date().toISOString());
+            const notes = document.getElementById('ibNotes').value || '';
+            const personaIds = Array.from(document.querySelectorAll('.ibPersona:checked')).map(x => x.value);
+            const slotKeys = Array.from(document.querySelectorAll('.ibSlot:checked')).map(x => x.value);
+            const promptIds = Array.from(document.querySelectorAll('.ibPrompt:checked')).map(x => x.value);
+            const st = document.getElementById('ibStatus');
+            if (!personaIds.length) { st.textContent = 'Select at least one eligible persona'; return; }
+            if (start && !confirm('Start will submit real image jobs. Continue?')) return;
+            const res = await fetch(`${ADMIN_BASE}/images/benchmarks`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, notes, personaIds, slotKeys, promptIds, start })
+            });
+            const d = await res.json().catch(() => ({}));
+            if (!res.ok) { st.textContent = (d.error && d.error.message) || ('HTTP ' + res.status); return; }
+            st.textContent = 'Created ' + d.id;
+            await ibLoadRuns();
+            ibOpen(d.id);
+        }
+        async function ibOpen(id) {
+            const res = await fetch(`${ADMIN_BASE}/images/benchmarks/${id}`);
+            const d = await res.json();
+            const el = document.getElementById('ibDetail');
+            const execHtml = (d.executions || []).map(e => {
+                const ev = e.evaluation || {};
+                const imgs = (e.candidates || []).map(c =>
+                    `<a href="${c.assetUrl}" target="_blank" rel="noopener"><img src="${c.assetUrl}" alt="" style="max-width:160px;max-height:160px;margin:4px;"></a>`
+                ).join('');
+                return `<div class="kv-item" style="margin:8px 0;">
+                    <div><strong>${escapeHtml(e.slotKey)}</strong> ${escapeHtml(e.promptId)} ${escapeHtml(e.status)}</div>
+                    <div class="filter-count">model=${escapeHtml(e.modelId || '')} cost=${escapeHtml(String(e.actualCost))} refs sent=${escapeHtml(e.referencesSent || '')} omitted=${escapeHtml(e.referencesOmitted || '')} (${escapeHtml(e.referenceOmitReason || '')})</div>
+                    <div class="filter-count">n requested=${e.requestedCandidates} actual=${e.actualCandidates ?? '—'} res ${escapeHtml(e.requestedResolution || '')}→${escapeHtml(e.actualResolution || '')} ${escapeHtml(e.resolutionDeviation || '')}</div>
+                    ${imgs}
+                    <div style="display:grid;gap:6px;max-width:520px;margin-top:8px;">
+                        <label>Identity 0–5 <input type="number" min="0" max="5" id="ibI-${e.id}" value="${ev.identityRating ?? ''}"></label>
+                        <label>Identity remarks <input type="text" id="ibIr-${e.id}" value="${escapeHtml(ev.identityRemarks || '')}"></label>
+                        <label>Realism 0–5 <input type="number" min="0" max="5" id="ibR-${e.id}" value="${ev.realismRating ?? ''}"></label>
+                        <label>Realism remarks <input type="text" id="ibRr-${e.id}" value="${escapeHtml(ev.realismRemarks || '')}"></label>
+                        <label>Admin remarks <input type="text" id="ibAr-${e.id}" value="${escapeHtml(ev.adminRemarks || '')}"></label>
+                        <button class="secondary" onclick="ibEval('${e.id}')">Save evaluation</button>
+                    </div>
+                </div>`;
+            }).join('');
+            el.innerHTML = `<h3>${escapeHtml(d.name)} — ${escapeHtml(d.status)}</h3>
+                <button class="secondary" onclick="ibStart('${d.id}')">Start this run</button>
+                <button class="secondary" onclick="ibCompare('${d.id}')">Comparison view</button>
+                ${execHtml}`;
+        }
+        async function ibStart(id) {
+            if (!confirm('This submits real generation jobs through the production pipeline. Continue?')) return;
+            const res = await fetch(`${ADMIN_BASE}/images/benchmarks/${id}/start`, { method: 'POST' });
+            const d = await res.json().catch(() => ({}));
+            if (!res.ok) { alert((d.error && d.error.message) || res.status); return; }
+            ibOpen(id);
+        }
+        async function ibEval(executionId) {
+            const body = {
+                identityRating: parseInt(document.getElementById('ibI-' + executionId).value, 10),
+                identityRemarks: document.getElementById('ibIr-' + executionId).value,
+                realismRating: parseInt(document.getElementById('ibR-' + executionId).value, 10),
+                realismRemarks: document.getElementById('ibRr-' + executionId).value,
+                adminRemarks: document.getElementById('ibAr-' + executionId).value
+            };
+            if (Number.isNaN(body.identityRating)) delete body.identityRating;
+            if (Number.isNaN(body.realismRating)) delete body.realismRating;
+            const res = await fetch(`${ADMIN_BASE}/images/benchmarks/executions/${executionId}/evaluation`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+            });
+            if (!res.ok) {
+                const d = await res.json().catch(() => ({}));
+                alert((d.error && d.error.message) || res.status);
+            }
+        }
+        async function ibCompare(id) {
+            const res = await fetch(`${ADMIN_BASE}/images/benchmarks/${id}/comparison`);
+            const d = await res.json();
+            const el = document.getElementById('ibCompare');
+            el.innerHTML = `<h3>Comparison (no ranking)</h3><div class="filter-count">${escapeHtml(d.note || '')}</div>` +
+                (d.personas || []).map(p =>
+                    `<div class="kv-item" style="margin-top:10px;"><div class="vh-title">Persona ${escapeHtml(p.personaId)}</div>` +
+                    (p.prompts || []).map(pr =>
+                        `<div style="margin:8px 0 0 12px;"><strong>${escapeHtml(pr.promptId)}</strong>` +
+                        (pr.models || []).map(m =>
+                            `<div class="filter-count">${escapeHtml(m.slotKey)} ${escapeHtml(m.status)} identity=${m.identityRating ?? '—'} realism=${m.realismRating ?? '—'} cost=${escapeHtml(String(m.actualCost))}</div>` +
+                            (m.candidateUrls || []).map(u => `<a href="${u}" target="_blank"><img src="${u}" alt="" style="max-width:120px;margin:3px;"></a>`).join('')
+                        ).join('') + '</div>'
+                    ).join('') + '</div>'
+                ).join('');
         }
 
         async function meLoadProdConfig() {

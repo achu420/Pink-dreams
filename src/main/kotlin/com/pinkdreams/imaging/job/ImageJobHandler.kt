@@ -1,7 +1,12 @@
 package com.pinkdreams.imaging.job
 
 sealed class ImageJobResult {
-    data class Success(val metadata: String = "") : ImageJobResult()
+    data class Success(
+        val metadata: String = "",
+        val actualCost: java.math.BigDecimal? = null,
+        val costCurrency: String? = null,
+        val costSource: String = "UNAVAILABLE",
+    ) : ImageJobResult()
     data class Failure(val errorMessage: String, val retryable: Boolean = true) : ImageJobResult()
 }
 

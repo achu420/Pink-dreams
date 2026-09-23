@@ -42,18 +42,18 @@ data class OpenRouterReference(
 )
 
 @Serializable
+data class OpenRouterImageUsage(
+    val cost: Double? = null,
+    @SerialName("total_cost")
+    val totalCost: Double? = null,
+)
+
+@Serializable
 data class OpenRouterImageResponse(
     val data: List<OpenRouterImageData>? = null,
     val error: OpenRouterImageError? = null,
-    // TODO: OpenRouter image API does not expose per-request cost in the response body
-    //   (unlike the text-completion API which returns usage/cost fields).
-    //   Cost is only available via the OpenRouter billing dashboard / usage API.
-    //   When OpenRouter adds cost fields to image responses, capture them here
-    //   (e.g. `val usage: OpenRouterImageUsage? = null`) and propagate them
-    //   through to ImageJobRepository.completeJobSuccess so they can be persisted
-    //   in `image_jobs.provider_cost_raw / provider_cost_currency`.
-    //   Until then, provider_cost_source is recorded as "UNAVAILABLE" on every
-    //   completed job (see ImageJobRepository.completeJobSuccess).
+    val usage: OpenRouterImageUsage? = null,
+    val id: String? = null,
 )
 
 @Serializable
@@ -289,10 +289,14 @@ class OpenRouterImageProvider(
                 )
             }
 
+            val costValue = response.usage?.cost ?: response.usage?.totalCost
             GenerationResult(
                 jobHandle = ProviderJobHandle(providerId, externalJobId),
                 status = GenerationStatus.COMPLETED,
                 candidates = candidates,
+                actualCost = costValue?.let { java.math.BigDecimal.valueOf(it) },
+                costCurrency = if (costValue != null) "USD" else null,
+                costSource = if (costValue != null) "OPENROUTER_RESPONSE" else "UNAVAILABLE",
             )
         } catch (e: Exception) {
             GenerationResult(

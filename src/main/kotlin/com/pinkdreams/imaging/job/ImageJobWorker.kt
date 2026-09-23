@@ -42,7 +42,13 @@ class ImageJobWorker(
                 val result = jobHandler.handle(claimed)
                 when (result) {
                     is ImageJobResult.Success -> {
-                        val completed = jobRepository.completeJobSuccess(claimed.id, workerName)
+                        val completed = jobRepository.completeJobSuccess(
+                            claimed.id,
+                            workerName,
+                            costRaw = result.actualCost,
+                            costCurrency = result.costCurrency,
+                            costSource = result.costSource,
+                        )
                         if (completed != null) {
                             notifyCompletion(completed, succeeded = true)
                             processed++

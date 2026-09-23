@@ -164,7 +164,10 @@ class ImageGenerationHandler(
                 metadata = buildMetadata(
                     candidateCount = candidates.size,
                     checksums = candidates
-                )
+                ),
+                actualCost = providerResult.actualCost,
+                costCurrency = providerResult.costCurrency,
+                costSource = providerResult.costSource,
             )
         } catch (e: Exception) {
             ImageJobResult.Failure(

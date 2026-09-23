@@ -41,6 +41,9 @@ data class GenerationResult(
     val status: GenerationStatus,
     val candidates: List<GeneratedCandidate> = emptyList(),
     val error: GenerationError? = null,
+    val actualCost: java.math.BigDecimal? = null,
+    val costCurrency: String? = null,
+    val costSource: String = "UNAVAILABLE",
 )
 
 enum class GenerationStatus {
