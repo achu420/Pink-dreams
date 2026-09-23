@@ -23,7 +23,7 @@
 | 21 Engine/skill config | DONE W/ FINDINGS (overlap 14) | settings singleton; no separate Skills row (intentional) |
 | 22 E2E QA runbook | DOC + CONDITIONAL | runbook exists; operator fill pending |
 | 23 Cost/SLA observability | DONE W/ FINDINGS (overlap 11/16) | slaTarget label added |
-| 24 Production hardening / go-live | PARTIAL LIVE | startup, DB, worker, one-process storage, flare generation verified; two-process soak and chat attachment not verified |
+| 24 Production hardening / go-live | LIVE W/ FINDINGS | two-process shared storage, chat attach, Admin UI verified — see 23-24_GO_LIVE_VERIFICATION.md |
 | 25 Model×persona evaluation | LIVE WITH FINDINGS | eval `094b2a03-8542-47ca-9003-3eaaa66e2d06`; flare and sunburst succeeded; Seedream rejected resolution 512; no winner |
 | 26 Model discovery | DONE | live catalog 53 models; 3 selected; discovery API |
 | 27 Real persona acceptance | LIVE WITH FINDINGS | 8 real jobs; bathroom and cafe stored; night and sea safety-blocked; Ananya regen succeeded; Richa regen safety-blocked |
@@ -33,7 +33,7 @@
 - Invented cost pricing
 
 ## Still open
-1. Task 24 two-process shared-storage soak, and chat attachment
-2. Signed-in Admin browser click-through
-3. Richa regeneration is provider-blocked on the stored bathroom and cafe candidates
-4. Posts / social publishing remain deferred
+1. Optional Seedream resolution mapping (`512` → `1K`/`2K`)
+2. Richa regeneration provider safety blocks on stored bathroom/cafe candidates
+3. Posts / social publishing remain deferred
+4. Cost ingestion / SLA target configuration (product decision)

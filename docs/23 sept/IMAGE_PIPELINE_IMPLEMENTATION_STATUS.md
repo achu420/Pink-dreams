@@ -1020,7 +1020,7 @@ IMAGE WAREHOUSE
 | 23 SLA target polish | PASS | ff6d30f |
 | 25 Live model × persona evaluation | LIVE WITH FINDINGS | see 23-25_LIVE_MODEL_EVALUATION.md |
 | 27 Real persona acceptance | LIVE WITH FINDINGS | see 23-27_LIVE_ACCEPTANCE_REPORT.md |
-| 24 Go-live soak | PARTIAL | one-process live path verified; two-process soak not run |
+| 24 Go-live soak | LIVE W/ FINDINGS | see 23-24_GO_LIVE_VERIFICATION.md |
 
 Live OpenRouter evidence is in the 23-25 and 23-27 reports. Night and sea prompts were safety-blocked and were not rewritten.
 
