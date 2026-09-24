@@ -77,6 +77,14 @@ object DatabaseFactory {
             ChatRequestExecutions,
             LlmExchanges,
             TurnAttributions,
+            // Phase PERSONA_CONTEXT_POC — POC-scoped additive tables
+            PersonaMasterDocuments,
+            PersonaFieldRegistry,
+            SkillContextRequirements,
+            PersonaPocRun,
+            PersonaPocScenario,
+            PersonaPocExecution,
+            PersonaPocEvaluation,
         )
         // Image observability table (IMG-12) — also created via V009 for Postgres.
         SchemaUtils.createMissingTablesAndColumns(
@@ -854,6 +862,110 @@ object TurnAttributions : Table("turn_attributions") {
     val createdAt = datetime("created_at")
 
     override val primaryKey = PrimaryKey(turnRequestId)
+}
+
+// ═════════════════════════════════════════════════════════════
+// PERSONA CONTEXT POC — Additive schema only
+// ═════════════════════════════════════════════════════════════
+
+object PersonaMasterDocuments : Table("persona_master_documents") {
+    val id = uuid("id")
+    val personaCoreVersionId = uuid("persona_core_version_id").uniqueIndex()
+    val contentJson = text("content_json")
+    val schemaVersion = text("schema_version").default("1.0")
+    val createdAt = datetime("created_at").default(LocalDateTime.now())
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object PersonaFieldRegistry : Table("persona_field_registry") {
+    val fieldId = text("field_id")
+    val path = text("path")
+    val semanticType = text("semantic_type").nullable()
+    val classification = text("classification")
+    val sensitivity = text("sensitivity").default("normal")
+    val stability = text("stability")
+    val behavioralCore = bool("behavioral_core").default(false)
+    val defaultLoad = bool("default_load").default(false)
+    val allowedContexts = text("allowed_contexts").nullable()
+    val prohibitedContexts = text("prohibited_contexts").nullable()
+    val description = text("description").nullable()
+    val createdAt = datetime("created_at").default(LocalDateTime.now())
+
+    override val primaryKey = PrimaryKey(fieldId)
+}
+
+object SkillContextRequirements : Table("skill_context_requirements") {
+    val skillKey = text("skill_key")
+    val requiredFields = text("required_fields").nullable()
+    val recommendedFields = text("recommended_fields").nullable()
+    val conditionalFields = text("conditional_fields").nullable()
+    val restrictedFields = text("restricted_fields").nullable()
+    val purpose = text("purpose").nullable()
+    val whenToUse = text("when_to_use").nullable()
+    val whenNotToUse = text("when_not_to_use").nullable()
+    val updatedAt = datetime("updated_at").default(LocalDateTime.now())
+
+    override val primaryKey = PrimaryKey(skillKey)
+}
+
+object PersonaPocRun : Table("persona_poc_run") {
+    val id = uuid("id")
+    val personaId = uuid("persona_id")
+    val createdAt = datetime("created_at").default(LocalDateTime.now())
+    val status = text("status").default("PLANNING")
+    val variants = text("variants").default("A,B,C")
+
+    override val primaryKey = PrimaryKey(id)
+}
+
+object PersonaPocScenario : Table("persona_poc_scenario") {
+    val scenarioId = uuid("scenario_id")
+    val skillKey = text("skill_key")
+    val category = text("category")
+    val userMessage = text("user_message")
+    val seedHistory = text("seed_history").nullable()
+    val seedMemoryFacts = text("seed_memory_facts").nullable()
+    val notes = text("notes").nullable()
+    val createdAt = datetime("created_at").default(LocalDateTime.now())
+
+    override val primaryKey = PrimaryKey(scenarioId)
+}
+
+object PersonaPocExecution : Table("persona_poc_execution") {
+    val executionId = uuid("execution_id")
+    val runId = uuid("run_id")
+    val scenarioId = uuid("scenario_id")
+    val variant = text("variant")
+    val resolvedContextText = text("resolved_context_text").nullable()
+    val personaTokens = integer("persona_tokens").nullable()
+    val totalInputTokens = integer("total_input_tokens").nullable()
+    val outputTokens = integer("output_tokens").nullable()
+    val latencyMs = integer("latency_ms").nullable()
+    val generatedResponse = text("generated_response").nullable()
+    val status = text("status").default("PENDING")
+    val error = text("error").nullable()
+    val createdAt = datetime("created_at").default(LocalDateTime.now())
+
+    override val primaryKey = PrimaryKey(executionId)
+}
+
+object PersonaPocEvaluation : Table("persona_poc_evaluation") {
+    val evaluationId = uuid("evaluation_id")
+    val executionId = uuid("execution_id").uniqueIndex()
+    val evaluator = text("evaluator")
+    val fidelityScore = short("fidelity_score").nullable()
+    val factualAccuracyScore = short("factual_accuracy_score").nullable()
+    val skillAdherenceScore = short("skill_adherence_score").nullable()
+    val relationshipContinuityScore = short("relationship_continuity_score").nullable()
+    val narrativeContinuityScore = short("narrative_continuity_score").nullable()
+    val naturalnessScore = short("naturalness_score").nullable()
+    val contextPrecisionScore = short("context_precision_score").nullable()
+    val restrictedLeakage = bool("restricted_leakage").default(false)
+    val notes = text("notes").nullable()
+    val scoredAt = datetime("scored_at").default(LocalDateTime.now())
+
+    override val primaryKey = PrimaryKey(evaluationId)
 }
 
 fun defaultNow(): LocalDateTime = LocalDateTime.now()
