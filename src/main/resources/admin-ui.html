@@ -129,8 +129,26 @@
         .tabs { display: flex; gap: 18px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
         .tab-button { padding: 9px 2px; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; color: var(--muted-mauve); font-size: 13px; font-weight: 600; }
         .tab-button.active { border-bottom-color: var(--rose); color: var(--warm-white); }
-        .tab-content { display: none; }
+        .tab-content { display: none; position: relative; }
         .tab-content.active { display: block; }
+        .tab-content.is-loading { min-height: 220px; }
+        .view-loader-overlay {
+            position: absolute; inset: 0; z-index: 8;
+            display: flex; justify-content: center; align-items: flex-start; padding-top: 36px;
+            background: rgba(25, 6, 17, 0.55); backdrop-filter: blur(2px); border-radius: var(--radius);
+        }
+        .view-loader {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--surface); border: 1px solid var(--border-strong); color: var(--blush);
+            border-radius: 999px; padding: 10px 16px; font-size: 13px; font-weight: 600;
+            box-shadow: 0 8px 24px rgba(0,0,0,.35);
+        }
+        .spinner {
+            width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; display: inline-block;
+            border: 2px solid rgba(247,216,225,.28); border-top-color: var(--rose);
+            animation: admin-spin .7s linear infinite;
+        }
+        @keyframes admin-spin { to { transform: rotate(360deg); } }
 
         /* ---------- KPI / stat cards, badges, empty states (shared globally) ---------- */
         .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 20px; }
@@ -229,7 +247,15 @@
         #observability .obs-badge.muted { background: rgba(205,187,196,.14); color: var(--obs-muted-mauve); }
         #observability .obs-badge.testing { background: rgba(242,184,75,.16); color: var(--obs-warning); }
         #observability .obs-empty { text-align: center; padding: 40px 20px; color: var(--obs-muted-mauve); font-size: 13px; }
-        #observability .obs-loading { padding: 20px; color: var(--obs-muted-mauve); font-size: 13px; }
+        #observability .obs-loading {
+            display: flex; align-items: center; gap: 10px;
+            padding: 20px; color: var(--obs-muted-mauve); font-size: 13px;
+        }
+        #observability .obs-loading::before {
+            content: ""; width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+            border: 2px solid rgba(247,216,225,.28); border-top-color: var(--obs-rose);
+            animation: admin-spin .7s linear infinite;
+        }
         #observability .obs-error { color: var(--obs-danger); background: rgba(240,86,122,.1); border: 1px solid rgba(240,86,122,.3); padding: 10px 14px; border-radius: 9px; margin-bottom: 12px; font-size: 12.5px; }
         #observability .obs-code-block { background: #0f0509; border: 1px solid var(--obs-border-strong); color: var(--obs-soft-rose); font-family: 'SF Mono', Consolas, monospace; font-size: 11.5px; line-height: 1.6; border-radius: 9px; padding: 12px; width: 100%; resize: vertical; }
         #observability .obs-kv { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--obs-border); font-size: 12.5px; }
@@ -463,15 +489,15 @@
             <div class="section">
                 <h2>System Dashboard</h2>
                 <div class="error" id="dashboardError" style="display:none;"></div>
-                <div id="dashboardStats" class="stat-row"><div class="stat-card"><div class="stat-label">Loading…</div></div></div>
+                <div id="dashboardStats" class="stat-row"><div class="view-loader" role="status"><span class="spinner" aria-hidden="true"></span><span>Loading dashboard…</span></div></div>
                 <div class="grid">
                     <div class="section">
                         <h3>AI Runtime Summary</h3>
-                        <div id="dashboardAiSummary">Loading…</div>
+                        <div id="dashboardAiSummary"><div class="view-loader" role="status"><span class="spinner" aria-hidden="true"></span><span>Loading…</span></div></div>
                     </div>
                     <div class="section">
                         <h3>SLA Snapshot</h3>
-                        <div id="dashboardSla">Loading…</div>
+                        <div id="dashboardSla"><div class="view-loader" role="status"><span class="spinner" aria-hidden="true"></span><span>Loading…</span></div></div>
                     </div>
                 </div>
             </div>
@@ -1111,7 +1137,7 @@
 
                 <div class="form-group">
                     <label>Persona:</label>
-                    <select id="chatPersonaSelect" onchange="onChatPersonaSelected()"></select>
+                    <select id="chatPersonaSelect" onchange="onChatPersonaSelected()"><option value="">Loading personas…</option></select>
                 </div>
 
                 <div id="chatStatus" style="font-size: 12px; color: #666; margin-bottom: 10px;"></div>
@@ -1163,7 +1189,7 @@
                         </div>
                         <div id="ciListError" class="error" style="display:none; margin: 0 12px 10px;"></div>
                         <div id="ciConversationList" class="ci-list-items">
-                            <div class="ci-empty">Loading…</div>
+                            <div class="view-loader" role="status"><span class="spinner" aria-hidden="true"></span><span>Loading conversations…</span></div>
                         </div>
                     </div>
                     <div class="ci-pane ci-transcript">
@@ -1280,7 +1306,7 @@
                 <button class="secondary" onclick="loadImageSla()">Refresh</button>
                 <span id="imgSlaStatus" class="filter-count"></span>
             </div>
-            <div id="imgSlaBody" class="empty-state" style="padding:20px;">Load to see image pipeline metrics.</div>
+            <div id="imgSlaBody"><div class="view-loader" role="status"><span class="spinner" aria-hidden="true"></span><span>Loading image SLA…</span></div></div>
         </div>
 
         <div id="modeleval" class="tab-content">
@@ -1616,14 +1642,94 @@
             });
         });
 
-        let obsDashboardLoadedOnce = false;
-        let dashboardLoadedOnce = false;
-        let ciLoadedOnce = false;
+        // Each sidebar page fetches its own data the first time it is shown.
+        // Refresh buttons and writes call the loaders directly and still
+        // update the screen. Image SLA, model evaluation, and the benchmark
+        // refetch on every visit because those numbers move while you work.
+        const viewLoaded = {};
+        const viewLoadInflight = {};
+        const loaderDepth = {};
+        const VIEW_REFRESH_ON_OPEN = { imagesla: true, modeleval: true, imgbench: true };
 
-        // Task 11 — sidebar navigation. Every existing tab-content div/ID and
-        // every existing JS function (loadLatencyDashboard, loadAiSettings,
-        // etc.) is untouched; this only decides which one is visible and
-        // updates the sidebar's active-item/topbar-title chrome around it.
+        function loaderMarkup(message) {
+            const text = message || 'Loading…';
+            return `<div class="view-loader" role="status" aria-live="polite"><span class="spinner" aria-hidden="true"></span><span>${escapeHtml(text)}</span></div>`;
+        }
+
+        function setViewLoading(tab, on, message) {
+            const root = document.getElementById(tab);
+            if (!root) return;
+            const existing = root.querySelector(':scope > [data-view-loader]');
+            if (!on) {
+                if (existing) existing.remove();
+                root.classList.remove('is-loading');
+                return;
+            }
+            root.classList.add('is-loading');
+            const overlay = existing || document.createElement('div');
+            overlay.className = 'view-loader-overlay';
+            overlay.setAttribute('data-view-loader', tab);
+            overlay.innerHTML = loaderMarkup(message || 'Loading…');
+            if (!existing) root.appendChild(overlay);
+        }
+
+        function withLoader(tab, fn, message) {
+            loaderDepth[tab] = (loaderDepth[tab] || 0) + 1;
+            setViewLoading(tab, true, message);
+            return Promise.resolve()
+                .then(fn)
+                .finally(() => {
+                    loaderDepth[tab] = Math.max(0, (loaderDepth[tab] || 1) - 1);
+                    if (loaderDepth[tab] === 0) setViewLoading(tab, false);
+                });
+        }
+
+        const VIEW_LOADERS = {
+            dashboard: () => loadDashboard(),
+            personas: () => loadPersonas(),
+            engines: () => loadEngines(),
+            skills: () => Promise.all([loadSkills(), loadMemoryEngines(), loadIntentEngines()]),
+            aisettings: () => Promise.all([loadAiSettings(), loadAiConfiguration(), loadAllowlist()]),
+            users: () => loadAdminUsers(),
+            chat: async () => {
+                const [, personasOk] = await withLoader('chat', () => Promise.all([loadAdminUsers(), loadChatPersonas()]));
+                if (personasOk === false) return false;
+            },
+            testchat: () => loadTestChatOptions(),
+            observability: () => withLoader('observability', () => Promise.all([
+                loadLatencyDashboard(),
+                loadEffectiveConfiguration(),
+                loadSlowTurns(),
+            ])),
+            imagesla: () => loadImageSla(),
+            modeleval: () => meInit(),
+            imgbench: () => ibInit(),
+            convinspector: () => ciLoadConversations(),
+        };
+
+        async function ensureViewLoaded(tab, opts) {
+            const loader = VIEW_LOADERS[tab];
+            if (!loader) return;
+            const force = !!(opts && opts.force) || !!VIEW_REFRESH_ON_OPEN[tab];
+            if (!force && viewLoaded[tab]) return;
+            if (viewLoadInflight[tab]) return viewLoadInflight[tab];
+            const job = (async () => {
+                try {
+                    const loaded = await loader();
+                    if (loaded !== false && !VIEW_REFRESH_ON_OPEN[tab]) viewLoaded[tab] = true;
+                } catch (e) {
+                    // Loaders report their own failures. Leave the view unloaded so the next visit retries.
+                } finally {
+                    delete viewLoadInflight[tab];
+                }
+            })();
+            viewLoadInflight[tab] = job;
+            return job;
+        }
+
+        // Sidebar navigation. showView switches the visible page and starts
+        // that page's loader. Data for a page is fetched the first time it
+        // is shown, not when the console first opens.
         const NAV_TITLES = {
             dashboard: 'Dashboard', setup: 'AI Configuration', observability: 'Observability',
             imagesla: 'Image SLA',
@@ -1636,32 +1742,10 @@
 
         function showView(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(tab).classList.add('active');
+            const view = document.getElementById(tab);
+            if (view) view.classList.add('active');
             document.getElementById('topbarTitle').textContent = NAV_TITLES[tab] || tab;
-
-            if (tab === 'observability' && !obsDashboardLoadedOnce) {
-                obsDashboardLoadedOnce = true;
-                loadLatencyDashboard();
-                loadEffectiveConfiguration();
-                loadSlowTurns();
-            }
-            if (tab === 'imagesla') {
-                loadImageSla();
-            }
-            if (tab === 'modeleval') {
-                meInit();
-            }
-            if (tab === 'imgbench') {
-                ibInit();
-            }
-            if (tab === 'dashboard' && !dashboardLoadedOnce) {
-                dashboardLoadedOnce = true;
-                loadDashboard();
-            }
-            if (tab === 'convinspector' && !ciLoadedOnce) {
-                ciLoadedOnce = true;
-                ciLoadConversations();
-            }
+            ensureViewLoaded(tab);
         }
 
         function navigate(navEl, tab, anchor) {
@@ -1744,6 +1828,7 @@
         // nothing is fabricated. A metric that can't be obtained reliably is
         // shown as an honest "—", never a fake placeholder value.
         async function loadDashboard() {
+            return withLoader('dashboard', async () => {
             document.getElementById('dashboardError').style.display = 'none';
             try {
                 const [obsRes, configRes, usersRes, personasRes, statsRes] = await Promise.all([
@@ -1834,6 +1919,7 @@
                 errEl.style.display = 'block';
                 errEl.innerHTML = `Unable to load dashboard data: ${escapeHtml(e.message)} <button class="secondary" style="margin-left:10px;padding:4px 12px;" onclick="loadDashboard()">Retry</button>`;
             }
+            });
         }
 
         function showError(elementId, msg) {
@@ -1931,6 +2017,7 @@
         let personaConversationCounts = null;
 
         async function loadPersonas() {
+            return withLoader('personas', async () => {
             try {
                 const res = await fetch(`${ADMIN_BASE}/personas`);
                 if (!res.ok) throw new Error('Failed to load personas');
@@ -1963,6 +2050,7 @@
             } catch (e) {
                 showError('createPersonaError', e.message);
             }
+            });
         }
 
         function renderPersonas() {
@@ -2065,6 +2153,7 @@
         }
 
         async function openPersonaDetail(personaId) {
+            return withLoader('persona-detail', async () => {
             pdPersonaId = personaId;
             pdVisualCache = null;
             showView('persona-detail');
@@ -2072,7 +2161,7 @@
             document.getElementById('pdError').innerHTML = '';
             document.getElementById('pdTitle').textContent = 'Loading…';
             document.getElementById('pdStatus').innerHTML = '';
-            document.getElementById('pdPanel-overview').innerHTML = '<div class="empty-state" style="padding:20px;">Loading…</div>';
+            document.getElementById('pdPanel-overview').innerHTML = loaderMarkup('Loading persona…');
             document.getElementById('pdPanel-core').innerHTML = '';
             document.getElementById('pdPanel-visual').innerHTML = '';
             document.getElementById('pdPanel-warehouse').innerHTML = '';
@@ -2101,7 +2190,7 @@
             }
             document.getElementById('pdPanel-core').innerHTML = personaVersionHistoryHtml(personaId);
 
-            document.getElementById('pdPanel-visual').innerHTML = '<div class="empty-state" style="padding:20px;">Loading visual identity…</div>';
+            document.getElementById('pdPanel-visual').innerHTML = loaderMarkup('Loading visual identity…');
             try {
                 const vis = await fetch(`${ADMIN_BASE}/personas/${encodeURIComponent(personaId)}/visual`);
                 if (!vis.ok) throw new Error('Failed to load visual identity');
@@ -2114,6 +2203,7 @@
                 document.getElementById('pdPanel-visual').innerHTML =
                     `<div class="empty-state" style="padding:20px;">Visual identity could not be loaded: ${escapeHtml(e.message)}</div>`;
             }
+            });
         }
 
         function kvItem(label, value) {
@@ -2179,7 +2269,7 @@
                     const privateBadge = role === 'PRIVATE' ? ' <span class="badge" style="background:#7a2e2e;">PRIVATE</span>' : '';
                     if (ref) {
                         const img = ref.assetUrl
-                            ? `<img src="${escapeHtml(ref.assetUrl)}" alt="${role}" style="max-width:140px;max-height:140px;display:block;margin:6px 0;border:1px solid #333;"/>`
+                            ? `<img loading="lazy" decoding="async" src="${escapeHtml(ref.assetUrl)}" alt="${role}" style="max-width:140px;max-height:140px;display:block;margin:6px 0;border:1px solid #333;"/>`
                             : '';
                         return `<div class="kv-item" style="margin-bottom:10px;padding:8px;border:1px solid #333;">
                             <div class="kv-label">${role}${privateBadge} — ${escapeHtml(ref.status)}</div>
@@ -2487,10 +2577,12 @@
         }
 
         async function loadImageSla() {
+            return withLoader('imagesla', async () => {
             const hours = (document.getElementById('imgSlaHours') || {}).value || 24;
             const statusEl = document.getElementById('imgSlaStatus');
             const bodyEl = document.getElementById('imgSlaBody');
             if (statusEl) statusEl.textContent = 'Loading…';
+            if (bodyEl) bodyEl.innerHTML = loaderMarkup('Loading image SLA…');
             try {
                 const res = await fetch(`${ADMIN_BASE}/images/sla?hours=${encodeURIComponent(hours)}`);
                 const d = await res.json().catch(() => ({}));
@@ -2559,10 +2651,12 @@
                 if (statusEl) statusEl.textContent = 'Failed';
                 if (bodyEl) bodyEl.innerHTML = `<div class="empty-state">Failed: ${escapeHtml(e.message || e)}</div>`;
             }
+            });
         }
 
         let meModelsLoaded = false;
         async function meInit() {
+            return withLoader('modeleval', async () => {
             if (!meModelsLoaded) {
                 await meLoadCandidateModels();
                 meModelsLoaded = true;
@@ -2573,12 +2667,15 @@
                 const el = document.getElementById('mePersonaId');
                 if (el && !el.value) el.value = selectedPersonaId;
             }
+            });
         }
 
         let ibLoaded = false;
         async function ibInit() {
+            return withLoader('imgbench', async () => {
             await ibRefresh();
             ibLoaded = true;
+            });
         }
         async function ibRefresh() {
             await Promise.all([ibLoadReady(), ibLoadPersonas(), ibLoadModels(), ibLoadPrompts(), ibLoadRuns()]);
@@ -2664,7 +2761,7 @@
             const execHtml = (d.executions || []).map(e => {
                 const ev = e.evaluation || {};
                 const imgs = (e.candidates || []).map(c =>
-                    `<a href="${c.assetUrl}" target="_blank" rel="noopener"><img src="${c.assetUrl}" alt="" style="max-width:160px;max-height:160px;margin:4px;"></a>`
+                    `<a href="${c.assetUrl}" target="_blank" rel="noopener"><img loading="lazy" decoding="async" src="${c.assetUrl}" alt="" style="max-width:160px;max-height:160px;margin:4px;"></a>`
                 ).join('');
                 return `<div class="kv-item" style="margin:8px 0;">
                     <div><strong>${escapeHtml(e.slotKey)}</strong> ${escapeHtml(e.promptId)} ${escapeHtml(e.status)}</div>
@@ -2722,7 +2819,7 @@
                         `<div style="margin:8px 0 0 12px;"><strong>${escapeHtml(pr.promptId)}</strong>` +
                         (pr.models || []).map(m =>
                             `<div class="filter-count">${escapeHtml(m.slotKey)} ${escapeHtml(m.status)} identity=${m.identityRating ?? '—'} realism=${m.realismRating ?? '—'} cost=${escapeHtml(String(m.actualCost))}</div>` +
-                            (m.candidateUrls || []).map(u => `<a href="${u}" target="_blank"><img src="${u}" alt="" style="max-width:120px;margin:3px;"></a>`).join('')
+                            (m.candidateUrls || []).map(u => `<a href="${u}" target="_blank"><img loading="lazy" decoding="async" src="${u}" alt="" style="max-width:120px;margin:3px;"></a>`).join('')
                         ).join('') + '</div>'
                     ).join('') + '</div>'
                 ).join('');
@@ -2854,7 +2951,7 @@
                 if (!res.ok) throw new Error((d.error && d.error.message) || ('HTTP ' + res.status));
                 const groups = (d.models || []).map(m => {
                     const imgs = (m.candidates || []).map(c =>
-                        `<a href="${escapeHtml(c.assetUrl)}" target="_blank" rel="noopener"><img src="${escapeHtml(c.assetUrl)}" alt="c${c.candidateIndex}" style="width:120px;height:120px;object-fit:cover;margin:4px;border-radius:6px;"></a>`
+                        `<a href="${escapeHtml(c.assetUrl)}" target="_blank" rel="noopener"><img loading="lazy" decoding="async" src="${escapeHtml(c.assetUrl)}" alt="c${c.candidateIndex}" style="width:120px;height:120px;object-fit:cover;margin:4px;border-radius:6px;"></a>`
                     ).join('') || '<span class="filter-count">No candidates yet (job may still be running)</span>';
                     return `<div style="border-top:1px solid var(--border, #333);padding:12px 0;margin-top:8px;">
                         <div class="vh-title">${escapeHtml(m.displayName || m.modelId)}</div>
@@ -2908,7 +3005,7 @@
             const panel = document.getElementById('pdPanel-warehouse');
             if (!panel) return;
             if (typeof offset === 'number') pdWhOffset = offset;
-            panel.innerHTML = '<div class="empty-state" style="padding:20px;">Loading warehouse…</div>';
+            panel.innerHTML = loaderMarkup('Loading warehouse…');
             try {
                 const status = (document.getElementById('pdWhFilter') || {}).value || '';
                 const qs = new URLSearchParams({ limit: '40', offset: String(pdWhOffset) });
@@ -2951,7 +3048,7 @@
                         ${list.map(c => `
                             <div class="kv-item pd-wh-card" data-status="${escapeHtml(c.status)}" style="padding:8px;border:1px solid #444;">
                                 <div class="kv-label">${escapeHtml(c.status)} · #${Number(c.candidateIndex)+1}</div>
-                                <img src="${escapeHtml(c.assetUrl)}" alt="" style="width:100%;max-height:200px;object-fit:contain;background:#111;margin:6px 0;"/>
+                                <img loading="lazy" decoding="async" src="${escapeHtml(c.assetUrl)}" alt="" style="width:100%;max-height:200px;object-fit:contain;background:#111;margin:6px 0;"/>
                                 <div class="filter-count">${escapeHtml(c.seedPrompt || '')}</div>
                                 <div class="filter-count">${escapeHtml(c.adminRemark || '')}</div>
                                 <div class="filter-count mono">${escapeHtml(c.createdAt)}${c.sourceCandidateId ? ' · regen from ' + escapeHtml(c.sourceCandidateId.slice(0,8)) : ''}</div>
@@ -3043,7 +3140,7 @@
                 ${candidates.map(c => `
                     <div class="kv-item" style="padding:8px;border:1px solid #444;" data-cid="${escapeHtml(c.id)}">
                         <div class="kv-label">#${Number(c.candidateIndex) + 1} · ${escapeHtml(c.status || 'GENERATED')}</div>
-                        <img src="${escapeHtml(c.assetUrl)}" alt="candidate" style="width:100%;max-height:220px;object-fit:contain;background:#111;margin:6px 0;"/>
+                        <img loading="lazy" decoding="async" src="${escapeHtml(c.assetUrl)}" alt="candidate" style="width:100%;max-height:220px;object-fit:contain;background:#111;margin:6px 0;"/>
                         <textarea class="pd-cand-remark" rows="2" style="width:100%;" placeholder="Admin remark">${escapeHtml(c.adminRemark || '')}</textarea>
                         <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
                             <button class="secondary" onclick="pdCandidateAction('${c.id}','SHORTLISTED')">Shortlist</button>
@@ -3069,7 +3166,7 @@
                 const thumbs = (d.references || []).map(r =>
                     `<div style="display:inline-block;margin:4px;text-align:center;">
                         <div class="filter-count">${escapeHtml(r.role)}</div>
-                        <img src="${escapeHtml(r.assetUrl)}" alt="${escapeHtml(r.role)}" style="width:72px;height:72px;object-fit:cover;border:1px solid #444;"/>
+                        <img loading="lazy" decoding="async" src="${escapeHtml(r.assetUrl)}" alt="${escapeHtml(r.role)}" style="width:72px;height:72px;object-fit:cover;border:1px solid #444;"/>
                     </div>`
                 ).join('') || '<span class="filter-count">No references bound to this job</span>';
                 el.innerHTML = `<div class="vh-title">Identity used (read-only)</div>
@@ -3343,6 +3440,7 @@
         let enginesCache = [];
 
         async function loadEngines() {
+            return withLoader('engines', async () => {
             try {
                 const res = await fetch(`${ADMIN_BASE}/engines`);
                 if (!res.ok) throw new Error('Failed to load engines');
@@ -3352,6 +3450,7 @@
             } catch (e) {
                 showError('engineError', e.message);
             }
+            });
         }
 
         // Engines use a split-pane list|detail on their own list view (never a
@@ -3526,6 +3625,7 @@
         }
 
         async function loadSkills() {
+            return withLoader('skills', async () => {
             try {
                 const [res, usageRes] = await Promise.all([
                     fetch(`${ADMIN_BASE}/skills`),
@@ -3548,6 +3648,7 @@
             } catch (e) {
                 showError('skillError', e.message);
             }
+            });
         }
 
         let selectedSkillKey = '';
@@ -3724,6 +3825,7 @@
         }
 
         async function loadMemoryEngines() {
+            return withLoader('skills', async () => {
             try {
                 const res = await fetch(`${ADMIN_BASE}/memory-engines`);
                 if (!res.ok) throw new Error('Failed to load memory engines');
@@ -3747,6 +3849,7 @@
             } catch (e) {
                 showError('memoryEngineError', e.message);
             }
+            });
         }
 
         async function publishMemoryEngineVersion(id) {
@@ -3797,6 +3900,7 @@
         }
 
         async function loadIntentEngines() {
+            return withLoader('skills', async () => {
             try {
                 const res = await fetch(`${ADMIN_BASE}/intent-engines`);
                 if (!res.ok) throw new Error('Failed to load intent engines');
@@ -3822,6 +3926,7 @@
             } catch (e) {
                 showError('intentEngineError', e.message);
             }
+            });
         }
 
         async function publishIntentEngineVersion(id) {
@@ -3858,6 +3963,7 @@
         // ---------------- AI Runtime Settings (Phase ADMIN-2) ----------------
 
         async function loadAiSettings() {
+            return withLoader('aisettings', async () => {
             try {
                 const res = await fetch(`${ADMIN_BASE}/ai-settings`);
                 if (!res.ok) throw new Error('Failed to load AI settings');
@@ -3903,6 +4009,7 @@
             } catch (e) {
                 showError('aiSettingsError', e.message);
             }
+            });
         }
 
         async function saveAiSettings() {
@@ -3957,6 +4064,7 @@
         // ---------------- AI Configuration Overview (Phase ADMIN-2) ----------------
 
         async function loadAiConfiguration() {
+            return withLoader('aisettings', async () => {
             try {
                 const res = await fetch(`${ADMIN_BASE}/ai-configuration`);
                 if (!res.ok) throw new Error('Failed to load AI configuration');
@@ -3982,6 +4090,7 @@
             } catch (e) {
                 showError('aiOverviewError', e.message);
             }
+            });
         }
 
         // ---------------- Test Chat (Phase ADMIN-3) ----------------
@@ -4029,6 +4138,7 @@
         }
 
         async function loadTestChatOptions() {
+            return withLoader('testchat', async () => {
             try {
                 const [personasRes, usersRes, enginesRes, intentRes, memoryRes] = await Promise.all([
                     fetch(`${ADMIN_BASE}/personas`),
@@ -4064,6 +4174,7 @@
             } catch (e) {
                 showError('tcCreateError', e.message);
             }
+            });
         }
 
         async function loadTestChatCoreVersions() {
@@ -4268,6 +4379,7 @@
         }
 
         async function loadAdminUsers(preferredUserId) {
+            return withLoader('users', async () => {
             try {
                 const res = await fetch(`${ADMIN_BASE}/users`);
                 if (!res.ok) throw new Error('Failed to load users');
@@ -4299,9 +4411,11 @@
                     select.value = previousValue;
                     onChatUserSelected();
                 }
+                viewLoaded.users = true;
             } catch (e) {
                 showError('chatError', e.message);
             }
+            });
         }
 
         /**
@@ -4437,12 +4551,13 @@
         }
 
         async function openUserDetail(userId) {
+            return withLoader('user-detail', async () => {
             udUserId = userId;
             showView('user-detail');
             udShowTab('overview');
             document.getElementById('udError').innerHTML = '';
             document.getElementById('udTitle').textContent = 'Loading…';
-            document.getElementById('udPanel-overview').innerHTML = '<div class="empty-state" style="padding:20px;">Loading…</div>';
+            document.getElementById('udPanel-overview').innerHTML = loaderMarkup('Loading user…');
             document.getElementById('udPanel-conversations').innerHTML = '';
             document.getElementById('udPanel-memory').innerHTML = '';
 
@@ -4467,7 +4582,7 @@
                 return;
             }
 
-            document.getElementById('udPanel-conversations').innerHTML = '<div class="empty-state" style="padding:20px;">Loading…</div>';
+            document.getElementById('udPanel-conversations').innerHTML = loaderMarkup('Loading conversations…');
             try {
                 const res = await fetch(`${ADMIN_BASE}/users/${encodeURIComponent(userId)}/conversations`);
                 if (!res.ok) throw new Error('Failed to load conversations');
@@ -4493,7 +4608,7 @@
                     `<div class="empty-state" style="padding:20px;">${escapeHtml(e.message)}</div>`;
             }
 
-            document.getElementById('udPanel-memory').innerHTML = '<div class="empty-state" style="padding:20px;">Loading…</div>';
+            document.getElementById('udPanel-memory').innerHTML = loaderMarkup('Loading memory…');
             try {
                 const res = await fetch(`${ADMIN_BASE}/users/${encodeURIComponent(userId)}/memory`);
                 if (!res.ok) throw new Error('Failed to load memory facts');
@@ -4523,6 +4638,7 @@
                 document.getElementById('udPanel-memory').innerHTML =
                     `<div class="empty-state" style="padding:20px;">${escapeHtml(e.message)}</div>`;
             }
+            });
         }
 
         /* ---------------------------------------------------------------
@@ -4533,6 +4649,7 @@
         let allowlistCache = { entries: [], envAllowlistCount: 0 };
 
         async function loadAllowlist() {
+            return withLoader('aisettings', async () => {
             try {
                 const res = await fetch(`${ADMIN_BASE}/allowlist`);
                 if (!res.ok) throw new Error('Failed to load admin allowlist');
@@ -4541,6 +4658,7 @@
             } catch (e) {
                 showError('allowlistError', e.message);
             }
+            });
         }
 
         function renderAllowlist() {
@@ -5095,26 +5213,30 @@
             }
         }
 
-        // Initial load
-        loadDashboard();
-        loadPersonas();
-        loadAdminUsers();
-        loadEngines();
-        loadSkills();
-        loadMemoryEngines();
-        loadIntentEngines();
-        loadAiSettings();
-        loadAllowlist();
-        loadAiConfiguration();
-        loadTestChatOptions();
-        (async () => {
-            const res = await fetch(`${ADMIN_BASE}/personas`);
-            if (res.ok) {
+        async function loadChatPersonas() {
+            const select = document.getElementById('chatPersonaSelect');
+            if (!select) return false;
+            try {
+                const res = await fetch(`${ADMIN_BASE}/personas`);
+                if (!res.ok) throw new Error('Failed to load personas');
                 const data = await res.json();
-                const select = document.getElementById('chatPersonaSelect');
-                select.innerHTML = '<option value="">-- Select Persona --</option>' + data.personas.map(p => `<option value="${escAttr(p.id)}">${escapeHtml(p.displayName)}</option>`).join('');
+                const previous = select.value;
+                select.innerHTML = '<option value="">-- Select Persona --</option>' +
+                    (data.personas || []).map(p => `<option value="${escAttr(p.id)}">${escapeHtml(p.displayName)}</option>`).join('');
+                if (previous && Array.from(select.options).some(o => o.value === previous)) {
+                    select.value = previous;
+                }
+                return true;
+            } catch (e) {
+                select.innerHTML = '<option value="">Could not load personas</option>';
+                showError('chatError', e.message);
+                return false;
             }
-        })();
+        }
+
+        // Dashboard is the landing page, so it loads immediately.
+        // Every other page waits until it is opened.
+        ensureViewLoaded('dashboard');
 
         // Task 5 — Admin Observability UI. Every call below hits the read-only
         // backend built in Task 5 (AdminObservabilityRoutes), which itself reads
@@ -5816,10 +5938,11 @@
         }
 
         async function ciLoadConversations() {
+            return withLoader('convinspector', async () => {
             const listEl = document.getElementById('ciConversationList');
             const errEl = document.getElementById('ciListError');
             errEl.style.display = 'none';
-            listEl.innerHTML = '<div class="ci-empty">Loading…</div>';
+            listEl.innerHTML = loaderMarkup('Loading conversations…');
             try {
                 const userId = document.getElementById('ciFilterUserId').value.trim();
                 const params = new URLSearchParams({ limit: '50' });
@@ -5853,6 +5976,7 @@
                 errEl.textContent = 'Failed to load conversations: ' + e.message;
                 errEl.style.display = 'block';
             }
+            });
         }
 
         /**
@@ -5877,7 +6001,7 @@
             const errEl = document.getElementById('ciDetailError');
             const transcriptEl = document.getElementById('ciTranscript');
             errEl.style.display = 'none';
-            transcriptEl.innerHTML = '<div class="ci-empty">Loading…</div>';
+            transcriptEl.innerHTML = loaderMarkup('Loading transcript…');
             try {
                 const res = await fetch(`${ADMIN_BASE}/conversations/${conversationId}`);
                 if (!res.ok) {
@@ -5935,7 +6059,7 @@
             if (clicked) clicked.classList.add('selected');
 
             const inspectorEl = document.getElementById('ciInspector');
-            inspectorEl.innerHTML = '<div class="ci-empty">Loading…</div>';
+            inspectorEl.innerHTML = loaderMarkup('Loading execution…');
             try {
                 const res = await fetch(`${ADMIN_BASE}/conversations/${conversationId}/messages/${messageId}/execution`);
                 if (!res.ok) {
