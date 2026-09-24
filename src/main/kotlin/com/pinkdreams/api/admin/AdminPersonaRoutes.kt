@@ -593,6 +593,81 @@ class AdminPersonaRoutes(
                 }
             }
 
+            // POST /v1/admin/personas/{personaId}/core-versions/{versionId}/mark-testing
+            post("/v1/admin/personas/{personaId}/core-versions/{versionId}/mark-testing") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@post
+                }
+
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@post
+                }
+
+                val personaId = try {
+                    UUID.fromString(call.parameters["personaId"])
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid persona ID format", null)),
+                    )
+                    return@post
+                }
+
+                val versionId = try {
+                    UUID.fromString(call.parameters["versionId"])
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid version ID format", null)),
+                    )
+                    return@post
+                }
+
+                try {
+                    personaRepository.markCoreVersionAsTesting(personaId, versionId)
+                    val version = coreVersionRepository.findById(versionId)
+                    if (version != null) {
+                        call.respond(
+                            HttpStatusCode.OK,
+                            CoreVersionResponse(
+                                id = version.id.toString(),
+                                personaId = version.personaId.toString(),
+                                version = version.version,
+                                content = version.content,
+                                status = version.status,
+                                changelogNote = version.changelogNote,
+                                author = version.author,
+                                isActive = false,
+                            ),
+                        )
+                    } else {
+                        call.respond(
+                            HttpStatusCode.NotFound,
+                            ErrorResponse(ApiError(ErrorCode.NOT_FOUND, "Version not found", null)),
+                        )
+                    }
+                } catch (e: IllegalArgumentException) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, e.message ?: "Resource not found", null)),
+                    )
+                } catch (e: IllegalStateException) {
+                    call.respond(
+                        HttpStatusCode.Conflict,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_FAILED, e.message ?: "Invalid state transition", null)),
+                    )
+                }
+            }
+
             // POST /v1/admin/personas/{personaId}/activate — transition draft → active
             post("/v1/admin/personas/{personaId}/activate") {
                 val principal = call.principal<UserIdPrincipal>()

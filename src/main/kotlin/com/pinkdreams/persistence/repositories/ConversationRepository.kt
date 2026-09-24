@@ -251,6 +251,52 @@ open class ConversationRepository(private val db: Database) {
             .map(::rowToModel)
     }
 
+    data class UserMetric(
+        val yesterday: Int,
+        val last7Days: Int,
+        val last30Days: Int,
+    )
+
+    fun countDistinctUsersForPersona(personaId: UUID, excludeTestUsers: Boolean = true): UserMetric = transaction(db) {
+        val now = LocalDateTime.now()
+        val yesterday = now.minusDays(1)
+        val sevenDaysAgo = now.minusDays(7)
+        val thirtyDaysAgo = now.minusDays(30)
+
+        val baseCondition = Conversations.personaId eq personaId
+        val testUserCondition = if (excludeTestUsers) Conversations.executionMode eq "PRODUCTION" else null
+
+        val yesterdayCount = Conversations.select {
+            if (testUserCondition != null) baseCondition and (Conversations.createdAt greaterEq yesterday) and testUserCondition
+            else baseCondition and (Conversations.createdAt greaterEq yesterday)
+        }
+            .map { it[Conversations.userId] }
+            .distinct()
+            .size
+
+        val sevenDaysCount = Conversations.select {
+            if (testUserCondition != null) baseCondition and (Conversations.createdAt greaterEq sevenDaysAgo) and testUserCondition
+            else baseCondition and (Conversations.createdAt greaterEq sevenDaysAgo)
+        }
+            .map { it[Conversations.userId] }
+            .distinct()
+            .size
+
+        val thirtyDaysCount = Conversations.select {
+            if (testUserCondition != null) baseCondition and (Conversations.createdAt greaterEq thirtyDaysAgo) and testUserCondition
+            else baseCondition and (Conversations.createdAt greaterEq thirtyDaysAgo)
+        }
+            .map { it[Conversations.userId] }
+            .distinct()
+            .size
+
+        UserMetric(
+            yesterday = yesterdayCount,
+            last7Days = sevenDaysCount,
+            last30Days = thirtyDaysCount,
+        )
+    }
+
     private fun rowToModel(row: ResultRow): Conversation {
         val executionMode = row[Conversations.executionMode]
         val snapshot = if (executionMode == "TEST") {

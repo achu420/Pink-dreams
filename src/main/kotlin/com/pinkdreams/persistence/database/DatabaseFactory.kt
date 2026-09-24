@@ -485,6 +485,7 @@ object Personas : Table("personas") {
     // table would add a repository and lifecycle for no query we actually make.
     val tags = text("tags").default("[]")
     val activeCoreVersionId = uuid("active_core_version_id").nullable()
+    val testingCoreVersionId = uuid("testing_core_version_id").nullable()
     val personaIdentityId = uuid("persona_identity_id").nullable()
     val coverReferenceImageId = uuid("cover_reference_image_id").nullable()
     val createdAt = datetime("created_at")

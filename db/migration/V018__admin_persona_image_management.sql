@@ -1,10 +1,14 @@
 -- V018: Admin persona & image management schema
 -- Adds cover image support for personas, content classification & routing for image jobs,
--- and test-user flag for distinguishing mock-chat users from real end users.
+-- test-user flag for distinguishing mock-chat users from real end users, and
+-- testing version pointers for personas.
 
--- 1. Persona cover image support
+-- 1. Persona cover image support + testing version pointer
 ALTER TABLE personas ADD COLUMN IF NOT EXISTS cover_reference_image_id UUID
     REFERENCES persona_visual_reference_images(id);
+
+ALTER TABLE personas ADD COLUMN IF NOT EXISTS testing_core_version_id UUID
+    REFERENCES persona_core_versions(id);
 
 -- 2. Image job content classification, model routing & failure tracking
 ALTER TABLE image_jobs ADD COLUMN IF NOT EXISTS content_classification TEXT NOT NULL DEFAULT 'GENERAL'

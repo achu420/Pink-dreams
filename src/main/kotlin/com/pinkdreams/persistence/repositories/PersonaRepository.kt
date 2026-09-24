@@ -130,6 +130,28 @@ open class PersonaRepository(private val db: Database) {
         }
     }
 
+    fun markCoreVersionAsTesting(personaId: UUID, versionId: UUID) = transaction(db) {
+        val versionRepo = PersonaCoreVersionRepository(db)
+        val version = versionRepo.findById(versionId) ?: throw IllegalArgumentException("Version not found: $versionId")
+        require(version.personaId == personaId) { "Version does not belong to persona $personaId" }
+        if (version.status != "published") {
+            throw IllegalStateException("Only published versions can be marked as testing")
+        }
+
+        Personas.update({ Personas.id eq personaId }) {
+            it[Personas.testingCoreVersionId] = versionId
+            it[Personas.updatedAt] = defaultNow()
+        }
+    }
+
+    fun clearTestingCoreVersion(personaId: UUID) = transaction(db) {
+        findById(personaId) ?: throw IllegalArgumentException("Persona not found: $personaId")
+        Personas.update({ Personas.id eq personaId }) {
+            it[Personas.testingCoreVersionId] = null
+            it[Personas.updatedAt] = defaultNow()
+        }
+    }
+
     /**
      * Partial update: a null argument means "leave unchanged", matching the
      * pre-existing behavior of this method. To CLEAR a profile field, pass an
