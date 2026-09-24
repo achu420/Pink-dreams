@@ -693,6 +693,8 @@ object Conversations : Table("conversations") {
     // provider-routing preference only — independent of every Intent-only
     // field above.
     val snapshotGenerationProviderSort = text("snapshot_generation_provider_sort").nullable()
+    // Persona Context POC phase: variant selection for this test conversation.
+    val snapshotPersonaContextVariant = text("snapshot_persona_context_variant").nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

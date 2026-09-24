@@ -67,6 +67,12 @@ open class ConversationRepository(private val db: Database) {
          * "latency"). Null means generation's provider routing is unchanged.
          */
         val generationProviderSort: String? = null,
+        /**
+         * Persona Context POC phase: variant selection for this test conversation.
+         * "A" = full persona (production behavior), "B" = selective, "C" = selective + behavioral core.
+         * Null means default production behavior (variant A).
+         */
+        val personaContextVariant: String? = null,
     )
 
     data class Conversation(
@@ -128,6 +134,7 @@ open class ConversationRepository(private val db: Database) {
             it[Conversations.snapshotIntentMaxOutputTokens] = snapshot.intentMaxOutputTokens
             it[Conversations.snapshotIntentJsonMode] = snapshot.intentJsonMode
             it[Conversations.snapshotGenerationProviderSort] = snapshot.generationProviderSort
+            it[Conversations.snapshotPersonaContextVariant] = snapshot.personaContextVariant
         }
         findById(id)!!
     }
@@ -361,6 +368,7 @@ open class ConversationRepository(private val db: Database) {
                 intentMaxOutputTokens = row[Conversations.snapshotIntentMaxOutputTokens],
                 intentJsonMode = row[Conversations.snapshotIntentJsonMode],
                 generationProviderSort = row[Conversations.snapshotGenerationProviderSort],
+                personaContextVariant = row[Conversations.snapshotPersonaContextVariant],
             )
         } else {
             null

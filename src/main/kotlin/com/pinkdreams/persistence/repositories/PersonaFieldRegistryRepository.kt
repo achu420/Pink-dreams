@@ -4,7 +4,7 @@ import com.pinkdreams.persistence.database.PersonaFieldRegistry
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.delete
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
@@ -82,7 +82,7 @@ class PersonaFieldRegistryRepository(private val db: Database) {
     }
 
     fun delete(fieldId: String): Boolean = transaction(db) {
-        PersonaFieldRegistry.delete { PersonaFieldRegistry.fieldId eq fieldId } > 0
+        PersonaFieldRegistry.deleteWhere { PersonaFieldRegistry.fieldId eq fieldId } > 0
     }
 
     private fun rowToModel(row: ResultRow): PersonaFieldRegistryEntry {

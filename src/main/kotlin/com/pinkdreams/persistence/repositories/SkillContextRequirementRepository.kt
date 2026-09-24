@@ -4,7 +4,7 @@ import com.pinkdreams.persistence.database.SkillContextRequirements
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.delete
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
@@ -63,7 +63,7 @@ class SkillContextRequirementRepository(private val db: Database) {
     }
 
     fun delete(skillKey: String): Boolean = transaction(db) {
-        SkillContextRequirements.delete { SkillContextRequirements.skillKey eq skillKey } > 0
+        SkillContextRequirements.deleteWhere { SkillContextRequirements.skillKey eq skillKey } > 0
     }
 
     private fun rowToModel(row: ResultRow): SkillContextRequirement {
