@@ -212,6 +212,11 @@ data class ReferenceNotesUpdateRequest(
     val notes: String? = null,
 )
 
+@Serializable
+data class SetCoverImageRequest(
+    val referenceImageId: String,
+)
+
 /**
  * Module — Persona Detail → Visual Identity tab.
  * Admin can read all versions and edit the draft visual identity
@@ -596,6 +601,34 @@ class AdminPersonaVisualRoutes(
                     val body = call.receive<ReferenceNotesUpdateRequest>()
                     val updated = visualAdminService.updateReferenceNotes(personaId, referenceId, body.notes)
                     call.respond(HttpStatusCode.OK, toReferenceResponse(personaId, updated))
+                } catch (e: Exception) {
+                    call.respondMappedVisualError(e)
+                }
+            }
+
+            // PUT /v1/admin/personas/{personaId}/cover
+            put("/v1/admin/personas/{personaId}/cover") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@put
+                val personaId = call.parseUuid("personaId") ?: return@put
+                try {
+                    val body = call.receive<SetCoverImageRequest>()
+                    val referenceId = UUID.fromString(body.referenceImageId)
+                    personaRepository.setCoverImage(personaId, referenceId)
+                    call.respond(HttpStatusCode.OK, mapOf("status" to "cover_image_updated"))
+                } catch (e: IllegalArgumentException) {
+                    call.respond(HttpStatusCode.BadRequest, ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, e.message ?: "Invalid persona or reference image ID", null)))
+                } catch (e: Exception) {
+                    call.respondMappedVisualError(e)
+                }
+            }
+
+            // DELETE /v1/admin/personas/{personaId}/cover
+            delete("/v1/admin/personas/{personaId}/cover") {
+                if (!call.requireAdmin(adminAuthorizationProvider)) return@delete
+                val personaId = call.parseUuid("personaId") ?: return@delete
+                try {
+                    personaRepository.clearCoverImage(personaId)
+                    call.respond(HttpStatusCode.OK, mapOf("status" to "cover_image_cleared"))
                 } catch (e: Exception) {
                     call.respondMappedVisualError(e)
                 }

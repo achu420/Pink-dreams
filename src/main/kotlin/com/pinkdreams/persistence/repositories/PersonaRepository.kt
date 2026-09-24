@@ -196,6 +196,28 @@ open class PersonaRepository(private val db: Database) {
         findById(personaId) ?: throw IllegalStateException("Failed to reload persona $personaId")
     }
 
+    fun setCoverImage(personaId: UUID, referenceImageId: UUID): Unit = transaction(db) {
+        findById(personaId) ?: throw IllegalArgumentException("Persona not found: $personaId")
+        Personas.update({ Personas.id eq personaId }) {
+            it[Personas.coverReferenceImageId] = referenceImageId
+            it[Personas.updatedAt] = defaultNow()
+        }
+    }
+
+    fun clearCoverImage(personaId: UUID): Unit = transaction(db) {
+        findById(personaId) ?: throw IllegalArgumentException("Persona not found: $personaId")
+        Personas.update({ Personas.id eq personaId }) {
+            it[Personas.coverReferenceImageId] = null
+            it[Personas.updatedAt] = defaultNow()
+        }
+    }
+
+    fun getCoverImageId(personaId: UUID): UUID? = transaction(db) {
+        Personas.select { Personas.id eq personaId }
+            .map { it[Personas.coverReferenceImageId] }
+            .singleOrNull()
+    }
+
     private fun rowToModel(row: ResultRow): Persona = Persona(
         id = row[Personas.id],
         slug = row[Personas.slug],
