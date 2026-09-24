@@ -235,6 +235,8 @@ data class ImageJobListItem(
     val lastError: String?,
     val createdAt: String,
     val completedAt: String?,
+    val contentClassification: String = "GENERAL",
+    val selectedModel: String? = null,
 )
 
 @Serializable
@@ -336,8 +338,36 @@ class AdminImageGenerationRoutes(
             get("/v1/admin/images/jobs") {
                 if (!call.requireAdmin(adminAuthorizationProvider)) return@get
                 val limit = call.request.queryParameters["limit"]?.toIntOrNull()?.coerceIn(1, 200) ?: 50
+                val offset = call.request.queryParameters["offset"]?.toIntOrNull()?.coerceAtLeast(0) ?: 0
+
+                val status = call.request.queryParameters["status"]?.let {
+                    try { ImageJobStatus.valueOf(it) } catch (_: Exception) { null }
+                }
+                val personaVisualVersionId = call.request.queryParameters["personaVisualVersionId"]?.let {
+                    try { UUID.fromString(it) } catch (_: Exception) { null }
+                }
+                val contentClassification = call.request.queryParameters["contentClassification"]
+                val selectedModel = call.request.queryParameters["selectedModel"]
+                val createdAfter = call.request.queryParameters["createdAfter"]?.let {
+                    try { LocalDateTime.parse(it) } catch (_: Exception) { null }
+                }
+                val createdBefore = call.request.queryParameters["createdBefore"]?.let {
+                    try { LocalDateTime.parse(it) } catch (_: Exception) { null }
+                }
+
+                val jobs = imageJobRepository.findFiltered(
+                    limit = limit,
+                    offset = offset,
+                    status = status,
+                    personaVisualVersionId = personaVisualVersionId,
+                    contentClassification = contentClassification,
+                    selectedModel = selectedModel,
+                    createdAfter = createdAfter,
+                    createdBefore = createdBefore,
+                )
+
                 call.respond(
-                    imageJobRepository.findRecent(limit).map {
+                    jobs.map {
                         ImageJobListItem(
                             jobId = it.id.toString(),
                             status = it.status.name,
@@ -346,6 +376,8 @@ class AdminImageGenerationRoutes(
                             lastError = ImageGenerationEventRepository.redactSecrets(it.lastError),
                             createdAt = it.createdAt.toString(),
                             completedAt = it.completedAt?.toString(),
+                            contentClassification = it.contentClassification,
+                            selectedModel = it.selectedModel,
                         )
                     }
                 )

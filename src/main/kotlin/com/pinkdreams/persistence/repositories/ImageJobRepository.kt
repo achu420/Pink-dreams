@@ -14,6 +14,8 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -79,6 +81,49 @@ class ImageJobRepository(private val db: Database) {
         ImageJobs.selectAll()
             .orderBy(ImageJobs.createdAt to org.jetbrains.exposed.sql.SortOrder.DESC)
             .limit(limit)
+            .map(::rowToModel)
+    }
+
+    fun findFiltered(
+        limit: Int = 50,
+        offset: Int = 0,
+        status: ImageJobStatus? = null,
+        personaVisualVersionId: UUID? = null,
+        contentClassification: String? = null,
+        selectedModel: String? = null,
+        createdAfter: LocalDateTime? = null,
+        createdBefore: LocalDateTime? = null,
+    ): List<ImageJob> = transaction(db) {
+        val conditions = mutableListOf<org.jetbrains.exposed.sql.Op<Boolean>>()
+
+        if (status != null) {
+            conditions.add(ImageJobs.status eq status.name)
+        }
+        if (personaVisualVersionId != null) {
+            conditions.add(ImageJobs.personaVisualVersionId eq personaVisualVersionId)
+        }
+        if (contentClassification != null) {
+            conditions.add(ImageJobs.contentClassification eq contentClassification)
+        }
+        if (selectedModel != null) {
+            conditions.add(ImageJobs.selectedModel eq selectedModel)
+        }
+        if (createdAfter != null) {
+            conditions.add(ImageJobs.createdAt greaterEq createdAfter)
+        }
+        if (createdBefore != null) {
+            conditions.add(ImageJobs.createdAt lessEq createdBefore)
+        }
+
+        val query = if (conditions.isEmpty()) {
+            ImageJobs.selectAll()
+        } else {
+            ImageJobs.select { conditions.reduce { a, b -> a and b } }
+        }
+
+        query
+            .orderBy(ImageJobs.createdAt to org.jetbrains.exposed.sql.SortOrder.DESC)
+            .limit(limit, offset.toLong())
             .map(::rowToModel)
     }
 
