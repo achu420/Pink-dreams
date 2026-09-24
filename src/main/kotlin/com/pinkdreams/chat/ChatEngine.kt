@@ -1,6 +1,7 @@
 package com.pinkdreams.chat
 
 import com.pinkdreams.common.errors.ErrorCode
+import com.pinkdreams.chat.context.PersonaContextProvider
 import com.pinkdreams.chat.memory.CompletedTurn
 import com.pinkdreams.chat.memory.NoopPostDeliveryMemoryExtraction
 import com.pinkdreams.chat.memory.PostDeliveryMemoryExtraction
@@ -230,6 +231,10 @@ class PipelineChatEngine(
     // caller/test is unaffected: with no enricher configured, the memory block
     // stays exactly what RepositoryContextAssembler already built.
     private val memoryContextEnricher: SkillAwareMemoryEnricher? = null,
+    // Persona Context POC: Resolve skill-aware persona after skill selection.
+    // Null by default (production behavior unchanged). Test variants can inject
+    // this to refine persona context based on actual selected skill.
+    private val personaContextResolution: PersonaContextResolutionStage? = null,
     // Task 24 — Complete Pipeline Attribution. Null by default (every existing
     // caller/test), in which case NO attribution record is written and this
     // class behaves exactly as before. Wired to a failure-isolated,
@@ -399,7 +404,10 @@ class PipelineChatEngine(
         attribution?.memoryContext(skillEnrichedContext)
         val afterSkillSelection = afterContext.advance(PipelineStage.SKILL_SELECTION)
 
-        val generationResult = timed("generation") { generator.generate(request, skillEnrichedContext) }
+        // Persona Context POC: Resolve skill-aware persona after skill selection
+        val personaResolvedContext = personaContextResolution?.resolve(skillEnrichedContext) ?: skillEnrichedContext
+
+        val generationResult = timed("generation") { generator.generate(request, personaResolvedContext) }
         val generated = when (generationResult) {
             is StageResult.Failed -> return fail(generationResult.code, afterSkillSelection, PipelineStage.GENERATION)
             is StageResult.Succeeded -> generationResult.value
