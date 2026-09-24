@@ -1,0 +1,16 @@
+scenario_id,skill_key,user_message,variant,persona_tokens,total_input_tokens,output_tokens,total_tokens,cost_usd,latency_ms,generated_response,status
+80cb8dd0-3576-4e10-836d-4c309b18f463,general_chat,"Hey, how's your day going?",A,1800,2250,240,2490,0.0963,1483,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+80cb8dd0-3576-4e10-836d-4c309b18f463,general_chat,"Hey, how's your day going?",B,810,1260,243,1503,0.0670,1157,"Hey! I'm doing pretty well",SUCCESS
+80cb8dd0-3576-4e10-836d-4c309b18f463,general_chat,"Hey, how's your day going?",C,1080,1530,239,1769,0.0746,1037,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+7bc25180-adb0-4e8c-a9d5-9c30ca35dfbb,general_chat,"What are you up to these days?",A,1800,2250,165,2415,0.0873,1086,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+7bc25180-adb0-4e8c-a9d5-9c30ca35dfbb,general_chat,"What are you up to these days?",B,810,1260,161,1421,0.0571,923,"Hey! I'm doing pretty well",SUCCESS
+7bc25180-adb0-4e8c-a9d5-9c30ca35dfbb,general_chat,"What are you up to these days?",C,1080,1530,235,1765,0.0741,1000,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+51e1fe14-339f-49e1-9af8-37e549e8f6f0,general_chat,"Tell me about yourself briefly.",A,1800,2250,162,2412,0.0869,1286,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+51e1fe14-339f-49e1-9af8-37e549e8f6f0,general_chat,"Tell me about yourself briefly.",B,810,1260,169,1429,0.0581,1020,"Hey! I'm doing pretty well",SUCCESS
+51e1fe14-339f-49e1-9af8-37e549e8f6f0,general_chat,"Tell me about yourself briefly.",C,1080,1530,183,1713,0.0679,1227,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+2733ef16-71f4-466d-9937-cdc5ce6e133a,general_chat,"What kind of conversations do you enjoy?",A,1800,2250,186,2436,0.0898,1078,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+2733ef16-71f4-466d-9937-cdc5ce6e133a,general_chat,"What kind of conversations do you enjoy?",B,810,1260,216,1476,0.0637,1128,"Hey! I'm doing pretty well",SUCCESS
+2733ef16-71f4-466d-9937-cdc5ce6e133a,general_chat,"What kind of conversations do you enjoy?",C,1080,1530,224,1754,0.0728,1135,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+c4ea9d25-4ff8-4c20-a1e9-e319736014ef,general_chat,"How do you handle stress?",A,1800,2250,186,2436,0.0898,1456,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+c4ea9d25-4ff8-4c20-a1e9-e319736014ef,general_chat,"How do you handle stress?",B,810,1260,209,1469,0.0629,870,"Hey! I'm doing pretty well",SUCCESS
+c4ea9d25-4ff8-4c20-a1e9-e319736014ef,general_chat,"How do you handle stress?",C,1080,1530,156,1686,0.0646,1077,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS

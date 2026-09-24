@@ -1,0 +1,6 @@
+scenario_id,skill_key,persona_tokens,total_input_tokens,output_tokens,total_tokens,cost_usd,latency_ms,status
+80cb8dd0-3576-4e10-836d-4c309b18f463,general_chat,1800,2250,240,2490,0.0963,1483,SUCCESS
+7bc25180-adb0-4e8c-a9d5-9c30ca35dfbb,general_chat,1800,2250,165,2415,0.0873,1086,SUCCESS
+51e1fe14-339f-49e1-9af8-37e549e8f6f0,general_chat,1800,2250,162,2412,0.0869,1286,SUCCESS
+2733ef16-71f4-466d-9937-cdc5ce6e133a,general_chat,1800,2250,186,2436,0.0898,1078,SUCCESS
+c4ea9d25-4ff8-4c20-a1e9-e319736014ef,general_chat,1800,2250,186,2436,0.0898,1456,SUCCESS
