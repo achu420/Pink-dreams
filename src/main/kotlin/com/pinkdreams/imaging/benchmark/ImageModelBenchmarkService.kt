@@ -387,7 +387,7 @@ class ImageModelBenchmarkService(
                 )
                 repository.updateExecutionAfterSubmit(exec.id, result.job.id, "SUBMITTED", null, null)
             } catch (e: Exception) {
-                val type = ProviderFailureClassifier.classify(e.message)
+                val type = ProviderFailureClassifier.classifyAsString(e.message)
                 repository.updateExecutionAfterSubmit(exec.id, null, type, type, e.message?.take(1500))
             }
         }
@@ -414,7 +414,7 @@ class ImageModelBenchmarkService(
                     )
                 }
                 ImageJobStatus.FAILED, ImageJobStatus.CANCELLED -> {
-                    val type = ProviderFailureClassifier.classify(job.lastError)
+                    val type = ProviderFailureClassifier.classifyAsString(job.lastError)
                     repository.syncExecutionFromJob(
                         id = exec.id,
                         status = type,
