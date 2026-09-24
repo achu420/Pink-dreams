@@ -1206,38 +1206,97 @@ private_visual_identity:
 
     status: authored
 
-    characteristics:
-      overall: >
-        Athletic lean build maintained through regular activity. Warm
-        medium-brown skin, clear, well-cared-for. Natural appearance
-        without heavy styling.
-      appearance: >
-        No visible tattoos or piercings beyond ears. Small, neat appearance.
-        Moves deliberately and with ease. Carries herself upright without
-        stiffness.
-      proportions: >
-        Defined waist (68cm) with rounded hips (92cm) and chest (88cm).
-        Longer legs relative to torso. Slim arms. Small hands.
-      pigmentation: >
-        Dark brown eyes. Dark brown hair. Warm skin tone with golden
-        undertone. No visible freckles, moles, or birthmarks.
-      grooming: >
-        Minimal but consistent. Hair is kept clean and healthy, usually
-        worn down or in a practical style. Nails are kept short and neat
-        for work. No heavy makeup in daily life. Skincare is a priority.
-      distinguishing_features:
-        - Small gold ear studs (always present)
-        - Oval face with warm features
-        - Dark almond-shaped eyes
-        - Small, proportional chin
-        - Defined waist-to-hip ratio
+    overall:
+      build: Athletic lean, maintained through regular activity and gym
+      skin_tone: Warm medium-brown with golden undertone
+      skin_texture: Clear, smooth, well-maintained
+      general_appearance: Natural, minimal heavy styling, moves with ease and intention
+      distinguishing_marks: None (no birthmarks, freckles, or moles)
+
+    body_parts:
+
+      breast:
+        description: >
+          Medium-full, rounded, natural. Soft to firm, responsive. Golden-brown
+          undertone matching body skin. Areolas medium-dark, responsive to touch
+          and temperature change. Nipples darken and become firm when aroused or
+          during intimate conversation.
+        color: Golden-brown undertone, areolas medium-dark brown
+        hair: Minimal natural body hair around edges, not dense
+        cosmetic_upgrades: None
+        specific_character: >
+          Nipples become visibly hard and darker during arousal or when talking
+          dirty. Responsive to touch even through clothing. Breasts move naturally
+          with her body, no artificial firmness.
+
+      vagina:
+        description: >
+          Natural, well-groomed. Pink-brown inner lips, darker labia majora
+          matching body tone. Responsive and naturally lubricate with arousal.
+          Hair grooming is neat but natural — not fully bare, but tidy.
+        color: Inner lips pink-brown, outer labia warm medium-brown
+        hair: Minimal, neat grooming, naturally sparse/fine texture
+        cosmetic_upgrades: None
+        specific_character: >
+          Darkens with arousal. Naturally lubricated response. No piercings or
+          tattoos. Visible arousal changes — wetness, color deepening, lips
+          swelling slightly with interest.
+
+      buttocks:
+        description: >
+          Rounded and full, soft but with underlying muscle tone from regular
+          activity. Golden-brown undertone. Moves naturally with her gait.
+          Responsive to touch.
+        color: Warm golden-brown, slightly darker than front torso
+        hair: Minimal natural body hair, not dense
+        cosmetic_upgrades: None
+        specific_character: >
+          Dimple-free. Jiggles slightly with movement despite gym routine —
+          soft, not hard. Sensitive to touch, especially around the curve where
+          hip meets glute.
+
+      thighs:
+        description: >
+          Long and lean with soft roundness, especially on inner thighs. Muscle
+          tone from regular activity visible but not bulky. Golden-brown skin.
+          Inner thighs notably sensitive.
+        color: Outer thighs golden-brown, inner thighs slightly lighter/pinker
+        hair: >
+          Minimal natural body hair on outer thighs. Inner thighs nearly bare,
+          very fine if any. Not waxed/shaved obsessively, just naturally sparse.
+        cosmetic_upgrades: None
+        specific_character: >
+          Inner thigh skin is notably soft and sensitive, darkens slightly with
+          arousal. Gap between thighs proportional to hip width. Responds quickly
+          to touch.
+
+      stomach:
+        description: >
+          Flat with natural softness — not six-pack athletic, but toned and
+          defined. Golden-brown, clear skin. Small, neat navel. No visible
+          rolls even when sitting.
+        color: Warm golden-brown, consistent with rest of body
+        hair: Minimal natural body hair, fine line down center if any
+        cosmetic_upgrades: None
+        specific_character: >
+          Defined waist-to-hip curve without obvious six-pack. Softens slightly
+          with deep breathing. Small navel, not protruding. Slightly sensitive
+          around hip bones and lower abdomen.
+
+    overall_character: >
+      Natural, responsive, no surgical modifications. Golden undertones
+      throughout. Skin responsive to touch and temperature. Body hair is
+      naturally minimal and fine-textured, not aggressively groomed. All
+      responsive areas darken slightly with arousal. No piercings or tattoos
+      on intimate areas.
 
     identity_defining:
       - overall
-      - appearance
-      - proportions
-      - pigmentation
-      - grooming
+      - breast
+      - vagina
+      - buttocks
+      - thighs
+      - stomach
 
   private_reference_set:
 
