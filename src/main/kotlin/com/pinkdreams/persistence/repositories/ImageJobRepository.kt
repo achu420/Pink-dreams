@@ -29,6 +29,7 @@ class ImageJobRepository(private val db: Database) {
         idempotencyKey: String,
         requestPayload: String,
         maxAttempts: Int = 3,
+        contentClassification: String = "GENERAL",
     ): ImageJob = transaction(db) {
         findByIdempotencyKey(personaVisualVersionId, idempotencyKey)?.let { return@transaction it }
 
@@ -47,6 +48,7 @@ class ImageJobRepository(private val db: Database) {
                 it[ImageJobs.maxAttempts] = maxAttempts
                 it[ImageJobs.availableAt] = now
                 it[ImageJobs.createdAt] = now
+                it[ImageJobs.contentClassification] = contentClassification
             }
             findById(id)!!
         } catch (e: Exception) {
@@ -184,6 +186,7 @@ class ImageJobRepository(private val db: Database) {
         workerName: String,
         errorMessage: String,
         shouldRetry: Boolean,
+        failureCategory: String? = null,
     ): ImageJob? = transaction(db) {
         val job = findById(jobId) ?: return@transaction null
         if (job.status != ImageJobStatus.RUNNING || job.claimedByWorker != workerName) {
@@ -211,6 +214,9 @@ class ImageJobRepository(private val db: Database) {
             it[ImageJobs.lastError] = redacted
             it[ImageJobs.claimedByWorker] = null
             it[ImageJobs.claimedAt] = null
+            if (failureCategory != null && !retry) {
+                it[ImageJobs.failureCategory] = failureCategory
+            }
         }
 
         if (updated > 0) findById(jobId) else null
@@ -295,5 +301,10 @@ class ImageJobRepository(private val db: Database) {
         providerCostRaw = row[ImageJobs.providerCostRaw],
         providerCostCurrency = row[ImageJobs.providerCostCurrency],
         providerCostSource = row[ImageJobs.providerCostSource],
+        contentClassification = row[ImageJobs.contentClassification],
+        requestedModel = row[ImageJobs.requestedModel],
+        selectedModel = row[ImageJobs.selectedModel],
+        routingAttempts = row[ImageJobs.routingAttempts],
+        failureCategory = row[ImageJobs.failureCategory],
     )
 }

@@ -27,4 +27,6 @@ data class ImageGenerationRequest(
     val adminCorrection: String? = null,
     /** Optional model override for evaluation runs; null uses production IMAGE_MODEL. */
     val modelId: String? = null,
+    /** Content classification for routing: GENERAL or RESTRICTED. */
+    val contentClassification: String = "GENERAL",
 )

@@ -26,6 +26,12 @@ data class ImageJob(
     val providerCostRaw: BigDecimal? = null,
     val providerCostCurrency: String? = null,
     val providerCostSource: String? = null,
+    // V018: content classification for routing (GENERAL/RESTRICTED), model selection, and failure tracking
+    val contentClassification: String = "GENERAL",
+    val requestedModel: String? = null,
+    val selectedModel: String? = null,
+    val routingAttempts: String? = null,  // JSONB serialized
+    val failureCategory: String? = null,
 ) {
     fun validate(): ValidationResult {
         val errors = mutableListOf<String>()

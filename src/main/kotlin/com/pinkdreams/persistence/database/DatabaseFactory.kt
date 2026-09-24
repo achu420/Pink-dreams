@@ -302,6 +302,12 @@ object ImageJobs : Table("image_jobs") {
     val providerCostRaw = decimal("provider_cost_raw", 18, 8).nullable()
     val providerCostCurrency = text("provider_cost_currency").nullable()
     val providerCostSource = text("provider_cost_source").nullable()
+    // V018: content classification for routing policy (GENERAL/RESTRICTED)
+    val contentClassification = varchar("content_classification", 50).default("GENERAL")
+    val requestedModel = varchar("requested_model", 255).nullable()
+    val selectedModel = varchar("selected_model", 255).nullable()
+    val routingAttempts = text("routing_attempts").nullable()  // JSONB
+    val failureCategory = varchar("failure_category", 50).nullable()
 
     override val primaryKey = PrimaryKey(id)
     init {

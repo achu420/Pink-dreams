@@ -44,6 +44,7 @@ data class GenerationResult(
     val actualCost: java.math.BigDecimal? = null,
     val costCurrency: String? = null,
     val costSource: String = "UNAVAILABLE",
+    val failureCategory: String? = null,
 )
 
 enum class GenerationStatus {
