@@ -36,6 +36,9 @@ class RepositoryContextAssembler(
     // Phase ADMIN-3: see MemoryScopeResolver. Default preserves pre-ADMIN-3
     // behavior exactly for every existing caller/test.
     private val memoryScopeResolver: MemoryScopeResolver = ProductionMemoryScope,
+    // Persona Context POC: provider for resolving persona fields. Defaults to raw (production) behavior.
+    // Test conversations with a variant can inject a ResolvedPersonaContextProvider instead.
+    private val personaContextProvider: PersonaContextProvider? = null,
 ) : ContextAssembler {
     override fun assemble(request: ChatRequest): StageResult<ChatContext> {
         val conversation = conversationRepository.findByIdForUser(request.conversationId, request.userId)
@@ -60,7 +63,14 @@ class RepositoryContextAssembler(
         val memories = memoryService.selectForContext(request.userId, scopedPersonaId, memoryLimit)
         val messages = messageRepository.findForConversation(request.conversationId).takeLast(messageLimit)
 
-        val block0 = ContextBlock("system", engineAndPersonaContent(engine.content, core.content))
+        // Persona Context POC: use provider to get persona content if available (for test variants)
+        val personaContent = if (personaContextProvider != null) {
+            // For now, use empty skill key as a placeholder; real test chat will pass proper skill key
+            personaContextProvider.getPersonaContext(request.personaId, core.id, "general_chat", request.content)
+        } else {
+            core.content
+        }
+        val block0 = ContextBlock("system", engineAndPersonaContent(engine.content, personaContent))
         val block1 = ContextBlock("system", profileContent(profile))
         val block2Facts = memories.toMutableList()
         val block3Messages = messages.toMutableList()
