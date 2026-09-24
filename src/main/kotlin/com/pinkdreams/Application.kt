@@ -427,7 +427,7 @@ fun Application.module(
         ChatRoutes(engine, conversationRepo, memoryFactRepo).register(this)
         ConversationHistoryRoutes(conversationRepo, messageRepo, userRepository = userRepo).register(this)
         AdminEngineRoutes(engineRepo, authProvider).register(this)
-        AdminPersonaRoutes(personaRepo, coreVersionRepo, authProvider).register(this)
+        AdminPersonaRoutes(personaRepo, coreVersionRepo, conversationRepo, authProvider).register(this)
         com.pinkdreams.api.admin.AdminPersonaVisualRoutes(
             personaRepository = personaRepo,
             personaIdentityRepository = personaIdentityRepository,

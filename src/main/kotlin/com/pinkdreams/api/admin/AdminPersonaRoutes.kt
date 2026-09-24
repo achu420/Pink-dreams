@@ -6,6 +6,7 @@ import com.pinkdreams.common.errors.ErrorCode
 import com.pinkdreams.common.errors.ErrorResponse
 import com.pinkdreams.persistence.repositories.PersonaRepository
 import com.pinkdreams.persistence.repositories.PersonaCoreVersionRepository
+import com.pinkdreams.persistence.repositories.ConversationRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.ContentType
 import io.ktor.server.application.call
@@ -21,6 +22,8 @@ import io.ktor.server.routing.patch
 import io.ktor.server.auth.authenticate
 import kotlinx.serialization.Serializable
 import java.util.UUID
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Serializable
 data class CreatePersonaRequest(
@@ -115,9 +118,30 @@ data class CoreVersionListResponse(
     val versions: List<CoreVersionResponse>,
 )
 
+@Serializable
+data class PersonaUserResponse(
+    val userId: String,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val email: String? = null,
+    val firstConversationAt: String,
+    val lastConversationAt: String,
+    val conversationCount: Int,
+)
+
+@Serializable
+data class PersonaUsersListResponse(
+    val personaId: String,
+    val users: List<PersonaUserResponse>,
+    val total: Int,
+    val limit: Int,
+    val offset: Int,
+)
+
 class AdminPersonaRoutes(
     private val personaRepository: PersonaRepository,
     private val coreVersionRepository: PersonaCoreVersionRepository,
+    private val conversationRepository: ConversationRepository,
     private val adminAuthorizationProvider: AdminAuthorizationProvider,
 ) {
     // Persona core versions have no isActive column of their own (unlike
@@ -811,6 +835,78 @@ class AdminPersonaRoutes(
                         ErrorResponse(ApiError(ErrorCode.VALIDATION_FAILED, e.message ?: "Invalid state transition", null)),
                     )
                 }
+            }
+
+            // GET /v1/admin/personas/{personaId}/users
+            get("/v1/admin/personas/{personaId}/users") {
+                val principal = call.principal<UserIdPrincipal>()
+                if (principal == null) {
+                    call.respond(
+                        HttpStatusCode.Unauthorized,
+                        ErrorResponse(ApiError(ErrorCode.UNAUTHORIZED, "Authentication required", null)),
+                    )
+                    return@get
+                }
+
+                if (!adminAuthorizationProvider.isAdmin(principal.name)) {
+                    call.respond(
+                        HttpStatusCode.Forbidden,
+                        ErrorResponse(ApiError(ErrorCode.ENTITLEMENT_DENIED, "Admin access required", null)),
+                    )
+                    return@get
+                }
+
+                val personaId = try {
+                    UUID.fromString(call.parameters["personaId"])
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        ErrorResponse(ApiError(ErrorCode.VALIDATION_ERROR, "Invalid persona ID format", null)),
+                    )
+                    return@get
+                }
+
+                // Validate persona exists
+                if (personaRepository.findById(personaId) == null) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        ErrorResponse(ApiError(ErrorCode.NOT_FOUND, "Persona not found", null)),
+                    )
+                    return@get
+                }
+
+                val limit = call.parameters["limit"]?.toIntOrNull()?.coerceIn(1, 500) ?: 50
+                val offset = call.parameters["offset"]?.toIntOrNull()?.coerceAtLeast(0) ?: 0
+
+                val (users, total) = conversationRepository.findUsersForPersona(
+                    personaId = personaId,
+                    limit = limit,
+                    offset = offset,
+                    excludeTestUsers = true,
+                )
+
+                val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+
+                call.respond(
+                    HttpStatusCode.OK,
+                    PersonaUsersListResponse(
+                        personaId = personaId.toString(),
+                        users = users.map { user ->
+                            PersonaUserResponse(
+                                userId = user.userId.toString(),
+                                firstName = null,  // Not stored in conversations table
+                                lastName = null,   // Not stored in conversations table
+                                email = null,      // Not stored in conversations table
+                                firstConversationAt = user.firstConversationAt.format(formatter),
+                                lastConversationAt = user.lastConversationAt.format(formatter),
+                                conversationCount = user.conversationCount,
+                            )
+                        },
+                        total = total,
+                        limit = limit,
+                        offset = offset,
+                    ),
+                )
             }
         }
     }

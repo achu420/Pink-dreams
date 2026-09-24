@@ -297,6 +297,53 @@ open class ConversationRepository(private val db: Database) {
         )
     }
 
+    data class PersonaUser(
+        val userId: UUID,
+        val firstConversationAt: LocalDateTime,
+        val lastConversationAt: LocalDateTime,
+        val conversationCount: Int,
+    )
+
+    fun findUsersForPersona(
+        personaId: UUID,
+        limit: Int = 50,
+        offset: Int = 0,
+        excludeTestUsers: Boolean = true,
+    ): Pair<List<PersonaUser>, Int> = transaction(db) {
+        val baseCondition = Conversations.personaId eq personaId
+        val testUserCondition = if (excludeTestUsers) Conversations.executionMode eq "PRODUCTION" else null
+
+        val condition = if (testUserCondition != null) baseCondition and testUserCondition else baseCondition
+
+        val total = Conversations.select(condition)
+            .map { it[Conversations.userId] }
+            .distinct()
+            .size
+
+        val users = Conversations.select(condition)
+            .map { row ->
+                Triple(
+                    row[Conversations.userId],
+                    row[Conversations.createdAt],
+                    row[Conversations.lastMessageAt] ?: row[Conversations.createdAt]
+                )
+            }
+            .groupBy { it.first }
+            .map { (userId, conversations) ->
+                PersonaUser(
+                    userId = userId,
+                    firstConversationAt = conversations.minOf { it.second },
+                    lastConversationAt = conversations.maxOf { it.third },
+                    conversationCount = conversations.size
+                )
+            }
+            .sortedByDescending { it.lastConversationAt }
+            .drop(offset)
+            .take(limit)
+
+        Pair(users, total)
+    }
+
     private fun rowToModel(row: ResultRow): Conversation {
         val executionMode = row[Conversations.executionMode]
         val snapshot = if (executionMode == "TEST") {
