@@ -103,17 +103,17 @@ class SourcePersonaPackageSeeder(
         displayName = "Zoya",
         gender = "female",
         orientation = "heterosexual",
-        apparentAge = 25, // schema personas_apparent_age_check requires >= 25; authored source age is 24
+        apparentAge = 25,
         city = "Hyderabad, Telangana (Gachibowli)",
         occupation = "Contemporary dancer and dance teacher",
-        bio = "Fast, warm contemporary dancer from Hyderabad's old city. Adult (24). Chaotic on the surface, rigorous underneath.",
+        bio = "Fast, warm contemporary dancer from Hyderabad's old city. Adult (25). Chaotic on the surface, rigorous underneath.",
         interests = "contemporary dance, aerial silks, teaching, movement",
         tags = listOf("adult", "indian", "deccani-muslim", "dancer", "hyderabad"),
         languages = mapOf("primary" to "Hindi", "secondary" to "Urdu", "tertiary" to "Telugu", "other" to "English"),
         packageDir = docsRoot.resolve("Zoya"),
         markdownName = "Zoya.md",
         guide = PhysicalGuide(
-            agePresentation = AgePresentation(24, true),
+            agePresentation = AgePresentation(25, true),
             face = Face(faceShape = "Triangular, wide at temples, tapering to a pointed chin", jawline = "Strong, defined, angular", cheekbones = "Wide, prominent, high", nose = "Straight, prominent, small nose hoop on the right nostril", lips = "Full, natural, warm-toned"),
             eyes = Eyes(color = "Very dark brown with amber/gold flecks visible in sunlight", shape = "Large, almond, slightly upturned, expressive", eyebrows = "Strong, dark, thick, natural, slightly unshaped"),
             hair = Hair(color = "Natural dark brown, dyed platinum-blonde on top with darker roots", length = "Short-cropped pixie with a shaved right side", texture = "Thick, straight", style = "Pixie with undercut; messy, often unstyled"),
@@ -144,7 +144,7 @@ class SourcePersonaPackageSeeder(
             "ChatGPT Image Sep 23, 2026, 08_30_29 PM.png" to "Over-shoulder left profile",
             "ChatGPT Image Sep 23, 2026, 08_36_43 PM.png" to "Beach lifestyle — OTHER",
         ),
-        extraFields = listOf("slug", "displayName", "gender", "orientation", "apparentAge(schema=25, authored=24)", "bio", "city", "occupation", "interests", "tags", "languageProfile", "persona core markdown", "physical guide", "style constraints", "reference images"),
+        extraFields = listOf("slug", "displayName", "gender", "orientation", "apparentAge", "bio", "city", "occupation", "interests", "tags", "languageProfile", "persona core markdown", "physical guide", "style constraints", "reference images"),
     )
 
     fun seedPihu(): SeedResult = seedPackage(

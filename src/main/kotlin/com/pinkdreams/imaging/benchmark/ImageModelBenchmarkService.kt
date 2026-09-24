@@ -129,8 +129,8 @@ class ImageModelBenchmarkService(
                     available = true,
                     modelId = hit.modelId,
                     provider = "openrouter",
-                    maxReferences = hit.maxReferenceImages,
-                    maxCandidates = hit.maxCandidateCount,
+                    maxReferences = BenchmarkLiveRequestLimits.references(slot.slotKey, hit.maxReferenceImages),
+                    maxCandidates = BenchmarkLiveRequestLimits.candidates(slot.slotKey, hit.maxCandidateCount),
                     supportedResolutions = hit.supportedResolutions,
                     pricingSource = price?.source ?: "UNAVAILABLE",
                     pricingSnapshot = priceJson,
@@ -177,12 +177,22 @@ class ImageModelBenchmarkService(
         if (missing.isNotEmpty()) {
             reasons += "MISSING_STANDARD_REFERENCES:${missing.joinToString(",") { it.name }}"
         }
+        val requiredSlots = listOf(
+            com.pinkdreams.visual.identity.ReferenceRole.FRONT,
+            com.pinkdreams.visual.identity.ReferenceRole.FACE_CLOSE,
+            com.pinkdreams.visual.identity.ReferenceRole.LEFT_PROFILE,
+        )
+        val missingRequired = requiredSlots.filter { byRole[it] == null }
+        if (missingRequired.isNotEmpty()) {
+            reasons += "MISSING_REQUIRED_REFERENCES:${missingRequired.joinToString(",") { it.name }}"
+        }
         val refIds = byRole.mapNotNull { (role, img) -> img?.let { role.name to it.id } }.toMap()
+        val blocking = reasons.filterNot { it.startsWith("MISSING_STANDARD_REFERENCES:") }
         return EligiblePersona(
             personaId = persona.id,
             displayName = persona.displayName,
             apparentAge = persona.apparentAge,
-            eligible = reasons.isEmpty(),
+            eligible = blocking.isEmpty(),
             reasons = reasons,
             visualVersionId = version.id,
             standardReferenceIds = refIds,
@@ -296,11 +306,13 @@ class ImageModelBenchmarkService(
                 val d = discovered[slot.slotKey]
                 val selection = BenchmarkReferencePolicy.select(
                     availableStandard = refs.filter { it.role.isStandardIdentitySlot() },
-                    maxReferences = d?.maxReferences,
+                    maxReferences = BenchmarkLiveRequestLimits.references(slot.slotKey, d?.maxReferences),
                 )
-                val resolution = BenchmarkResolutionPolicy.choose(d?.supportedResolutions.orEmpty())
-                val maxN = d?.maxCandidates ?: 1
-                val requestedN = minOf(4, maxOf(1, maxN))
+                val resolution = when (slot.slotKey) {
+                    "SEEDREAM_4_5" -> BenchmarkResolutionPolicy.choose(listOf("2K"))
+                    else -> BenchmarkResolutionPolicy.choose(d?.supportedResolutions.orEmpty())
+                }
+                val requestedN = BenchmarkLiveRequestLimits.candidates(slot.slotKey, d?.maxCandidates)
                 prompts.forEach { prompt ->
                     val status = when {
                         d == null || !d.available -> "MODEL_UNAVAILABLE"
@@ -355,13 +367,15 @@ class ImageModelBenchmarkService(
         val prompts = repository.listPrompts(runId).associateBy { it.promptId }
         executions.filter { it.status == "PLANNED" }.forEach { exec ->
             val prompt = prompts[exec.promptId] ?: return@forEach
+            val slug = personaRepository.findById(exec.personaId)?.slug ?: ""
+            val seedPrompt = BenchmarkPersonaPrompts.resolve(slug, exec.promptId, prompt.promptText)
             val sentIds = parseRefIds(exec.referencesSent)
             try {
                 val result = imageGenerationService.create(
                     ImageGenerationService.CreateCommand(
                         personaId = exec.personaId,
                         idempotencyKey = "bench-${runId}-${exec.id}",
-                        seedPrompt = prompt.promptText,
+                        seedPrompt = seedPrompt,
                         candidateCount = exec.requestedCandidates ?: 1,
                         visualVersionId = exec.visualIdentityVersionId,
                         selectedReferenceIds = sentIds,

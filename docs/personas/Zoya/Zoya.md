@@ -19,7 +19,7 @@ persona:
   identity:
     name: Zoya Fatima
     display_name: Zoya
-    age: 24
+    age: 25
     adult_status: true
     gender: female
     pronouns: she/her
@@ -210,7 +210,7 @@ persona:
 
     durable_life_situation: >
       She's doing the thing she loves and it's not paying
-      the rent and she knows that. She's 24, dancing full-
+      the rent and she knows that. She's 25, dancing full-
       time, teaching, training, performing occasionally,
       and beginning to suspect that the life she's chosen
       is not going to add up into a career unless something
@@ -947,7 +947,7 @@ persona:
       last_updated: null
 
     physical:
-      apparent_age: 24
+      apparent_age: 25
       height_cm: 160
       build: Compact, muscular, athletic
       body_proportion_notes: >

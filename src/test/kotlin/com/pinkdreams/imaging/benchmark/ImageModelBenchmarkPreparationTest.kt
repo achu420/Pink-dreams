@@ -83,6 +83,20 @@ class ImageModelBenchmarkPreparationTest {
     }
 
     @Test
+    fun `live request limits cap seedream qwen flux riverflow`() {
+        assertEquals(1, BenchmarkLiveRequestLimits.candidates("SEEDREAM_5_LITE", 4))
+        assertEquals(1, BenchmarkLiveRequestLimits.candidates("SEEDREAM_4_5", 4))
+        assertEquals(1, BenchmarkLiveRequestLimits.candidates("QWEN_IMAGE_3_PRO", 6))
+        assertEquals(4, BenchmarkLiveRequestLimits.candidates("GPT_IMAGE_2", 10))
+        assertEquals(3, BenchmarkLiveRequestLimits.references("QWEN_IMAGE_3_PRO", 4))
+        assertEquals(2, BenchmarkLiveRequestLimits.references("FLUX_2_PRO", 8))
+        assertEquals(2, BenchmarkLiveRequestLimits.references("FLUX_2_KLEIN_4B", 4))
+        assertEquals(2, BenchmarkLiveRequestLimits.references("RIVERFLOW_2_5_FAST", 8))
+        val seedream45 = BenchmarkResolutionPolicy.choose(listOf("2K"))
+        assertEquals("2K", seedream45.actualResolution)
+    }
+
+    @Test
     fun `resolution policy records 2K deviation when 1K missing`() {
         val choice = BenchmarkResolutionPolicy.choose(listOf("2K", "4K"))
         assertEquals("1K", choice.requestedResolution)
@@ -161,9 +175,11 @@ class ImageModelBenchmarkPreparationTest {
         assertEquals("READY", detail.run.status)
         assertTrue(detail.executions.none { it.jobId != null })
         val qwen = detail.executions.first { it.slotKey == "QWEN_IMAGE_3_PRO" }
+        assertEquals(1, qwen.requestedCandidates)
+        assertTrue(qwen.referencesOmitted!!.contains("RIGHT_PROFILE"))
         assertTrue(qwen.referencesOmitted!!.contains("BACK"))
         val lite = detail.executions.first { it.slotKey == "SEEDREAM_5_LITE" }
-        assertEquals(4, lite.requestedCandidates)
+        assertEquals(1, lite.requestedCandidates)
         assertEquals("2K", lite.actualResolution)
         assertEquals("MODEL_UNAVAILABLE", detail.executions.first { it.slotKey == "MUSE_IMAGE" }.status)
         val eval = service.evaluate(

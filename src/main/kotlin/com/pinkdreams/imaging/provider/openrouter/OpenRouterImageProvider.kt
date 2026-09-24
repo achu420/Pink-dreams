@@ -121,6 +121,20 @@ class OpenRouterImageProvider(
                 supportsCancellation = false,
                 supportsIdempotency = false,
             )
+            // Catalog lists input_references; the previous default profile blocked them locally.
+            model.contains("flux.2", ignoreCase = true) ||
+                model.contains("riverflow", ignoreCase = true) -> ProviderCapabilities(
+                maxCandidateCount = 1,
+                supportsReferences = true,
+                supportsMultipleReferences = true,
+                supportedAspectRatios = listOf("1:1", "3:2", "2:3", "4:3", "3:4", "16:9", "9:16"),
+                minWidthPx = 256,
+                maxWidthPx = 2048,
+                minHeightPx = 256,
+                maxHeightPx = 2048,
+                supportsCancellation = false,
+                supportsIdempotency = false,
+            )
             model.startsWith("openai/gpt-image") ||
                 model.contains("gemini", ignoreCase = true) && model.contains("image", ignoreCase = true) ||
                 model.startsWith("qwen/qwen-image") ||
@@ -395,14 +409,19 @@ class OpenRouterImageProvider(
         }.joinToString(". ")
         val prompt = if (roleNote.isBlank()) request.prompt else request.prompt + "\n" + roleNote
 
+        val model = effectiveModel(request)
         return OpenRouterImageRequest(
-            model = effectiveModel(request),
+            model = model,
             prompt = prompt,
             n = request.candidateCount,
-            resolution = determineResolution(effectiveModel(request), request.widthPx, request.heightPx),
+            resolution = determineResolution(model, request.widthPx, request.heightPx),
             aspect_ratio = request.aspectRatio ?: determineAspectRatio(request.widthPx, request.heightPx),
             quality = "auto",
-            output_format = normalizeOutputFormat(outputFormat),
+            output_format = if (model.contains("riverflow", ignoreCase = true)) {
+                "jpeg"
+            } else {
+                normalizeOutputFormat(outputFormat)
+            },
             input_references = references,
         )
     }
