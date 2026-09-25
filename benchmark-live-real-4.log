@@ -1,0 +1,392 @@
+﻿Initialized native services in: C:\Users\Achal\.gradle\native
+Initialized jansi services in: C:\Users\Achal\.gradle\native
+Received JVM installation metadata from 'C:\Program Files\Amazon Corretto\jdk21.0.12_9': {JAVA_HOME=C:\Program Files\Amazon Corretto\jdk21.0.12_9, JAVA_VERSION=21.0.12.1, JAVA_VENDOR=Amazon.com Inc., RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=21.0.12.1+9-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=21.0.12.1+9-LTS, VM_VENDOR=Amazon.com Inc., OS_ARCH=amd64}
+Found daemon DaemonInfo{pid=29984, address=[4ce6c8f2-2f7f-45d2-8da7-cfb953ecddc9 port:62357, addresses:[/127.0.0.1]], state=Idle, lastBusy=1790320667771, context=DefaultDaemonContext[uid=66b1515c-d46b-453f-b6b5-f30a9d9d7822,javaHome=C:\Program Files\Amazon Corretto\jdk21.0.12_9,daemonRegistryDir=C:\Users\Achal\.gradle\daemon,pid=29984,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,daemonOpts=--add-opens=java.base/java.util=ALL-UNNAMED,--add-opens=java.base/java.lang=ALL-UNNAMED,--add-opens=java.base/java.lang.invoke=ALL-UNNAMED,--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED,--add-opens=java.base/java.nio.charset=ALL-UNNAMED,--add-opens=java.base/java.net=ALL-UNNAMED,--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED,-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]} however its context does not match the desired criteria.
+At least one daemon option is different.
+Wanted: DefaultDaemonContext[uid=null,javaHome=C:\Program Files\Amazon Corretto\jdk21.0.12_9,daemonRegistryDir=C:\Users\Achal\.gradle\daemon,pid=29244,idleTimeout=null,priority=NORMAL,applyInstrumentationAgent=true,daemonOpts=--add-opens=java.base/java.util=ALL-UNNAMED,--add-opens=java.base/java.lang=ALL-UNNAMED,--add-opens=java.base/java.lang.invoke=ALL-UNNAMED,--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED,--add-opens=java.base/java.nio.charset=ALL-UNNAMED,--add-opens=java.base/java.net=ALL-UNNAMED,--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED,-Xmx2g,-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]
+Actual: DefaultDaemonContext[uid=66b1515c-d46b-453f-b6b5-f30a9d9d7822,javaHome=C:\Program Files\Amazon Corretto\jdk21.0.12_9,daemonRegistryDir=C:\Users\Achal\.gradle\daemon,pid=29984,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,daemonOpts=--add-opens=java.base/java.util=ALL-UNNAMED,--add-opens=java.base/java.lang=ALL-UNNAMED,--add-opens=java.base/java.lang.invoke=ALL-UNNAMED,--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED,--add-opens=java.base/java.nio.charset=ALL-UNNAMED,--add-opens=java.base/java.net=ALL-UNNAMED,--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED,-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]
+
+  Looking for a different daemon...
+The client will now receive all logging from the daemon (pid: 5940). The daemon log file: C:\Users\Achal\.gradle\daemon\8.7\daemon-5940.out.log
+Starting 9th build in daemon [uptime: 1 hrs 20 mins 50.765 secs, performance: 100%, GC rate: 0.00/s, heap usage: 0% of 2 GiB]
+Using 8 worker leases.
+Closing daemon's stdin at end of input.
+The daemon will no longer process any standard input.
+Invalidating in-memory cache of E:\Projects\Pink dreams\.gradle\8.7\fileHashes\fileHashes.bin
+Invalidating in-memory cache of E:\Projects\Pink dreams\.gradle\8.7\fileHashes\resourceHashesCache.bin
+Now considering [E:\Projects\Pink dreams] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+Settings evaluated using settings file 'E:\Projects\Pink dreams\settings.gradle.kts'.
+Projects loaded. Root project using build file 'E:\Projects\Pink dreams\build.gradle.kts'.
+Included projects: [root project 'pink-dreams']
+
+> Configure project :
+Evaluating root project 'pink-dreams' using build file 'E:\Projects\Pink dreams\build.gradle.kts'.
+Invalidating in-memory cache of E:\Projects\Pink dreams\.gradle\buildOutputCleanup\outputFiles.bin
+Invalidating in-memory cache of C:\Users\Achal\.gradle\caches\journal-1\file-access.bin
+Transforming plugin-2.3.12.jar (io.ktor.plugin:plugin:2.3.12) with ExternalDependencyInstrumentingArtifactTransform
+Transforming shadow-7.1.2.jar (gradle.plugin.com.github.johnrengelman:shadow:7.1.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming log4j-core-2.17.1.jar (org.apache.logging.log4j:log4j-core:2.17.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-stdlib-1.9.22.jar (org.jetbrains.kotlin:kotlin-stdlib:1.9.22) with ExternalDependencyInstrumentingArtifactTransform
+Transforming annotations-13.0.jar (org.jetbrains:annotations:13.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-serialization-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-serialization:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-api-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-idea-proto-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-idea-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-klib-commonizer-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-native-utils-1.9.25.jar (org.jetbrains.kotlin:kotlin-native-utils:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-util-klib-1.9.25.jar (org.jetbrains.kotlin:kotlin-util-klib:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-build-tools-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-build-tools-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-android-extensions-1.9.25.jar (org.jetbrains.kotlin:kotlin-android-extensions:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-compiler-runner-1.9.25.jar (org.jetbrains.kotlin:kotlin-compiler-runner:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-compiler-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-compiler-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-compiler-impl-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-gradle-plugin-3.4.1.jar (com.google.cloud.tools:jib-gradle-plugin:3.4.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-annotations-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-project-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-project-model:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-tooling-core-1.9.25.jar (org.jetbrains.kotlin:kotlin-tooling-core:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-util-io-1.9.25.jar (org.jetbrains.kotlin:kotlin-util-io:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-daemon-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-daemon-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming trove4j-1.0.20200330.jar (org.jetbrains.intellij.deps:trove4j:1.0.20200330) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-daemon-client-1.9.25.jar (org.jetbrains.kotlin:kotlin-daemon-client:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlinx-coroutines-core-jvm-1.5.0.jar (org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-jvm-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-jvm:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-common-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-common:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-http-client-apache-v2-1.42.2.jar (com.google.http-client:google-http-client-apache-v2:1.42.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-auth-library-oauth2-http-1.10.0.jar (com.google.auth:google-auth-library-oauth2-http:1.10.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-http-client-gson-1.42.2.jar (com.google.http-client:google-http-client-gson:1.42.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-http-client-1.42.2.jar (com.google.http-client:google-http-client:1.42.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-compress-1.21.jar (org.apache.commons:commons-compress:1.21) with ExternalDependencyInstrumentingArtifactTransform
+Transforming opencensus-contrib-http-util-0.31.1.jar (io.opencensus:opencensus-contrib-http-util:0.31.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming guava-32.1.2-jre.jar (com.google.guava:guava:32.1.2-jre) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-datatype-jsr310-2.15.2.jar (com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming native-gradle-plugin-0.9.25.jar (org.graalvm.buildtools:native-gradle-plugin:0.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming utils-0.9.25.jar (org.graalvm.buildtools:utils:0.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming graalvm-reachability-metadata-0.9.25.jar (org.graalvm.buildtools:graalvm-reachability-metadata:0.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-databind-2.15.2.jar (com.fasterxml.jackson.core:jackson-databind:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-annotations-2.15.2.jar (com.fasterxml.jackson.core:jackson-annotations:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-core-2.15.2.jar (com.fasterxml.jackson.core:jackson-core:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-commons-9.2.jar (org.ow2.asm:asm-commons:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-analysis-9.2.jar (org.ow2.asm:asm-analysis:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-tree-9.2.jar (org.ow2.asm:asm-tree:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-9.5.jar (org.ow2.asm:asm:9.5) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-gradle-plugin-extension-api-0.4.0.jar (com.google.cloud.tools:jib-gradle-plugin-extension-api:0.4.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-build-plan-0.4.0.jar (com.google.cloud.tools:jib-build-plan:0.4.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-plugins-extension-common-0.2.0.jar (com.google.cloud.tools:jib-plugins-extension-common:0.2.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jdom2-2.0.6.jar (org.jdom:jdom2:2.0.6) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-io-2.11.0.jar (commons-io:commons-io:2.11.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming ant-1.10.11.jar (org.apache.ant:ant:1.10.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming plexus-utils-3.4.1.jar (org.codehaus.plexus:plexus-utils:3.4.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jdependency-2.7.0.jar (org.vafer:jdependency:2.7.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming httpclient-4.5.13.jar (org.apache.httpcomponents:httpclient:4.5.13) with ExternalDependencyInstrumentingArtifactTransform
+Transforming httpcore-4.4.15.jar (org.apache.httpcomponents:httpcore:4.4.15) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jsr305-3.0.2.jar (com.google.code.findbugs:jsr305:3.0.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming j2objc-annotations-2.8.jar (com.google.j2objc:j2objc-annotations:2.8) with ExternalDependencyInstrumentingArtifactTransform
+Transforming opencensus-api-0.31.1.jar (io.opencensus:opencensus-api:0.31.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming auto-value-annotations-1.9.jar (com.google.auto.value:auto-value-annotations:1.9) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-auth-library-credentials-1.10.0.jar (com.google.auth:google-auth-library-credentials:1.10.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming failureaccess-1.0.1.jar (com.google.guava:failureaccess:1.0.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar (com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava) with ExternalDependencyInstrumentingArtifactTransform
+Transforming checker-qual-3.33.0.jar (org.checkerframework:checker-qual:3.33.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming error_prone_annotations-2.18.0.jar (com.google.errorprone:error_prone_annotations:2.18.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming ant-launcher-1.10.11.jar (org.apache.ant:ant-launcher:1.10.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming log4j-api-2.17.1.jar (org.apache.logging.log4j:log4j-api:2.17.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-logging-1.2.jar (commons-logging:commons-logging:1.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-codec-1.11.jar (commons-codec:commons-codec:1.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming grpc-context-1.27.2.jar (io.grpc:grpc-context:1.27.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming gson-2.9.0.jar (com.google.code.gson:gson:2.9.0) with ExternalDependencyInstrumentingArtifactTransform
+Invalidating in-memory cache of C:\Users\Achal\.gradle\caches\8.7\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\Achal\.gradle\caches\8.7\fileHashes\resourceHashesCache.bin
+Using Kotlin Gradle Plugin gradle82 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+All projects evaluated.
+Task name matched 'test'
+Selected primary task 'test' from project :
+Tasks to be executed: [task ':checkKotlinGradlePluginConfigurationErrors', task ':compileKotlin', task ':compileJava', task ':processResources', task ':classes', task ':compileTestKotlin', task ':compileTestJava', task ':processTestResources', task ':testClasses', task ':test']
+Tasks that were excluded: []
+Resolve mutations for :checkKotlinGradlePluginConfigurationErrors (Thread[#623,included builds,5,main]) started.
+:checkKotlinGradlePluginConfigurationErrors (Thread[#623,included builds,5,main]) started.
+Invalidating in-memory cache of E:\Projects\Pink dreams\.gradle\8.7\executionHistory\executionHistory.bin
+
+> Task :checkKotlinGradlePluginConfigurationErrors
+Caching disabled for task ':checkKotlinGradlePluginConfigurationErrors' because:
+  Build cache is disabled
+Task ':checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+Resolve mutations for :compileKotlin (Thread[#626,Execution worker Thread 3,5,main]) started.
+:compileKotlin (Thread[#626,Execution worker Thread 3,5,main]) started.
+
+> Task :compileKotlin
+Transforming exposed-jdbc-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-java-time-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-core-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-content-negotiation-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-call-logging-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-status-pages-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-auth-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-netty-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-host-common-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-sessions-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-json-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websocket-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-events-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websockets-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-cio-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-utils-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-io-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk8-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk7-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-core-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-json-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-reflect-1.9.21.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming postgresql-42.7.4.jar with ClasspathEntrySnapshotTransform
+Transforming HikariCP-5.1.0.jar with ClasspathEntrySnapshotTransform
+Transforming logback-classic-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-jdk8-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-core-jvm-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming annotations-23.0.0.jar with ClasspathEntrySnapshotTransform
+Transforming slf4j-api-2.0.15.jar with ClasspathEntrySnapshotTransform
+Transforming config-1.4.3.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http2-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming alpn-api-1.1.3.v20160715.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming logback-core-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-handler-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-unix-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-buffer-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-resolver-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Caching disabled for task ':compileKotlin' because:
+  Build cache is disabled
+Task ':compileKotlin' is not up-to-date because:
+  Input property 'sources' file E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\config\LlmConfig.kt has changed.
+file or directory 'E:\Projects\Pink dreams\src\main\java', not found
+file or directory 'E:\Projects\Pink dreams\src\main\java', not found
+file or directory 'E:\Projects\Pink dreams\src\main\java', not found
+file or directory 'E:\Projects\Pink dreams\src\main\java', not found
+Kotlin source files: E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminAiSettingsRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminAllowlistRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminAuthRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminConversationRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminCsv.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminEngineRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminImageBenchmarkRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminImageEvaluationRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminImageGenerationRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminIntentEngineRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminMemoryEngineRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminMemoryFactsRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminObservabilityRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminPersonaContextPocRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminPersonaRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminPersonaVisualRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminSkillRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminStatsRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminTestChatRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\admin\AdminUserRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\chat\ChatRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\conversation\ConversationHistoryRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\health\HealthRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\api\images\UserImageRoutes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\Application.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\auth\AdminAuthorizationProvider.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\auth\AdminSessionAuth.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\auth\DevAuthProvider.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\auth\SessionCookieAuthProvider.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\baseline\BaselineConfiguration.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\baseline\BaselineSeeder.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\baseline\PersonaContextPocSeed.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\benchmark\PersonaContextPocBenchmarkRunner.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\benchmark\PersonaContextPocBenchmarkService.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\ChatEngine.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\ChatEngineFactory.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\CompositePostDeliveryHook.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\context\PersonaContextProvider.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\context\RawPersonaContextProvider.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\context\RepositoryContextAssembler.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\context\ResolvedPersonaContextProvider.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\continuity\ContinuitySummarization.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\continuity\LlmContinuitySummarizer.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\imaging\BestEffortImageEnqueue.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\imaging\ImageMessageCompletionAttach.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memory\DeterministicMemoryContextSelector.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memory\LlmMemoryExtractor.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memory\MemoryContextFormat.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memory\MemoryContextSelector.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memory\MemoryExtraction.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memory\MemoryScopeResolver.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memory\MemoryService.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memory\SkillAwareMemoryEnricher.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memoryengine\BestEffortMemoryEngineMaintenance.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memoryengine\LlmMemoryEngineMaintainer.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memoryengine\MemoryEngineChangeApplier.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memoryengine\MemoryEngineDefaultContent.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memoryengine\MemoryEngineMaintainer.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\memoryengine\MemoryEngineTypes.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\personacontext\PersonaContextRenderer.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\personacontext\PersonaContextResolver.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\personacontext\PersonaFieldRelevanceScorer.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\PersonaContextResolutionStage.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\sensitive\SensitivePreferenceRelevance.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\sensitive\SensitivePreferenceService.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\skill\IntentDiscovery.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\skill\IntentEngineDefaultContent.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\skill\LlmIntentDiscovery.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\chat\skill\SkillContextEnricher.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\common\errors\ApiError.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\common\errors\ErrorCode.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\common\errors\ErrorResponse.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\config\AiRuntimeSettings.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\config\AppConfig.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\config\DatabaseConfig.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\config\ImageProviderConfig.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\config\LlmConfig.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\benchmark\BenchmarkLiveRequestLimits.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\benchmark\BenchmarkModelSlots.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\benchmark\BenchmarkPersonaPrompts.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\benchmark\BenchmarkPrompts.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\benchmark\BenchmarkReferencePolicy.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\benchmark\BenchmarkRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\benchmark\BenchmarkResolutionPolicy.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\benchmark\ImageModelBenchmarkService.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\benchmark\ProviderFailureClassifier.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\compiler\PromptCompiler.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\compiler\SceneIntent.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\config\ImageProviderSettingsRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\config\ImageRuntimeConfig.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\evaluation\ImageEvaluationRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\evaluation\ImageModelEvaluationService.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\job\BridgingImageJobHandler.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\job\ImageJob.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\job\ImageJobHandler.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\job\ImageJobLeaseHeartbeat.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\job\ImageJobStatus.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\job\ImageJobType.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\job\ImageJobWorker.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\job\ImageJobWorkerRuntime.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\observability\ImageGenerationEventRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\observability\ObservableImageJobHandler.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\orchestration\CandidateStatus.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\orchestration\GeneratedCandidate.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\orchestration\GeneratedCandidateRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\orchestration\ImageGenerationHandler.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\orchestration\ImageGenerationOrchestrator.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\orchestration\ImageGenerationRequest.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\orchestration\ImageGenerationService.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\orchestration\ImageWarehouseRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\provider\FakeImageProvider.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\provider\GenerationRequest.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\provider\GenerationResult.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\provider\ImageProvider.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\provider\openrouter\OpenRouterImageModelCatalog.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\provider\openrouter\OpenRouterImageProvider.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\provider\openrouter\OpenRouterModelsPricingCatalog.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\provider\ProviderCapabilities.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\retention\ImageRetentionCleaner.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\imaging\storage\ImageStorageDiagnostics.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\llm\JsonResponseExtractor.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\llm\LlmClient.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\llm\LlmGenerator.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\llm\observability\ObservableLlmClient.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\llm\OpenRouterLlmClient.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\llm\ProviderExchange.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\observability\TurnAttribution.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\AdminUserProvisioning.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\database\DatabaseFactory.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\AdminAllowlistRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\AdminStatsRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\AiSettingsRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\ChatRequestExecutionRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\ConversationEngineRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\ConversationRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\ImageJobRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\IntentEngineRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\LlmExchangeRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\MemoryEngineRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\MemoryFactRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\MessageRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\PerformanceMetricsRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\PersonaCoreVersionRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\PersonaFieldRegistryRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\PersonaIdentityRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\PersonalGuideRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\PersonaMasterRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\PersonaRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\PersonaVisualVersionRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\ReferenceImageRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\SensitivePreferenceRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\SkillContextRequirementRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\SkillRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\TurnAttributionRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\UserProfileRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\UserRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\repositories\WardrobeRepository.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\RepositoryChatExecutionCoordinator.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\persistence\RepositoryChatPersistence.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\storage\InMemoryObjectStorage.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\storage\LocalFileObjectStorage.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\storage\ObjectStorage.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\testchat\PinnedRepositories.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\testchat\TestChatContextAssembler.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\testchat\TestChatService.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\visual\identity\ImagePipelineTestPersonaSeeder.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\visual\identity\PersonaVisualAdminService.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\visual\identity\PhysicalGuide.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\visual\identity\PrivateVisualGuide.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\visual\identity\ReferenceImage.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\visual\identity\SourcePersonaPackageSeeder.kt, E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\visual\identity\WardrobeItem.kt
+Java source files: 
+Script source files: 
+Script file extensions: 
+Using Kotlin/JVM incremental compilation
+[KOTLIN] Kotlin compilation 'jdkHome' argument: C:\Program Files\Amazon Corretto\jdk21.0.12_9
+
+Resolve mutations for :processResources (Thread[#625,Execution worker Thread 2,5,main]) started.
+:processResources (Thread[#625,Execution worker Thread 2,5,main]) started.
+
+> Task :processResources UP-TO-DATE
+Caching disabled for task ':processResources' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':processResources' as it is up-to-date.
+Resolve mutations for :processTestResources (Thread[#625,Execution worker Thread 2,5,main]) started.
+:processTestResources (Thread[#625,Execution worker Thread 2,5,main]) started.
+
+> Task :processTestResources NO-SOURCE
+Skipping task ':processTestResources' as it has no source files and no previous output files.
+
+> Task :compileKotlin
+i: found daemon on port 17404 (4374781 ms old), trying to connect
+i: connected to the daemon
+Options for KOTLIN DAEMON: IncrementalCompilationOptions(super=CompilationOptions(compilerMode=INCREMENTAL_COMPILER, targetPlatform=JVM, reportCategories=[0, 3], reportSeverity=2, requestedCompilationResults=[0], kotlinScriptExtensions=[]), areFileChangesKnown=true, modifiedFiles=[E:\Projects\Pink dreams\src\main\kotlin\com\pinkdreams\config\LlmConfig.kt], deletedFiles=[], classpathChanges=NoChanges, workingDir=E:\Projects\Pink dreams\build\kotlin\compileKotlin\cacheable, multiModuleICSettings=MultiModuleICSettings(buildHistoryFile=E:\Projects\Pink dreams\build\kotlin\compileKotlin\local-state\build-history.bin, useModuleDetection=false), usePreciseJavaTracking=true, outputFiles=[E:\Projects\Pink dreams\build\classes\kotlin\main, E:\Projects\Pink dreams\build\kotlin\compileKotlin\cacheable, E:\Projects\Pink dreams\build\kotlin\compileKotlin\local-state])
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/config/LlmConfig.kt:39:18 Parameter 'appConfig' is never used
+Resolve mutations for :compileJava (Thread[#626,Execution worker Thread 3,5,main]) started.
+:compileJava (Thread[#626,Execution worker Thread 3,5,main]) started.
+
+> Task :compileJava NO-SOURCE
+Skipping task ':compileJava' as it has no source files and no previous output files.
+Resolve mutations for :classes (Thread[#626,Execution worker Thread 3,5,main]) started.
+:classes (Thread[#626,Execution worker Thread 3,5,main]) started.
+
+> Task :classes UP-TO-DATE
+Skipping task ':classes' as it has no actions.
+Resolve mutations for :compileTestKotlin (Thread[#626,Execution worker Thread 3,5,main]) started.
+:compileTestKotlin (Thread[#626,Execution worker Thread 3,5,main]) started.
+
+> Task :compileTestKotlin
+Transforming main with ClasspathEntrySnapshotTransform
+Transforming main with ClasspathEntrySnapshotTransform
+Transforming exposed-jdbc-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-java-time-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-core-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-test-junit5-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-test-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-content-negotiation-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-test-host-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-call-logging-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-status-pages-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-auth-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-netty-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-host-common-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-sessions-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-websockets-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-json-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-apache-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-cio-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websocket-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-events-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-tls-certificates-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-tls-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websockets-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-cio-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-utils-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-test-dispatcher-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-io-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk8-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk7-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-core-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-json-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-reflect-1.9.21.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming postgresql-42.7.4.jar with ClasspathEntrySnapshotTransform
+Transforming HikariCP-5.1.0.jar with ClasspathEntrySnapshotTransform
+Transforming logback-classic-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming h2-2.2.224.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-jdk8-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-core-jvm-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming annotations-23.0.0.jar with ClasspathEntrySnapshotTransform
+Transforming slf4j-api-2.0.15.jar with ClasspathEntrySnapshotTransform
+Transforming config-1.4.3.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http2-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming alpn-api-1.1.3.v20160715.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming logback-core-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming junit-4.13.2.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-handler-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-unix-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-buffer-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-resolver-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming hamcrest-core-1.3.jar with ClasspathEntrySnapshotTransform
+Transforming junit-platform-commons-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming junit-jupiter-api-5.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming httpasyncclient-4.1.5.jar with ClasspathEntrySnapshotTransform
+Transforming apiguardian-api-1.1.0.jar with ClasspathEntrySnapshotTransform
+Transforming opentest4j-1.2.0.jar with ClasspathEntrySnapshotTransform
+Transforming httpcore-nio-4.4.15.jar with ClasspathEntrySnapshotTransform
+Transforming httpclient-4.5.13.jar with ClasspathEntrySnapshotTransform
+Transforming httpcore-4.4.15.jar with ClasspathEntrySnapshotTransform
+Transforming commons-logging-1.2.jar with ClasspathEntrySnapshotTransform
+Transforming commons-codec-1.11.jar with ClasspathEntrySnapshotTransform
+Caching disabled for ClasspathEntrySnapshotTransform: E:\Projects\Pink dreams\build\classes\kotlin\main because:
+  Build cache is disabled
+Caching disabled for task ':compileTestKotlin' because:
+  Build cache is disabled
+Skipping task ':compileTestKotlin' as it is up-to-date.
+
+> Task :compileTestKotlin UP-TO-DATE
+Resolve mutations for :compileTestJava (Thread[#630,Execution worker Thread 7,5,main]) started.
+:compileTestJava (Thread[#626,Execution worker Thread 3,5,main]) started.
+
+> Task :compileTestJava NO-SOURCE
+Skipping task ':compileTestJava' as it has no source files and no previous output files.
+Resolve mutations for :testClasses (Thread[#630,Execution worker Thread 7,5,main]) started.
+:testClasses (Thread[#630,Execution worker Thread 7,5,main]) started.
+
+> Task :testClasses UP-TO-DATE
+Skipping task ':testClasses' as it has no actions.
+Resolve mutations for :test (Thread[#630,Execution worker Thread 7,5,main]) started.
+:test (Thread[#626,Execution worker Thread 3,5,main]) started.
+
+> Task :test
+Caching disabled for task ':test' because:
+  Build cache is disabled
+Task ':test' is not up-to-date because:
+  Task has failed previously.
+file or directory 'E:\Projects\Pink dreams\build\classes\java\test', not found
+Starting process 'Gradle Test Executor 4'. Working directory: E:\Projects\Pink dreams Command: C:\Program Files\Amazon Corretto\jdk21.0.12_9\bin\java.exe -Dorg.gradle.internal.worker.tmpdir=E:\Projects\Pink dreams\build\tmp\test\work -Dorg.gradle.native=false @C:\Users\Achal\.gradle\.tmp\gradle-worker-classpath16250197302426802136txt -Xmx2g -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 4'
+Successfully started process 'Gradle Test Executor 4'
+
+Gradle Test Executor 4 started executing tests.
+
+> Task :test
+
+PersonaContextPocLiveRealBenchmark > execute live openrouter benchmark - real api calls() STANDARD_OUT
+
+    ????????????????????????????????????????????????????????????????
+    LIVE OPENROUTER BENCHMARK � REAL API CALLS
+    Execution model: 1 scenario ? all 3 variants ? verify ? next
+    ????????????????????????????????????????????????????????????????
+
+    ? LLM Config loaded
+      Endpoint: https://openrouter.ai/api/v1/chat/completions
+      Model: deepseek/deepseek-v4-flash-0731
+      API Key: ? MISSING OR TEST KEY
+
+    ? WARNING: No valid API key found in OPENROUTER_API_KEY environment variable
+      Ensure you ran: . .\run-local.secrets.ps1
+      Or set: $env:OPENROUTER_API_KEY = 'sk-or-v1-...'
+
+Gradle Test Executor 4 finished executing tests.
+
+> Task :test FAILED
+
+PersonaContextPocLiveRealBenchmark > execute live openrouter benchmark - real api calls() FAILED
+    java.lang.Exception: OPENROUTER_API_KEY not set properly
+        at com.pinkdreams.chat.PersonaContextPocLiveRealBenchmark.execute live openrouter benchmark - real api calls(PersonaContextPocLiveRealBenchmark.kt:67)
+Finished generating test XML results (0.017 secs) into: E:\Projects\Pink dreams\build\test-results\test
+Generating HTML test report...
+gradle : 
+At line:1 char:359
++ ... ecrets.ps1; gradle test --tests "PersonaContextPocLiveRealBenchmark"  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+1 test completed, 1 failed
+Finished generating test html results (0.015 secs) into: E:\Projects\Pink dreams\build\reports\tests\test
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///E:/Projects/Pink%20dreams/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.7/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 43s
+5 actionable tasks: 3 executed, 2 up-to-date
+Watched directory hierarchies: [E:\Projects\Pink dreams]
