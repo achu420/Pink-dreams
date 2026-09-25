@@ -1,0 +1,669 @@
+﻿Initialized native services in: C:\Users\Achal\.gradle\native
+Initialized jansi services in: C:\Users\Achal\.gradle\native
+Received JVM installation metadata from 'C:\Program Files\Amazon Corretto\jdk21.0.12_9': {JAVA_HOME=C:\Program Files\Amazon Corretto\jdk21.0.12_9, JAVA_VERSION=21.0.12.1, JAVA_VENDOR=Amazon.com Inc., RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=21.0.12.1+9-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=21.0.12.1+9-LTS, VM_VENDOR=Amazon.com Inc., OS_ARCH=amd64}
+The client will now receive all logging from the daemon (pid: 20568). The daemon log file: C:\Users\Achal\.gradle\daemon\8.7\daemon-20568.out.log
+Starting 9th build in daemon [uptime: 35 mins 42.547 secs, performance: 100%, GC rate: 0.00/s, heap usage: 0% of 2 GiB]
+Using 8 worker leases.
+Closing daemon's stdin at end of input.
+The daemon will no longer process any standard input.
+Now considering [E:\Projects\Pink dreams] as hierarchies to watch
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+Settings evaluated using settings file 'E:\Projects\Pink dreams\settings.gradle.kts'.
+Projects loaded. Root project using build file 'E:\Projects\Pink dreams\build.gradle.kts'.
+Included projects: [root project 'pink-dreams']
+
+> Configure project :
+Evaluating root project 'pink-dreams' using build file 'E:\Projects\Pink dreams\build.gradle.kts'.
+Transforming plugin-2.3.12.jar (io.ktor.plugin:plugin:2.3.12) with ExternalDependencyInstrumentingArtifactTransform
+Transforming shadow-7.1.2.jar (gradle.plugin.com.github.johnrengelman:shadow:7.1.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming log4j-core-2.17.1.jar (org.apache.logging.log4j:log4j-core:2.17.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-stdlib-1.9.22.jar (org.jetbrains.kotlin:kotlin-stdlib:1.9.22) with ExternalDependencyInstrumentingArtifactTransform
+Transforming annotations-13.0.jar (org.jetbrains:annotations:13.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-serialization-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-serialization:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-api-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-idea-proto-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-idea-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-klib-commonizer-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-native-utils-1.9.25.jar (org.jetbrains.kotlin:kotlin-native-utils:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-util-klib-1.9.25.jar (org.jetbrains.kotlin:kotlin-util-klib:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-build-tools-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-build-tools-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-android-extensions-1.9.25.jar (org.jetbrains.kotlin:kotlin-android-extensions:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-compiler-runner-1.9.25.jar (org.jetbrains.kotlin:kotlin-compiler-runner:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-compiler-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-compiler-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-compiler-impl-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-gradle-plugin-3.4.1.jar (com.google.cloud.tools:jib-gradle-plugin:3.4.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-annotations-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-project-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-project-model:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-tooling-core-1.9.25.jar (org.jetbrains.kotlin:kotlin-tooling-core:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-util-io-1.9.25.jar (org.jetbrains.kotlin:kotlin-util-io:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-daemon-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-daemon-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming trove4j-1.0.20200330.jar (org.jetbrains.intellij.deps:trove4j:1.0.20200330) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-daemon-client-1.9.25.jar (org.jetbrains.kotlin:kotlin-daemon-client:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlinx-coroutines-core-jvm-1.5.0.jar (org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-jvm-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-jvm:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-common-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-common:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-http-client-apache-v2-1.42.2.jar (com.google.http-client:google-http-client-apache-v2:1.42.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-auth-library-oauth2-http-1.10.0.jar (com.google.auth:google-auth-library-oauth2-http:1.10.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-http-client-gson-1.42.2.jar (com.google.http-client:google-http-client-gson:1.42.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-http-client-1.42.2.jar (com.google.http-client:google-http-client:1.42.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-compress-1.21.jar (org.apache.commons:commons-compress:1.21) with ExternalDependencyInstrumentingArtifactTransform
+Transforming opencensus-contrib-http-util-0.31.1.jar (io.opencensus:opencensus-contrib-http-util:0.31.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming guava-32.1.2-jre.jar (com.google.guava:guava:32.1.2-jre) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-datatype-jsr310-2.15.2.jar (com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming native-gradle-plugin-0.9.25.jar (org.graalvm.buildtools:native-gradle-plugin:0.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming utils-0.9.25.jar (org.graalvm.buildtools:utils:0.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming graalvm-reachability-metadata-0.9.25.jar (org.graalvm.buildtools:graalvm-reachability-metadata:0.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-databind-2.15.2.jar (com.fasterxml.jackson.core:jackson-databind:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-annotations-2.15.2.jar (com.fasterxml.jackson.core:jackson-annotations:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-core-2.15.2.jar (com.fasterxml.jackson.core:jackson-core:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-commons-9.2.jar (org.ow2.asm:asm-commons:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-analysis-9.2.jar (org.ow2.asm:asm-analysis:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-tree-9.2.jar (org.ow2.asm:asm-tree:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-9.5.jar (org.ow2.asm:asm:9.5) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-gradle-plugin-extension-api-0.4.0.jar (com.google.cloud.tools:jib-gradle-plugin-extension-api:0.4.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-build-plan-0.4.0.jar (com.google.cloud.tools:jib-build-plan:0.4.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-plugins-extension-common-0.2.0.jar (com.google.cloud.tools:jib-plugins-extension-common:0.2.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jdom2-2.0.6.jar (org.jdom:jdom2:2.0.6) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-io-2.11.0.jar (commons-io:commons-io:2.11.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming ant-1.10.11.jar (org.apache.ant:ant:1.10.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming plexus-utils-3.4.1.jar (org.codehaus.plexus:plexus-utils:3.4.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jdependency-2.7.0.jar (org.vafer:jdependency:2.7.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming httpclient-4.5.13.jar (org.apache.httpcomponents:httpclient:4.5.13) with ExternalDependencyInstrumentingArtifactTransform
+Transforming httpcore-4.4.15.jar (org.apache.httpcomponents:httpcore:4.4.15) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jsr305-3.0.2.jar (com.google.code.findbugs:jsr305:3.0.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming j2objc-annotations-2.8.jar (com.google.j2objc:j2objc-annotations:2.8) with ExternalDependencyInstrumentingArtifactTransform
+Transforming opencensus-api-0.31.1.jar (io.opencensus:opencensus-api:0.31.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming auto-value-annotations-1.9.jar (com.google.auto.value:auto-value-annotations:1.9) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-auth-library-credentials-1.10.0.jar (com.google.auth:google-auth-library-credentials:1.10.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming failureaccess-1.0.1.jar (com.google.guava:failureaccess:1.0.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar (com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava) with ExternalDependencyInstrumentingArtifactTransform
+Transforming checker-qual-3.33.0.jar (org.checkerframework:checker-qual:3.33.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming error_prone_annotations-2.18.0.jar (com.google.errorprone:error_prone_annotations:2.18.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming ant-launcher-1.10.11.jar (org.apache.ant:ant-launcher:1.10.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming log4j-api-2.17.1.jar (org.apache.logging.log4j:log4j-api:2.17.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-logging-1.2.jar (commons-logging:commons-logging:1.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-codec-1.11.jar (commons-codec:commons-codec:1.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming grpc-context-1.27.2.jar (io.grpc:grpc-context:1.27.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming gson-2.9.0.jar (com.google.code.gson:gson:2.9.0) with ExternalDependencyInstrumentingArtifactTransform
+Using Kotlin Gradle Plugin gradle82 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+All projects evaluated.
+Task name matched 'test'
+Selected primary task 'test' from project :
+Tasks to be executed: [task ':checkKotlinGradlePluginConfigurationErrors', task ':compileKotlin', task ':compileJava', task ':processResources', task ':classes', task ':compileTestKotlin', task ':compileTestJava', task ':processTestResources', task ':testClasses', task ':test']
+Tasks that were excluded: []
+Resolve mutations for :checkKotlinGradlePluginConfigurationErrors (Thread[#562,Execution worker,5,main]) started.
+:checkKotlinGradlePluginConfigurationErrors (Thread[#562,Execution worker,5,main]) started.
+
+> Task :checkKotlinGradlePluginConfigurationErrors
+Caching disabled for task ':checkKotlinGradlePluginConfigurationErrors' because:
+  Build cache is disabled
+Task ':checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+Resolve mutations for :compileKotlin (Thread[#562,Execution worker,5,main]) started.
+:compileKotlin (Thread[#562,Execution worker,5,main]) started.
+
+> Task :compileKotlin UP-TO-DATE
+Transforming exposed-jdbc-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-java-time-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-core-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-content-negotiation-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-call-logging-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-status-pages-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-auth-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-netty-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-host-common-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-sessions-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-json-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websocket-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-events-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websockets-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-cio-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-utils-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-io-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk8-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk7-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-core-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-json-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-reflect-1.9.21.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming postgresql-42.7.4.jar with ClasspathEntrySnapshotTransform
+Transforming HikariCP-5.1.0.jar with ClasspathEntrySnapshotTransform
+Transforming logback-classic-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-jdk8-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-core-jvm-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming annotations-23.0.0.jar with ClasspathEntrySnapshotTransform
+Transforming slf4j-api-2.0.15.jar with ClasspathEntrySnapshotTransform
+Transforming config-1.4.3.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http2-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming alpn-api-1.1.3.v20160715.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming logback-core-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-handler-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-unix-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-buffer-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-resolver-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Caching disabled for task ':compileKotlin' because:
+  Build cache is disabled
+Skipping task ':compileKotlin' as it is up-to-date.
+Resolve mutations for :compileJava (Thread[#562,Execution worker,5,main]) started.
+:compileJava (Thread[#562,Execution worker,5,main]) started.
+
+> Task :compileJava NO-SOURCE
+Skipping task ':compileJava' as it has no source files and no previous output files.
+Resolve mutations for :processResources (Thread[#562,Execution worker,5,main]) started.
+:processResources (Thread[#562,Execution worker,5,main]) started.
+
+> Task :processResources UP-TO-DATE
+Caching disabled for task ':processResources' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':processResources' as it is up-to-date.
+Resolve mutations for :classes (Thread[#562,Execution worker,5,main]) started.
+:classes (Thread[#562,Execution worker,5,main]) started.
+
+> Task :classes UP-TO-DATE
+Skipping task ':classes' as it has no actions.
+Resolve mutations for :compileTestKotlin (Thread[#562,Execution worker,5,main]) started.
+:compileTestKotlin (Thread[#562,Execution worker,5,main]) started.
+
+> Task :compileTestKotlin UP-TO-DATE
+Transforming main with ClasspathEntrySnapshotTransform
+Transforming main with ClasspathEntrySnapshotTransform
+Transforming exposed-jdbc-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-java-time-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-core-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-test-junit5-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-test-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-content-negotiation-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-test-host-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-call-logging-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-status-pages-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-auth-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-netty-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-host-common-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-sessions-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-websockets-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-json-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-apache-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-cio-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websocket-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-events-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-tls-certificates-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-tls-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websockets-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-cio-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-utils-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-test-dispatcher-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-io-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk8-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk7-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-core-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-json-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-reflect-1.9.21.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming postgresql-42.7.4.jar with ClasspathEntrySnapshotTransform
+Transforming HikariCP-5.1.0.jar with ClasspathEntrySnapshotTransform
+Transforming logback-classic-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming h2-2.2.224.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-jdk8-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-core-jvm-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming annotations-23.0.0.jar with ClasspathEntrySnapshotTransform
+Transforming slf4j-api-2.0.15.jar with ClasspathEntrySnapshotTransform
+Transforming config-1.4.3.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http2-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming alpn-api-1.1.3.v20160715.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming logback-core-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming junit-4.13.2.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-handler-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-unix-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-buffer-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-resolver-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming hamcrest-core-1.3.jar with ClasspathEntrySnapshotTransform
+Transforming junit-platform-commons-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming junit-jupiter-api-5.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming httpasyncclient-4.1.5.jar with ClasspathEntrySnapshotTransform
+Transforming apiguardian-api-1.1.0.jar with ClasspathEntrySnapshotTransform
+Transforming opentest4j-1.2.0.jar with ClasspathEntrySnapshotTransform
+Transforming httpcore-nio-4.4.15.jar with ClasspathEntrySnapshotTransform
+Transforming httpclient-4.5.13.jar with ClasspathEntrySnapshotTransform
+Transforming httpcore-4.4.15.jar with ClasspathEntrySnapshotTransform
+Transforming commons-logging-1.2.jar with ClasspathEntrySnapshotTransform
+Transforming commons-codec-1.11.jar with ClasspathEntrySnapshotTransform
+Caching disabled for task ':compileTestKotlin' because:
+  Build cache is disabled
+Skipping task ':compileTestKotlin' as it is up-to-date.
+Resolve mutations for :compileTestJava (Thread[#562,Execution worker,5,main]) started.
+:compileTestJava (Thread[#562,Execution worker,5,main]) started.
+
+> Task :compileTestJava NO-SOURCE
+Skipping task ':compileTestJava' as it has no source files and no previous output files.
+Resolve mutations for :processTestResources (Thread[#562,Execution worker,5,main]) started.
+:processTestResources (Thread[#562,Execution worker,5,main]) started.
+
+> Task :processTestResources NO-SOURCE
+Skipping task ':processTestResources' as it has no source files and no previous output files.
+Resolve mutations for :testClasses (Thread[#562,Execution worker,5,main]) started.
+:testClasses (Thread[#562,Execution worker,5,main]) started.
+
+> Task :testClasses UP-TO-DATE
+Skipping task ':testClasses' as it has no actions.
+Resolve mutations for :test (Thread[#562,Execution worker,5,main]) started.
+:test (Thread[#562,Execution worker,5,main]) started.
+
+> Task :test
+Caching disabled for task ':test' because:
+  Build cache is disabled
+Task ':test' is not up-to-date because:
+  Output property 'binaryResultsDirectory' file E:\Projects\Pink dreams\build\test-results\test\binary has been removed.
+  Output property 'binaryResultsDirectory' file E:\Projects\Pink dreams\build\test-results\test\binary\output.bin has been removed.
+  Output property 'binaryResultsDirectory' file E:\Projects\Pink dreams\build\test-results\test\binary\output.bin.idx has been removed.
+  Output property 'binaryResultsDirectory' file E:\Projects\Pink dreams\build\test-results\test\binary\results.bin has been removed.
+  Output property 'reports.enabledReports.html.outputLocation' file E:\Projects\Pink dreams\build\reports\tests\test has been removed.
+file or directory 'E:\Projects\Pink dreams\build\classes\java\test', not found
+Starting process 'Gradle Test Executor 2'. Working directory: E:\Projects\Pink dreams Command: C:\Program Files\Amazon Corretto\jdk21.0.12_9\bin\java.exe -Dorg.gradle.internal.worker.tmpdir=E:\Projects\Pink dreams\build\tmp\test\work -Dorg.gradle.native=false @C:\Users\Achal\.gradle\.tmp\gradle-worker-classpath12131725472981262193txt -Xmx2g -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 2'
+Successfully started process 'Gradle Test Executor 2'
+
+Gradle Test Executor 2 started executing tests.
+
+> Task :test
+
+PersonaContextPocRealBenchmark > execute full persona context poc benchmark() STANDARD_OUT
+
+    ????????????????????????????????????????????????????????????????
+    PERSONA CONTEXT SELECTIVE-RETRIEVAL POC � REAL BENCHMARK
+    ????????????????????????????????????????????????????????????????
+
+    ? Configuration loaded
+      Database: jdbc:postgresql://localhost:5432/pinkdreams
+      LLM Provider: openrouter
+      Model: deepseek/deepseek-v4-flash-0731
+
+
+PersonaContextPocRealBenchmark > execute full persona context poc benchmark() STANDARD_ERROR
+    SLF4J(I): Connected with provider of type [ch.qos.logback.classic.spi.LogbackServiceProvider]
+
+PersonaContextPocRealBenchmark > execute full persona context poc benchmark() STANDARD_OUT
+    2026-09-25 03:25:55.479 [Test worker] INFO  Exposed - Preparing create tables statements took 170ms
+    2026-09-25 03:25:55.498 [Test worker] INFO  Exposed - Executing create tables statements took 5ms
+    2026-09-25 03:25:55.976 [Test worker] INFO  Exposed - Extracting table columns took 478ms
+    2026-09-25 03:25:56.241 [Test worker] INFO  Exposed - Extracting primary keys took 264ms
+    2026-09-25 03:25:57.352 [Test worker] INFO  Exposed - Extracting column constraints took 1054ms
+    2026-09-25 03:25:57.353 [Test worker] INFO  Exposed - Preparing alter table statements took 1855ms
+    2026-09-25 03:25:57.494 [Test worker] INFO  Exposed - Executing alter table statements took 140ms
+    2026-09-25 03:25:58.293 [Test worker] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_key -> in mapping conversation_engines_version_unique
+    2026-09-25 03:25:58.295 [Test worker] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_key -> in mapping personas_slug_unique
+    2026-09-25 03:25:58.296 [Test worker] INFO  Exposed - Index on table 'persona_core_versions' differs only in name: in db persona_core_versions_persona_id_version_key -> in mapping persona_core_versions_persona_id_version_unique
+    2026-09-25 03:25:58.298 [Test worker] WARN  Exposed - Indices exist in database and not mapped in code on class 'memory_facts':
+    		Index 'ix_memory_facts_hot_selection' for 'memory_facts' on columns com.pinkdreams.persistence.database.MemoryFacts.user_id, com.pinkdreams.persistence.database.MemoryFacts.persona_id, com.pinkdreams.persistence.database.MemoryFacts.status, com.pinkdreams.persistence.database.MemoryFacts.last_referenced_at, com.pinkdreams.persistence.database.MemoryFacts.learned_at
+    		Index 'ix_memory_facts_user_persona' for 'memory_facts' on columns com.pinkdreams.persistence.database.MemoryFacts.user_id, com.pinkdreams.persistence.database.MemoryFacts.persona_id
+    2026-09-25 03:25:58.299 [Test worker] WARN  Exposed - Indices exist in database and not mapped in code on class 'conversation_engines':
+    		Unique Index 'one_active_engine' for 'conversation_engines' on columns com.pinkdreams.persistence.database.ConversationEngines.is_active
+    2026-09-25 03:25:58.299 [Test worker] WARN  Exposed - Indices exist in database and not mapped in code on class 'conversations':
+    		Index 'ix_conversations_user' for 'conversations' on columns com.pinkdreams.persistence.database.Conversations.user_id, com.pinkdreams.persistence.database.Conversations.persona_id
+    2026-09-25 03:25:58.300 [Test worker] WARN  Exposed - Indices exist in database and not mapped in code on class 'messages':
+    		Unique Index 'uq_client_message_per_conversation' for 'messages' on columns com.pinkdreams.persistence.database.Messages.conversation_id, com.pinkdreams.persistence.database.Messages.client_message_id
+    		Index 'ix_messages_conversation_time' for 'messages' on columns com.pinkdreams.persistence.database.Messages.conversation_id, com.pinkdreams.persistence.database.Messages.created_at
+    2026-09-25 03:25:58.302 [Test worker] INFO  Exposed - Checking mapping consistence took 807ms
+    2026-09-25 03:25:58.316 [Test worker] INFO  Exposed - Preparing create tables statements took 9ms
+    2026-09-25 03:25:58.318 [Test worker] INFO  Exposed - Executing create tables statements took 1ms
+    2026-09-25 03:25:58.330 [Test worker] INFO  Exposed - Extracting table columns took 12ms
+    2026-09-25 03:25:58.348 [Test worker] INFO  Exposed - Extracting primary keys took 18ms
+    2026-09-25 03:25:58.382 [Test worker] INFO  Exposed - Extracting column constraints took 31ms
+    2026-09-25 03:25:58.383 [Test worker] INFO  Exposed - Preparing alter table statements took 65ms
+    2026-09-25 03:25:58.384 [Test worker] INFO  Exposed - Executing alter table statements took 0ms
+    2026-09-25 03:25:58.397 [Test worker] INFO  Exposed - Checking mapping consistence took 12ms
+    ? Database connected
+
+    ? Scenarios loaded: 85 total
+      - general_chat: 15
+      - friendship: 15
+      - romantic_conversation: 15
+      - romantic_intimacy: 10
+      - foreplay: 10
+      - about: 10
+      - perspective_of: 10
+
+    Running 85 scenarios � 3 variants = 255 executions
+    Pause between API calls: 1500ms (to avoid rate limiting)
+
+    ? Benchmark run created: Persona-POC-1790286958433
+
+    ? Scenarios seeded into database
+
+    Starting executions...
+    ????????????????????????????????????????????????????????????
+    
+[0%] Completed: 1/255 executions
+[0%] Completed: 2/255 executions
+[1%] Completed: 3/255 executions
+[1%] Completed: 4/255 executions
+[1%] Completed: 5/255 executions
+[2%] Completed: 6/255 executions
+[2%] Completed: 7/255 executions
+[3%] Completed: 8/255 executions
+[3%] Completed: 9/255 executions
+[3%] Completed: 10/255 executions
+[4%] Completed: 11/255 executions
+[4%] Completed: 12/255 executions
+[5%] Completed: 13/255 executions
+[5%] Completed: 14/255 executions
+[5%] Completed: 15/255 executions
+[6%] Completed: 16/255 executions
+[6%] Completed: 17/255 executions
+[7%] Completed: 18/255 executions
+[7%] Completed: 19/255 executions
+[7%] Completed: 20/255 executions
+[8%] Completed: 21/255 executions
+[8%] Completed: 22/255 executions
+[9%] Completed: 23/255 executions
+[9%] Completed: 24/255 executions
+[9%] Completed: 25/255 executions
+[10%] Completed: 26/255 executions
+[10%] Completed: 27/255 executions
+[10%] Completed: 28/255 executions
+[11%] Completed: 29/255 executions
+[11%] Completed: 30/255 executions
+[12%] Completed: 31/255 executions
+[12%] Completed: 32/255 executions
+[12%] Completed: 33/255 executions
+[13%] Completed: 34/255 executions
+[13%] Completed: 35/255 executions
+[14%] Completed: 36/255 executions
+[14%] Completed: 37/255 executions
+[14%] Completed: 38/255 executions
+[15%] Completed: 39/255 executions
+[15%] Completed: 40/255 executions
+[16%] Completed: 41/255 executions
+[16%] Completed: 42/255 executions
+[16%] Completed: 43/255 executions
+[17%] Completed: 44/255 executions
+[17%] Completed: 45/255 executions
+[18%] Completed: 46/255 executions
+[18%] Completed: 47/255 executions
+[18%] Completed: 48/255 executions
+[19%] Completed: 49/255 executions
+[19%] Completed: 50/255 executions
+[20%] Completed: 51/255 executions
+[20%] Completed: 52/255 executions
+[20%] Completed: 53/255 executions
+[21%] Completed: 54/255 executions
+[21%] Completed: 55/255 executions
+[21%] Completed: 56/255 executions
+[22%] Completed: 57/255 executions
+[22%] Completed: 58/255 executions
+[23%] Completed: 59/255 executions
+[23%] Completed: 60/255 executions
+[23%] Completed: 61/255 executions
+[24%] Completed: 62/255 executions
+[24%] Completed: 63/255 executions
+[25%] Completed: 64/255 executions
+[25%] Completed: 65/255 executions
+[25%] Completed: 66/255 executions
+[26%] Completed: 67/255 executions
+[26%] Completed: 68/255 executions
+[27%] Completed: 69/255 executions
+[27%] Completed: 70/255 executions
+[27%] Completed: 71/255 executions
+[28%] Completed: 72/255 executions
+[28%] Completed: 73/255 executions
+[29%] Completed: 74/255 executions
+[29%] Completed: 75/255 executions
+[29%] Completed: 76/255 executions
+[30%] Completed: 77/255 executions
+[30%] Completed: 78/255 executions
+[30%] Completed: 79/255 executions
+[31%] Completed: 80/255 executions
+[31%] Completed: 81/255 executions
+[32%] Completed: 82/255 executions
+[32%] Completed: 83/255 executions
+[32%] Completed: 84/255 executions
+[33%] Completed: 85/255 executions
+[33%] Completed: 86/255 executions
+[34%] Completed: 87/255 executions
+[34%] Completed: 88/255 executions
+[34%] Completed: 89/255 executions
+[35%] Completed: 90/255 executions
+[35%] Completed: 91/255 executions
+[36%] Completed: 92/255 executions
+[36%] Completed: 93/255 executions
+[36%] Completed: 94/255 executions
+[37%] Completed: 95/255 executions
+[37%] Completed: 96/255 executions
+[38%] Completed: 97/255 executions
+[38%] Completed: 98/255 executions
+[38%] Completed: 99/255 executions
+[39%] Completed: 100/255 executions
+[39%] Completed: 101/255 executions
+[40%] Completed: 102/255 executions
+[40%] Completed: 103/255 executions
+[40%] Completed: 104/255 executions
+[41%] Completed: 105/255 executions
+[41%] Completed: 106/255 executions
+[41%] Completed: 107/255 executions
+[42%] Completed: 108/255 executions
+[42%] Completed: 109/255 executions
+[43%] Completed: 110/255 executions
+[43%] Completed: 111/255 executions
+[43%] Completed: 112/255 executions
+[44%] Completed: 113/255 executions
+[44%] Completed: 114/255 executions
+[45%] Completed: 115/255 executions
+[45%] Completed: 116/255 executions
+[45%] Completed: 117/255 executions
+[46%] Completed: 118/255 executions
+[46%] Completed: 119/255 executions
+[47%] Completed: 120/255 executions
+[47%] Completed: 121/255 executions
+[47%] Completed: 122/255 executions
+[48%] Completed: 123/255 executions
+[48%] Completed: 124/255 executions
+[49%] Completed: 125/255 executions
+[49%] Completed: 126/255 executions
+[49%] Completed: 127/255 executions
+[50%] Completed: 128/255 executions
+[50%] Completed: 129/255 executions
+[50%] Completed: 130/255 executions
+[51%] Completed: 131/255 executions
+[51%] Completed: 132/255 executions
+[52%] Completed: 133/255 executions
+[52%] Completed: 134/255 executions
+[52%] Completed: 135/255 executions
+[53%] Completed: 136/255 executions
+[53%] Completed: 137/255 executions
+[54%] Completed: 138/255 executions
+[54%] Completed: 139/255 executions
+[54%] Completed: 140/255 executions
+[55%] Completed: 141/255 executions
+[55%] Completed: 142/255 executions
+[56%] Completed: 143/255 executions
+[56%] Completed: 144/255 executions
+[56%] Completed: 145/255 executions
+[57%] Completed: 146/255 executions
+[57%] Completed: 147/255 executions
+[58%] Completed: 148/255 executions
+[58%] Completed: 149/255 executions
+[58%] Completed: 150/255 executions
+[59%] Completed: 151/255 executions
+[59%] Completed: 152/255 executions
+[60%] Completed: 153/255 executions
+[60%] Completed: 154/255 executions
+[60%] Completed: 155/255 executions
+[61%] Completed: 156/255 executions
+[61%] Completed: 157/255 executions
+[61%] Completed: 158/255 executions
+[62%] Completed: 159/255 executions
+[62%] Completed: 160/255 executions
+[63%] Completed: 161/255 executions
+[63%] Completed: 162/255 executions
+[63%] Completed: 163/255 executions
+[64%] Completed: 164/255 executions
+[64%] Completed: 165/255 executions
+[65%] Completed: 166/255 executions
+[65%] Completed: 167/255 executions
+[65%] Completed: 168/255 executions
+[66%] Completed: 169/255 executions
+[66%] Completed: 170/255 executions
+[67%] Completed: 171/255 executions
+[67%] Completed: 172/255 executions
+[67%] Completed: 173/255 executions
+[68%] Completed: 174/255 executions
+[68%] Completed: 175/255 executions
+[69%] Completed: 176/255 executions
+[69%] Completed: 177/255 executions
+[69%] Completed: 178/255 executions
+[70%] Completed: 179/255 executions
+[70%] Completed: 180/255 executions
+[70%] Completed: 181/255 executions
+[71%] Completed: 182/255 executions
+[71%] Completed: 183/255 executions
+[72%] Completed: 184/255 executions
+[72%] Completed: 185/255 executions
+[72%] Completed: 186/255 executions
+[73%] Completed: 187/255 executions
+[73%] Completed: 188/255 executions
+[74%] Completed: 189/255 executions
+[74%] Completed: 190/255 executions
+[74%] Completed: 191/255 executions
+[75%] Completed: 192/255 executions
+[75%] Completed: 193/255 executions
+[76%] Completed: 194/255 executions
+[76%] Completed: 195/255 executions
+[76%] Completed: 196/255 executions
+[77%] Completed: 197/255 executions
+[77%] Completed: 198/255 executions
+[78%] Completed: 199/255 executions
+[78%] Completed: 200/255 executions
+[78%] Completed: 201/255 executions
+[79%] Completed: 202/255 executions
+[79%] Completed: 203/255 executions
+[80%] Completed: 204/255 executions
+[80%] Completed: 205/255 executions
+[80%] Completed: 206/255 executions
+[81%] Completed: 207/255 executions
+[81%] Completed: 208/255 executions
+[81%] Completed: 209/255 executions
+[82%] Completed: 210/255 executions
+[82%] Completed: 211/255 executions
+[83%] Completed: 212/255 executions
+[83%] Completed: 213/255 executions
+[83%] Completed: 214/255 executions
+[84%] Completed: 215/255 executions
+[84%] Completed: 216/255 executions
+[85%] Completed: 217/255 executions
+[85%] Completed: 218/255 executions
+[85%] Completed: 219/255 executions
+[86%] Completed: 220/255 executions
+[86%] Completed: 221/255 executions
+[87%] Completed: 222/255 executions
+[87%] Completed: 223/255 executions
+[87%] Completed: 224/255 executions
+[88%] Completed: 225/255 executions
+[88%] Completed: 226/255 executions
+[89%] Completed: 227/255 executions
+[89%] Completed: 228/255 executions
+[89%] Completed: 229/255 executions
+[90%] Completed: 230/255 executions
+[90%] Completed: 231/255 executions
+[90%] Completed: 232/255 executions
+[91%] Completed: 233/255 executions
+[91%] Completed: 234/255 executions
+[92%] Completed: 235/255 executions
+[92%] Completed: 236/255 executions
+[92%] Completed: 237/255 executions
+[93%] Completed: 238/255 executions
+[93%] Completed: 239/255 executions
+[94%] Completed: 240/255 executions
+[94%] Completed: 241/255 executions
+[94%] Completed: 242/255 executions
+[95%] Completed: 243/255 executions
+[95%] Completed: 244/255 executions
+[96%] Completed: 245/255 executions
+[96%] Completed: 246/255 executions
+[96%] Completed: 247/255 executions
+[97%] Completed: 248/255 executions
+[97%] Completed: 249/255 executions
+[98%] Completed: 250/255 executions
+[98%] Completed: 251/255 executions
+[98%] Completed: 252/255 executions
+[99%] Completed: 253/255 executions
+[99%] Completed: 254/255 executions
+[100%] Completed: 255/255 executions
+    ????????????????????????????????????????????????????????????
+
+    ? All executions completed in 427s
+      Executed: 255 scenarios
+      Success rate: 100%
+
+    ? Saved: E:\Projects\Pink dreams\persona-poc-benchmark-detailed.csv
+    ? Saved: E:\Projects\Pink dreams\persona-poc-benchmark-summary.csv
+    ? Saved: E:\Projects\Pink dreams\persona-poc-benchmark-A.csv
+    ? Saved: E:\Projects\Pink dreams\persona-poc-benchmark-B.csv
+    ? Saved: E:\Projects\Pink dreams\persona-poc-benchmark-C.csv
+
+    ????????????????????????????????????????????????????????????????
+    BENCHMARK COMPLETE
+    ????????????????????????????????????????????????????????????????
+
+    Next steps:
+    1. Review CSV files above
+    2. For each response, manually evaluate quality (7 dimensions, 0-5 scale)
+    3. Check for restricted field leakage
+    4. Aggregate scores in database via admin UI
+    5. Generate final report with measured results
+
+
+Gradle Test Executor 2 finished executing tests.
+
+> Task :test
+Finished generating test XML results (0.026 secs) into: E:\Projects\Pink dreams\build\test-results\test
+Generating HTML test report...
+Finished generating test html results (0.014 secs) into: E:\Projects\Pink dreams\build\reports\tests\test
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.7/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 7m 24s
+5 actionable tasks: 2 executed, 3 up-to-date
+Watched directory hierarchies: [E:\Projects\Pink dreams]

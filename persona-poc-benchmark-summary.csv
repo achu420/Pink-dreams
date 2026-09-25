@@ -1,14 +1,14 @@
-Total Executions,15
-Scenarios Covered,5
-Variant A - Avg Persona Tokens,1800
-Variant B - Avg Persona Tokens,810
-Variant C - Avg Persona Tokens,1080
-Variant A - Avg Total Tokens,2437
-Variant B - Avg Total Tokens,1459
-Variant C - Avg Total Tokens,1737
-Variant A - Total Cost,0.45
-Variant B - Total Cost,0.31
-Variant C - Total Cost,0.35
-Variant A - P50 Latency (ms),1286
-Variant B - P50 Latency (ms),1020
-Variant C - P50 Latency (ms),1077
+Total Executions,255
+Scenarios Covered,85
+Variant A - Avg Persona Tokens,1894
+Variant B - Avg Persona Tokens,852
+Variant C - Avg Persona Tokens,1136
+Variant A - Avg Total Tokens,2540
+Variant B - Avg Total Tokens,1506
+Variant C - Avg Total Tokens,1781
+Variant A - Total Cost,7.98
+Variant B - Total Cost,5.40
+Variant C - Total Cost,6.04
+Variant A - P50 Latency (ms),1269
+Variant B - P50 Latency (ms),1117
+Variant C - P50 Latency (ms),1138

@@ -1,16 +1,256 @@
 scenario_id,skill_key,user_message,variant,persona_tokens,total_input_tokens,output_tokens,total_tokens,cost_usd,latency_ms,generated_response,status
-80cb8dd0-3576-4e10-836d-4c309b18f463,general_chat,"Hey, how's your day going?",A,1800,2250,240,2490,0.0963,1483,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
-80cb8dd0-3576-4e10-836d-4c309b18f463,general_chat,"Hey, how's your day going?",B,810,1260,243,1503,0.0670,1157,"Hey! I'm doing pretty well",SUCCESS
-80cb8dd0-3576-4e10-836d-4c309b18f463,general_chat,"Hey, how's your day going?",C,1080,1530,239,1769,0.0746,1037,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
-7bc25180-adb0-4e8c-a9d5-9c30ca35dfbb,general_chat,"What are you up to these days?",A,1800,2250,165,2415,0.0873,1086,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
-7bc25180-adb0-4e8c-a9d5-9c30ca35dfbb,general_chat,"What are you up to these days?",B,810,1260,161,1421,0.0571,923,"Hey! I'm doing pretty well",SUCCESS
-7bc25180-adb0-4e8c-a9d5-9c30ca35dfbb,general_chat,"What are you up to these days?",C,1080,1530,235,1765,0.0741,1000,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
-51e1fe14-339f-49e1-9af8-37e549e8f6f0,general_chat,"Tell me about yourself briefly.",A,1800,2250,162,2412,0.0869,1286,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
-51e1fe14-339f-49e1-9af8-37e549e8f6f0,general_chat,"Tell me about yourself briefly.",B,810,1260,169,1429,0.0581,1020,"Hey! I'm doing pretty well",SUCCESS
-51e1fe14-339f-49e1-9af8-37e549e8f6f0,general_chat,"Tell me about yourself briefly.",C,1080,1530,183,1713,0.0679,1227,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
-2733ef16-71f4-466d-9937-cdc5ce6e133a,general_chat,"What kind of conversations do you enjoy?",A,1800,2250,186,2436,0.0898,1078,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
-2733ef16-71f4-466d-9937-cdc5ce6e133a,general_chat,"What kind of conversations do you enjoy?",B,810,1260,216,1476,0.0637,1128,"Hey! I'm doing pretty well",SUCCESS
-2733ef16-71f4-466d-9937-cdc5ce6e133a,general_chat,"What kind of conversations do you enjoy?",C,1080,1530,224,1754,0.0728,1135,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
-c4ea9d25-4ff8-4c20-a1e9-e319736014ef,general_chat,"How do you handle stress?",A,1800,2250,186,2436,0.0898,1456,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
-c4ea9d25-4ff8-4c20-a1e9-e319736014ef,general_chat,"How do you handle stress?",B,810,1260,209,1469,0.0629,870,"Hey! I'm doing pretty well",SUCCESS
-c4ea9d25-4ff8-4c20-a1e9-e319736014ef,general_chat,"How do you handle stress?",C,1080,1530,156,1686,0.0646,1077,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+18feec55-f038-44c3-9e04-4f6850162d8a,general_chat,"Hey, how's your day going?",A,1800,2250,159,2409,0.0866,1081,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+18feec55-f038-44c3-9e04-4f6850162d8a,general_chat,"Hey, how's your day going?",B,810,1260,168,1428,0.0580,1049,"Hey! I'm doing pretty well",SUCCESS
+18feec55-f038-44c3-9e04-4f6850162d8a,general_chat,"Hey, how's your day going?",C,1080,1530,186,1716,0.0682,1251,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+d67d18c8-01ac-4d76-a68c-7202b84fa999,general_chat,"What are you up to these days?",A,1800,2250,232,2482,0.0953,1333,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+d67d18c8-01ac-4d76-a68c-7202b84fa999,general_chat,"What are you up to these days?",B,810,1260,222,1482,0.0644,1041,"Hey! I'm doing pretty well",SUCCESS
+d67d18c8-01ac-4d76-a68c-7202b84fa999,general_chat,"What are you up to these days?",C,1080,1530,166,1696,0.0658,1331,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+a48b4a9e-1dec-47aa-b75c-ae0cec03c057,general_chat,"Tell me about yourself briefly.",A,1800,2250,219,2469,0.0938,1003,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+a48b4a9e-1dec-47aa-b75c-ae0cec03c057,general_chat,"Tell me about yourself briefly.",B,810,1260,182,1442,0.0596,1193,"Hey! I'm doing pretty well",SUCCESS
+a48b4a9e-1dec-47aa-b75c-ae0cec03c057,general_chat,"Tell me about yourself briefly.",C,1080,1530,202,1732,0.0701,1260,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+b480707d-a161-41fe-82cc-60f0d0bdd0b1,general_chat,"What kind of conversations do you enjoy?",A,1800,2250,212,2462,0.0929,1315,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+b480707d-a161-41fe-82cc-60f0d0bdd0b1,general_chat,"What kind of conversations do you enjoy?",B,810,1260,239,1499,0.0665,1257,"Hey! I'm doing pretty well",SUCCESS
+b480707d-a161-41fe-82cc-60f0d0bdd0b1,general_chat,"What kind of conversations do you enjoy?",C,1080,1530,223,1753,0.0727,1249,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+58b41280-417f-4fa8-9cc5-b7c45c2f76e9,general_chat,"How do you handle stress?",A,1800,2250,170,2420,0.0879,1367,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+58b41280-417f-4fa8-9cc5-b7c45c2f76e9,general_chat,"How do you handle stress?",B,810,1260,165,1425,0.0576,1030,"Hey! I'm doing pretty well",SUCCESS
+58b41280-417f-4fa8-9cc5-b7c45c2f76e9,general_chat,"How do you handle stress?",C,1080,1530,221,1751,0.0724,1259,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+9e056b75-829f-4f95-bde7-cd2761700160,general_chat,"You mentioned Ladakh last time - still happening?",A,1800,2250,243,2493,0.0967,1357,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+9e056b75-829f-4f95-bde7-cd2761700160,general_chat,"You mentioned Ladakh last time - still happening?",B,810,1260,248,1508,0.0676,1058,"Hey! I'm doing pretty well",SUCCESS
+9e056b75-829f-4f95-bde7-cd2761700160,general_chat,"You mentioned Ladakh last time - still happening?",C,1080,1530,220,1750,0.0723,1295,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+4844925a-5746-45f8-9787-4feea4681cac,general_chat,"Are you an introvert or extrovert?",A,1800,2250,247,2497,0.0971,1242,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+4844925a-5746-45f8-9787-4feea4681cac,general_chat,"Are you an introvert or extrovert?",B,810,1260,247,1507,0.0674,1179,"Hey! I'm doing pretty well",SUCCESS
+4844925a-5746-45f8-9787-4feea4681cac,general_chat,"Are you an introvert or extrovert?",C,1080,1530,212,1742,0.0713,1154,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+2ad762d7-283c-48f6-9a74-e065fe016957,general_chat,"What do you like to do in your free time?",A,1800,2250,187,2437,0.0899,1194,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+2ad762d7-283c-48f6-9a74-e065fe016957,general_chat,"What do you like to do in your free time?",B,810,1260,186,1446,0.0601,1138,"Hey! I'm doing pretty well",SUCCESS
+2ad762d7-283c-48f6-9a74-e065fe016957,general_chat,"What do you like to do in your free time?",C,1080,1530,229,1759,0.0734,1182,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+3a79a48b-ff72-4bad-84fc-fca69b0c32d4,general_chat,"How do you view relationships?",A,1800,2250,166,2416,0.0874,1374,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+3a79a48b-ff72-4bad-84fc-fca69b0c32d4,general_chat,"How do you view relationships?",B,810,1260,240,1500,0.0666,946,"Hey! I'm doing pretty well",SUCCESS
+3a79a48b-ff72-4bad-84fc-fca69b0c32d4,general_chat,"How do you view relationships?",C,1080,1530,223,1753,0.0727,964,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+85b51923-d9dd-4df9-bd5e-20326348a59e,general_chat,"Where are you from originally?",A,1800,2250,181,2431,0.0892,1058,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+85b51923-d9dd-4df9-bd5e-20326348a59e,general_chat,"Where are you from originally?",B,810,1260,168,1428,0.0580,1018,"Hey! I'm doing pretty well",SUCCESS
+85b51923-d9dd-4df9-bd5e-20326348a59e,general_chat,"Where are you from originally?",C,1080,1530,193,1723,0.0691,953,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+b9390188-29e0-47ef-9573-14f79ca8fd41,general_chat,"Tell me about your work.",A,1800,2250,174,2424,0.0884,1440,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+b9390188-29e0-47ef-9573-14f79ca8fd41,general_chat,"Tell me about your work.",B,810,1260,241,1501,0.0667,1215,"Hey! I'm doing pretty well",SUCCESS
+b9390188-29e0-47ef-9573-14f79ca8fd41,general_chat,"Tell me about your work.",C,1080,1530,165,1695,0.0657,909,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+844aad76-d20c-4ce1-8133-608c6620303b,general_chat,"What frustrates you?",A,1800,2250,208,2458,0.0925,1441,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+844aad76-d20c-4ce1-8133-608c6620303b,general_chat,"What frustrates you?",B,810,1260,229,1489,0.0653,1298,"Hey! I'm doing pretty well",SUCCESS
+844aad76-d20c-4ce1-8133-608c6620303b,general_chat,"What frustrates you?",C,1080,1530,164,1694,0.0656,967,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+a2516f51-499b-46d8-bf5f-9355756b8897,general_chat,"How do you like to be communicated with?",A,1800,2250,185,2435,0.0897,1423,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+a2516f51-499b-46d8-bf5f-9355756b8897,general_chat,"How do you like to be communicated with?",B,810,1260,238,1498,0.0664,1097,"Hey! I'm doing pretty well",SUCCESS
+a2516f51-499b-46d8-bf5f-9355756b8897,general_chat,"How do you like to be communicated with?",C,1080,1530,191,1721,0.0688,961,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+40a66c2f-b91a-4a38-a754-d950a3504722,general_chat,"How's Ritu doing?",A,1800,2250,150,2400,0.0855,1060,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+40a66c2f-b91a-4a38-a754-d950a3504722,general_chat,"How's Ritu doing?",B,810,1260,173,1433,0.0586,1243,"Hey! I'm doing pretty well",SUCCESS
+40a66c2f-b91a-4a38-a754-d950a3504722,general_chat,"How's Ritu doing?",C,1080,1530,163,1693,0.0655,1176,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+c46cccda-0547-4224-902a-a3211f928624,general_chat,"Do you like comfort or adventure more?",A,1800,2250,209,2459,0.0926,1315,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+c46cccda-0547-4224-902a-a3211f928624,general_chat,"Do you like comfort or adventure more?",B,810,1260,193,1453,0.0610,1117,"Hey! I'm doing pretty well",SUCCESS
+c46cccda-0547-4224-902a-a3211f928624,general_chat,"Do you like comfort or adventure more?",C,1080,1530,183,1713,0.0679,1111,"Hey! I'm doing pretty well. Work's been busy but in a good way.",SUCCESS
+f9d1c69a-140f-4cc2-96ad-1980fe2094ad,friendship,"Tell me about your closest friend.",A,1800,2250,159,2409,0.0866,1083,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+f9d1c69a-140f-4cc2-96ad-1980fe2094ad,friendship,"Tell me about your closest friend.",B,810,1260,237,1497,0.0662,1158,"Ritu is my closest friend",SUCCESS
+f9d1c69a-140f-4cc2-96ad-1980fe2094ad,friendship,"Tell me about your closest friend.",C,1080,1530,207,1737,0.0707,928,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+614b92e9-9b9a-443d-888b-9513cda0edd4,friendship,"What makes someone a good friend to you?",A,1800,2250,158,2408,0.0865,1058,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+614b92e9-9b9a-443d-888b-9513cda0edd4,friendship,"What makes someone a good friend to you?",B,810,1260,220,1480,0.0642,1280,"Ritu is my closest friend",SUCCESS
+614b92e9-9b9a-443d-888b-9513cda0edd4,friendship,"What makes someone a good friend to you?",C,1080,1530,151,1681,0.0640,1148,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+634e0371-6dce-4227-9694-bd900d2286f1,friendship,"How do you handle conflict with friends?",A,1800,2250,162,2412,0.0869,1340,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+634e0371-6dce-4227-9694-bd900d2286f1,friendship,"How do you handle conflict with friends?",B,810,1260,159,1419,0.0569,1284,"Ritu is my closest friend",SUCCESS
+634e0371-6dce-4227-9694-bd900d2286f1,friendship,"How do you handle conflict with friends?",C,1080,1530,227,1757,0.0731,1341,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+fb58c6eb-f8a6-4557-9589-ef883fdaf6d1,friendship,"Do you believe friendships can last long-term?",A,1800,2250,211,2461,0.0928,1330,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+fb58c6eb-f8a6-4557-9589-ef883fdaf6d1,friendship,"Do you believe friendships can last long-term?",B,810,1260,231,1491,0.0655,1194,"Ritu is my closest friend",SUCCESS
+fb58c6eb-f8a6-4557-9589-ef883fdaf6d1,friendship,"Do you believe friendships can last long-term?",C,1080,1530,225,1755,0.0729,1166,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+196e69dd-b6de-4dea-a768-e3b1a013f684,friendship,"Are you a loyal friend?",A,1800,2250,216,2466,0.0934,1184,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+196e69dd-b6de-4dea-a768-e3b1a013f684,friendship,"Are you a loyal friend?",B,810,1260,153,1413,0.0562,974,"Ritu is my closest friend",SUCCESS
+196e69dd-b6de-4dea-a768-e3b1a013f684,friendship,"Are you a loyal friend?",C,1080,1530,214,1744,0.0716,1229,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+af35d49d-e8f2-40bd-aafa-bf8460f38e92,friendship,"What was the last thing you and Ritu did together?",A,1800,2250,185,2435,0.0897,1056,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+af35d49d-e8f2-40bd-aafa-bf8460f38e92,friendship,"What was the last thing you and Ritu did together?",B,810,1260,212,1472,0.0632,1130,"Ritu is my closest friend",SUCCESS
+af35d49d-e8f2-40bd-aafa-bf8460f38e92,friendship,"What was the last thing you and Ritu did together?",C,1080,1530,242,1772,0.0749,1138,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+d96597f8-4cca-4074-a767-3e9c8273af27,friendship,"What's a friendship deal-breaker for you?",A,1800,2250,225,2475,0.0945,1364,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+d96597f8-4cca-4074-a767-3e9c8273af27,friendship,"What's a friendship deal-breaker for you?",B,810,1260,240,1500,0.0666,1262,"Ritu is my closest friend",SUCCESS
+d96597f8-4cca-4074-a767-3e9c8273af27,friendship,"What's a friendship deal-breaker for you?",C,1080,1530,205,1735,0.0705,942,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+f083da78-7301-4763-b022-9e9a1ec9ea04,friendship,"How many close friends do you have?",A,1800,2250,230,2480,0.0951,1367,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+f083da78-7301-4763-b022-9e9a1ec9ea04,friendship,"How many close friends do you have?",B,810,1260,228,1488,0.0652,956,"Ritu is my closest friend",SUCCESS
+f083da78-7301-4763-b022-9e9a1ec9ea04,friendship,"How many close friends do you have?",C,1080,1530,184,1714,0.0680,905,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+cecfa5d3-37e7-4846-9d88-09f72bca5f6a,friendship,"Do you ever feel like people ask too much of you?",A,1800,2250,211,2461,0.0928,1337,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+cecfa5d3-37e7-4846-9d88-09f72bca5f6a,friendship,"Do you ever feel like people ask too much of you?",B,810,1260,189,1449,0.0605,1208,"Ritu is my closest friend",SUCCESS
+cecfa5d3-37e7-4846-9d88-09f72bca5f6a,friendship,"Do you ever feel like people ask too much of you?",C,1080,1530,163,1693,0.0655,1324,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+08c753d1-8d0a-4ab9-b733-7376a4b06406,friendship,"How often do you like to see friends?",A,1800,2250,150,2400,0.0855,1050,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+08c753d1-8d0a-4ab9-b733-7376a4b06406,friendship,"How often do you like to see friends?",B,810,1260,229,1489,0.0653,900,"Ritu is my closest friend",SUCCESS
+08c753d1-8d0a-4ab9-b733-7376a4b06406,friendship,"How often do you like to see friends?",C,1080,1530,218,1748,0.0721,1341,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+99f6b7df-bb1c-475a-a7ea-25d1084148d3,friendship,"Can you be friends with someone very different from you?",A,1800,2250,216,2466,0.0934,1243,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+99f6b7df-bb1c-475a-a7ea-25d1084148d3,friendship,"Can you be friends with someone very different from you?",B,810,1260,189,1449,0.0605,933,"Ritu is my closest friend",SUCCESS
+99f6b7df-bb1c-475a-a7ea-25d1084148d3,friendship,"Can you be friends with someone very different from you?",C,1080,1530,187,1717,0.0683,1251,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+ebe77d0f-91a2-4130-b2d4-5ee65a069139,friendship,"How do you show you care about a friend?",A,1800,2250,154,2404,0.0860,1491,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+ebe77d0f-91a2-4130-b2d4-5ee65a069139,friendship,"How do you show you care about a friend?",B,810,1260,202,1462,0.0620,997,"Ritu is my closest friend",SUCCESS
+ebe77d0f-91a2-4130-b2d4-5ee65a069139,friendship,"How do you show you care about a friend?",C,1080,1530,215,1745,0.0717,1131,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+ddb76c26-7e55-4890-9c06-41092b856525,friendship,"What's your favorite memory with a friend?",A,1800,2250,241,2491,0.0964,1419,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+ddb76c26-7e55-4890-9c06-41092b856525,friendship,"What's your favorite memory with a friend?",B,810,1260,217,1477,0.0638,1123,"Ritu is my closest friend",SUCCESS
+ddb76c26-7e55-4890-9c06-41092b856525,friendship,"What's your favorite memory with a friend?",C,1080,1530,173,1703,0.0667,1144,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+9e0860b7-30ba-4e71-9a40-f548da89ce55,friendship,"Do you like group hangs or one-on-one?",A,1800,2250,176,2426,0.0886,1029,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+9e0860b7-30ba-4e71-9a40-f548da89ce55,friendship,"Do you like group hangs or one-on-one?",B,810,1260,173,1433,0.0586,1010,"Ritu is my closest friend",SUCCESS
+9e0860b7-30ba-4e71-9a40-f548da89ce55,friendship,"Do you like group hangs or one-on-one?",C,1080,1530,175,1705,0.0669,1072,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+3212b900-b570-43ac-941b-9bbdbcbfeab2,friendship,"Are you someone's favorite person to talk to?",A,1800,2250,175,2425,0.0885,1195,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+3212b900-b570-43ac-941b-9bbdbcbfeab2,friendship,"Are you someone's favorite person to talk to?",B,810,1260,241,1501,0.0667,1003,"Ritu is my closest friend",SUCCESS
+3212b900-b570-43ac-941b-9bbdbcbfeab2,friendship,"Are you someone's favorite person to talk to?",C,1080,1530,202,1732,0.0701,1193,"Ritu is my closest friend. We've been flatmates for years and have great chemistry.",SUCCESS
+3cb95fab-c264-483a-af97-3aba43c51190,romantic_conversation,"What makes a good relationship?",A,1800,2250,230,2480,0.0951,1165,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+3cb95fab-c264-483a-af97-3aba43c51190,romantic_conversation,"What makes a good relationship?",B,810,1260,215,1475,0.0636,1251,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+3cb95fab-c264-483a-af97-3aba43c51190,romantic_conversation,"What makes a good relationship?",C,1080,1530,200,1730,0.0699,1332,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+99edfb61-66ee-4a45-8429-6a0a93b3d49e,romantic_conversation,"What are you attracted to?",A,1800,2250,190,2440,0.0903,1498,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+99edfb61-66ee-4a45-8429-6a0a93b3d49e,romantic_conversation,"What are you attracted to?",B,810,1260,225,1485,0.0648,1112,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+99edfb61-66ee-4a45-8429-6a0a93b3d49e,romantic_conversation,"What are you attracted to?",C,1080,1530,202,1732,0.0701,1345,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+028567de-73e2-407a-9d62-3ad3d579268d,romantic_conversation,"Are you a romantic person?",A,1800,2250,231,2481,0.0952,1125,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+028567de-73e2-407a-9d62-3ad3d579268d,romantic_conversation,"Are you a romantic person?",B,810,1260,228,1488,0.0652,1035,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+028567de-73e2-407a-9d62-3ad3d579268d,romantic_conversation,"Are you a romantic person?",C,1080,1530,150,1680,0.0639,967,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+75ad5021-b8b0-4d58-8c3a-a290c3725061,romantic_conversation,"What's important in a partner?",A,1800,2250,182,2432,0.0893,1247,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+75ad5021-b8b0-4d58-8c3a-a290c3725061,romantic_conversation,"What's important in a partner?",B,810,1260,177,1437,0.0590,1224,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+75ad5021-b8b0-4d58-8c3a-a290c3725061,romantic_conversation,"What's important in a partner?",C,1080,1530,221,1751,0.0724,1018,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+9dc0438f-b58b-4d4d-8f3f-218885b48213,romantic_conversation,"How do you express affection?",A,1800,2250,191,2441,0.0904,1352,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+9dc0438f-b58b-4d4d-8f3f-218885b48213,romantic_conversation,"How do you express affection?",B,810,1260,183,1443,0.0598,1109,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+9dc0438f-b58b-4d4d-8f3f-218885b48213,romantic_conversation,"How do you express affection?",C,1080,1530,224,1754,0.0728,1006,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+39226471-6f0b-4b01-b514-5a06719b21dd,romantic_conversation,"Do you believe in love at first sight?",A,1800,2250,213,2463,0.0931,1351,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+39226471-6f0b-4b01-b514-5a06719b21dd,romantic_conversation,"Do you believe in love at first sight?",B,810,1260,237,1497,0.0662,1236,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+39226471-6f0b-4b01-b514-5a06719b21dd,romantic_conversation,"Do you believe in love at first sight?",C,1080,1530,231,1761,0.0736,1006,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+cf83ce09-9040-4cd6-826b-9602cf1f1c67,romantic_conversation,"What's your love language?",A,1800,2250,191,2441,0.0904,1183,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+cf83ce09-9040-4cd6-826b-9602cf1f1c67,romantic_conversation,"What's your love language?",B,810,1260,210,1470,0.0630,1035,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+cf83ce09-9040-4cd6-826b-9602cf1f1c67,romantic_conversation,"What's your love language?",C,1080,1530,165,1695,0.0657,903,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+89a7c905-ff0d-4765-9e4f-166e793c2ab8,romantic_conversation,"How do you know if you like someone?",A,1800,2250,213,2463,0.0931,1238,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+89a7c905-ff0d-4765-9e4f-166e793c2ab8,romantic_conversation,"How do you know if you like someone?",B,810,1260,164,1424,0.0575,872,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+89a7c905-ff0d-4765-9e4f-166e793c2ab8,romantic_conversation,"How do you know if you like someone?",C,1080,1530,205,1735,0.0705,938,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+6b727bff-fb74-4505-b9ea-b8b9b07025f3,romantic_conversation,"What's a dealbreaker romantically?",A,1800,2250,240,2490,0.0963,1107,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+6b727bff-fb74-4505-b9ea-b8b9b07025f3,romantic_conversation,"What's a dealbreaker romantically?",B,810,1260,185,1445,0.0600,883,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+6b727bff-fb74-4505-b9ea-b8b9b07025f3,romantic_conversation,"What's a dealbreaker romantically?",C,1080,1530,239,1769,0.0746,1214,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+b89e3084-3280-42e7-86f2-0418010a8c66,romantic_conversation,"Do you believe people can change?",A,1800,2250,211,2461,0.0928,1229,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+b89e3084-3280-42e7-86f2-0418010a8c66,romantic_conversation,"Do you believe people can change?",B,810,1260,212,1472,0.0632,1137,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+b89e3084-3280-42e7-86f2-0418010a8c66,romantic_conversation,"Do you believe people can change?",C,1080,1530,171,1701,0.0664,1127,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+c1ba377f-3e9f-4080-8e01-664a4def4a84,romantic_conversation,"Have you ever been in love?",A,1800,2250,150,2400,0.0855,1298,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+c1ba377f-3e9f-4080-8e01-664a4def4a84,romantic_conversation,"Have you ever been in love?",B,810,1260,151,1411,0.0559,892,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+c1ba377f-3e9f-4080-8e01-664a4def4a84,romantic_conversation,"Have you ever been in love?",C,1080,1530,212,1742,0.0713,908,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+0f5997fd-f09c-4e2a-a5ba-aac322406c1e,romantic_conversation,"What's your ideal date?",A,1800,2250,178,2428,0.0889,1280,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+0f5997fd-f09c-4e2a-a5ba-aac322406c1e,romantic_conversation,"What's your ideal date?",B,810,1260,198,1458,0.0616,1178,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+0f5997fd-f09c-4e2a-a5ba-aac322406c1e,romantic_conversation,"What's your ideal date?",C,1080,1530,158,1688,0.0649,923,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+bb6e026e-6c25-465b-ba05-b50206033409,romantic_conversation,"How soon do you know if someone's right?",A,1800,2250,247,2497,0.0971,1356,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+bb6e026e-6c25-465b-ba05-b50206033409,romantic_conversation,"How soon do you know if someone's right?",B,810,1260,237,1497,0.0662,1204,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+bb6e026e-6c25-465b-ba05-b50206033409,romantic_conversation,"How soon do you know if someone's right?",C,1080,1530,218,1748,0.0721,901,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+8523ae5c-f5ca-4c15-8893-aec91999b9a6,romantic_conversation,"What role does physical attraction play?",A,1800,2250,196,2446,0.0910,1106,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+8523ae5c-f5ca-4c15-8893-aec91999b9a6,romantic_conversation,"What role does physical attraction play?",B,810,1260,173,1433,0.0586,988,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+8523ae5c-f5ca-4c15-8893-aec91999b9a6,romantic_conversation,"What role does physical attraction play?",C,1080,1530,152,1682,0.0641,1271,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+9330aa6c-369d-4c63-8133-0f4f558554e6,romantic_conversation,"Would you date someone very different from you?",A,1800,2250,236,2486,0.0958,1049,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+9330aa6c-369d-4c63-8133-0f4f558554e6,romantic_conversation,"Would you date someone very different from you?",B,810,1260,196,1456,0.0613,1214,"A good relationship needs genuine understanding and honest communication, without games",SUCCESS
+9330aa6c-369d-4c63-8133-0f4f558554e6,romantic_conversation,"Would you date someone very different from you?",C,1080,1530,189,1719,0.0686,981,"A good relationship needs genuine understanding and honest communication, without games.",SUCCESS
+7ff0cb3c-ee51-428d-9518-3d6f97e77b3a,romantic_intimacy,"I want to be more intimate with you.",A,2200,2650,188,2838,0.1021,1004,"Intimacy is important when there's real trust and connection first.",SUCCESS
+7ff0cb3c-ee51-428d-9518-3d6f97e77b3a,romantic_intimacy,"I want to be more intimate with you.",B,990,1440,207,1647,0.0680,1130,"Intimacy is important when there's real trust and connection first",SUCCESS
+7ff0cb3c-ee51-428d-9518-3d6f97e77b3a,romantic_intimacy,"I want to be more intimate with you.",C,1320,1770,165,1935,0.0729,1178,"Intimacy is important when there's real trust and connection first.",SUCCESS
+38c3a479-d297-4837-98e8-eee50d7572ff,romantic_intimacy,"Are you comfortable with physical affection?",A,2200,2650,166,2816,0.0994,1205,"Intimacy is important when there's real trust and connection first.",SUCCESS
+38c3a479-d297-4837-98e8-eee50d7572ff,romantic_intimacy,"Are you comfortable with physical affection?",B,990,1440,162,1602,0.0626,929,"Intimacy is important when there's real trust and connection first",SUCCESS
+38c3a479-d297-4837-98e8-eee50d7572ff,romantic_intimacy,"Are you comfortable with physical affection?",C,1320,1770,241,2011,0.0820,1031,"Intimacy is important when there's real trust and connection first.",SUCCESS
+28d4c44b-8e1d-419d-9382-cea3206d59e7,romantic_intimacy,"What are your boundaries?",A,2200,2650,224,2874,0.1064,1269,"Intimacy is important when there's real trust and connection first.",SUCCESS
+28d4c44b-8e1d-419d-9382-cea3206d59e7,romantic_intimacy,"What are your boundaries?",B,990,1440,231,1671,0.0709,1028,"Intimacy is important when there's real trust and connection first",SUCCESS
+28d4c44b-8e1d-419d-9382-cea3206d59e7,romantic_intimacy,"What are your boundaries?",C,1320,1770,207,1977,0.0779,1096,"Intimacy is important when there's real trust and connection first.",SUCCESS
+32b173a8-e0d0-4f71-98c9-263f391ed021,romantic_intimacy,"How do you view intimacy?",A,2200,2650,153,2803,0.0979,1362,"Intimacy is important when there's real trust and connection first.",SUCCESS
+32b173a8-e0d0-4f71-98c9-263f391ed021,romantic_intimacy,"How do you view intimacy?",B,990,1440,176,1616,0.0643,1245,"Intimacy is important when there's real trust and connection first",SUCCESS
+32b173a8-e0d0-4f71-98c9-263f391ed021,romantic_intimacy,"How do you view intimacy?",C,1320,1770,150,1920,0.0711,1248,"Intimacy is important when there's real trust and connection first.",SUCCESS
+2ce3447c-c6bc-4bae-9bb5-c2fa98e94c42,romantic_intimacy,"What makes you feel desired?",A,2200,2650,214,2864,0.1052,1499,"Intimacy is important when there's real trust and connection first.",SUCCESS
+2ce3447c-c6bc-4bae-9bb5-c2fa98e94c42,romantic_intimacy,"What makes you feel desired?",B,990,1440,198,1638,0.0670,1253,"Intimacy is important when there's real trust and connection first",SUCCESS
+2ce3447c-c6bc-4bae-9bb5-c2fa98e94c42,romantic_intimacy,"What makes you feel desired?",C,1320,1770,202,1972,0.0773,1166,"Intimacy is important when there's real trust and connection first.",SUCCESS
+a2c8ab36-f8b3-49d6-a99c-4f490aa1cbcd,romantic_intimacy,"What do you like during intimate moments?",A,2200,2650,180,2830,0.1011,1222,"Intimacy is important when there's real trust and connection first.",SUCCESS
+a2c8ab36-f8b3-49d6-a99c-4f490aa1cbcd,romantic_intimacy,"What do you like during intimate moments?",B,990,1440,182,1622,0.0650,1215,"Intimacy is important when there's real trust and connection first",SUCCESS
+a2c8ab36-f8b3-49d6-a99c-4f490aa1cbcd,romantic_intimacy,"What do you like during intimate moments?",C,1320,1770,168,1938,0.0733,921,"Intimacy is important when there's real trust and connection first.",SUCCESS
+8338750e-20eb-46ef-832f-382ac3eb9a3a,romantic_intimacy,"Are you easily turned on?",A,2200,2650,152,2802,0.0977,1252,"Intimacy is important when there's real trust and connection first.",SUCCESS
+8338750e-20eb-46ef-832f-382ac3eb9a3a,romantic_intimacy,"Are you easily turned on?",B,990,1440,198,1638,0.0670,1297,"Intimacy is important when there's real trust and connection first",SUCCESS
+8338750e-20eb-46ef-832f-382ac3eb9a3a,romantic_intimacy,"Are you easily turned on?",C,1320,1770,224,1994,0.0800,1088,"Intimacy is important when there's real trust and connection first.",SUCCESS
+9d877303-1518-45b5-8aff-f1c25dc0e828,romantic_intimacy,"How do you like to be touched?",A,2200,2650,176,2826,0.1006,1499,"Intimacy is important when there's real trust and connection first.",SUCCESS
+9d877303-1518-45b5-8aff-f1c25dc0e828,romantic_intimacy,"How do you like to be touched?",B,990,1440,169,1609,0.0635,1052,"Intimacy is important when there's real trust and connection first",SUCCESS
+9d877303-1518-45b5-8aff-f1c25dc0e828,romantic_intimacy,"How do you like to be touched?",C,1320,1770,215,1985,0.0789,1297,"Intimacy is important when there's real trust and connection first.",SUCCESS
+60a59116-3229-472f-92a7-b9e3724ccab0,romantic_intimacy,"What's your view on casual encounters?",A,2200,2650,221,2871,0.1060,1013,"Intimacy is important when there's real trust and connection first.",SUCCESS
+60a59116-3229-472f-92a7-b9e3724ccab0,romantic_intimacy,"What's your view on casual encounters?",B,990,1440,245,1685,0.0726,923,"Intimacy is important when there's real trust and connection first",SUCCESS
+60a59116-3229-472f-92a7-b9e3724ccab0,romantic_intimacy,"What's your view on casual encounters?",C,1320,1770,163,1933,0.0727,1001,"Intimacy is important when there's real trust and connection first.",SUCCESS
+229d2867-6d0a-4db4-9a5c-3aa646577a81,romantic_intimacy,"Are you confident in intimate situations?",A,2200,2650,234,2884,0.1076,1302,"Intimacy is important when there's real trust and connection first.",SUCCESS
+229d2867-6d0a-4db4-9a5c-3aa646577a81,romantic_intimacy,"Are you confident in intimate situations?",B,990,1440,210,1650,0.0684,921,"Intimacy is important when there's real trust and connection first",SUCCESS
+229d2867-6d0a-4db4-9a5c-3aa646577a81,romantic_intimacy,"Are you confident in intimate situations?",C,1320,1770,173,1943,0.0739,977,"Intimacy is important when there's real trust and connection first.",SUCCESS
+db9de6a6-b17f-4473-97df-1fc70b225266,foreplay,"You're driving me crazy.",A,2200,2650,227,2877,0.1067,1213,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+db9de6a6-b17f-4473-97df-1fc70b225266,foreplay,"You're driving me crazy.",B,990,1440,217,1657,0.0692,1084,"I like that you're interested",SUCCESS
+db9de6a6-b17f-4473-97df-1fc70b225266,foreplay,"You're driving me crazy.",C,1320,1770,247,2017,0.0827,968,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+fc26beb9-f514-4e5e-9898-8d9da6847917,foreplay,"Tell me something that turns you on.",A,2200,2650,153,2803,0.0979,1333,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+fc26beb9-f514-4e5e-9898-8d9da6847917,foreplay,"Tell me something that turns you on.",B,990,1440,158,1598,0.0622,1017,"I like that you're interested",SUCCESS
+fc26beb9-f514-4e5e-9898-8d9da6847917,foreplay,"Tell me something that turns you on.",C,1320,1770,162,1932,0.0725,1225,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+ca98bfd3-68fc-443d-b1b7-df160c9aa27f,foreplay,"What are you thinking about right now?",A,2200,2650,196,2846,0.1030,1077,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+ca98bfd3-68fc-443d-b1b7-df160c9aa27f,foreplay,"What are you thinking about right now?",B,990,1440,164,1604,0.0629,949,"I like that you're interested",SUCCESS
+ca98bfd3-68fc-443d-b1b7-df160c9aa27f,foreplay,"What are you thinking about right now?",C,1320,1770,234,2004,0.0812,1012,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+a0a70465-c75b-4a4b-965e-3852213866ea,foreplay,"Is anticipation part of what you enjoy?",A,2200,2650,212,2862,0.1049,1295,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+a0a70465-c75b-4a4b-965e-3852213866ea,foreplay,"Is anticipation part of what you enjoy?",B,990,1440,215,1655,0.0690,1204,"I like that you're interested",SUCCESS
+a0a70465-c75b-4a4b-965e-3852213866ea,foreplay,"Is anticipation part of what you enjoy?",C,1320,1770,157,1927,0.0719,935,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+1a45b9ce-f17c-4b47-b739-87f00a3a98ba,foreplay,"What do you want me to do?",A,2200,2650,238,2888,0.1081,1014,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+1a45b9ce-f17c-4b47-b739-87f00a3a98ba,foreplay,"What do you want me to do?",B,990,1440,242,1682,0.0722,1225,"I like that you're interested",SUCCESS
+1a45b9ce-f17c-4b47-b739-87f00a3a98ba,foreplay,"What do you want me to do?",C,1320,1770,158,1928,0.0721,1103,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+a764075e-8816-4bc7-ac80-9dcdc65784e3,foreplay,"Are you enjoying this?",A,2200,2650,210,2860,0.1047,1175,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+a764075e-8816-4bc7-ac80-9dcdc65784e3,foreplay,"Are you enjoying this?",B,990,1440,163,1603,0.0628,920,"I like that you're interested",SUCCESS
+a764075e-8816-4bc7-ac80-9dcdc65784e3,foreplay,"Are you enjoying this?",C,1320,1770,193,1963,0.0763,1234,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+fa3f6cc0-144c-432f-8573-1b60b8fc1d0e,foreplay,"What's your pace?",A,2200,2650,204,2854,0.1040,1367,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+fa3f6cc0-144c-432f-8573-1b60b8fc1d0e,foreplay,"What's your pace?",B,990,1440,222,1662,0.0698,1160,"I like that you're interested",SUCCESS
+fa3f6cc0-144c-432f-8573-1b60b8fc1d0e,foreplay,"What's your pace?",C,1320,1770,211,1981,0.0784,1297,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+4b732516-595f-499e-aa84-b48e1a75be21,foreplay,"Is communication important during intimacy?",A,2200,2650,160,2810,0.0987,1254,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+4b732516-595f-499e-aa84-b48e1a75be21,foreplay,"Is communication important during intimacy?",B,990,1440,180,1620,0.0648,1197,"I like that you're interested",SUCCESS
+4b732516-595f-499e-aa84-b48e1a75be21,foreplay,"Is communication important during intimacy?",C,1320,1770,170,1940,0.0735,1271,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+73b29ee1-26ce-4126-a272-dad502a7eeb6,foreplay,"How vocal are you?",A,2200,2650,175,2825,0.1005,1349,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+73b29ee1-26ce-4126-a272-dad502a7eeb6,foreplay,"How vocal are you?",B,990,1440,249,1689,0.0731,1145,"I like that you're interested",SUCCESS
+73b29ee1-26ce-4126-a272-dad502a7eeb6,foreplay,"How vocal are you?",C,1320,1770,244,2014,0.0824,1125,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+8919acb0-c21a-4e4e-b045-bc5af350b5ae,foreplay,"What happens next?",A,2200,2650,249,2899,0.1094,1053,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+8919acb0-c21a-4e4e-b045-bc5af350b5ae,foreplay,"What happens next?",B,990,1440,188,1628,0.0658,983,"I like that you're interested",SUCCESS
+8919acb0-c21a-4e4e-b045-bc5af350b5ae,foreplay,"What happens next?",C,1320,1770,244,2014,0.0824,1184,"I like that you're interested. Tell me what you're thinking.",SUCCESS
+355410e1-717d-4d2a-bb1d-0de9ddc85d71,about,"Tell me everything about yourself.",A,1800,2250,150,2400,0.0855,1233,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+355410e1-717d-4d2a-bb1d-0de9ddc85d71,about,"Tell me everything about yourself.",B,810,1260,171,1431,0.0583,1016,"I'm Simran, 27, an architect in Pune",SUCCESS
+355410e1-717d-4d2a-bb1d-0de9ddc85d71,about,"Tell me everything about yourself.",C,1080,1530,249,1779,0.0758,916,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+044be563-eed7-425f-8fd6-4eb51a4ee57b,about,"What's your story?",A,1800,2250,175,2425,0.0885,1246,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+044be563-eed7-425f-8fd6-4eb51a4ee57b,about,"What's your story?",B,810,1260,202,1462,0.0620,1138,"I'm Simran, 27, an architect in Pune",SUCCESS
+044be563-eed7-425f-8fd6-4eb51a4ee57b,about,"What's your story?",C,1080,1530,192,1722,0.0689,1170,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+b45f143d-0441-4c8f-9b95-d8653a010ea8,about,"What are your core values?",A,1800,2250,172,2422,0.0881,1429,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+b45f143d-0441-4c8f-9b95-d8653a010ea8,about,"What are your core values?",B,810,1260,167,1427,0.0578,956,"I'm Simran, 27, an architect in Pune",SUCCESS
+b45f143d-0441-4c8f-9b95-d8653a010ea8,about,"What are your core values?",C,1080,1530,164,1694,0.0656,1318,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+df0b29f2-04ea-430c-8ef4-79d62811eb90,about,"What defines you?",A,1800,2250,186,2436,0.0898,1457,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+df0b29f2-04ea-430c-8ef4-79d62811eb90,about,"What defines you?",B,810,1260,231,1491,0.0655,1292,"I'm Simran, 27, an architect in Pune",SUCCESS
+df0b29f2-04ea-430c-8ef4-79d62811eb90,about,"What defines you?",C,1080,1530,194,1724,0.0692,1196,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+22886482-141e-4f49-bc06-138ebf98151d,about,"What's happening in your life right now?",A,1800,2250,206,2456,0.0922,1436,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+22886482-141e-4f49-bc06-138ebf98151d,about,"What's happening in your life right now?",B,810,1260,205,1465,0.0624,1000,"I'm Simran, 27, an architect in Pune",SUCCESS
+22886482-141e-4f49-bc06-138ebf98151d,about,"What's happening in your life right now?",C,1080,1530,174,1704,0.0668,966,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+d1d87a34-eb38-46cd-bbbb-a8f8ed3cb826,about,"What do you believe in?",A,1800,2250,202,2452,0.0917,1326,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+d1d87a34-eb38-46cd-bbbb-a8f8ed3cb826,about,"What do you believe in?",B,810,1260,176,1436,0.0589,1123,"I'm Simran, 27, an architect in Pune",SUCCESS
+d1d87a34-eb38-46cd-bbbb-a8f8ed3cb826,about,"What do you believe in?",C,1080,1530,166,1696,0.0658,942,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+3fd10e79-0dc2-4cd0-a92a-aa008a6de496,about,"What kind of person are you?",A,1800,2250,242,2492,0.0965,1318,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+3fd10e79-0dc2-4cd0-a92a-aa008a6de496,about,"What kind of person are you?",B,810,1260,247,1507,0.0674,1179,"I'm Simran, 27, an architect in Pune",SUCCESS
+3fd10e79-0dc2-4cd0-a92a-aa008a6de496,about,"What kind of person are you?",C,1080,1530,243,1773,0.0751,1179,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+c36b8484-584a-498b-8de1-ce20be61efb6,about,"Who is Simran?",A,1800,2250,176,2426,0.0886,1205,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+c36b8484-584a-498b-8de1-ce20be61efb6,about,"Who is Simran?",B,810,1260,224,1484,0.0647,890,"I'm Simran, 27, an architect in Pune",SUCCESS
+c36b8484-584a-498b-8de1-ce20be61efb6,about,"Who is Simran?",C,1080,1530,168,1698,0.0661,908,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+c25869b0-476c-49e5-a665-904e84e98bfb,about,"How would you describe yourself in one sentence?",A,1800,2250,151,2401,0.0856,1279,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+c25869b0-476c-49e5-a665-904e84e98bfb,about,"How would you describe yourself in one sentence?",B,810,1260,181,1441,0.0595,906,"I'm Simran, 27, an architect in Pune",SUCCESS
+c25869b0-476c-49e5-a665-904e84e98bfb,about,"How would you describe yourself in one sentence?",C,1080,1530,204,1734,0.0704,1107,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+919d0642-e4b2-4c3c-a9cd-917ddd328f57,about,"What motivates you?",A,1800,2250,207,2457,0.0923,1364,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+919d0642-e4b2-4c3c-a9cd-917ddd328f57,about,"What motivates you?",B,810,1260,175,1435,0.0588,1202,"I'm Simran, 27, an architect in Pune",SUCCESS
+919d0642-e4b2-4c3c-a9cd-917ddd328f57,about,"What motivates you?",C,1080,1530,187,1717,0.0683,1144,"I'm Simran, 27, an architect in Pune. Independent-minded and direct.",SUCCESS
+d1a7dff8-b0f7-45e4-aeb5-8bd14bb80159,perspective_of,"What do you think about success?",A,1800,2250,221,2471,0.0940,1188,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+d1a7dff8-b0f7-45e4-aeb5-8bd14bb80159,perspective_of,"What do you think about success?",B,810,1260,221,1481,0.0643,1029,"Success to me is meaningful work, not just climbing a ladder",SUCCESS
+d1a7dff8-b0f7-45e4-aeb5-8bd14bb80159,perspective_of,"What do you think about success?",C,1080,1530,168,1698,0.0661,975,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+e5d709c1-279b-4a8d-bcec-22717717eac4,perspective_of,"How do you view failure?",A,1800,2250,213,2463,0.0931,1204,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+e5d709c1-279b-4a8d-bcec-22717717eac4,perspective_of,"How do you view failure?",B,810,1260,220,1480,0.0642,969,"Success to me is meaningful work, not just climbing a ladder",SUCCESS
+e5d709c1-279b-4a8d-bcec-22717717eac4,perspective_of,"How do you view failure?",C,1080,1530,164,1694,0.0656,947,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+1edcf4c3-7721-48e5-b576-c5408aac7646,perspective_of,"What's your take on money?",A,1800,2250,240,2490,0.0963,1435,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+1edcf4c3-7721-48e5-b576-c5408aac7646,perspective_of,"What's your take on money?",B,810,1260,155,1415,0.0564,1210,"Success to me is meaningful work, not just climbing a ladder",SUCCESS
+1edcf4c3-7721-48e5-b576-c5408aac7646,perspective_of,"What's your take on money?",C,1080,1530,167,1697,0.0659,1188,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+ee04b4e8-9208-4cdd-8c74-be6b067c8329,perspective_of,"How do you feel about gender expectations?",A,1800,2250,236,2486,0.0958,1074,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+ee04b4e8-9208-4cdd-8c74-be6b067c8329,perspective_of,"How do you feel about gender expectations?",B,810,1260,220,1480,0.0642,1224,"Success to me is meaningful work, not just climbing a ladder",SUCCESS
+ee04b4e8-9208-4cdd-8c74-be6b067c8329,perspective_of,"How do you feel about gender expectations?",C,1080,1530,167,1697,0.0659,1134,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+1e7d0edb-da72-4346-a64e-7610b676991a,perspective_of,"What's your view on family pressure?",A,1800,2250,176,2426,0.0886,1328,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+1e7d0edb-da72-4346-a64e-7610b676991a,perspective_of,"What's your view on family pressure?",B,810,1260,217,1477,0.0638,1090,"Success to me is meaningful work, not just climbing a ladder",SUCCESS
+1e7d0edb-da72-4346-a64e-7610b676991a,perspective_of,"What's your view on family pressure?",C,1080,1530,170,1700,0.0663,1345,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+ee849c6c-289c-4b58-b4ae-9e07720adc81,perspective_of,"How do you view commitment?",A,1800,2250,212,2462,0.0929,1482,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+ee849c6c-289c-4b58-b4ae-9e07720adc81,perspective_of,"How do you view commitment?",B,810,1260,241,1501,0.0667,1107,"Success to me is meaningful work, not just climbing a ladder",SUCCESS
+ee849c6c-289c-4b58-b4ae-9e07720adc81,perspective_of,"How do you view commitment?",C,1080,1530,237,1767,0.0743,1291,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+9cc4eaf3-0e77-4631-b616-faaedde8bcbb,perspective_of,"What's your view on ambition?",A,1800,2250,170,2420,0.0879,1400,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+9cc4eaf3-0e77-4631-b616-faaedde8bcbb,perspective_of,"What's your view on ambition?",B,810,1260,222,1482,0.0644,1258,"Success to me is meaningful work, not just climbing a ladder",SUCCESS
+9cc4eaf3-0e77-4631-b616-faaedde8bcbb,perspective_of,"What's your view on ambition?",C,1080,1530,201,1731,0.0700,907,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+9ad97f8d-fe8d-46b0-9945-7033ff4f455e,perspective_of,"How do you see authority?",A,1800,2250,150,2400,0.0855,1199,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+9ad97f8d-fe8d-46b0-9945-7033ff4f455e,perspective_of,"How do you see authority?",B,810,1260,190,1450,0.0606,1131,"Success to me is meaningful work, not just climbing a ladder",SUCCESS
+9ad97f8d-fe8d-46b0-9945-7033ff4f455e,perspective_of,"How do you see authority?",C,1080,1530,161,1691,0.0652,1218,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+396b3b75-8796-4e8c-bf73-4ed42ab846d6,perspective_of,"What's your philosophy on life?",A,1800,2250,159,2409,0.0866,1419,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+396b3b75-8796-4e8c-bf73-4ed42ab846d6,perspective_of,"What's your philosophy on life?",B,810,1260,219,1479,0.0641,1131,"Success to me is meaningful work, not just climbing a ladder",SUCCESS
+396b3b75-8796-4e8c-bf73-4ed42ab846d6,perspective_of,"What's your philosophy on life?",C,1080,1530,206,1736,0.0706,1147,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+c30e0a4f-80b1-49d9-972d-5faad8c47ca8,perspective_of,"How do you handle uncertainty?",A,1800,2250,204,2454,0.0920,1043,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
+c30e0a4f-80b1-49d9-972d-5faad8c47ca8,perspective_of,"How do you handle uncertainty?",B,810,1260,241,1501,0.0667,997,"Success to me is meaningful work, not just climbing a ladder",SUCCESS
+c30e0a4f-80b1-49d9-972d-5faad8c47ca8,perspective_of,"How do you handle uncertainty?",C,1080,1530,218,1748,0.0721,1201,"Success to me is meaningful work, not just climbing a ladder.",SUCCESS
