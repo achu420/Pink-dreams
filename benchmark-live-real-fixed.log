@@ -1,3 +1,554 @@
 ﻿Initialized native services in: C:\Users\Achal\.gradle\native
 Initialized jansi services in: C:\Users\Achal\.gradle\native
 Received JVM installation metadata from 'C:\Program Files\Amazon Corretto\jdk21.0.12_9': {JAVA_HOME=C:\Program Files\Amazon Corretto\jdk21.0.12_9, JAVA_VERSION=21.0.12.1, JAVA_VENDOR=Amazon.com Inc., RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=21.0.12.1+9-LTS, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=21.0.12.1+9-LTS, VM_VENDOR=Amazon.com Inc., OS_ARCH=amd64}
+Found daemon DaemonInfo{pid=29984, address=[4ce6c8f2-2f7f-45d2-8da7-cfb953ecddc9 port:62357, addresses:[/127.0.0.1]], state=Idle, lastBusy=1790320667771, context=DefaultDaemonContext[uid=66b1515c-d46b-453f-b6b5-f30a9d9d7822,javaHome=C:\Program Files\Amazon Corretto\jdk21.0.12_9,daemonRegistryDir=C:\Users\Achal\.gradle\daemon,pid=29984,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,daemonOpts=--add-opens=java.base/java.util=ALL-UNNAMED,--add-opens=java.base/java.lang=ALL-UNNAMED,--add-opens=java.base/java.lang.invoke=ALL-UNNAMED,--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED,--add-opens=java.base/java.nio.charset=ALL-UNNAMED,--add-opens=java.base/java.net=ALL-UNNAMED,--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED,-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]} however its context does not match the desired criteria.
+At least one daemon option is different.
+Wanted: DefaultDaemonContext[uid=null,javaHome=C:\Program Files\Amazon Corretto\jdk21.0.12_9,daemonRegistryDir=C:\Users\Achal\.gradle\daemon,pid=24328,idleTimeout=null,priority=NORMAL,applyInstrumentationAgent=true,daemonOpts=--add-opens=java.base/java.util=ALL-UNNAMED,--add-opens=java.base/java.lang=ALL-UNNAMED,--add-opens=java.base/java.lang.invoke=ALL-UNNAMED,--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED,--add-opens=java.base/java.nio.charset=ALL-UNNAMED,--add-opens=java.base/java.net=ALL-UNNAMED,--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED,-Xmx2g,-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]
+Actual: DefaultDaemonContext[uid=66b1515c-d46b-453f-b6b5-f30a9d9d7822,javaHome=C:\Program Files\Amazon Corretto\jdk21.0.12_9,daemonRegistryDir=C:\Users\Achal\.gradle\daemon,pid=29984,idleTimeout=10800000,priority=NORMAL,applyInstrumentationAgent=true,daemonOpts=--add-opens=java.base/java.util=ALL-UNNAMED,--add-opens=java.base/java.lang=ALL-UNNAMED,--add-opens=java.base/java.lang.invoke=ALL-UNNAMED,--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED,--add-opens=java.base/java.nio.charset=ALL-UNNAMED,--add-opens=java.base/java.net=ALL-UNNAMED,--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED,-Dfile.encoding=UTF-8,-Duser.country=US,-Duser.language=en,-Duser.variant]
+
+  Looking for a different daemon...
+The client will now receive all logging from the daemon (pid: 5940). The daemon log file: C:\Users\Achal\.gradle\daemon\8.7\daemon-5940.out.log
+Starting 10th build in daemon [uptime: 1 hrs 22 mins 10.189 secs, performance: 100%, GC rate: 0.00/s, heap usage: 0% of 2 GiB]
+Using 8 worker leases.
+Now considering [E:\Projects\Pink dreams] as hierarchies to watch
+Closing daemon's stdin at end of input.
+The daemon will no longer process any standard input.
+Watching the file system is configured to be enabled if available
+File system watching is active
+Starting Build
+Settings evaluated using settings file 'E:\Projects\Pink dreams\settings.gradle.kts'.
+Projects loaded. Root project using build file 'E:\Projects\Pink dreams\build.gradle.kts'.
+Included projects: [root project 'pink-dreams']
+
+> Configure project :
+Evaluating root project 'pink-dreams' using build file 'E:\Projects\Pink dreams\build.gradle.kts'.
+Caching disabled for Kotlin DSL script compilation (Project/TopLevel/stage1) because:
+  Build cache is disabled
+Transforming plugin-2.3.12.jar (io.ktor.plugin:plugin:2.3.12) with ExternalDependencyInstrumentingArtifactTransform
+Transforming shadow-7.1.2.jar (gradle.plugin.com.github.johnrengelman:shadow:7.1.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming log4j-core-2.17.1.jar (org.apache.logging.log4j:log4j-core:2.17.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-stdlib-1.9.22.jar (org.jetbrains.kotlin:kotlin-stdlib:1.9.22) with ExternalDependencyInstrumentingArtifactTransform
+Transforming annotations-13.0.jar (org.jetbrains:annotations:13.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-serialization-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-serialization:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-api-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-1.9.25-gradle82.jar (org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-idea-proto-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea-proto:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-idea-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-klib-commonizer-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-native-utils-1.9.25.jar (org.jetbrains.kotlin:kotlin-native-utils:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-util-klib-1.9.25.jar (org.jetbrains.kotlin:kotlin-util-klib:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-build-tools-api-1.9.25.jar (org.jetbrains.kotlin:kotlin-build-tools-api:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-android-extensions-1.9.25.jar (org.jetbrains.kotlin:kotlin-android-extensions:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-compiler-runner-1.9.25.jar (org.jetbrains.kotlin:kotlin-compiler-runner:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-compiler-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-compiler-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-compiler-impl-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-gradle-plugin-3.4.1.jar (com.google.cloud.tools:jib-gradle-plugin:3.4.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-gradle-plugin-annotations-1.9.25.jar (org.jetbrains.kotlin:kotlin-gradle-plugin-annotations:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-project-model-1.9.25.jar (org.jetbrains.kotlin:kotlin-project-model:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-tooling-core-1.9.25.jar (org.jetbrains.kotlin:kotlin-tooling-core:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-util-io-1.9.25.jar (org.jetbrains.kotlin:kotlin-util-io:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-daemon-embeddable-1.9.25.jar (org.jetbrains.kotlin:kotlin-daemon-embeddable:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming trove4j-1.0.20200330.jar (org.jetbrains.intellij.deps:trove4j:1.0.20200330) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-daemon-client-1.9.25.jar (org.jetbrains.kotlin:kotlin-daemon-client:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlinx-coroutines-core-jvm-1.5.0.jar (org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.5.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-jvm-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-jvm:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming kotlin-scripting-common-1.9.25.jar (org.jetbrains.kotlin:kotlin-scripting-common:1.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-http-client-apache-v2-1.42.2.jar (com.google.http-client:google-http-client-apache-v2:1.42.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-auth-library-oauth2-http-1.10.0.jar (com.google.auth:google-auth-library-oauth2-http:1.10.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-http-client-gson-1.42.2.jar (com.google.http-client:google-http-client-gson:1.42.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-http-client-1.42.2.jar (com.google.http-client:google-http-client:1.42.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-compress-1.21.jar (org.apache.commons:commons-compress:1.21) with ExternalDependencyInstrumentingArtifactTransform
+Transforming opencensus-contrib-http-util-0.31.1.jar (io.opencensus:opencensus-contrib-http-util:0.31.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming guava-32.1.2-jre.jar (com.google.guava:guava:32.1.2-jre) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-datatype-jsr310-2.15.2.jar (com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming native-gradle-plugin-0.9.25.jar (org.graalvm.buildtools:native-gradle-plugin:0.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming utils-0.9.25.jar (org.graalvm.buildtools:utils:0.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming graalvm-reachability-metadata-0.9.25.jar (org.graalvm.buildtools:graalvm-reachability-metadata:0.9.25) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-databind-2.15.2.jar (com.fasterxml.jackson.core:jackson-databind:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-annotations-2.15.2.jar (com.fasterxml.jackson.core:jackson-annotations:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jackson-core-2.15.2.jar (com.fasterxml.jackson.core:jackson-core:2.15.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-commons-9.2.jar (org.ow2.asm:asm-commons:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-analysis-9.2.jar (org.ow2.asm:asm-analysis:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-tree-9.2.jar (org.ow2.asm:asm-tree:9.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming asm-9.5.jar (org.ow2.asm:asm:9.5) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-gradle-plugin-extension-api-0.4.0.jar (com.google.cloud.tools:jib-gradle-plugin-extension-api:0.4.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-build-plan-0.4.0.jar (com.google.cloud.tools:jib-build-plan:0.4.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jib-plugins-extension-common-0.2.0.jar (com.google.cloud.tools:jib-plugins-extension-common:0.2.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jdom2-2.0.6.jar (org.jdom:jdom2:2.0.6) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-io-2.11.0.jar (commons-io:commons-io:2.11.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming ant-1.10.11.jar (org.apache.ant:ant:1.10.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming plexus-utils-3.4.1.jar (org.codehaus.plexus:plexus-utils:3.4.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jdependency-2.7.0.jar (org.vafer:jdependency:2.7.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming httpclient-4.5.13.jar (org.apache.httpcomponents:httpclient:4.5.13) with ExternalDependencyInstrumentingArtifactTransform
+Transforming httpcore-4.4.15.jar (org.apache.httpcomponents:httpcore:4.4.15) with ExternalDependencyInstrumentingArtifactTransform
+Transforming jsr305-3.0.2.jar (com.google.code.findbugs:jsr305:3.0.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming j2objc-annotations-2.8.jar (com.google.j2objc:j2objc-annotations:2.8) with ExternalDependencyInstrumentingArtifactTransform
+Transforming opencensus-api-0.31.1.jar (io.opencensus:opencensus-api:0.31.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming auto-value-annotations-1.9.jar (com.google.auto.value:auto-value-annotations:1.9) with ExternalDependencyInstrumentingArtifactTransform
+Transforming google-auth-library-credentials-1.10.0.jar (com.google.auth:google-auth-library-credentials:1.10.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming failureaccess-1.0.1.jar (com.google.guava:failureaccess:1.0.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar (com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava) with ExternalDependencyInstrumentingArtifactTransform
+Transforming checker-qual-3.33.0.jar (org.checkerframework:checker-qual:3.33.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming error_prone_annotations-2.18.0.jar (com.google.errorprone:error_prone_annotations:2.18.0) with ExternalDependencyInstrumentingArtifactTransform
+Transforming ant-launcher-1.10.11.jar (org.apache.ant:ant-launcher:1.10.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming log4j-api-2.17.1.jar (org.apache.logging.log4j:log4j-api:2.17.1) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-logging-1.2.jar (commons-logging:commons-logging:1.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming commons-codec-1.11.jar (commons-codec:commons-codec:1.11) with ExternalDependencyInstrumentingArtifactTransform
+Transforming grpc-context-1.27.2.jar (io.grpc:grpc-context:1.27.2) with ExternalDependencyInstrumentingArtifactTransform
+Transforming gson-2.9.0.jar (com.google.code.gson:gson:2.9.0) with ExternalDependencyInstrumentingArtifactTransform
+Using Kotlin Gradle Plugin gradle82 variant
+kotlin scripting plugin: created the scripting discovery configuration: kotlinScriptDef
+kotlin scripting plugin: created the scripting discovery configuration: testKotlinScriptDef
+Caching disabled for Kotlin DSL script compilation (Project/TopLevel/stage2) because:
+  Build cache is disabled
+All projects evaluated.
+Task name matched 'test'
+Selected primary task 'test' from project :
+Tasks to be executed: [task ':checkKotlinGradlePluginConfigurationErrors', task ':compileKotlin', task ':compileJava', task ':processResources', task ':classes', task ':compileTestKotlin', task ':compileTestJava', task ':processTestResources', task ':testClasses', task ':test']
+Tasks that were excluded: []
+Resolve mutations for :checkKotlinGradlePluginConfigurationErrors (Thread[#705,Execution worker,5,main]) started.
+:checkKotlinGradlePluginConfigurationErrors (Thread[#705,Execution worker,5,main]) started.
+
+> Task :checkKotlinGradlePluginConfigurationErrors
+Caching disabled for task ':checkKotlinGradlePluginConfigurationErrors' because:
+  Build cache is disabled
+Task ':checkKotlinGradlePluginConfigurationErrors' is not up-to-date because:
+  Task has not declared any outputs despite executing actions.
+Resolve mutations for :compileKotlin (Thread[#705,Execution worker,5,main]) started.
+:compileKotlin (Thread[#705,Execution worker,5,main]) started.
+
+> Task :compileKotlin UP-TO-DATE
+Transforming exposed-jdbc-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-java-time-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-core-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-content-negotiation-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-call-logging-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-status-pages-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-auth-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-netty-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-host-common-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-sessions-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-json-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websocket-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-events-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websockets-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-cio-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-utils-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-io-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk8-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk7-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-core-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-json-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-reflect-1.9.21.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming postgresql-42.7.4.jar with ClasspathEntrySnapshotTransform
+Transforming HikariCP-5.1.0.jar with ClasspathEntrySnapshotTransform
+Transforming logback-classic-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-jdk8-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-core-jvm-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming annotations-23.0.0.jar with ClasspathEntrySnapshotTransform
+Transforming slf4j-api-2.0.15.jar with ClasspathEntrySnapshotTransform
+Transforming config-1.4.3.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http2-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming alpn-api-1.1.3.v20160715.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming logback-core-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-handler-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-unix-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-buffer-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-resolver-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Caching disabled for task ':compileKotlin' because:
+  Build cache is disabled
+Skipping task ':compileKotlin' as it is up-to-date.
+Resolve mutations for :compileJava (Thread[#705,Execution worker,5,main]) started.
+:compileJava (Thread[#705,Execution worker,5,main]) started.
+
+> Task :compileJava NO-SOURCE
+Skipping task ':compileJava' as it has no source files and no previous output files.
+Resolve mutations for :processResources (Thread[#705,Execution worker,5,main]) started.
+:processResources (Thread[#705,Execution worker,5,main]) started.
+
+> Task :processResources UP-TO-DATE
+Caching disabled for task ':processResources' because:
+  Build cache is disabled
+  Not worth caching
+Skipping task ':processResources' as it is up-to-date.
+Resolve mutations for :classes (Thread[#705,Execution worker,5,main]) started.
+:classes (Thread[#705,Execution worker,5,main]) started.
+
+> Task :classes UP-TO-DATE
+Skipping task ':classes' as it has no actions.
+Resolve mutations for :compileTestKotlin (Thread[#705,Execution worker,5,main]) started.
+:compileTestKotlin (Thread[#705,Execution worker,5,main]) started.
+
+> Task :compileTestKotlin UP-TO-DATE
+Transforming main with ClasspathEntrySnapshotTransform
+Transforming main with ClasspathEntrySnapshotTransform
+Transforming exposed-jdbc-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-java-time-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming exposed-core-0.53.0.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-test-junit5-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-test-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-content-negotiation-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-test-host-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-call-logging-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-status-pages-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-auth-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-netty-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-host-common-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-sessions-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-websockets-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-server-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-json-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-kotlinx-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-apache-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-cio-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-client-core-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websocket-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-serialization-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-events-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-resources-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-tls-certificates-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-tls-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-websockets-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-cio-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-http-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-network-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-utils-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-test-dispatcher-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming ktor-io-jvm-2.3.12.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk8-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-jdk7-1.8.22.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-core-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-serialization-json-jvm-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-reflect-1.9.21.jar with ClasspathEntrySnapshotTransform
+Transforming kotlin-stdlib-1.9.25.jar with ClasspathEntrySnapshotTransform
+Transforming postgresql-42.7.4.jar with ClasspathEntrySnapshotTransform
+Transforming HikariCP-5.1.0.jar with ClasspathEntrySnapshotTransform
+Transforming logback-classic-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming h2-2.2.224.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-jdk8-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming kotlinx-coroutines-core-jvm-1.8.1.jar with ClasspathEntrySnapshotTransform
+Transforming annotations-23.0.0.jar with ClasspathEntrySnapshotTransform
+Transforming slf4j-api-2.0.15.jar with ClasspathEntrySnapshotTransform
+Transforming config-1.4.3.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http2-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming alpn-api-1.1.3.v20160715.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming logback-core-1.5.7.jar with ClasspathEntrySnapshotTransform
+Transforming junit-4.13.2.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-http-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-handler-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-codec-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-kqueue-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-classes-epoll-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-native-unix-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-transport-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-buffer-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-resolver-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming netty-common-4.1.111.Final.jar with ClasspathEntrySnapshotTransform
+Transforming hamcrest-core-1.3.jar with ClasspathEntrySnapshotTransform
+Transforming junit-platform-commons-1.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming junit-jupiter-api-5.6.3.jar with ClasspathEntrySnapshotTransform
+Transforming httpasyncclient-4.1.5.jar with ClasspathEntrySnapshotTransform
+Transforming apiguardian-api-1.1.0.jar with ClasspathEntrySnapshotTransform
+Transforming opentest4j-1.2.0.jar with ClasspathEntrySnapshotTransform
+Transforming httpcore-nio-4.4.15.jar with ClasspathEntrySnapshotTransform
+Transforming httpclient-4.5.13.jar with ClasspathEntrySnapshotTransform
+Transforming httpcore-4.4.15.jar with ClasspathEntrySnapshotTransform
+Transforming commons-logging-1.2.jar with ClasspathEntrySnapshotTransform
+Transforming commons-codec-1.11.jar with ClasspathEntrySnapshotTransform
+Caching disabled for task ':compileTestKotlin' because:
+  Build cache is disabled
+Skipping task ':compileTestKotlin' as it is up-to-date.
+Resolve mutations for :compileTestJava (Thread[#705,Execution worker,5,main]) started.
+:compileTestJava (Thread[#705,Execution worker,5,main]) started.
+
+> Task :compileTestJava NO-SOURCE
+Skipping task ':compileTestJava' as it has no source files and no previous output files.
+Resolve mutations for :processTestResources (Thread[#705,Execution worker,5,main]) started.
+:processTestResources (Thread[#705,Execution worker,5,main]) started.
+
+> Task :processTestResources NO-SOURCE
+Skipping task ':processTestResources' as it has no source files and no previous output files.
+Resolve mutations for :testClasses (Thread[#705,Execution worker,5,main]) started.
+:testClasses (Thread[#705,Execution worker,5,main]) started.
+
+> Task :testClasses UP-TO-DATE
+Skipping task ':testClasses' as it has no actions.
+Resolve mutations for :test (Thread[#705,Execution worker,5,main]) started.
+:test (Thread[#705,Execution worker,5,main]) started.
+
+> Task :test
+Caching disabled for task ':test' because:
+  Build cache is disabled
+Task ':test' is not up-to-date because:
+  Task has failed previously.
+file or directory 'E:\Projects\Pink dreams\build\classes\java\test', not found
+Starting process 'Gradle Test Executor 5'. Working directory: E:\Projects\Pink dreams Command: C:\Program Files\Amazon Corretto\jdk21.0.12_9\bin\java.exe -Dorg.gradle.internal.worker.tmpdir=E:\Projects\Pink dreams\build\tmp\test\work -Dorg.gradle.native=false @C:\Users\Achal\.gradle\.tmp\gradle-worker-classpath10936234979455553594txt -Xmx2g -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -ea worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Test Executor 5'
+Successfully started process 'Gradle Test Executor 5'
+
+Gradle Test Executor 5 started executing tests.
+
+> Task :test
+
+PersonaContextPocLiveRealBenchmark > execute live openrouter benchmark - real api calls() STANDARD_OUT
+
+    ????????????????????????????????????????????????????????????????
+    LIVE OPENROUTER BENCHMARK � REAL API CALLS
+    Execution model: 1 scenario ? all 3 variants ? verify ? next
+    ????????????????????????????????????????????????????????????????
+
+    ? LLM Config loaded
+      Endpoint: https://openrouter.ai/api/v1/chat/completions
+      Model: deepseek/deepseek-v4-flash-0731
+      API Key: ? loaded
+
+    ? 85 scenarios loaded
+
+
+PersonaContextPocLiveRealBenchmark > execute live openrouter benchmark - real api calls() STANDARD_ERROR
+    SLF4J(I): Connected with provider of type [ch.qos.logback.classic.spi.LogbackServiceProvider]
+
+PersonaContextPocLiveRealBenchmark > execute live openrouter benchmark - real api calls() STANDARD_OUT
+    ??????????????????????????????????????????????????????????????????????
+    [1/85] GENERAL_CHAT � Personality
+    User: Hey, how's your day going?...
+
+      Variant A... ? 6026ms | 219?221 tokens | $0.1235
+      Variant B... ? 4941ms | 119?136 tokens | $0.0738
+      Variant C... ? 2655ms | 78?194 tokens | $0.0924
+
+      Variant A: "Hey! It's going okay, yaar. Just wrapping up a client presen..."
+      Variant B: "Hey! Day's been pretty solid, actually. Just wrapped up a si..."
+      Variant C: "Hey! It's been a mixed bag, honestly. Just got back from sit..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [2/85] GENERAL_CHAT � Narrative
+    User: What are you up to these days?...
+
+      Variant A... ? 7511ms | 219?126 tokens | $0.0836
+      Variant B... ? 6391ms | 119?125 tokens | $0.0692
+      Variant C... ? 24089ms | 157?585 tokens | $0.2677
+
+      Variant A: " Ah yaar, nothing too crazy � just juggling work and life as..."
+      Variant B: " Honestly? Juggling a ton of site visits and finalizing a re..."
+      Variant C: "Hey! Keeping busy, as always. I'm neck-deep in this restaura..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [3/85] GENERAL_CHAT � Identity
+    User: Tell me about yourself briefly....
+
+      Variant A... ? 28338ms | 217?411 tokens | $0.2030
+      Variant B... ? 1434ms | 117?95 tokens | $0.0563
+      Variant C... ? 15410ms | 76?270 tokens | $0.1240
+
+      Variant A: "Oh bhai, itna formal? Theek hai, brief mein bata deti hoon. ..."
+      Variant B: "I�m Simran, 27, an architect based in Pune. I design spaces ..."
+      Variant C: "I'm Simran, 27, an architect in Pune. I've been designing sp..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [4/85] GENERAL_CHAT � Preferences
+    User: What kind of conversations do you enjoy?...
+
+      Variant A... ? ERROR: Socket timeout has expired [url=https://openrouter.ai/api/v1/chat/completions, socket_timeout=unknown] ms
+      Variant B... ? 8021ms | 119?228 tokens | $0.1124
+      Variant C... ? 7416ms | 157?177 tokens | $0.0963
+
+      Variant B: "Honestly, I enjoy conversations that have some depth to them..."
+      Variant C: "Honestly, I love conversations that go beyond the usual smal..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [5/85] GENERAL_CHAT � Personality
+    User: How do you handle stress?...
+
+      Variant A... ? 2276ms | 217?198 tokens | $0.1135
+      Variant B... ? 13425ms | 117?306 tokens | $0.1449
+      Variant C... ? 9132ms | 76?219 tokens | $0.1026
+
+      Variant A: "Arre, honestly? Stress toh aata hi hai especially jab client..."
+      Variant B: " Honestly? Stress and I have a love-hate relationship. Being..."
+      Variant C: "Honestly, it depends on the kind of stress. With work deadli..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [6/85] GENERAL_CHAT � Continuity
+    User: You mentioned Ladakh last time - still happening?...
+
+      Variant A... ? 3309ms | 221?249 tokens | $0.1355
+      Variant B... ? 3677ms | 121?153 tokens | $0.0812
+      Variant C... ? 12122ms | 159?238 tokens | $0.1222
+
+      Variant A: "Haan, absolutely! Ladakh is still on. October's the perfect ..."
+      Variant B: "Yeah, it's still on. I've been loosely planning it for mid-S..."
+      Variant C: "Yeah, it's still happening! I'm actually finalizing the itin..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [7/85] GENERAL_CHAT � Personality
+    User: Are you an introvert or extrovert?...
+
+      Variant A... ? 13685ms | 221?220 tokens | $0.1233
+      Variant B... ? 5344ms | 42?410 tokens | $0.1781
+      Variant C... ? 4987ms | 159?212 tokens | $0.1113
+
+      Variant A: "Haan, mostly introvert, honestly. Like, I can do people well..."
+      Variant B: "Honestly? I'm a proper ambivert. Depends entirely on the sit..."
+      Variant C: "Honestly, I'm more of an introvert. I love my own space and ..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [8/85] GENERAL_CHAT � Preferences
+    User: What do you like to do in your free time?...
+
+      Variant A... ? 13021ms | 222?275 tokens | $0.1466
+      Variant B... ? 18282ms | 122?423 tokens | $0.1947
+      Variant C... ? 6128ms | 160?200 tokens | $0.1064
+
+      Variant A: " Arre, free time mein I love to just pack a bag and get out ..."
+      Variant B: "Hey! That's a great question. Honestly, when I'm not caught ..."
+      Variant C: "Free time? Honestly, I don't get much of it, but when I do, ..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [9/85] GENERAL_CHAT � Worldview
+    User: How do you view relationships?...
+
+      Variant A... ? 3115ms | 217?486 tokens | $0.2345
+      Variant B... ? 2435ms | 117?261 tokens | $0.1260
+      Variant C... ? 12891ms | 155?415 tokens | $0.1960
+
+      Variant A: "Arre, relationships? Dekh, main bahut seedhi baat karti hoon..."
+      Variant B: "Honestly? I see relationships like architecture�they need a ..."
+      Variant C: "Honestly? I see relationships like good architecture. They n..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [10/85] GENERAL_CHAT � Identity
+    User: Where are you from originally?...
+
+      Variant A... ? 4088ms | 217?110 tokens | $0.0766
+      Variant B... ? 6628ms | 117?176 tokens | $0.0903
+      Variant C... ? 8849ms | 155?175 tokens | $0.0952
+
+      Variant A: "Ah, I'm a proper Pune girl, born and raised. Lived here my w..."
+      Variant B: " Born and raised in Pune, actually. Lived here my whole life..."
+      Variant C: "Born and raised in Pune, actually. Lived here all my life�Ko..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [11/85] GENERAL_CHAT � Narrative
+    User: Tell me about your work....
+
+      Variant A... ? 13809ms | 217?369 tokens | $0.1854
+      Variant B... ? 2963ms | 117?280 tokens | $0.1340
+      Variant C... ? 13931ms | 155?703 tokens | $0.3170
+
+      Variant A: "Ah, work! It's actually going decent. I'm an architect in Pu..."
+      Variant B: "I'm an architect in Pune, so my work is a mix of design, sit..."
+      Variant C: "Oh, it�s a proper juggling act right now. I�m an architect, ..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [12/85] GENERAL_CHAT � Personality
+    User: What frustrates you?...
+
+      Variant A... ? 7623ms | 137?282 tokens | $0.1376
+      Variant B... ? 8274ms | 116?260 tokens | $0.1254
+      Variant C... ? 10484ms | 154?360 tokens | $0.1728
+
+      Variant A: "Arre yaar, honestly? Flaky log. When people say "we'll meet"..."
+      Variant B: "Honestly? People who treat design like it's just decoration...."
+      Variant C: "Honestly? Bad design in public spaces. I can't help but noti..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [13/85] GENERAL_CHAT � Preferences
+    User: How do you like to be communicated with?...
+
+      Variant A... ? 11615ms | 220?325 tokens | $0.1673
+      Variant B... ? 7033ms | 120?221 tokens | $0.1096
+      Variant C... ? 8597ms | 158?306 tokens | $0.1506
+
+      Variant A: " Arre, honestly? Just be direct with me. I don't have time f..."
+      Variant B: "Honestly? Just be straight with me. I don't do well with exc..."
+      Variant C: "Honestly, I appreciate directness. No beating around the bus..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [14/85] GENERAL_CHAT � Continuity
+    User: How's Ritu doing?...
+
+      Variant A... ? 5091ms | 217?127 tokens | $0.0837
+      Variant B... ? 5421ms | 117?121 tokens | $0.0672
+      Variant C... ? 2264ms | 155?177 tokens | $0.0960
+
+      Variant A: " Ritu is doing great, yaar. She's been busy with her new pro..."
+      Variant B: "Ritu's doing well, actually. Just got a promotion at work�sh..."
+      Variant C: "Ritu's doing great, actually! She just got promoted at her m..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [15/85] GENERAL_CHAT � Personality
+    User: Do you like comfort or adventure more?...
+
+      Variant A... ? 8998ms | 219?286 tokens | $0.1508
+      Variant B... ? 8889ms | 119?291 tokens | $0.1389
+      Variant C... ? 17167ms | 157?239 tokens | $0.1224
+
+      Variant A: "Comfort and adventure? Honestly, it depends on the situation..."
+      Variant B: "Honestly? I need both, but if you're forcing me to pick a si..."
+      Variant C: "Honestly, both, but in different ways. Like, I need my comfo..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [16/85] FRIENDSHIP � Identity
+    User: Tell me about your closest friend....
+
+      Variant A... ? 8499ms | 218?181 tokens | $0.1065
+      Variant B... ? 12537ms | 39?295 tokens | $0.1294
+      Variant C... ? 19238ms | 156?321 tokens | $0.1567
+
+      Variant A: "Arre, closest friend toh meri flatmate Ritu hai. We've been ..."
+      Variant B: "My closest friend is Neha�we've been inseparable since archi..."
+      Variant C: "My closest friend is Ritu, my flatmate. We've been living to..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [17/85] FRIENDSHIP � Personality
+    User: What makes someone a good friend to you?...
+
+      Variant A... ? 5310ms | 220?521 tokens | $0.2496
+      Variant B... ? 10073ms | 120?321 tokens | $0.1516
+      Variant C... ? 13401ms | 101?1129 tokens | $0.4883
+
+      Variant A: "Hmm, that's a good question. For me, a good friend is someon..."
+      Variant B: "Honestly? It comes down to trust and being real. I don�t nee..."
+      Variant C: "Honestly? It comes down to authenticity. I don't have the ba..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [18/85] FRIENDSHIP � Preferences
+    User: How do you handle conflict with friends?...
+
+      Variant A... ? 7280ms | 219?344 tokens | $0.1751
+      Variant B... ? 9541ms | 119?359 tokens | $0.1674
+      Variant C... ? 6836ms | 157?372 tokens | $0.1782
+
+      Variant A: "Arre, conflict toh hota hi hai, but I've learned to handle i..."
+      Variant B: "Honestly? I don't do the whole "let it fester" thing. I'm to..."
+      Variant C: "Honestly, I'm not a fan of sweeping things under the rug. If..."
+
+    ??????????????????????????????????????????????????????????????????????
+    [19/85] FRIENDSHIP � Worldview
+    User: Do you believe friendships can last long-term?...
+
+      Variant A... ? 5208ms | 220?414 tokens | $0.2047
+      Variant B... ? 11646ms | 63?899 tokens | $0.3864

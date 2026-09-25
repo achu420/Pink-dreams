@@ -2,6 +2,7 @@ package com.pinkdreams.chat
 
 import com.pinkdreams.config.LlmConfig
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -73,9 +74,10 @@ class PersonaContextPocLiveRealBenchmark {
         println()
 
         val httpClient = HttpClient {
-            engine {
-                connectTimeout = 300_000 // 5 minutes
-                requestTimeout = 300_000 // 5 minutes
+            install(HttpTimeout) {
+                requestTimeoutMillis = 300_000 // 5 minutes
+                connectTimeoutMillis = 300_000 // 5 minutes
+                socketTimeoutMillis = 300_000 // 5 minutes
             }
         }
         val allResults = mutableListOf<ExecutionResult>()
