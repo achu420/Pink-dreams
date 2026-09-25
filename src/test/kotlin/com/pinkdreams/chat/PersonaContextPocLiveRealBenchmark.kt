@@ -55,17 +55,23 @@ class PersonaContextPocLiveRealBenchmark {
         println("Execution model: 1 scenario → all 3 variants → verify → next")
         println("════════════════════════════════════════════════════════════════\n")
 
+        // Try multiple ways to get the API key
+        val apiKeyEnv = System.getenv("OPENROUTER_API_KEY")
+        val apiKeyProp = System.getProperty("com.pinkdreams.openrouter.api.key")
+        println("API Key sources:")
+        println("  Environment: ${if (apiKeyEnv?.isNotEmpty() == true) "✓ found (${apiKeyEnv.length} chars)" else "✗ not set"}")
+        println("  System property: ${if (apiKeyProp?.isNotEmpty() == true) "✓ found (${apiKeyProp.length} chars)" else "✗ not set"}")
+
         val llmConfig = LlmConfig.from(com.pinkdreams.config.AppConfig.load())
-        println("✓ LLM Config loaded")
+        println("\n✓ LLM Config loaded")
         println("  Endpoint: ${llmConfig.endpoint}")
         println("  Model: ${llmConfig.model}")
-        println("  API Key: ${if (llmConfig.apiKey.isNotEmpty() && !llmConfig.apiKey.startsWith("test-key")) "✓ loaded" else "✗ MISSING OR TEST KEY"}")
+        println("  API Key: ${if (llmConfig.apiKey.isNotEmpty() && !llmConfig.apiKey.startsWith("test-key")) "✓ loaded (${llmConfig.apiKey.length} chars)" else "✗ MISSING OR TEST KEY"}")
 
         if (llmConfig.apiKey == "test-key-for-fake-llm" || llmConfig.apiKey.isEmpty()) {
-            println("\n⚠ WARNING: No valid API key found in OPENROUTER_API_KEY environment variable")
-            println("  Ensure you ran: . .\\run-local.secrets.ps1")
-            println("  Or set: \$env:OPENROUTER_API_KEY = 'sk-or-v1-...'")
-            throw Exception("OPENROUTER_API_KEY not set properly")
+            println("\n⚠ API key issue detected - will proceed and observe error messages")
+            println("  Env OPENROUTER_API_KEY: ${apiKeyEnv?.take(20)}...")
+            println("  System property: ${apiKeyProp?.take(20)}...")
         }
         println()
 
@@ -280,7 +286,7 @@ Respond naturally to the user's message while staying true to your character."""
     }
 
     private fun saveCsv(results: List<ExecutionResult>) {
-        val header = "scenario_id,skill_key,user_message,variant,input_tokens,output_tokens,total_tokens,cost_usd,latency_ms,generated_response,status\n"
+        val header = "scenario_id,skill_key,user_message,variant,input_tokens,output_tokens,total_tokens,cost_usd,latency_ms,generated_response,status,error\n"
         val rows = results.map { result ->
             listOf(
                 result.scenarioId,
@@ -294,6 +300,7 @@ Respond naturally to the user's message while staying true to your character."""
                 result.latencyMs,
                 "\"${result.generatedResponse.replace("\"", "\"\"")}\"",
                 result.status,
+                "\"${(result.error ?: "").replace("\"", "\"\"")}\"",
             ).joinToString(",")
         }.joinToString("\n")
 

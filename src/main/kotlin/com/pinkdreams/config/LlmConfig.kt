@@ -38,6 +38,7 @@ data class LlmConfig(
     companion object {
         fun from(appConfig: AppConfig): LlmConfig {
             val apiKey = System.getenv("OPENROUTER_API_KEY")
+                ?: System.getProperty("com.pinkdreams.openrouter.api.key")
                 ?: System.getProperty("OPENROUTER_API_KEY")
                 ?: "test-key-for-fake-llm"
             return LlmConfig(
