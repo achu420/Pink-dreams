@@ -11,6 +11,9 @@ import com.pinkdreams.chat.memory.SkillAwareMemoryEnricher
 import com.pinkdreams.chat.memoryengine.BestEffortMemoryEngineMaintenance
 import com.pinkdreams.chat.memoryengine.LlmMemoryEngineMaintainer
 import com.pinkdreams.chat.memoryengine.MemoryEngineChangeApplier
+import com.pinkdreams.chat.personacontext.production.BareScalarRendering
+import com.pinkdreams.chat.personacontext.production.PersonaFieldAuthorizer
+import com.pinkdreams.chat.personacontext.production.ProductionPersonaContextService
 import com.pinkdreams.chat.sensitive.SensitivePreferenceService
 import com.pinkdreams.chat.skill.LlmIntentDiscovery
 import com.pinkdreams.chat.skill.SkillContextEnricher
@@ -30,8 +33,11 @@ import com.pinkdreams.persistence.repositories.LlmExchangeRepository
 import com.pinkdreams.persistence.repositories.MemoryEngineRepository
 import com.pinkdreams.persistence.repositories.MemoryFactRepository
 import com.pinkdreams.persistence.repositories.MessageRepository
+import com.pinkdreams.persistence.repositories.PersonaFieldRegistryRepository
+import com.pinkdreams.persistence.repositories.PersonaMasterRepository
 import com.pinkdreams.persistence.repositories.PersonaRepository
 import com.pinkdreams.persistence.repositories.FailureIsolatedTurnAttributionRecorder
+import com.pinkdreams.persistence.repositories.SkillContextRequirementRepository
 import com.pinkdreams.persistence.repositories.SkillRepository
 import com.pinkdreams.persistence.repositories.TurnAttributionRepository
 import com.pinkdreams.persistence.repositories.UserProfileRepository
@@ -109,6 +115,19 @@ object ChatEngineFactory {
         // Image pipeline — optional so existing tests that construct Dependencies
         // without an image service keep working (noop: no image enqueue hook).
         val imageGenerationService: com.pinkdreams.imaging.orchestration.ImageGenerationService? = null,
+        // Persona Context POC Experiment 1: optional provider that, when set,
+        // resolves persona context via PersonaContextResolver (variant B/C)
+        // instead of raw core.content. Null (the default, always true for the
+        // one production engine and every pre-existing test) preserves
+        // production behavior exactly — see RepositoryContextAssembler's own
+        // default for the same reasoning.
+        val personaContextProvider: com.pinkdreams.chat.context.PersonaContextProvider? = null,
+        // Persona Context POC Experiment 1: the skill key to resolve persona
+        // context against, for callers (the benchmark harness) that already
+        // know the turn's skill before context assembly runs. Null (the
+        // default) preserves RepositoryContextAssembler's existing
+        // "general_chat" placeholder behavior exactly.
+        val personaContextSkillKey: String? = null,
     )
 
     fun build(deps: Dependencies): PipelineChatEngine {
@@ -296,6 +315,43 @@ object ChatEngineFactory {
             memoryContextSelector,
             memoryScopeResolver = deps.memoryScopeResolver,
         )
+        // Phase 49 (Strategy D): the post-skill-selection persona-authorization
+        // stage. Safe to construct unconditionally: PersonaFieldAuthorizer
+        // returns a non-USABLE status (DOCUMENT_NOT_FOUND) whenever
+        // persona_master_documents has no row for a persona/core-version pair,
+        // and ProductionPersonaContextService's strict-substitution fallback
+        // then keeps the PERSONA block's pre-existing PersonaCoreVersions.content
+        // baseline exactly as it is — this stage can never make a persona's
+        // context worse than the pre-Phase-49 baseline, only better once real
+        // data exists. As of the production-readiness pass, Simran DOES have
+        // real seeded data (PersonaContextSeeder, wired at startup in
+        // Application.kt) — this is no longer a hypothetical no-op for her.
+        //
+        // Rendering policy: BareScalarRendering is the settled engineering
+        // default (not a deferred "human decision required"). Rationale: the
+        // PERSONA block is injected as prose alongside PersonaCoreVersions.content
+        // (itself unlabeled prose), so bare values integrate naturally into
+        // that surrounding text; AgeOnlyLabeledScalarRendering is a narrow,
+        // single-field research diagnostic (Phase 16-19), not a general
+        // production strategy; AllScalarsLabeledRendering's verbose "Field:
+        // value" format suits a debug/inspection view, not a conversational
+        // system prompt. This is an infrastructure default, independent of
+        // and not a re-opening of the separate, still-unresolved B-vs-LA
+        // *behavioral* research question — the policy remains fully swappable
+        // at this one construction site with no change to authorization or
+        // retrieval (Phase 46-51's tests already prove policy swaps never
+        // change which fields are included, only their surface text).
+        val personaContextResolution = PersonaContextResolutionStage(
+            ProductionPersonaContextService(
+                PersonaFieldAuthorizer(
+                    deps.db,
+                    PersonaMasterRepository(deps.db),
+                    PersonaFieldRegistryRepository(deps.db),
+                    SkillContextRequirementRepository(deps.db),
+                ),
+                BareScalarRendering,
+            ),
+        )
 
         return PipelineChatEngine(
             entitlementChecker = { EntitlementDecision.Allowed },
@@ -309,6 +365,8 @@ object ChatEngineFactory {
                 personaRepository = deps.personaRepository,
                 sensitivePreferenceService = deps.sensitivePreferenceService,
                 memoryScopeResolver = deps.memoryScopeResolver,
+                personaContextProvider = deps.personaContextProvider,
+                pinnedSkillKey = deps.personaContextSkillKey,
             ),
             generator = llmGenerator,
             outputValidator = { _, _ -> ValidationDecision.Accepted },
@@ -319,6 +377,7 @@ object ChatEngineFactory {
             intentDiscovery = intentDiscovery,
             skillContextEnricher = skillContextEnricher,
             memoryContextEnricher = memoryContextEnricher,
+            personaContextResolution = personaContextResolution,
             // Task 24 — one attribution record per turn, for BOTH the production
             // engine and every Test Chat engine (isTestChat distinguishes them,
             // exactly as it already does on llm_exchanges). Failure-isolated by

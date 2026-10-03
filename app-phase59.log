@@ -1,0 +1,373 @@
+﻿> Task :checkKotlinGradlePluginConfigurationErrors
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+
+> Task :run
+gradle : SLF4J(I): Connected with provider of type [ch.qos.logback.classic.spi.LogbackServiceProvider]
+At line:1 char:359
++ ... ink dreams"; . .\run-local.secrets.ps1; gradle run *> app-phase59.log
++                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (SLF4J(I): Conne...erviceProvider]:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-09-29 18:09:57.945 [main] INFO  ktor.application - Autoreload is disabled because the development mode is off.
+2026-09-29 18:10:02.401 [main] INFO  Exposed - Preparing create tables statements took 263ms
+2026-09-29 18:10:02.406 [main] INFO  Exposed - Executing create tables statements took 4ms
+2026-09-29 18:10:03.408 [main] INFO  Exposed - Extracting table columns took 1002ms
+2026-09-29 18:10:03.834 [main] INFO  Exposed - Extracting primary keys took 426ms
+2026-09-29 18:10:06.955 [main] INFO  Exposed - Extracting column constraints took 3040ms
+2026-09-29 18:10:06.956 [main] INFO  Exposed - Preparing alter table statements took 4550ms
+2026-09-29 18:10:07.038 [main] INFO  Exposed - Executing alter table statements took 81ms
+2026-09-29 18:10:07.867 [main] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_key -> in mapping conversation_engines_version_unique
+2026-09-29 18:10:07.880 [main] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_key -> in mapping personas_slug_unique
+2026-09-29 18:10:07.881 [main] INFO  Exposed - Index on table 'persona_core_versions' differs only in name: in db persona_core_versions_persona_id_version_key -> in mapping persona_core_versions_persona_id_version_unique
+2026-09-29 18:10:07.883 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'memory_facts':
+		Index 'ix_memory_facts_hot_selection' for 'memory_facts' on columns com.pinkdreams.persistence.database.MemoryFacts.user_id, com.pinkdreams.persistence.database.MemoryFacts.persona_id, com.pinkdreams.persistence.database.MemoryFacts.status, com.pinkdreams.persistence.database.MemoryFacts.last_referenced_at, com.pinkdreams.persistence.database.MemoryFacts.learned_at
+		Index 'ix_memory_facts_user_persona' for 'memory_facts' on columns com.pinkdreams.persistence.database.MemoryFacts.user_id, com.pinkdreams.persistence.database.MemoryFacts.persona_id
+2026-09-29 18:10:07.883 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'conversation_engines':
+		Unique Index 'one_active_engine' for 'conversation_engines' on columns com.pinkdreams.persistence.database.ConversationEngines.is_active
+2026-09-29 18:10:07.884 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'conversations':
+		Index 'ix_conversations_user' for 'conversations' on columns com.pinkdreams.persistence.database.Conversations.user_id, com.pinkdreams.persistence.database.Conversations.persona_id
+2026-09-29 18:10:07.884 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'messages':
+		Unique Index 'uq_client_message_per_conversation' for 'messages' on columns com.pinkdreams.persistence.database.Messages.conversation_id, com.pinkdreams.persistence.database.Messages.client_message_id
+		Index 'ix_messages_conversation_time' for 'messages' on columns com.pinkdreams.persistence.database.Messages.conversation_id, com.pinkdreams.persistence.database.Messages.created_at
+2026-09-29 18:10:07.886 [main] INFO  Exposed - Checking mapping consistence took 847ms
+2026-09-29 18:10:07.912 [main] INFO  Exposed - Preparing create tables statements took 12ms
+2026-09-29 18:10:07.914 [main] INFO  Exposed - Executing create tables statements took 1ms
+2026-09-29 18:10:07.931 [main] INFO  Exposed - Extracting table columns took 15ms
+2026-09-29 18:10:07.978 [main] INFO  Exposed - Extracting primary keys took 37ms
+2026-09-29 18:10:08.021 [main] INFO  Exposed - Extracting column constraints took 41ms
+2026-09-29 18:10:08.021 [main] INFO  Exposed - Preparing alter table statements took 105ms
+2026-09-29 18:10:08.024 [main] INFO  Exposed - Executing alter table statements took 1ms
+2026-09-29 18:10:08.074 [main] INFO  Exposed - Checking mapping consistence took 50ms
+BASELINE_SEED: conversationEngine=draft v10 created (existing active version untouched) persona=already present 
+personaCore=already present memoryEngine=already present intentEngine=draft v5 created (existing active version 
+untouched) skillsCreated=0 skillsAlreadyPresent=26
+PERSONA_CONTEXT_SEED: masterDocument=already present for this core version fieldRegistry=already present (32 fields) 
+skillMappings=already present (5 skills)
+2026-09-29 18:10:22.160 [main] INFO  ktor.application - Application started in 24.429 seconds.
+2026-09-29 18:10:22.163 [main] INFO  ktor.application - Application started: io.ktor.server.application.Application@5149f008
+2026-09-29 18:10:24.630 [DefaultDispatcher-worker-1] INFO  ktor.application - Responding at http://127.0.0.1:8080
+2026-09-29 18:11:11.783 [eventLoopGroupProxy-4-1] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines in 2548ms
+2026-09-29 18:11:12.569 [eventLoopGroupProxy-4-2] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines in 531ms
+2026-09-29 18:11:24.181 [eventLoopGroupProxy-4-3] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines in 335ms
+2026-09-29 18:11:30.557 [eventLoopGroupProxy-4-4] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines in 323ms
+2026-09-29 18:11:31.177 [eventLoopGroupProxy-4-5] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines in 416ms
+2026-09-29 18:11:31.638 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines in 276ms
+2026-09-29 18:11:37.283 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines/ad333478-0d23-4706-affa-ea4bb0852b19 in 141ms
+2026-09-29 18:11:37.652 [eventLoopGroupProxy-4-8] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines/e5f12292-b889-4783-b4fa-c6c7b5248576 in 196ms
+2026-09-29 18:11:38.063 [eventLoopGroupProxy-4-1] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines/feaba8bd-7dbb-47a4-a66d-0f1e0afb499d in 138ms
+2026-09-29 18:11:38.358 [eventLoopGroupProxy-4-2] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines/3b6e6087-43e8-48fe-8370-a5005c6fbb62 in 134ms
+2026-09-29 18:11:38.715 [eventLoopGroupProxy-4-3] INFO  ktor.application - 200 OK: GET - /v1/admin/intent-engines/dbd836ae-58f1-4f08-adce-252aed2b3052 in 162ms
+2026-09-29 18:11:44.112 [eventLoopGroupProxy-4-4] INFO  ktor.application - 200 OK: POST - /v1/admin/intent-engines/dbd836ae-58f1-4f08-adce-252aed2b3052/publish in 180ms
+2026-09-29 18:11:44.421 [eventLoopGroupProxy-4-5] INFO  ktor.application - 200 OK: POST - /v1/admin/intent-engines/dbd836ae-58f1-4f08-adce-252aed2b3052/activate in 165ms
+2026-09-29 18:11:56.831 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/admin/engines in 180ms
+2026-09-29 18:12:04.360 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/f370176a-ff8d-4b96-91b2-0e6adbbbfb42 in 134ms
+2026-09-29 18:12:06.161 [eventLoopGroupProxy-4-8] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/34b930c7-803b-40e5-b1c3-8488afb29070 in 145ms
+2026-09-29 18:12:07.943 [eventLoopGroupProxy-4-1] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/79d43457-7cf1-4524-a41e-9d9c0cefd716 in 264ms
+2026-09-29 18:12:09.689 [eventLoopGroupProxy-4-2] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/1b6be6d7-f7a1-444f-b365-54dfb5788ca0 in 143ms
+2026-09-29 18:12:11.184 [eventLoopGroupProxy-4-3] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/2648339c-0c1e-47e4-a273-8723421e6f4a in 186ms
+2026-09-29 18:12:13.177 [eventLoopGroupProxy-4-4] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/afa28166-3cf1-452a-bbed-c4d7d31a9c6d in 213ms
+2026-09-29 18:12:14.753 [eventLoopGroupProxy-4-5] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/09cce1b8-04ba-4bd6-82f6-29ec9c388de5 in 145ms
+2026-09-29 18:12:16.429 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/fd983c97-d06f-455f-9b5e-39efe4b58e61 in 275ms
+2026-09-29 18:12:18.364 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/e385ae3e-965e-4d3a-9806-6760944c27b0 in 132ms
+2026-09-29 18:12:20.513 [eventLoopGroupProxy-4-8] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/609d5422-4a5e-4636-9f4e-50c7c03de186 in 158ms
+2026-09-29 18:12:28.399 [eventLoopGroupProxy-4-1] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/609d5422-4a5e-4636-9f4e-50c7c03de186 in 189ms
+2026-09-29 18:12:28.746 [eventLoopGroupProxy-4-2] INFO  ktor.application - 200 OK: GET - /v1/admin/engines/609d5422-4a5e-4636-9f4e-50c7c03de186 in 197ms
+2026-09-29 18:12:33.843 [eventLoopGroupProxy-4-3] INFO  ktor.application - 200 OK: POST - /v1/admin/engines/609d5422-4a5e-4636-9f4e-50c7c03de186/publish in 150ms
+2026-09-29 18:12:34.244 [eventLoopGroupProxy-4-4] INFO  ktor.application - 200 OK: POST - /v1/admin/engines/609d5422-4a5e-4636-9f4e-50c7c03de186/activate in 210ms
+2026-09-29 18:12:39.835 [eventLoopGroupProxy-4-5] INFO  ktor.application - 200 OK: GET - /v1/admin/personas in 266ms
+2026-09-29 18:12:46.493 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/admin/personas/378b82c0-9ef4-4f30-8132-c5b6431e4695 in 206ms
+2026-09-29 18:12:47.009 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/admin/personas in 254ms
+2026-09-29 18:13:13.970 [eventLoopGroupProxy-4-8] INFO  ktor.application - 201 Created: POST - /v1/conversations in 519ms
+INTENT_DIAGNOSTICS: conversation=5be8d248-567f-4795-8746-9f8b8337d27d requestId=da25afa6-0930-4dc3-acff-17b52caa03a6 
+outcome=COMPLETED finishReason=stop promptTokens=1917 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=5be8d248-567f-4795-8746-9f8b8337d27d 
+requestId=da25afa6-0930-4dc3-acff-17b52caa03a6
+MEMORY_CONTEXT_SELECTION: applied conversation=5be8d248-567f-4795-8746-9f8b8337d27d 
+requestId=da25afa6-0930-4dc3-acff-17b52caa03a6
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=7
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=7 
+usedReplacement=true
+STAGE_TIMINGS: conversation=5be8d248-567f-4795-8746-9f8b8337d27d requestId=da25afa6-0930-4dc3-acff-17b52caa03a6 
+context_assembly=1110ms intent_discovery=5867ms memory_context_selection=376ms skill_context_enrichment=214ms 
+generation=4161ms total_before_persist=12904ms persist=238ms
+2026-09-29 18:13:34.945 [eventLoopGroupProxy-4-1] INFO  ktor.application - 200 OK: POST - /v1/conversations/5be8d248-567f-4795-8746-9f8b8337d27d/messages in 14015ms
+MEMORY_EXTRACTION: conversation=5be8d248-567f-4795-8746-9f8b8337d27d requestId=da25afa6-0930-4dc3-acff-17b52caa03a6 
+proposed=3 accepted=3 queueDelayMs=29 durationMs=8760
+2026-09-29 18:13:53.289 [eventLoopGroupProxy-4-2] INFO  ktor.application - 404 Not Found: GET - /v1/admin/persona-context/skills in 8ms
+2026-09-29 18:13:53.428 [eventLoopGroupProxy-4-3] INFO  ktor.application - 404 Not Found: GET - /v1/admin/personas/378b82c0-9ef4-4f30-8132-c5b6431e4695/context in 1ms
+2026-09-29 18:14:16.052 [eventLoopGroupProxy-4-4] INFO  ktor.application - 404 Not Found: POST - /v1/conversations in 281ms
+2026-09-29 18:14:16.982 [eventLoopGroupProxy-4-5] INFO  ktor.application - 404 Not Found: POST - /v1/conversations//messages in 0ms
+2026-09-29 18:14:17.448 [eventLoopGroupProxy-4-6] INFO  ktor.application - 404 Not Found: POST - /v1/conversations in 185ms
+2026-09-29 18:14:18.611 [eventLoopGroupProxy-4-7] INFO  ktor.application - 404 Not Found: POST - /v1/conversations//messages in 0ms
+2026-09-29 18:14:19.344 [eventLoopGroupProxy-4-8] INFO  ktor.application - 404 Not Found: POST - /v1/conversations in 313ms
+2026-09-29 18:14:20.166 [eventLoopGroupProxy-4-1] INFO  ktor.application - 404 Not Found: POST - /v1/conversations//messages in 1ms
+2026-09-29 18:14:20.711 [eventLoopGroupProxy-4-2] INFO  ktor.application - 404 Not Found: POST - /v1/conversations in 197ms
+2026-09-29 18:14:21.824 [eventLoopGroupProxy-4-3] INFO  ktor.application - 404 Not Found: POST - /v1/conversations//messages in 1ms
+2026-09-29 18:14:22.510 [eventLoopGroupProxy-4-4] INFO  ktor.application - 404 Not Found: POST - /v1/conversations in 238ms
+2026-09-29 18:14:23.312 [eventLoopGroupProxy-4-5] INFO  ktor.application - 404 Not Found: POST - /v1/conversations//messages in 1ms
+2026-09-29 18:14:24.021 [eventLoopGroupProxy-4-6] INFO  ktor.application - 404 Not Found: POST - /v1/conversations in 287ms
+2026-09-29 18:14:24.939 [eventLoopGroupProxy-4-7] INFO  ktor.application - 404 Not Found: POST - /v1/conversations//messages in 1ms
+2026-09-29 18:14:25.672 [eventLoopGroupProxy-4-8] INFO  ktor.application - 404 Not Found: POST - /v1/conversations in 167ms
+2026-09-29 18:14:26.700 [eventLoopGroupProxy-4-1] INFO  ktor.application - 404 Not Found: POST - /v1/conversations//messages in 1ms
+2026-09-29 18:14:27.159 [eventLoopGroupProxy-4-2] INFO  ktor.application - 404 Not Found: POST - /v1/conversations in 154ms
+2026-09-29 18:14:28.056 [eventLoopGroupProxy-4-3] INFO  ktor.application - 404 Not Found: POST - /v1/conversations//messages in 1ms
+2026-09-29 18:14:36.795 [eventLoopGroupProxy-4-4] INFO  ktor.application - 201 Created: POST - /v1/conversations in 414ms
+2026-09-29 18:14:37.584 [eventLoopGroupProxy-4-5] INFO  ktor.application - 400 Bad Request: POST - /v1/conversations/94458522-a834-4275-875a-72409a4c98d4/messages in 234ms
+2026-09-29 18:14:38.191 [eventLoopGroupProxy-4-6] INFO  ktor.application - 201 Created: POST - /v1/conversations in 308ms
+2026-09-29 18:14:38.733 [eventLoopGroupProxy-4-7] INFO  ktor.application - 400 Bad Request: POST - /v1/conversations/be296a58-58c3-41c6-81b1-223455ba0abf/messages in 124ms
+2026-09-29 18:14:39.348 [eventLoopGroupProxy-4-8] INFO  ktor.application - 201 Created: POST - /v1/conversations in 473ms
+2026-09-29 18:14:39.850 [eventLoopGroupProxy-4-1] INFO  ktor.application - 400 Bad Request: POST - /v1/conversations/5a5b7d78-bf71-4709-8184-8ce5f1fdd748/messages in 127ms
+2026-09-29 18:14:40.489 [eventLoopGroupProxy-4-2] INFO  ktor.application - 201 Created: POST - /v1/conversations in 470ms
+2026-09-29 18:14:41.196 [eventLoopGroupProxy-4-3] INFO  ktor.application - 400 Bad Request: POST - /v1/conversations/5f5fbcde-dc86-42d4-9749-899e8641ea15/messages in 113ms
+2026-09-29 18:14:41.681 [eventLoopGroupProxy-4-4] INFO  ktor.application - 201 Created: POST - /v1/conversations in 347ms
+2026-09-29 18:14:42.523 [eventLoopGroupProxy-4-5] INFO  ktor.application - 400 Bad Request: POST - /v1/conversations/bc2e342f-4055-4295-980e-4e7e2c85d6ba/messages in 258ms
+2026-09-29 18:14:42.979 [eventLoopGroupProxy-4-6] INFO  ktor.application - 201 Created: POST - /v1/conversations in 288ms
+2026-09-29 18:14:43.979 [eventLoopGroupProxy-4-7] INFO  ktor.application - 400 Bad Request: POST - /v1/conversations/0f9507b2-e513-4770-ad66-961d8f714435/messages in 170ms
+2026-09-29 18:14:44.481 [eventLoopGroupProxy-4-8] INFO  ktor.application - 201 Created: POST - /v1/conversations in 312ms
+2026-09-29 18:14:45.397 [eventLoopGroupProxy-4-1] INFO  ktor.application - 400 Bad Request: POST - /v1/conversations/99c3d501-1a9a-4326-8aff-2e70d15aebe8/messages in 160ms
+2026-09-29 18:14:45.935 [eventLoopGroupProxy-4-2] INFO  ktor.application - 201 Created: POST - /v1/conversations in 355ms
+2026-09-29 18:14:46.922 [eventLoopGroupProxy-4-3] INFO  ktor.application - 400 Bad Request: POST - /v1/conversations/858ede2b-564e-445a-9a02-62a7f7ad1bb3/messages in 163ms
+INTENT_DIAGNOSTICS: conversation=94458522-a834-4275-875a-72409a4c98d4 requestId=6861cceb-ecd6-4637-a59e-df22b84d3f3b 
+outcome=COMPLETED finishReason=stop promptTokens=1918 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=94458522-a834-4275-875a-72409a4c98d4 
+requestId=6861cceb-ecd6-4637-a59e-df22b84d3f3b
+MEMORY_CONTEXT_SELECTION: applied conversation=94458522-a834-4275-875a-72409a4c98d4 
+requestId=6861cceb-ecd6-4637-a59e-df22b84d3f3b
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4 
+usedReplacement=true
+STAGE_TIMINGS: conversation=94458522-a834-4275-875a-72409a4c98d4 requestId=6861cceb-ecd6-4637-a59e-df22b84d3f3b 
+context_assembly=972ms intent_discovery=2619ms memory_context_selection=261ms skill_context_enrichment=247ms 
+generation=1459ms total_before_persist=6455ms persist=183ms
+2026-09-29 18:15:24.868 [eventLoopGroupProxy-4-4] INFO  ktor.application - 200 OK: POST - /v1/conversations/94458522-a834-4275-875a-72409a4c98d4/messages in 7023ms
+INTENT_DIAGNOSTICS: conversation=be296a58-58c3-41c6-81b1-223455ba0abf requestId=2a103587-7529-420a-a053-0e58d2432331 
+outcome=COMPLETED finishReason=stop promptTokens=1919 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=be296a58-58c3-41c6-81b1-223455ba0abf 
+requestId=2a103587-7529-420a-a053-0e58d2432331
+MEMORY_CONTEXT_SELECTION: applied conversation=be296a58-58c3-41c6-81b1-223455ba0abf 
+requestId=2a103587-7529-420a-a053-0e58d2432331
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4 
+usedReplacement=true
+STAGE_TIMINGS: conversation=be296a58-58c3-41c6-81b1-223455ba0abf requestId=2a103587-7529-420a-a053-0e58d2432331 
+context_assembly=1333ms intent_discovery=1464ms memory_context_selection=440ms skill_context_enrichment=205ms 
+generation=3931ms total_before_persist=8319ms persist=270ms
+2026-09-29 18:15:34.528 [eventLoopGroupProxy-4-5] INFO  ktor.application - 200 OK: POST - /v1/conversations/be296a58-58c3-41c6-81b1-223455ba0abf/messages in 9121ms
+MEMORY_EXTRACTION: conversation=94458522-a834-4275-875a-72409a4c98d4 requestId=6861cceb-ecd6-4637-a59e-df22b84d3f3b 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=12166
+INTENT_DIAGNOSTICS: conversation=5a5b7d78-bf71-4709-8184-8ce5f1fdd748 requestId=412dbf77-ba77-4a4d-a627-186a30190e1f 
+outcome=COMPLETED finishReason=stop promptTokens=1917 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=5a5b7d78-bf71-4709-8184-8ce5f1fdd748 
+requestId=412dbf77-ba77-4a4d-a627-186a30190e1f
+MEMORY_CONTEXT_SELECTION: applied conversation=5a5b7d78-bf71-4709-8184-8ce5f1fdd748 
+requestId=412dbf77-ba77-4a4d-a627-186a30190e1f
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4 
+usedReplacement=true
+STAGE_TIMINGS: conversation=5a5b7d78-bf71-4709-8184-8ce5f1fdd748 requestId=412dbf77-ba77-4a4d-a627-186a30190e1f 
+context_assembly=805ms intent_discovery=1730ms memory_context_selection=329ms skill_context_enrichment=150ms 
+generation=2009ms total_before_persist=5788ms persist=163ms
+2026-09-29 18:15:41.566 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: POST - /v1/conversations/5a5b7d78-bf71-4709-8184-8ce5f1fdd748/messages in 6283ms
+MEMORY_EXTRACTION: conversation=5a5b7d78-bf71-4709-8184-8ce5f1fdd748 requestId=412dbf77-ba77-4a4d-a627-186a30190e1f 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=1776
+MEMORY_EXTRACTION: conversation=be296a58-58c3-41c6-81b1-223455ba0abf requestId=2a103587-7529-420a-a053-0e58d2432331 
+proposed=2 accepted=2 queueDelayMs=0 durationMs=11002
+INTENT_DIAGNOSTICS: conversation=5f5fbcde-dc86-42d4-9749-899e8641ea15 requestId=0949c115-387b-4f74-8bc0-bedf67563f6e 
+outcome=COMPLETED finishReason=stop promptTokens=1916 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=5f5fbcde-dc86-42d4-9749-899e8641ea15 
+requestId=0949c115-387b-4f74-8bc0-bedf67563f6e
+MEMORY_CONTEXT_SELECTION: applied conversation=5f5fbcde-dc86-42d4-9749-899e8641ea15 
+requestId=0949c115-387b-4f74-8bc0-bedf67563f6e
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4 
+usedReplacement=true
+STAGE_TIMINGS: conversation=5f5fbcde-dc86-42d4-9749-899e8641ea15 requestId=0949c115-387b-4f74-8bc0-bedf67563f6e 
+context_assembly=1333ms intent_discovery=2254ms memory_context_selection=485ms skill_context_enrichment=203ms 
+generation=3093ms total_before_persist=8209ms persist=130ms
+2026-09-29 18:15:50.607 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: POST - /v1/conversations/5f5fbcde-dc86-42d4-9749-899e8641ea15/messages in 8702ms
+INTENT_DIAGNOSTICS: conversation=bc2e342f-4055-4295-980e-4e7e2c85d6ba requestId=f5e4b78d-7b3e-4373-b12e-fc1dde158b42 
+outcome=COMPLETED finishReason=stop promptTokens=1921 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=bc2e342f-4055-4295-980e-4e7e2c85d6ba 
+requestId=f5e4b78d-7b3e-4373-b12e-fc1dde158b42
+MEMORY_CONTEXT_SELECTION: applied conversation=bc2e342f-4055-4295-980e-4e7e2c85d6ba 
+requestId=f5e4b78d-7b3e-4373-b12e-fc1dde158b42
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4 
+usedReplacement=true
+STAGE_TIMINGS: conversation=bc2e342f-4055-4295-980e-4e7e2c85d6ba requestId=f5e4b78d-7b3e-4373-b12e-fc1dde158b42 
+context_assembly=934ms intent_discovery=1483ms memory_context_selection=359ms skill_context_enrichment=141ms 
+generation=2191ms total_before_persist=5982ms persist=175ms
+2026-09-29 18:15:57.870 [eventLoopGroupProxy-4-8] INFO  ktor.application - 200 OK: POST - /v1/conversations/bc2e342f-4055-4295-980e-4e7e2c85d6ba/messages in 6666ms
+MEMORY_EXTRACTION: conversation=5f5fbcde-dc86-42d4-9749-899e8641ea15 requestId=0949c115-387b-4f74-8bc0-bedf67563f6e 
+proposed=4 accepted=4 queueDelayMs=0 durationMs=11805
+INTENT_DIAGNOSTICS: conversation=0f9507b2-e513-4770-ad66-961d8f714435 requestId=e04d4459-8813-4ae0-946f-4ba27d340c04 
+outcome=COMPLETED finishReason=stop promptTokens=1917 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=0f9507b2-e513-4770-ad66-961d8f714435 
+requestId=e04d4459-8813-4ae0-946f-4ba27d340c04
+MEMORY_CONTEXT_SELECTION: applied conversation=0f9507b2-e513-4770-ad66-961d8f714435 
+requestId=e04d4459-8813-4ae0-946f-4ba27d340c04
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4 
+usedReplacement=true
+STAGE_TIMINGS: conversation=0f9507b2-e513-4770-ad66-961d8f714435 requestId=e04d4459-8813-4ae0-946f-4ba27d340c04 
+context_assembly=1992ms intent_discovery=1686ms memory_context_selection=280ms skill_context_enrichment=123ms 
+generation=1342ms total_before_persist=6277ms persist=184ms
+2026-09-29 18:16:05.457 [eventLoopGroupProxy-4-1] INFO  ktor.application - 200 OK: POST - /v1/conversations/0f9507b2-e513-4770-ad66-961d8f714435/messages in 6994ms
+MEMORY_EXTRACTION: conversation=0f9507b2-e513-4770-ad66-961d8f714435 requestId=e04d4459-8813-4ae0-946f-4ba27d340c04 
+proposed=1 accepted=1 queueDelayMs=0 durationMs=1499
+INTENT_DIAGNOSTICS: conversation=99c3d501-1a9a-4326-8aff-2e70d15aebe8 requestId=f7f5211f-bfb2-4bfa-9ff4-9ec2ac129e5f 
+outcome=COMPLETED finishReason=stop promptTokens=1917 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=99c3d501-1a9a-4326-8aff-2e70d15aebe8 
+requestId=f7f5211f-bfb2-4bfa-9ff4-9ec2ac129e5f
+MEMORY_EXTRACTION: conversation=bc2e342f-4055-4295-980e-4e7e2c85d6ba requestId=f5e4b78d-7b3e-4373-b12e-fc1dde158b42 
+proposed=2 accepted=2 queueDelayMs=0 durationMs=11241
+MEMORY_CONTEXT_SELECTION: applied conversation=99c3d501-1a9a-4326-8aff-2e70d15aebe8 
+requestId=f7f5211f-bfb2-4bfa-9ff4-9ec2ac129e5f
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4 
+usedReplacement=true
+STAGE_TIMINGS: conversation=99c3d501-1a9a-4326-8aff-2e70d15aebe8 requestId=f7f5211f-bfb2-4bfa-9ff4-9ec2ac129e5f 
+context_assembly=883ms intent_discovery=1540ms memory_context_selection=333ms skill_context_enrichment=138ms 
+generation=2738ms total_before_persist=6395ms persist=169ms
+2026-09-29 18:16:12.893 [eventLoopGroupProxy-4-2] INFO  ktor.application - 200 OK: POST - /v1/conversations/99c3d501-1a9a-4326-8aff-2e70d15aebe8/messages in 7167ms
+MEMORY_EXTRACTION: conversation=99c3d501-1a9a-4326-8aff-2e70d15aebe8 requestId=f7f5211f-bfb2-4bfa-9ff4-9ec2ac129e5f 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=4993
+INTENT_DIAGNOSTICS: conversation=858ede2b-564e-445a-9a02-62a7f7ad1bb3 requestId=3e87ece0-722f-4945-8786-0d394642402c 
+outcome=COMPLETED finishReason=stop promptTokens=1918 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=858ede2b-564e-445a-9a02-62a7f7ad1bb3 
+requestId=3e87ece0-722f-4945-8786-0d394642402c
+MEMORY_CONTEXT_SELECTION: applied conversation=858ede2b-564e-445a-9a02-62a7f7ad1bb3 
+requestId=3e87ece0-722f-4945-8786-0d394642402c
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4 
+usedReplacement=true
+STAGE_TIMINGS: conversation=858ede2b-564e-445a-9a02-62a7f7ad1bb3 requestId=3e87ece0-722f-4945-8786-0d394642402c 
+context_assembly=1345ms intent_discovery=3233ms memory_context_selection=489ms skill_context_enrichment=243ms 
+generation=2654ms total_before_persist=9037ms persist=241ms
+2026-09-29 18:16:23.070 [eventLoopGroupProxy-4-3] INFO  ktor.application - 200 OK: POST - /v1/conversations/858ede2b-564e-445a-9a02-62a7f7ad1bb3/messages in 9748ms
+MEMORY_EXTRACTION: conversation=858ede2b-564e-445a-9a02-62a7f7ad1bb3 requestId=3e87ece0-722f-4945-8786-0d394642402c 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=6539
+2026-09-29 18:16:36.887 [eventLoopGroupProxy-4-4] INFO  ktor.application - 201 Created: POST - /v1/conversations in 447ms
+INTENT_DIAGNOSTICS: conversation=099133d7-f561-4ac9-a355-e4d1cc4f0b87 requestId=e72f072d-8e2f-4b9c-bf25-33677dd68d65 
+outcome=COMPLETED finishReason=stop promptTokens=1927 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=099133d7-f561-4ac9-a355-e4d1cc4f0b87 
+requestId=e72f072d-8e2f-4b9c-bf25-33677dd68d65
+MEMORY_CONTEXT_SELECTION: applied conversation=099133d7-f561-4ac9-a355-e4d1cc4f0b87 
+requestId=e72f072d-8e2f-4b9c-bf25-33677dd68d65
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4 
+usedReplacement=true
+STAGE_TIMINGS: conversation=099133d7-f561-4ac9-a355-e4d1cc4f0b87 requestId=e72f072d-8e2f-4b9c-bf25-33677dd68d65 
+context_assembly=892ms intent_discovery=2326ms memory_context_selection=283ms skill_context_enrichment=162ms 
+generation=1541ms total_before_persist=6347ms persist=196ms
+2026-09-29 18:16:57.540 [eventLoopGroupProxy-4-5] INFO  ktor.application - 200 OK: POST - /v1/conversations/099133d7-f561-4ac9-a355-e4d1cc4f0b87/messages in 7039ms
+INTENT_DIAGNOSTICS: conversation=099133d7-f561-4ac9-a355-e4d1cc4f0b87 requestId=e4861a8b-7431-42bb-be7d-de6ac6832f65 
+outcome=COMPLETED finishReason=stop promptTokens=2013 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=099133d7-f561-4ac9-a355-e4d1cc4f0b87 
+requestId=e4861a8b-7431-42bb-be7d-de6ac6832f65
+MEMORY_CONTEXT_SELECTION: applied conversation=099133d7-f561-4ac9-a355-e4d1cc4f0b87 
+requestId=e4861a8b-7431-42bb-be7d-de6ac6832f65
+MEMORY_EXTRACTION: conversation=099133d7-f561-4ac9-a355-e4d1cc4f0b87 requestId=e72f072d-8e2f-4b9c-bf25-33677dd68d65 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=6730
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=4 
+usedReplacement=true
+STAGE_TIMINGS: conversation=099133d7-f561-4ac9-a355-e4d1cc4f0b87 requestId=e4861a8b-7431-42bb-be7d-de6ac6832f65 
+context_assembly=1244ms intent_discovery=2647ms memory_context_selection=268ms skill_context_enrichment=136ms 
+generation=1907ms total_before_persist=7561ms persist=230ms
+2026-09-29 18:17:06.431 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: POST - /v1/conversations/099133d7-f561-4ac9-a355-e4d1cc4f0b87/messages in 8420ms
+MEMORY_EXTRACTION: conversation=099133d7-f561-4ac9-a355-e4d1cc4f0b87 requestId=e4861a8b-7431-42bb-be7d-de6ac6832f65 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=8240
+2026-09-29 18:17:24.995 [eventLoopGroupProxy-4-7] INFO  ktor.application - 201 Created: POST - /v1/conversations in 387ms
+INTENT_DIAGNOSTICS: conversation=6f99217f-8e27-45b8-bad6-92c280aec423 requestId=ed83ad22-1b9f-47e3-a91d-e65e890088f2 
+outcome=COMPLETED finishReason=stop promptTokens=1926 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='companionship' conversation=6f99217f-8e27-45b8-bad6-92c280aec423 
+requestId=ed83ad22-1b9f-47e3-a91d-e65e890088f2
+MEMORY_CONTEXT_SELECTION: applied conversation=6f99217f-8e27-45b8-bad6-92c280aec423 
+requestId=ed83ad22-1b9f-47e3-a91d-e65e890088f2
+PERSONA_AUTHORIZER: status=SKILL_MAPPING_MISSING personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=companionship 
+fieldCount=0
+PERSONA_CONTEXT: status=SKILL_MAPPING_MISSING personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=companionship 
+fieldCount=0 usedReplacement=false
+STAGE_TIMINGS: conversation=6f99217f-8e27-45b8-bad6-92c280aec423 requestId=ed83ad22-1b9f-47e3-a91d-e65e890088f2 
+context_assembly=897ms intent_discovery=2682ms memory_context_selection=390ms skill_context_enrichment=134ms 
+generation=3100ms total_before_persist=7864ms persist=189ms
+2026-09-29 18:17:34.011 [eventLoopGroupProxy-4-8] INFO  ktor.application - 200 OK: POST - /v1/conversations/6f99217f-8e27-45b8-bad6-92c280aec423/messages in 8693ms
+2026-09-29 18:17:35.417 [eventLoopGroupProxy-4-1] INFO  ktor.application - 201 Created: POST - /v1/conversations in 637ms
+MEMORY_EXTRACTION: conversation=6f99217f-8e27-45b8-bad6-92c280aec423 requestId=ed83ad22-1b9f-47e3-a91d-e65e890088f2 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=6018
+INTENT_DIAGNOSTICS: conversation=a384f856-0f35-4219-81b5-61489f0e47f4 requestId=c60ddd08-4446-40c5-911d-092882b602a2 
+outcome=COMPLETED finishReason=stop promptTokens=1933 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='advice' conversation=a384f856-0f35-4219-81b5-61489f0e47f4 
+requestId=c60ddd08-4446-40c5-911d-092882b602a2
+MEMORY_CONTEXT_SELECTION: applied conversation=a384f856-0f35-4219-81b5-61489f0e47f4 
+requestId=c60ddd08-4446-40c5-911d-092882b602a2
+PERSONA_AUTHORIZER: status=SKILL_MAPPING_MISSING personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=advice 
+fieldCount=0
+PERSONA_CONTEXT: status=SKILL_MAPPING_MISSING personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=advice 
+fieldCount=0 usedReplacement=false
+STAGE_TIMINGS: conversation=a384f856-0f35-4219-81b5-61489f0e47f4 requestId=c60ddd08-4446-40c5-911d-092882b602a2 
+context_assembly=1390ms intent_discovery=1963ms memory_context_selection=333ms skill_context_enrichment=317ms 
+generation=3818ms total_before_persist=8965ms persist=181ms
+2026-09-29 18:17:45.245 [eventLoopGroupProxy-4-2] INFO  ktor.application - 200 OK: POST - /v1/conversations/a384f856-0f35-4219-81b5-61489f0e47f4/messages in 9552ms
+2026-09-29 18:17:46.545 [eventLoopGroupProxy-4-3] INFO  ktor.application - 201 Created: POST - /v1/conversations in 669ms
+INTENT_DIAGNOSTICS: conversation=82bea108-a0ad-4e13-a693-244007fdfb75 requestId=5831691b-38fc-425e-8000-685423a231d4 
+outcome=COMPLETED finishReason=stop promptTokens=1927 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='friendship' conversation=82bea108-a0ad-4e13-a693-244007fdfb75 
+requestId=5831691b-38fc-425e-8000-685423a231d4
+MEMORY_CONTEXT_SELECTION: applied conversation=82bea108-a0ad-4e13-a693-244007fdfb75 
+requestId=5831691b-38fc-425e-8000-685423a231d4
+MEMORY_EXTRACTION: conversation=a384f856-0f35-4219-81b5-61489f0e47f4 requestId=c60ddd08-4446-40c5-911d-092882b602a2 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=5707
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=friendship fieldCount=5
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=friendship fieldCount=5 
+usedReplacement=true
+STAGE_TIMINGS: conversation=82bea108-a0ad-4e13-a693-244007fdfb75 requestId=5831691b-38fc-425e-8000-685423a231d4 
+context_assembly=1043ms intent_discovery=1730ms memory_context_selection=227ms skill_context_enrichment=243ms 
+generation=1438ms total_before_persist=5408ms persist=240ms
+2026-09-29 18:17:52.866 [eventLoopGroupProxy-4-4] INFO  ktor.application - 200 OK: POST - /v1/conversations/82bea108-a0ad-4e13-a693-244007fdfb75/messages in 6060ms
+2026-09-29 18:17:53.783 [eventLoopGroupProxy-4-5] INFO  ktor.application - 201 Created: POST - /v1/conversations in 434ms
+MEMORY_EXTRACTION: unparseable extraction response (JsonDecodingException: Unexpected JSON token at offset 0: Expected 
+start of the object '{', but had 'O' instead at path: $
+JSON input: Oh, that genuinely means a lot to hear. I'm really glad you feel that way ? because I?ve got your back, 
+always.); raw=Oh, that genuinely means a lot to hear. I'm really glad you feel that way ? because I?ve got your back, 
+always.
+MEMORY_EXTRACTION: conversation=82bea108-a0ad-4e13-a693-244007fdfb75 requestId=5831691b-38fc-425e-8000-685423a231d4 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=3556
+INTENT_DIAGNOSTICS: conversation=0d21bd49-12c0-4a8b-9f91-d933a8180f19 requestId=0a5a0183-ee49-4bcd-a4d3-32eb3b9e0232 
+outcome=COMPLETED finishReason=stop promptTokens=1930 completionTokens=10 reasoningTokens=0
+SKILL_SELECTION: selected='playful_teasing' conversation=0d21bd49-12c0-4a8b-9f91-d933a8180f19 
+requestId=0a5a0183-ee49-4bcd-a4d3-32eb3b9e0232
+MEMORY_CONTEXT_SELECTION: applied conversation=0d21bd49-12c0-4a8b-9f91-d933a8180f19 
+requestId=0a5a0183-ee49-4bcd-a4d3-32eb3b9e0232
+PERSONA_AUTHORIZER: status=SKILL_MAPPING_MISSING personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 
+skillKey=playful_teasing fieldCount=0
+PERSONA_CONTEXT: status=SKILL_MAPPING_MISSING personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=playful_teasing 
+fieldCount=0 usedReplacement=false
+STAGE_TIMINGS: conversation=0d21bd49-12c0-4a8b-9f91-d933a8180f19 requestId=0a5a0183-ee49-4bcd-a4d3-32eb3b9e0232 
+context_assembly=1045ms intent_discovery=1630ms memory_context_selection=315ms skill_context_enrichment=132ms 
+generation=1781ms total_before_persist=5595ms persist=135ms
+2026-09-29 18:18:00.627 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: POST - /v1/conversations/0d21bd49-12c0-4a8b-9f91-d933a8180f19/messages in 6620ms
+MEMORY_EXTRACTION: conversation=0d21bd49-12c0-4a8b-9f91-d933a8180f19 requestId=0a5a0183-ee49-4bcd-a4d3-32eb3b9e0232 
+proposed=1 accepted=1 queueDelayMs=0 durationMs=10626
+2026-09-29 18:18:17.323 [eventLoopGroupProxy-4-7] INFO  ktor.application - 201 Created: POST - /v1/conversations in 431ms
+INTENT_DIAGNOSTICS: conversation=cd3b8a12-c9a3-44c0-8eac-be0affc72f5a requestId=60ebc745-752b-44df-bf5e-0314f5095167 
+outcome=COMPLETED finishReason=stop promptTokens=1932 completionTokens=11 reasoningTokens=0
+SKILL_SELECTION: selected='romantic_intimacy' conversation=cd3b8a12-c9a3-44c0-8eac-be0affc72f5a 
+requestId=60ebc745-752b-44df-bf5e-0314f5095167
+MEMORY_CONTEXT_SELECTION: applied conversation=cd3b8a12-c9a3-44c0-8eac-be0affc72f5a 
+requestId=60ebc745-752b-44df-bf5e-0314f5095167
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=romantic_intimacy 
+fieldCount=5
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=romantic_intimacy fieldCount=5 
+usedReplacement=true
+STAGE_TIMINGS: conversation=cd3b8a12-c9a3-44c0-8eac-be0affc72f5a requestId=60ebc745-752b-44df-bf5e-0314f5095167 
+context_assembly=985ms intent_discovery=2027ms memory_context_selection=366ms skill_context_enrichment=146ms 
+generation=1805ms total_before_persist=6324ms persist=153ms
+2026-09-29 18:18:24.796 [eventLoopGroupProxy-4-8] INFO  ktor.application - 200 OK: POST - /v1/conversations/cd3b8a12-c9a3-44c0-8eac-be0affc72f5a/messages in 7063ms
+MEMORY_EXTRACTION: conversation=cd3b8a12-c9a3-44c0-8eac-be0affc72f5a requestId=60ebc745-752b-44df-bf5e-0314f5095167 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=4435

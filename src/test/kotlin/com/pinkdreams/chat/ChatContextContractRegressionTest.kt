@@ -126,21 +126,25 @@ class ChatContextContractRegressionTest {
         val actualRequest = fakeLlmClient.lastRequest
         assertNotNull(actualRequest, "Fake LlmClient must have received a request")
         val blocks = actualRequest.context.blocks
-        // 3 system sections + 10 native history messages (of 12 persisted; oldest 2 excluded) + 1 current message.
-        assertEquals(14, blocks.size, "Contract requires 3 system blocks + 10 native history messages + 1 current message")
+        // 4 system sections (engine, persona, profile, memory -- Phase 49 splits
+        // engine and persona into independently addressable blocks) + 10 native
+        // history messages (of 12 persisted; oldest 2 excluded) + 1 current message.
+        assertEquals(15, blocks.size, "Contract requires 4 system blocks + 10 native history messages + 1 current message")
 
         val engineBlock = blocks[0]
-        val profileBlock = blocks[1]
-        val memoryBlock = blocks[2]
-        val historyBlocks = blocks.subList(3, 13)
-        val currentBlock = blocks[13]
+        val personaBlock = blocks[1]
+        val profileBlock = blocks[2]
+        val memoryBlock = blocks[3]
+        val historyBlocks = blocks.subList(4, 14)
+        val currentBlock = blocks[14]
 
         // 1. Engine
         assertEquals("system", engineBlock.role)
         assertTrue(engineBlock.content.contains("ENGINE_CONTRACT_TEST_123"), "Engine content missing from actual LLM request")
 
         // 2. Persona core
-        assertTrue(engineBlock.content.contains("PERSONA_CONTRACT_TEST_456"), "Persona core content missing from actual LLM request")
+        assertEquals("system", personaBlock.role)
+        assertTrue(personaBlock.content.contains("PERSONA_CONTRACT_TEST_456"), "Persona core content missing from actual LLM request")
 
         // 3. User profile
         assertEquals("system", profileBlock.role)

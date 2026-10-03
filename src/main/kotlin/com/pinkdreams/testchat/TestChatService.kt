@@ -71,6 +71,10 @@ class TestChatService(
         val intentJsonMode: Boolean? = null,
         /** Primary Generation Latency phase: pins PRIMARY generation's OpenRouter provider-routing preference. Null keeps generation's provider routing unchanged. */
         val generationProviderSort: String? = null,
+        /** Persona Context POC: "A"/"B"/"C" selective-retrieval variant. Null keeps production behavior (raw persona content). */
+        val personaContextVariant: String? = null,
+        /** Persona Context POC Experiment 1: the skill key persona context is resolved against, for callers (the benchmark harness) that know the turn's skill upfront. Null keeps the "general_chat" placeholder. */
+        val personaContextSkillKey: String? = null,
     )
 
     fun create(request: CreationRequest): CreationResult {
@@ -158,6 +162,8 @@ class TestChatService(
             intentMaxOutputTokens = request.intentMaxOutputTokens,
             intentJsonMode = request.intentJsonMode,
             generationProviderSort = request.generationProviderSort,
+            personaContextVariant = request.personaContextVariant,
+            personaContextSkillKey = request.personaContextSkillKey,
         )
 
         val conversation = conversationRepository.createTest(
@@ -264,6 +270,90 @@ class TestChatService(
             // exchange from a Test Chat conversation is tagged so it's
             // distinguishable from production traffic.
             isTestChat = true,
+            // Persona Context POC Experiment 1: only constructed when the
+            // conversation actually pinned a non-"A" variant — every other
+            // Test Chat conversation (and the one production engine) keeps
+            // personaContextProvider = null, i.e. raw core.content, exactly
+            // as before this field existed.
+            personaContextProvider = snapshot.personaContextVariant
+                ?.takeIf { it != "A" }
+                ?.let { variant ->
+                    // Phase 7 Candidate F probe: variant "D" is not a real
+                    // resolver variant — it renders the SAME full document as
+                    // A through the same renderer B/C use, to isolate
+                    // structure/formatting from context volume. Never used
+                    // outside the explicitly-labeled Phase 7 experiment.
+                    if (variant == "D") {
+                        com.pinkdreams.chat.context.StructuredFullDocumentContextProvider(
+                            personaMasterRepo = com.pinkdreams.persistence.repositories.PersonaMasterRepository(db),
+                        )
+                    } else if (variant == "X") {
+                        // Phase 10 Experiment 1 probe: variant "X" is not a real
+                        // resolver variant either — it reuses variant B's OWN
+                        // resolved field selection verbatim and renders it as raw
+                        // JSON instead of structured markdown, to isolate
+                        // structure from selection. Never used outside the
+                        // explicitly-labeled Phase 10 experiment.
+                        com.pinkdreams.chat.context.SelectiveRawContextProvider(
+                            db = db,
+                            personaMasterRepo = com.pinkdreams.persistence.repositories.PersonaMasterRepository(db),
+                            fieldRegistryRepo = com.pinkdreams.persistence.repositories.PersonaFieldRegistryRepository(db),
+                            skillContextReqRepo = com.pinkdreams.persistence.repositories.SkillContextRequirementRepository(db),
+                        )
+                    } else if (variant == "FR") {
+                        // Phase 10C: variant "FR" (Full Raw) — the complete,
+                        // unfiltered persona document, serialized raw, actually
+                        // wired as a non-null provider so its content genuinely
+                        // reaches the generation request. This is NOT variant
+                        // "A" and does not touch or repurpose the "A" branch
+                        // above (see PHASE10A_A_BASELINE_CORRECTION.md — "A"
+                        // intentionally remains the historical null-provider
+                        // fallback, unchanged). Never used outside the
+                        // explicitly-labeled Phase 10 experiment.
+                        com.pinkdreams.chat.context.FullRawContextProvider(
+                            personaMasterRepo = com.pinkdreams.persistence.repositories.PersonaMasterRepository(db),
+                        )
+                    } else if (variant == "L") {
+                        // Phase 16 diagnostic: variant "L" is identical to B's
+                        // own resolver selection, rendered identically to B
+                        // except top-level scalar fields (e.g. identity.age)
+                        // get an explicit label instead of a bare value — see
+                        // PHASE15_TIMELINE_B_ROOT_CAUSE.md /
+                        // PHASE16_LABELED_SCALAR_DIAGNOSTIC.md. Temporary,
+                        // isolated, never wired into any other path.
+                        com.pinkdreams.chat.context.LabeledScalarDiagnosticProvider(
+                            db = db,
+                            personaMasterRepo = com.pinkdreams.persistence.repositories.PersonaMasterRepository(db),
+                            fieldRegistryRepo = com.pinkdreams.persistence.repositories.PersonaFieldRegistryRepository(db),
+                            skillContextReqRepo = com.pinkdreams.persistence.repositories.SkillContextRequirementRepository(db),
+                        )
+                    } else if (variant == "LA") {
+                        // Phase 20 diagnostic: variant "LA" ("L-age") is
+                        // identical to B's own resolver selection and
+                        // rendering, except ONLY "identity.age" gets an
+                        // explicit label — every other top-level scalar
+                        // stays a bare value exactly as in B. Isolates the
+                        // age-label manipulation from variant L (Phase 16),
+                        // which labels ALL top-level scalars — see
+                        // PHASE20_LABEL_ISOLATION_DESIGN.md. Temporary,
+                        // isolated, never wired into any other path.
+                        com.pinkdreams.chat.context.AgeOnlyLabeledScalarDiagnosticProvider(
+                            db = db,
+                            personaMasterRepo = com.pinkdreams.persistence.repositories.PersonaMasterRepository(db),
+                            fieldRegistryRepo = com.pinkdreams.persistence.repositories.PersonaFieldRegistryRepository(db),
+                            skillContextReqRepo = com.pinkdreams.persistence.repositories.SkillContextRequirementRepository(db),
+                        )
+                    } else {
+                        com.pinkdreams.chat.context.ResolvedPersonaContextProvider(
+                            db = db,
+                            personaMasterRepo = com.pinkdreams.persistence.repositories.PersonaMasterRepository(db),
+                            fieldRegistryRepo = com.pinkdreams.persistence.repositories.PersonaFieldRegistryRepository(db),
+                            skillContextReqRepo = com.pinkdreams.persistence.repositories.SkillContextRequirementRepository(db),
+                            variant = variant,
+                        )
+                    }
+                },
+            personaContextSkillKey = snapshot.personaContextSkillKey,
         )
         return ChatEngineFactory.build(pinnedDependencies)
     }

@@ -1,0 +1,424 @@
+﻿Starting a Gradle Daemon, 12 busy and 1 stopped Daemons could not be reused, use --status for details
+> Task :checkKotlinGradlePluginConfigurationErrors
+> Task :processResources
+> Task :compileKotlin
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/Application.kt:81:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.serialization.ExperimentalSerializationApi' or '@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)'
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/api/admin/AdminPersonaContextPocRoutes.kt:62:25 Variable 'persona' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/api/admin/AdminPersonaContextPocRoutes.kt:95:25 Variable 'runId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/benchmark/PersonaContextPocBenchmarkService.kt:72:9 Parameter 'scenarioIds' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/benchmark/PersonaContextPocBenchmarkService.kt:91:9 Parameter 'runId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/benchmark/PersonaContextPocBenchmarkService.kt:92:9 Parameter 'personaId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/benchmark/PersonaContextPocBenchmarkService.kt:93:9 Parameter 'scenarios' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/benchmark/PersonaContextPocBenchmarkService.kt:94:9 Parameter 'variants' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/benchmark/PersonaContextPocBenchmarkService.kt:108:30 Parameter 'runId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/benchmark/PersonaContextPocBenchmarkService.kt:126:9 Parameter 'executionId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/benchmark/PersonaContextPocBenchmarkService.kt:127:9 Parameter 'evaluator' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/benchmark/PersonaContextPocBenchmarkService.kt:128:9 Parameter 'scores' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/benchmark/PersonaContextPocBenchmarkService.kt:136:23 Parameter 'runId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/chat/context/AgeOnlyLabeledScalarDiagnosticProvider.kt:119:51 Parameter 'fieldId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/chat/context/LabeledScalarDiagnosticProvider.kt:114:51 Parameter 'fieldId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/chat/personacontext/PersonaContextRenderer.kt:17:9 Parameter 'personaName' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/chat/personacontext/PersonaContextRenderer.kt:63:51 Parameter 'fieldId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/chat/personacontext/PersonaContextResolver.kt:29:9 Parameter 'personaId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/chat/personacontext/PersonaContextResolver.kt:75:21 Name shadowed: fieldRegistry
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/config/DatabaseConfig.kt:12:18 Parameter 'appConfig' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/config/ImageProviderConfig.kt:26:18 Parameter 'appConfig' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/config/LlmConfig.kt:39:18 Parameter 'appConfig' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/benchmark/BenchmarkRepository.kt:111:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/benchmark/BenchmarkRepository.kt:146:25 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/benchmark/BenchmarkRepository.kt:162:26 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/benchmark/BenchmarkRepository.kt:196:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/benchmark/BenchmarkRepository.kt:202:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/benchmark/BenchmarkRepository.kt:255:45 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/benchmark/BenchmarkRepository.kt:293:43 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/benchmark/BenchmarkRepository.kt:303:30 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/config/ImageProviderSettingsRepository.kt:38:31 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/config/ImageProviderSettingsRepository.kt:64:44 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/evaluation/ImageEvaluationRepository.kt:155:35 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/evaluation/ImageEvaluationRepository.kt:169:40 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/evaluation/ImageEvaluationRepository.kt:173:26 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/evaluation/ImageEvaluationRepository.kt:186:31 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/evaluation/ImageEvaluationRepository.kt:192:31 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/observability/ImageGenerationEventRepository.kt:98:31 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/observability/ImageGenerationEventRepository.kt:110:31 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/GeneratedCandidateRepository.kt:68:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/GeneratedCandidateRepository.kt:75:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/GeneratedCandidateRepository.kt:81:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/GeneratedCandidateRepository.kt:92:33 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/GeneratedCandidateRepository.kt:102:33 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/GeneratedCandidateRepository.kt:113:37 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/GeneratedCandidateRepository.kt:123:33 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/GeneratedCandidateRepository.kt:153:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/ImageWarehouseRepository.kt:39:35 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/ImageWarehouseRepository.kt:43:41 Elvis operator (?:) always returns the left operand of non-nullable type UUID
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/ImageWarehouseRepository.kt:45:48 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/ImageWarehouseRepository.kt:49:30 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/orchestration/ImageWarehouseRepository.kt:63:43 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/provider/openrouter/OpenRouterImageModelCatalog.kt:61:21 'constructor URL(String!)' is deprecated. Deprecated in Java
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/provider/openrouter/OpenRouterImageProvider.kt:261:63 Unnecessary non-null assertion (!!) on a non-null receiver of type OpenRouterImageError
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/provider/openrouter/OpenRouterImageProvider.kt:269:55 Unnecessary non-null assertion (!!) on a non-null receiver of type List<OpenRouterImageData>
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/provider/openrouter/OpenRouterImageProvider.kt:282:39 Unnecessary non-null assertion (!!) on a non-null receiver of type List<OpenRouterImageData>
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/provider/openrouter/OpenRouterImageProvider.kt:295:54 Parameter 'index' is never used, could be renamed to _
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/provider/openrouter/OpenRouterImageProvider.kt:343:18 Variable 'response' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/provider/openrouter/OpenRouterImageProvider.kt:347:54 Parameter 'index' is never used, could be renamed to _
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/provider/openrouter/OpenRouterImageProvider.kt:471:19 'constructor URL(String!)' is deprecated. Deprecated in Java
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/provider/openrouter/OpenRouterImageProvider.kt:551:19 'constructor URL(String!)' is deprecated. Deprecated in Java
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/provider/openrouter/OpenRouterModelsPricingCatalog.kt:51:21 'constructor URL(String!)' is deprecated. Deprecated in Java
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/imaging/retention/ImageRetentionCleaner.kt:57:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/llm/OpenRouterLlmClient.kt:262:19 'constructor URL(String!)' is deprecated. Deprecated in Java
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/RepositoryChatPersistence.kt:67:25 Variable 'conversation' is never used
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/RepositoryChatPersistence.kt:67:54 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/RepositoryChatPersistence.kt:78:59 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminAllowlistRepository.kt:43:24 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminAllowlistRepository.kt:56:24 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:51:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:53:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:55:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:58:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:65:14 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:87:37 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:102:33 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:103:30 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:104:28 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:116:14 'slice(Expression<*>, vararg Expression<*>): FieldSet' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AdminStatsRepository.kt:136:14 'slice(Expression<*>, vararg Expression<*>): FieldSet' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AiSettingsRepository.kt:52:20 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/AiSettingsRepository.kt:78:33 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ChatRequestExecutionRepository.kt:71:31 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ChatRequestExecutionRepository.kt:119:60 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationEngineRepository.kt:78:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationEngineRepository.kt:84:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationEngineRepository.kt:90:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:163:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:169:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:186:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:267:27 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:290:44 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:298:44 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:306:45 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:339:35 'select(Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:344:35 'select(Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ImageJobRepository.kt:121:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ImageJobRepository.kt:131:19 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ImageJobRepository.kt:137:19 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ImageJobRepository.kt:146:19 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ImageJobRepository.kt:151:19 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ImageJobRepository.kt:311:19 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ImageJobRepository.kt:322:19 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/IntentEngineRepository.kt:87:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/IntentEngineRepository.kt:91:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/IntentEngineRepository.kt:95:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/LlmExchangeRepository.kt:139:35 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/LlmExchangeRepository.kt:152:22 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/LlmExchangeRepository.kt:156:22 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/LlmExchangeRepository.kt:162:22 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/LlmExchangeRepository.kt:175:22 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/MemoryEngineRepository.kt:93:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/MemoryEngineRepository.kt:97:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/MemoryEngineRepository.kt:101:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/MemoryFactRepository.kt:147:21 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/MemoryFactRepository.kt:153:21 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/MemoryFactRepository.kt:166:21 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/MessageRepository.kt:84:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/MessageRepository.kt:90:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/MessageRepository.kt:96:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/MessageRepository.kt:145:60 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PerformanceMetricsRepository.kt:121:22 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PerformanceMetricsRepository.kt:152:38 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PerformanceMetricsRepository.kt:159:35 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PerformanceMetricsRepository.kt:163:34 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PerformanceMetricsRepository.kt:220:26 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PerformanceMetricsRepository.kt:266:22 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PerformanceMetricsRepository.kt:320:37 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaCoreVersionRepository.kt:98:30 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaCoreVersionRepository.kt:103:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaCoreVersionRepository.kt:109:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaCoreVersionRepository.kt:114:29 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaCoreVersionRepository.kt:135:14 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaFieldRegistryRepository.kt:53:30 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaFieldRegistryRepository.kt:59:30 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaFieldRegistryRepository.kt:64:30 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaIdentityRepository.kt:29:25 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaMasterRepository.kt:40:32 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaRepository.kt:72:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaRepository.kt:84:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaRepository.kt:94:28 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaRepository.kt:238:18 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaVisualVersionRepository.kt:56:31 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaVisualVersionRepository.kt:62:31 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaVisualVersionRepository.kt:67:31 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaVisualVersionRepository.kt:75:47 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaVisualVersionRepository.kt:80:24 Unnecessary safe call on a non-null receiver of type UUID
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonaVisualVersionRepository.kt:136:14 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/PersonalGuideRepository.kt:35:41 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ReferenceImageRepository.kt:101:38 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ReferenceImageRepository.kt:107:38 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ReferenceImageRepository.kt:112:38 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ReferenceImageRepository.kt:120:38 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/SensitivePreferenceRepository.kt:75:30 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/SensitivePreferenceRepository.kt:82:30 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/SkillContextRequirementRepository.kt:47:34 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/SkillRepository.kt:93:17 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/SkillRepository.kt:97:16 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/SkillRepository.kt:101:16 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/SkillRepository.kt:106:16 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/SkillRepository.kt:111:16 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/TurnAttributionRepository.kt:77:26 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/UserProfileRepository.kt:61:22 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/UserRepository.kt:19:16 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/WardrobeRepository.kt:81:36 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/WardrobeRepository.kt:87:36 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/WardrobeRepository.kt:92:36 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+
+> Task :compileJava NO-SOURCE
+> Task :classes
+
+> Task :run
+gradle : SLF4J(I): Connected with provider of type [ch.qos.logback.classic.spi.LogbackServiceProvider]
+At line:1 char:359
++ ... ts\Pink dreams"; . .\run-local.secrets.ps1; gradle run *> app-run.log
++                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (SLF4J(I): Conne...erviceProvider]:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-10-03 16:56:16.600 [main] INFO  ktor.application - Autoreload is disabled because the development mode is off.
+2026-10-03 16:56:19.749 [main] INFO  Exposed - Preparing create tables statements took 245ms
+2026-10-03 16:56:19.762 [main] INFO  Exposed - Executing create tables statements took 8ms
+2026-10-03 16:56:20.705 [main] INFO  Exposed - Extracting table columns took 942ms
+2026-10-03 16:56:21.181 [main] INFO  Exposed - Extracting primary keys took 476ms
+2026-10-03 16:56:23.266 [main] INFO  Exposed - Extracting column constraints took 1981ms
+2026-10-03 16:56:23.268 [main] INFO  Exposed - Preparing alter table statements took 3505ms
+2026-10-03 16:56:23.409 [main] INFO  Exposed - Executing alter table statements took 141ms
+2026-10-03 16:56:24.368 [main] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_key -> in mapping conversation_engines_version_unique
+2026-10-03 16:56:24.372 [main] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_key -> in mapping personas_slug_unique
+2026-10-03 16:56:24.373 [main] INFO  Exposed - Index on table 'persona_core_versions' differs only in name: in db persona_core_versions_persona_id_version_key -> in mapping persona_core_versions_persona_id_version_unique
+2026-10-03 16:56:24.376 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'memory_facts':
+		Index 'ix_memory_facts_hot_selection' for 'memory_facts' on columns com.pinkdreams.persistence.database.MemoryFacts.user_id, com.pinkdreams.persistence.database.MemoryFacts.persona_id, com.pinkdreams.persistence.database.MemoryFacts.status, com.pinkdreams.persistence.database.MemoryFacts.last_referenced_at, com.pinkdreams.persistence.database.MemoryFacts.learned_at
+		Index 'ix_memory_facts_user_persona' for 'memory_facts' on columns com.pinkdreams.persistence.database.MemoryFacts.user_id, com.pinkdreams.persistence.database.MemoryFacts.persona_id
+2026-10-03 16:56:24.377 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'conversation_engines':
+		Unique Index 'one_active_engine' for 'conversation_engines' on columns com.pinkdreams.persistence.database.ConversationEngines.is_active
+2026-10-03 16:56:24.378 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'conversations':
+		Index 'ix_conversations_user' for 'conversations' on columns com.pinkdreams.persistence.database.Conversations.user_id, com.pinkdreams.persistence.database.Conversations.persona_id
+2026-10-03 16:56:24.379 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'messages':
+		Unique Index 'uq_client_message_per_conversation' for 'messages' on columns com.pinkdreams.persistence.database.Messages.conversation_id, com.pinkdreams.persistence.database.Messages.client_message_id
+		Index 'ix_messages_conversation_time' for 'messages' on columns com.pinkdreams.persistence.database.Messages.conversation_id, com.pinkdreams.persistence.database.Messages.created_at
+2026-10-03 16:56:24.382 [main] INFO  Exposed - Checking mapping consistence took 972ms
+2026-10-03 16:56:24.424 [main] INFO  Exposed - Preparing create tables statements took 30ms
+2026-10-03 16:56:24.426 [main] INFO  Exposed - Executing create tables statements took 2ms
+2026-10-03 16:56:24.443 [main] INFO  Exposed - Extracting table columns took 16ms
+2026-10-03 16:56:24.454 [main] INFO  Exposed - Extracting primary keys took 11ms
+2026-10-03 16:56:24.524 [main] INFO  Exposed - Extracting column constraints took 68ms
+2026-10-03 16:56:24.524 [main] INFO  Exposed - Preparing alter table statements took 97ms
+2026-10-03 16:56:24.526 [main] INFO  Exposed - Executing alter table statements took 1ms
+2026-10-03 16:56:24.543 [main] INFO  Exposed - Checking mapping consistence took 17ms
+BASELINE_SEED: conversationEngine=already present persona=already present personaCore=already present 
+memoryEngine=already present intentEngine=already present skillsCreated=0 skillsAlreadyPresent=26
+PERSONA_CONTEXT_SEED: masterDocument=already present for this core version fieldRegistry=already present (32 fields) 
+skillMappings=already present (5 skills)
+2026-10-03 16:56:35.551 [main] INFO  ktor.application - Application started in 19.243 seconds.
+2026-10-03 16:56:35.554 [main] INFO  ktor.application - Application started: io.ktor.server.application.Application@1a2e2935
+2026-10-03 16:56:36.882 [DefaultDispatcher-worker-1] INFO  ktor.application - Responding at http://127.0.0.1:8080
+2026-10-03 16:57:06.282 [eventLoopGroupProxy-4-1] INFO  ktor.application - 200 OK: POST - /v1/admin/auth/login in 730ms
+2026-10-03 16:57:09.370 [eventLoopGroupProxy-4-3] INFO  ktor.application - 200 OK: GET - /v1/admin/personas in 1509ms
+2026-10-03 16:57:13.540 [eventLoopGroupProxy-4-5] INFO  ktor.application - 200 OK: GET - /v1/admin/stats/activity in 5514ms
+2026-10-03 16:57:19.660 [eventLoopGroupProxy-4-1] INFO  ktor.application - 200 OK: GET - /v1/admin/observability/latency-dashboard in 12179ms
+2026-10-03 16:57:19.791 [eventLoopGroupProxy-4-2] INFO  ktor.application - 200 OK: GET - /v1/admin/users in 12032ms
+2026-10-03 16:57:21.268 [eventLoopGroupProxy-4-4] INFO  ktor.application - 200 OK: GET - /v1/admin/ai-configuration in 13296ms
+2026-10-03 16:58:05.821 [eventLoopGroupProxy-4-4] INFO  ktor.application - 200 OK: GET - /v1/admin/personas in 598ms
+2026-10-03 16:58:16.853 [eventLoopGroupProxy-4-2] INFO  ktor.application - 200 OK: GET - /v1/admin/users in 11631ms
+2026-10-03 16:58:17.461 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/admin/stats/users in 543ms
+2026-10-03 16:58:50.446 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/conversations in 257ms
+2026-10-03 16:58:51.216 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 750ms
+2026-10-03 16:58:52.607 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 1102ms
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=f8f8eb78-fe48-45d2-a64e-d9d43bd31493 
+outcome=COMPLETED finishReason=stop promptTokens=2236 completionTokens=6 reasoningTokens=0
+SKILL_SELECTION: none conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=f8f8eb78-fe48-45d2-a64e-d9d43bd31493
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=f8f8eb78-fe48-45d2-a64e-d9d43bd31493
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=f8f8eb78-fe48-45d2-a64e-d9d43bd31493 
+context_assembly=1508ms intent_discovery=6286ms memory_context_selection=358ms skill_context_enrichment=0ms 
+generation=2357ms total_before_persist=11072ms persist=412ms
+2026-10-03 16:59:08.911 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 12206ms
+2026-10-03 16:59:09.768 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 820ms
+2026-10-03 16:59:10.453 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 561ms
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=f8f8eb78-fe48-45d2-a64e-d9d43bd31493 
+proposed=0 accepted=0 queueDelayMs=32 durationMs=3640
+2026-10-03 16:59:15.216 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 724ms
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=b0b90269-f488-4e1e-9ff3-58b3b5ac3224 
+outcome=COMPLETED finishReason=stop promptTokens=2206 completionTokens=10 reasoningTokens=0
+SKILL_SELECTION: selected='playful_teasing' conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=b0b90269-f488-4e1e-9ff3-58b3b5ac3224
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=b0b90269-f488-4e1e-9ff3-58b3b5ac3224
+PERSONA_AUTHORIZER: status=DOCUMENT_NOT_FOUND personaId=8186eb81-a0c5-4ce9-a3c7-bed2500dd9c7 skillKey=playful_teasing 
+fieldCount=0
+PERSONA_CONTEXT: status=DOCUMENT_NOT_FOUND personaId=8186eb81-a0c5-4ce9-a3c7-bed2500dd9c7 skillKey=playful_teasing 
+fieldCount=0 usedReplacement=false
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=b0b90269-f488-4e1e-9ff3-58b3b5ac3224 
+context_assembly=1862ms intent_discovery=2451ms memory_context_selection=620ms skill_context_enrichment=615ms 
+generation=2827ms total_before_persist=9848ms persist=344ms
+2026-10-03 17:03:18.455 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 10796ms
+2026-10-03 17:03:19.845 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 1309ms
+2026-10-03 17:03:20.623 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 622ms
+2026-10-03 17:03:25.228 [eventLoopGroupProxy-4-6] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 573ms
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=b0b90269-f488-4e1e-9ff3-58b3b5ac3224 
+proposed=0 accepted=0 queueDelayMs=2 durationMs=9792
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=6c334f7e-c7df-4e39-942f-700c697745b7 
+outcome=COMPLETED finishReason=stop promptTokens=2128 completionTokens=10 reasoningTokens=0
+SKILL_SELECTION: selected='playful_teasing' conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=6c334f7e-c7df-4e39-942f-700c697745b7
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=6c334f7e-c7df-4e39-942f-700c697745b7
+PERSONA_AUTHORIZER: status=DOCUMENT_NOT_FOUND personaId=8186eb81-a0c5-4ce9-a3c7-bed2500dd9c7 skillKey=playful_teasing 
+fieldCount=0
+PERSONA_CONTEXT: status=DOCUMENT_NOT_FOUND personaId=8186eb81-a0c5-4ce9-a3c7-bed2500dd9c7 skillKey=playful_teasing 
+fieldCount=0 usedReplacement=false
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=6c334f7e-c7df-4e39-942f-700c697745b7 
+context_assembly=2217ms intent_discovery=3707ms memory_context_selection=1354ms skill_context_enrichment=473ms 
+generation=2426ms total_before_persist=10899ms persist=580ms
+2026-10-03 17:11:45.199 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 12156ms
+2026-10-03 17:11:46.643 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 1406ms
+2026-10-03 17:11:47.533 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 623ms
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=6c334f7e-c7df-4e39-942f-700c697745b7 
+proposed=0 accepted=0 queueDelayMs=23 durationMs=4462
+2026-10-03 17:11:52.291 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 724ms
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=46068239-b363-45b4-a9b1-e2d1d5d48eff 
+outcome=COMPLETED finishReason=stop promptTokens=2165 completionTokens=6 reasoningTokens=0
+SKILL_SELECTION: none conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=46068239-b363-45b4-a9b1-e2d1d5d48eff
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=46068239-b363-45b4-a9b1-e2d1d5d48eff
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=46068239-b363-45b4-a9b1-e2d1d5d48eff 
+context_assembly=1635ms intent_discovery=3809ms memory_context_selection=525ms skill_context_enrichment=0ms 
+generation=2798ms total_before_persist=9535ms persist=363ms
+2026-10-03 17:13:14.889 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 10655ms
+2026-10-03 17:13:16.021 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 1099ms
+2026-10-03 17:13:17.085 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 930ms
+MEMORY_EXTRACTION: unparseable extraction response (JsonDecodingException: Unexpected JSON token at offset 0: Expected 
+start of the object '{', but had '"' instead at path: $
+JSON input: ","Lola); raw=","Lola
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=46068239-b363-45b4-a9b1-e2d1d5d48eff 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=4667
+2026-10-03 17:13:21.662 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 548ms
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=7bc7b901-4286-45ea-a0e5-584bad4748fc 
+outcome=COMPLETED finishReason=stop promptTokens=2227 completionTokens=9 reasoningTokens=0
+SKILL_SELECTION: selected='sexual_stimulation' conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=7bc7b901-4286-45ea-a0e5-584bad4748fc
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=7bc7b901-4286-45ea-a0e5-584bad4748fc
+PERSONA_AUTHORIZER: status=DOCUMENT_NOT_FOUND personaId=8186eb81-a0c5-4ce9-a3c7-bed2500dd9c7 
+skillKey=sexual_stimulation fieldCount=0
+PERSONA_CONTEXT: status=DOCUMENT_NOT_FOUND personaId=8186eb81-a0c5-4ce9-a3c7-bed2500dd9c7 skillKey=sexual_stimulation 
+fieldCount=0 usedReplacement=false
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=7bc7b901-4286-45ea-a0e5-584bad4748fc 
+context_assembly=1763ms intent_discovery=2331ms memory_context_selection=472ms skill_context_enrichment=294ms 
+generation=2767ms total_before_persist=8631ms persist=522ms
+2026-10-03 17:14:47.643 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 10091ms
+2026-10-03 17:14:49.236 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 1561ms
+2026-10-03 17:14:50.425 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 906ms
+2026-10-03 17:14:55.398 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 939ms
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=7bc7b901-4286-45ea-a0e5-584bad4748fc 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=15224
+MEMORY_ENGINE: maintenance failed for conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=46068239-b363-45b4-a9b1-e2d1d5d48eff: OpenRouterBudgetExhaustionException: OpenRouter returned no content 
+(finish_reason=length, completionTokens=6000, reasoningTokens=6000). For reasoning models this usually means 
+max_tokens was exhausted by reasoning before any content was produced.
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=5952ef11-cba5-4aaa-b7cb-90cf4e9a7627 
+outcome=COMPLETED finishReason=stop promptTokens=2256 completionTokens=7 reasoningTokens=0
+SKILL_SELECTION: selected='learning' conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=5952ef11-cba5-4aaa-b7cb-90cf4e9a7627
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=5952ef11-cba5-4aaa-b7cb-90cf4e9a7627
+PERSONA_AUTHORIZER: status=DOCUMENT_NOT_FOUND personaId=8186eb81-a0c5-4ce9-a3c7-bed2500dd9c7 skillKey=learning 
+fieldCount=0
+PERSONA_CONTEXT: status=DOCUMENT_NOT_FOUND personaId=8186eb81-a0c5-4ce9-a3c7-bed2500dd9c7 skillKey=learning 
+fieldCount=0 usedReplacement=false
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=5952ef11-cba5-4aaa-b7cb-90cf4e9a7627 
+context_assembly=1622ms intent_discovery=2654ms memory_context_selection=624ms skill_context_enrichment=281ms 
+generation=3811ms total_before_persist=9840ms persist=494ms
+2026-10-03 17:16:03.243 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 11413ms
+2026-10-03 17:16:04.782 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 1510ms
+2026-10-03 17:16:05.568 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 645ms
+2026-10-03 17:16:10.288 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 672ms
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=5952ef11-cba5-4aaa-b7cb-90cf4e9a7627 
+proposed=0 accepted=0 queueDelayMs=6 durationMs=10541
+CONTINUITY_SUMMARIZATION: Failed for conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=5952ef11-cba5-4aaa-b7cb-90cf4e9a7627: OpenRouterBudgetExhaustionException: OpenRouter returned no content 
+(finish_reason=length, completionTokens=1000, reasoningTokens=1000). For reasoning models this usually means 
+max_tokens was exhausted by reasoning before any content was produced.
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=8c966e93-12f1-457c-93e1-98b4daa73ea7 
+outcome=COMPLETED finishReason=stop promptTokens=2213 completionTokens=6 reasoningTokens=0
+SKILL_SELECTION: none conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=8c966e93-12f1-457c-93e1-98b4daa73ea7
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=8c966e93-12f1-457c-93e1-98b4daa73ea7
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=8c966e93-12f1-457c-93e1-98b4daa73ea7 
+context_assembly=2114ms intent_discovery=2492ms memory_context_selection=274ms skill_context_enrichment=0ms 
+generation=2158ms total_before_persist=7800ms persist=335ms
+2026-10-03 17:17:37.346 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 8801ms
+2026-10-03 17:17:38.421 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 1037ms
+2026-10-03 17:17:39.118 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 532ms
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=8c966e93-12f1-457c-93e1-98b4daa73ea7 
+proposed=0 accepted=0 queueDelayMs=2 durationMs=4256
+2026-10-03 17:17:43.824 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 672ms
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=b3a76d53-79b7-479a-a587-166c671678e4 
+outcome=COMPLETED finishReason=stop promptTokens=2224 completionTokens=6 reasoningTokens=0
+SKILL_SELECTION: none conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=b3a76d53-79b7-479a-a587-166c671678e4
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=b3a76d53-79b7-479a-a587-166c671678e4
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=b3a76d53-79b7-479a-a587-166c671678e4 
+context_assembly=1723ms intent_discovery=2213ms memory_context_selection=263ms skill_context_enrichment=0ms 
+generation=2500ms total_before_persist=7649ms persist=575ms
+2026-10-03 17:18:31.475 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 8975ms
+2026-10-03 17:18:32.687 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 1180ms
+2026-10-03 17:18:33.854 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 930ms
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=b3a76d53-79b7-479a-a587-166c671678e4 
+proposed=1 accepted=0 queueDelayMs=1 durationMs=4888
+2026-10-03 17:18:38.320 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 438ms
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=e8b334f2-87c0-4d2c-bc9d-f30010fd0cc0 
+outcome=COMPLETED finishReason=stop promptTokens=2246 completionTokens=9 reasoningTokens=0
+SKILL_SELECTION: selected='sexual_stimulation' conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=e8b334f2-87c0-4d2c-bc9d-f30010fd0cc0
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=e8b334f2-87c0-4d2c-bc9d-f30010fd0cc0
+PERSONA_AUTHORIZER: status=DOCUMENT_NOT_FOUND personaId=8186eb81-a0c5-4ce9-a3c7-bed2500dd9c7 
+skillKey=sexual_stimulation fieldCount=0
+PERSONA_CONTEXT: status=DOCUMENT_NOT_FOUND personaId=8186eb81-a0c5-4ce9-a3c7-bed2500dd9c7 skillKey=sexual_stimulation 
+fieldCount=0 usedReplacement=false
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=e8b334f2-87c0-4d2c-bc9d-f30010fd0cc0 
+context_assembly=2343ms intent_discovery=5188ms memory_context_selection=477ms skill_context_enrichment=232ms 
+generation=2485ms total_before_persist=12019ms persist=485ms
+2026-10-03 17:20:11.320 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 13395ms
+2026-10-03 17:20:13.339 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 1981ms
+2026-10-03 17:20:14.721 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 1220ms
+2026-10-03 17:20:19.350 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 598ms
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=e8b334f2-87c0-4d2c-bc9d-f30010fd0cc0 
+proposed=0 accepted=0 queueDelayMs=2 durationMs=13559
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=f7e28dff-66b8-4a76-ada4-a85f28e0227d 
+outcome=COMPLETED finishReason=stop promptTokens=2218 completionTokens=6 reasoningTokens=0
+SKILL_SELECTION: none conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=f7e28dff-66b8-4a76-ada4-a85f28e0227d
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=f7e28dff-66b8-4a76-ada4-a85f28e0227d
+MEMORY_ENGINE: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 batch=[110,120) userApplied=2 userSkipped=1 
+personaApplied=2 personaSkipped=1
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=f7e28dff-66b8-4a76-ada4-a85f28e0227d 
+context_assembly=1938ms intent_discovery=3328ms memory_context_selection=406ms skill_context_enrichment=0ms 
+generation=2430ms total_before_persist=8700ms persist=386ms
+2026-10-03 17:21:21.946 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 9833ms
+2026-10-03 17:21:23.129 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 1153ms
+2026-10-03 17:21:23.968 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 705ms
+2026-10-03 17:21:28.942 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 930ms
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=f7e28dff-66b8-4a76-ada4-a85f28e0227d 
+proposed=0 accepted=0 queueDelayMs=1 durationMs=14555
+INTENT_DIAGNOSTICS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=2dc9cbe9-f43d-4f48-8a2b-7ed535599421 
+outcome=COMPLETED finishReason=stop promptTokens=2224 completionTokens=6 reasoningTokens=0
+SKILL_SELECTION: none conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=2dc9cbe9-f43d-4f48-8a2b-7ed535599421
+MEMORY_CONTEXT_SELECTION: applied conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 
+requestId=2dc9cbe9-f43d-4f48-8a2b-7ed535599421
+STAGE_TIMINGS: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=2dc9cbe9-f43d-4f48-8a2b-7ed535599421 
+context_assembly=1650ms intent_discovery=2837ms memory_context_selection=257ms skill_context_enrichment=0ms 
+generation=2023ms total_before_persist=7223ms persist=296ms
+2026-10-03 17:22:13.711 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: POST - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/messages in 8258ms
+2026-10-03 17:22:14.629 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0 in 884ms
+2026-10-03 17:22:15.801 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 974ms
+2026-10-03 17:22:20.359 [eventLoopGroupProxy-4-7] INFO  ktor.application - 200 OK: GET - /v1/conversations/df32481a-89e4-4f63-88ba-47bfeba153f0/memory in 521ms
+MEMORY_EXTRACTION: conversation=df32481a-89e4-4f63-88ba-47bfeba153f0 requestId=2dc9cbe9-f43d-4f48-8a2b-7ed535599421 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=10920

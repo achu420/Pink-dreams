@@ -1,256 +1,256 @@
-scenario_id,skill_key,user_message,variant,input_tokens,output_tokens,total_tokens,cost_usd,latency_ms,generated_response,status
-44e0f34a-95d9-474a-91df-6a04be76cbf4,general_chat,"Hey, how's your day going?",A,0,0,0,0.0000,0,"",FAILED
-44e0f34a-95d9-474a-91df-6a04be76cbf4,general_chat,"Hey, how's your day going?",B,0,0,0,0.0000,0,"",FAILED
-44e0f34a-95d9-474a-91df-6a04be76cbf4,general_chat,"Hey, how's your day going?",C,0,0,0,0.0000,0,"",FAILED
-765e8fd6-1380-4242-8148-97ef29f4507d,general_chat,"What are you up to these days?",A,0,0,0,0.0000,0,"",FAILED
-765e8fd6-1380-4242-8148-97ef29f4507d,general_chat,"What are you up to these days?",B,0,0,0,0.0000,0,"",FAILED
-765e8fd6-1380-4242-8148-97ef29f4507d,general_chat,"What are you up to these days?",C,0,0,0,0.0000,0,"",FAILED
-ef52b0f5-5d35-4fd6-8734-5e10d211e76d,general_chat,"Tell me about yourself briefly.",A,0,0,0,0.0000,0,"",FAILED
-ef52b0f5-5d35-4fd6-8734-5e10d211e76d,general_chat,"Tell me about yourself briefly.",B,0,0,0,0.0000,0,"",FAILED
-ef52b0f5-5d35-4fd6-8734-5e10d211e76d,general_chat,"Tell me about yourself briefly.",C,0,0,0,0.0000,0,"",FAILED
-37323798-7348-410d-8c14-1557d0472d0c,general_chat,"What kind of conversations do you enjoy?",A,0,0,0,0.0000,0,"",FAILED
-37323798-7348-410d-8c14-1557d0472d0c,general_chat,"What kind of conversations do you enjoy?",B,0,0,0,0.0000,0,"",FAILED
-37323798-7348-410d-8c14-1557d0472d0c,general_chat,"What kind of conversations do you enjoy?",C,0,0,0,0.0000,0,"",FAILED
-bbaa9136-17fd-4181-83ca-03a0ee0466b2,general_chat,"How do you handle stress?",A,0,0,0,0.0000,0,"",FAILED
-bbaa9136-17fd-4181-83ca-03a0ee0466b2,general_chat,"How do you handle stress?",B,0,0,0,0.0000,0,"",FAILED
-bbaa9136-17fd-4181-83ca-03a0ee0466b2,general_chat,"How do you handle stress?",C,0,0,0,0.0000,0,"",FAILED
-f50f470b-1e6e-4592-b777-56a2eac0bb5b,general_chat,"You mentioned Ladakh last time - still happening?",A,0,0,0,0.0000,0,"",FAILED
-f50f470b-1e6e-4592-b777-56a2eac0bb5b,general_chat,"You mentioned Ladakh last time - still happening?",B,0,0,0,0.0000,0,"",FAILED
-f50f470b-1e6e-4592-b777-56a2eac0bb5b,general_chat,"You mentioned Ladakh last time - still happening?",C,0,0,0,0.0000,0,"",FAILED
-90356341-dcfb-4bbe-811c-0ec3b7137821,general_chat,"Are you an introvert or extrovert?",A,0,0,0,0.0000,0,"",FAILED
-90356341-dcfb-4bbe-811c-0ec3b7137821,general_chat,"Are you an introvert or extrovert?",B,0,0,0,0.0000,0,"",FAILED
-90356341-dcfb-4bbe-811c-0ec3b7137821,general_chat,"Are you an introvert or extrovert?",C,0,0,0,0.0000,0,"",FAILED
-d933c6d0-8c13-460d-8ef8-3251fc30f3ce,general_chat,"What do you like to do in your free time?",A,0,0,0,0.0000,0,"",FAILED
-d933c6d0-8c13-460d-8ef8-3251fc30f3ce,general_chat,"What do you like to do in your free time?",B,0,0,0,0.0000,0,"",FAILED
-d933c6d0-8c13-460d-8ef8-3251fc30f3ce,general_chat,"What do you like to do in your free time?",C,0,0,0,0.0000,0,"",FAILED
-2439e167-9b48-496e-8157-53ce227bde7c,general_chat,"How do you view relationships?",A,0,0,0,0.0000,0,"",FAILED
-2439e167-9b48-496e-8157-53ce227bde7c,general_chat,"How do you view relationships?",B,0,0,0,0.0000,0,"",FAILED
-2439e167-9b48-496e-8157-53ce227bde7c,general_chat,"How do you view relationships?",C,0,0,0,0.0000,0,"",FAILED
-3f91347a-e2b5-47c2-8181-b2058f7166a6,general_chat,"Where are you from originally?",A,0,0,0,0.0000,0,"",FAILED
-3f91347a-e2b5-47c2-8181-b2058f7166a6,general_chat,"Where are you from originally?",B,0,0,0,0.0000,0,"",FAILED
-3f91347a-e2b5-47c2-8181-b2058f7166a6,general_chat,"Where are you from originally?",C,0,0,0,0.0000,0,"",FAILED
-e87b63b3-7847-46a8-b997-62a4953e6868,general_chat,"Tell me about your work.",A,0,0,0,0.0000,0,"",FAILED
-e87b63b3-7847-46a8-b997-62a4953e6868,general_chat,"Tell me about your work.",B,0,0,0,0.0000,0,"",FAILED
-e87b63b3-7847-46a8-b997-62a4953e6868,general_chat,"Tell me about your work.",C,0,0,0,0.0000,0,"",FAILED
-442c8936-9eaa-4aa4-bac9-82c7cd7ac5b5,general_chat,"What frustrates you?",A,0,0,0,0.0000,0,"",FAILED
-442c8936-9eaa-4aa4-bac9-82c7cd7ac5b5,general_chat,"What frustrates you?",B,0,0,0,0.0000,0,"",FAILED
-442c8936-9eaa-4aa4-bac9-82c7cd7ac5b5,general_chat,"What frustrates you?",C,0,0,0,0.0000,0,"",FAILED
-945dba5d-3f91-4281-93f0-143d298ca196,general_chat,"How do you like to be communicated with?",A,0,0,0,0.0000,0,"",FAILED
-945dba5d-3f91-4281-93f0-143d298ca196,general_chat,"How do you like to be communicated with?",B,0,0,0,0.0000,0,"",FAILED
-945dba5d-3f91-4281-93f0-143d298ca196,general_chat,"How do you like to be communicated with?",C,0,0,0,0.0000,0,"",FAILED
-4399d102-3302-4ffb-bafc-b92839f17f01,general_chat,"How's Ritu doing?",A,0,0,0,0.0000,0,"",FAILED
-4399d102-3302-4ffb-bafc-b92839f17f01,general_chat,"How's Ritu doing?",B,0,0,0,0.0000,0,"",FAILED
-4399d102-3302-4ffb-bafc-b92839f17f01,general_chat,"How's Ritu doing?",C,0,0,0,0.0000,0,"",FAILED
-1542b37e-ed6f-47ba-b968-c5aa17c043ed,general_chat,"Do you like comfort or adventure more?",A,0,0,0,0.0000,0,"",FAILED
-1542b37e-ed6f-47ba-b968-c5aa17c043ed,general_chat,"Do you like comfort or adventure more?",B,0,0,0,0.0000,0,"",FAILED
-1542b37e-ed6f-47ba-b968-c5aa17c043ed,general_chat,"Do you like comfort or adventure more?",C,0,0,0,0.0000,0,"",FAILED
-74c7b423-c5f0-405b-9dea-ec5d2475228c,friendship,"Tell me about your closest friend.",A,0,0,0,0.0000,0,"",FAILED
-74c7b423-c5f0-405b-9dea-ec5d2475228c,friendship,"Tell me about your closest friend.",B,0,0,0,0.0000,0,"",FAILED
-74c7b423-c5f0-405b-9dea-ec5d2475228c,friendship,"Tell me about your closest friend.",C,0,0,0,0.0000,0,"",FAILED
-4a59c556-1a6b-4d14-ac15-88520b2b1c25,friendship,"What makes someone a good friend to you?",A,0,0,0,0.0000,0,"",FAILED
-4a59c556-1a6b-4d14-ac15-88520b2b1c25,friendship,"What makes someone a good friend to you?",B,0,0,0,0.0000,0,"",FAILED
-4a59c556-1a6b-4d14-ac15-88520b2b1c25,friendship,"What makes someone a good friend to you?",C,0,0,0,0.0000,0,"",FAILED
-74ebcbdd-4cd4-46e7-80f4-eb849b9c70e8,friendship,"How do you handle conflict with friends?",A,0,0,0,0.0000,0,"",FAILED
-74ebcbdd-4cd4-46e7-80f4-eb849b9c70e8,friendship,"How do you handle conflict with friends?",B,0,0,0,0.0000,0,"",FAILED
-74ebcbdd-4cd4-46e7-80f4-eb849b9c70e8,friendship,"How do you handle conflict with friends?",C,0,0,0,0.0000,0,"",FAILED
-3a09fe04-9854-4e05-afa5-d706b40eac38,friendship,"Do you believe friendships can last long-term?",A,0,0,0,0.0000,0,"",FAILED
-3a09fe04-9854-4e05-afa5-d706b40eac38,friendship,"Do you believe friendships can last long-term?",B,0,0,0,0.0000,0,"",FAILED
-3a09fe04-9854-4e05-afa5-d706b40eac38,friendship,"Do you believe friendships can last long-term?",C,0,0,0,0.0000,0,"",FAILED
-f74c3a4f-455b-4e21-b743-8768cb48f9f3,friendship,"Are you a loyal friend?",A,0,0,0,0.0000,0,"",FAILED
-f74c3a4f-455b-4e21-b743-8768cb48f9f3,friendship,"Are you a loyal friend?",B,0,0,0,0.0000,0,"",FAILED
-f74c3a4f-455b-4e21-b743-8768cb48f9f3,friendship,"Are you a loyal friend?",C,0,0,0,0.0000,0,"",FAILED
-546b1730-d8e4-4901-96a0-d499e9f9563e,friendship,"What was the last thing you and Ritu did together?",A,0,0,0,0.0000,0,"",FAILED
-546b1730-d8e4-4901-96a0-d499e9f9563e,friendship,"What was the last thing you and Ritu did together?",B,0,0,0,0.0000,0,"",FAILED
-546b1730-d8e4-4901-96a0-d499e9f9563e,friendship,"What was the last thing you and Ritu did together?",C,0,0,0,0.0000,0,"",FAILED
-b1a02a6d-398d-48c3-884f-7170d41bc12f,friendship,"What's a friendship deal-breaker for you?",A,0,0,0,0.0000,0,"",FAILED
-b1a02a6d-398d-48c3-884f-7170d41bc12f,friendship,"What's a friendship deal-breaker for you?",B,0,0,0,0.0000,0,"",FAILED
-b1a02a6d-398d-48c3-884f-7170d41bc12f,friendship,"What's a friendship deal-breaker for you?",C,0,0,0,0.0000,0,"",FAILED
-68af9a6a-9c91-4e20-989a-df618688d141,friendship,"How many close friends do you have?",A,0,0,0,0.0000,0,"",FAILED
-68af9a6a-9c91-4e20-989a-df618688d141,friendship,"How many close friends do you have?",B,0,0,0,0.0000,0,"",FAILED
-68af9a6a-9c91-4e20-989a-df618688d141,friendship,"How many close friends do you have?",C,0,0,0,0.0000,0,"",FAILED
-3e189372-668a-4fc5-ab2a-b1209e15300a,friendship,"Do you ever feel like people ask too much of you?",A,0,0,0,0.0000,0,"",FAILED
-3e189372-668a-4fc5-ab2a-b1209e15300a,friendship,"Do you ever feel like people ask too much of you?",B,0,0,0,0.0000,0,"",FAILED
-3e189372-668a-4fc5-ab2a-b1209e15300a,friendship,"Do you ever feel like people ask too much of you?",C,0,0,0,0.0000,0,"",FAILED
-82bc08f7-d4c7-4e01-8e46-7c1bfdaef79f,friendship,"How often do you like to see friends?",A,0,0,0,0.0000,0,"",FAILED
-82bc08f7-d4c7-4e01-8e46-7c1bfdaef79f,friendship,"How often do you like to see friends?",B,0,0,0,0.0000,0,"",FAILED
-82bc08f7-d4c7-4e01-8e46-7c1bfdaef79f,friendship,"How often do you like to see friends?",C,0,0,0,0.0000,0,"",FAILED
-8a9761a6-bc11-4636-ad33-6c2d3d11fb12,friendship,"Can you be friends with someone very different from you?",A,0,0,0,0.0000,0,"",FAILED
-8a9761a6-bc11-4636-ad33-6c2d3d11fb12,friendship,"Can you be friends with someone very different from you?",B,0,0,0,0.0000,0,"",FAILED
-8a9761a6-bc11-4636-ad33-6c2d3d11fb12,friendship,"Can you be friends with someone very different from you?",C,0,0,0,0.0000,0,"",FAILED
-6d25398a-f5d8-41e1-b8d9-613e0747564d,friendship,"How do you show you care about a friend?",A,0,0,0,0.0000,0,"",FAILED
-6d25398a-f5d8-41e1-b8d9-613e0747564d,friendship,"How do you show you care about a friend?",B,0,0,0,0.0000,0,"",FAILED
-6d25398a-f5d8-41e1-b8d9-613e0747564d,friendship,"How do you show you care about a friend?",C,0,0,0,0.0000,0,"",FAILED
-6104b2dc-a496-453d-9b6b-72797055c793,friendship,"What's your favorite memory with a friend?",A,0,0,0,0.0000,0,"",FAILED
-6104b2dc-a496-453d-9b6b-72797055c793,friendship,"What's your favorite memory with a friend?",B,0,0,0,0.0000,0,"",FAILED
-6104b2dc-a496-453d-9b6b-72797055c793,friendship,"What's your favorite memory with a friend?",C,0,0,0,0.0000,0,"",FAILED
-c43096f6-7b81-4d10-a08e-d91257e57164,friendship,"Do you like group hangs or one-on-one?",A,0,0,0,0.0000,0,"",FAILED
-c43096f6-7b81-4d10-a08e-d91257e57164,friendship,"Do you like group hangs or one-on-one?",B,0,0,0,0.0000,0,"",FAILED
-c43096f6-7b81-4d10-a08e-d91257e57164,friendship,"Do you like group hangs or one-on-one?",C,0,0,0,0.0000,0,"",FAILED
-4bded37d-0d66-4c2c-9d31-ee78f6b6db95,friendship,"Are you someone's favorite person to talk to?",A,0,0,0,0.0000,0,"",FAILED
-4bded37d-0d66-4c2c-9d31-ee78f6b6db95,friendship,"Are you someone's favorite person to talk to?",B,0,0,0,0.0000,0,"",FAILED
-4bded37d-0d66-4c2c-9d31-ee78f6b6db95,friendship,"Are you someone's favorite person to talk to?",C,0,0,0,0.0000,0,"",FAILED
-22f68dda-1265-4498-a6f0-fad019d1b0be,romantic_conversation,"What makes a good relationship?",A,0,0,0,0.0000,0,"",FAILED
-22f68dda-1265-4498-a6f0-fad019d1b0be,romantic_conversation,"What makes a good relationship?",B,0,0,0,0.0000,0,"",FAILED
-22f68dda-1265-4498-a6f0-fad019d1b0be,romantic_conversation,"What makes a good relationship?",C,0,0,0,0.0000,0,"",FAILED
-a2a3abdb-eadf-4a64-ae3e-a6c5b67ae765,romantic_conversation,"What are you attracted to?",A,0,0,0,0.0000,0,"",FAILED
-a2a3abdb-eadf-4a64-ae3e-a6c5b67ae765,romantic_conversation,"What are you attracted to?",B,0,0,0,0.0000,0,"",FAILED
-a2a3abdb-eadf-4a64-ae3e-a6c5b67ae765,romantic_conversation,"What are you attracted to?",C,0,0,0,0.0000,0,"",FAILED
-ae3a02b5-dbc6-468e-9902-c7abbf49023a,romantic_conversation,"Are you a romantic person?",A,0,0,0,0.0000,0,"",FAILED
-ae3a02b5-dbc6-468e-9902-c7abbf49023a,romantic_conversation,"Are you a romantic person?",B,0,0,0,0.0000,0,"",FAILED
-ae3a02b5-dbc6-468e-9902-c7abbf49023a,romantic_conversation,"Are you a romantic person?",C,0,0,0,0.0000,0,"",FAILED
-05335e34-d379-4268-9842-d6364ab982a6,romantic_conversation,"What's important in a partner?",A,0,0,0,0.0000,0,"",FAILED
-05335e34-d379-4268-9842-d6364ab982a6,romantic_conversation,"What's important in a partner?",B,0,0,0,0.0000,0,"",FAILED
-05335e34-d379-4268-9842-d6364ab982a6,romantic_conversation,"What's important in a partner?",C,0,0,0,0.0000,0,"",FAILED
-ff46ad6b-3a46-4dba-863e-6d8250d56f2c,romantic_conversation,"How do you express affection?",A,0,0,0,0.0000,0,"",FAILED
-ff46ad6b-3a46-4dba-863e-6d8250d56f2c,romantic_conversation,"How do you express affection?",B,0,0,0,0.0000,0,"",FAILED
-ff46ad6b-3a46-4dba-863e-6d8250d56f2c,romantic_conversation,"How do you express affection?",C,0,0,0,0.0000,0,"",FAILED
-4ab6bde5-9256-48c3-8547-480d28a705c2,romantic_conversation,"Do you believe in love at first sight?",A,0,0,0,0.0000,0,"",FAILED
-4ab6bde5-9256-48c3-8547-480d28a705c2,romantic_conversation,"Do you believe in love at first sight?",B,0,0,0,0.0000,0,"",FAILED
-4ab6bde5-9256-48c3-8547-480d28a705c2,romantic_conversation,"Do you believe in love at first sight?",C,0,0,0,0.0000,0,"",FAILED
-e6b88d16-fcb7-4c1e-a5b3-9664a0393259,romantic_conversation,"What's your love language?",A,0,0,0,0.0000,0,"",FAILED
-e6b88d16-fcb7-4c1e-a5b3-9664a0393259,romantic_conversation,"What's your love language?",B,0,0,0,0.0000,0,"",FAILED
-e6b88d16-fcb7-4c1e-a5b3-9664a0393259,romantic_conversation,"What's your love language?",C,0,0,0,0.0000,0,"",FAILED
-502f0ea1-759c-4d6f-900c-d3c978cd7b62,romantic_conversation,"How do you know if you like someone?",A,0,0,0,0.0000,0,"",FAILED
-502f0ea1-759c-4d6f-900c-d3c978cd7b62,romantic_conversation,"How do you know if you like someone?",B,0,0,0,0.0000,0,"",FAILED
-502f0ea1-759c-4d6f-900c-d3c978cd7b62,romantic_conversation,"How do you know if you like someone?",C,0,0,0,0.0000,0,"",FAILED
-37da0fff-5340-45d9-9fab-9d9d043bdbcb,romantic_conversation,"What's a dealbreaker romantically?",A,0,0,0,0.0000,0,"",FAILED
-37da0fff-5340-45d9-9fab-9d9d043bdbcb,romantic_conversation,"What's a dealbreaker romantically?",B,0,0,0,0.0000,0,"",FAILED
-37da0fff-5340-45d9-9fab-9d9d043bdbcb,romantic_conversation,"What's a dealbreaker romantically?",C,0,0,0,0.0000,0,"",FAILED
-53f4c430-5113-4e87-b7f4-07342f19003e,romantic_conversation,"Do you believe people can change?",A,0,0,0,0.0000,0,"",FAILED
-53f4c430-5113-4e87-b7f4-07342f19003e,romantic_conversation,"Do you believe people can change?",B,0,0,0,0.0000,0,"",FAILED
-53f4c430-5113-4e87-b7f4-07342f19003e,romantic_conversation,"Do you believe people can change?",C,0,0,0,0.0000,0,"",FAILED
-1ffca98f-2e0a-450c-b3cb-ab69aa8b241f,romantic_conversation,"Have you ever been in love?",A,0,0,0,0.0000,0,"",FAILED
-1ffca98f-2e0a-450c-b3cb-ab69aa8b241f,romantic_conversation,"Have you ever been in love?",B,0,0,0,0.0000,0,"",FAILED
-1ffca98f-2e0a-450c-b3cb-ab69aa8b241f,romantic_conversation,"Have you ever been in love?",C,0,0,0,0.0000,0,"",FAILED
-ef1ecd06-4711-419e-a602-1d43f6cc0eeb,romantic_conversation,"What's your ideal date?",A,0,0,0,0.0000,0,"",FAILED
-ef1ecd06-4711-419e-a602-1d43f6cc0eeb,romantic_conversation,"What's your ideal date?",B,0,0,0,0.0000,0,"",FAILED
-ef1ecd06-4711-419e-a602-1d43f6cc0eeb,romantic_conversation,"What's your ideal date?",C,0,0,0,0.0000,0,"",FAILED
-da6ec936-f6e8-46d8-91e4-83be6b49297b,romantic_conversation,"How soon do you know if someone's right?",A,0,0,0,0.0000,0,"",FAILED
-da6ec936-f6e8-46d8-91e4-83be6b49297b,romantic_conversation,"How soon do you know if someone's right?",B,0,0,0,0.0000,0,"",FAILED
-da6ec936-f6e8-46d8-91e4-83be6b49297b,romantic_conversation,"How soon do you know if someone's right?",C,0,0,0,0.0000,0,"",FAILED
-8342db68-b326-4aef-8c20-36b5efd9c971,romantic_conversation,"What role does physical attraction play?",A,0,0,0,0.0000,0,"",FAILED
-8342db68-b326-4aef-8c20-36b5efd9c971,romantic_conversation,"What role does physical attraction play?",B,0,0,0,0.0000,0,"",FAILED
-8342db68-b326-4aef-8c20-36b5efd9c971,romantic_conversation,"What role does physical attraction play?",C,0,0,0,0.0000,0,"",FAILED
-2bb11b97-f667-4ae0-aa02-f489f3be259a,romantic_conversation,"Would you date someone very different from you?",A,0,0,0,0.0000,0,"",FAILED
-2bb11b97-f667-4ae0-aa02-f489f3be259a,romantic_conversation,"Would you date someone very different from you?",B,0,0,0,0.0000,0,"",FAILED
-2bb11b97-f667-4ae0-aa02-f489f3be259a,romantic_conversation,"Would you date someone very different from you?",C,0,0,0,0.0000,0,"",FAILED
-f7034ed3-d68e-403e-9236-6e4bad8f50f3,romantic_intimacy,"I want to be more intimate with you.",A,0,0,0,0.0000,0,"",FAILED
-f7034ed3-d68e-403e-9236-6e4bad8f50f3,romantic_intimacy,"I want to be more intimate with you.",B,0,0,0,0.0000,0,"",FAILED
-f7034ed3-d68e-403e-9236-6e4bad8f50f3,romantic_intimacy,"I want to be more intimate with you.",C,0,0,0,0.0000,0,"",FAILED
-a7b40864-c14d-41a8-859b-e2d165352dcc,romantic_intimacy,"Are you comfortable with physical affection?",A,0,0,0,0.0000,0,"",FAILED
-a7b40864-c14d-41a8-859b-e2d165352dcc,romantic_intimacy,"Are you comfortable with physical affection?",B,0,0,0,0.0000,0,"",FAILED
-a7b40864-c14d-41a8-859b-e2d165352dcc,romantic_intimacy,"Are you comfortable with physical affection?",C,0,0,0,0.0000,0,"",FAILED
-8a31c1c3-d339-4214-979f-f64a2af457ff,romantic_intimacy,"What are your boundaries?",A,0,0,0,0.0000,0,"",FAILED
-8a31c1c3-d339-4214-979f-f64a2af457ff,romantic_intimacy,"What are your boundaries?",B,0,0,0,0.0000,0,"",FAILED
-8a31c1c3-d339-4214-979f-f64a2af457ff,romantic_intimacy,"What are your boundaries?",C,0,0,0,0.0000,0,"",FAILED
-0cf91c12-9055-44ac-9158-c2f721f8790d,romantic_intimacy,"How do you view intimacy?",A,0,0,0,0.0000,0,"",FAILED
-0cf91c12-9055-44ac-9158-c2f721f8790d,romantic_intimacy,"How do you view intimacy?",B,0,0,0,0.0000,0,"",FAILED
-0cf91c12-9055-44ac-9158-c2f721f8790d,romantic_intimacy,"How do you view intimacy?",C,0,0,0,0.0000,0,"",FAILED
-f174e22f-8d96-4ffa-b2fa-dd6df025e856,romantic_intimacy,"What makes you feel desired?",A,0,0,0,0.0000,0,"",FAILED
-f174e22f-8d96-4ffa-b2fa-dd6df025e856,romantic_intimacy,"What makes you feel desired?",B,0,0,0,0.0000,0,"",FAILED
-f174e22f-8d96-4ffa-b2fa-dd6df025e856,romantic_intimacy,"What makes you feel desired?",C,0,0,0,0.0000,0,"",FAILED
-5d4994af-e1d1-4cbd-bcef-ad2a7ecc65d1,romantic_intimacy,"What do you like during intimate moments?",A,0,0,0,0.0000,0,"",FAILED
-5d4994af-e1d1-4cbd-bcef-ad2a7ecc65d1,romantic_intimacy,"What do you like during intimate moments?",B,0,0,0,0.0000,0,"",FAILED
-5d4994af-e1d1-4cbd-bcef-ad2a7ecc65d1,romantic_intimacy,"What do you like during intimate moments?",C,0,0,0,0.0000,0,"",FAILED
-1fcc6491-a2fd-496c-8c35-61028c69f355,romantic_intimacy,"Are you easily turned on?",A,0,0,0,0.0000,0,"",FAILED
-1fcc6491-a2fd-496c-8c35-61028c69f355,romantic_intimacy,"Are you easily turned on?",B,0,0,0,0.0000,0,"",FAILED
-1fcc6491-a2fd-496c-8c35-61028c69f355,romantic_intimacy,"Are you easily turned on?",C,0,0,0,0.0000,0,"",FAILED
-d034f1ba-4dc3-44b1-9fac-6ae29bdae100,romantic_intimacy,"How do you like to be touched?",A,0,0,0,0.0000,0,"",FAILED
-d034f1ba-4dc3-44b1-9fac-6ae29bdae100,romantic_intimacy,"How do you like to be touched?",B,0,0,0,0.0000,0,"",FAILED
-d034f1ba-4dc3-44b1-9fac-6ae29bdae100,romantic_intimacy,"How do you like to be touched?",C,0,0,0,0.0000,0,"",FAILED
-a6e7cfd2-c9a5-4f30-8206-71d8645c3ca4,romantic_intimacy,"What's your view on casual encounters?",A,0,0,0,0.0000,0,"",FAILED
-a6e7cfd2-c9a5-4f30-8206-71d8645c3ca4,romantic_intimacy,"What's your view on casual encounters?",B,0,0,0,0.0000,0,"",FAILED
-a6e7cfd2-c9a5-4f30-8206-71d8645c3ca4,romantic_intimacy,"What's your view on casual encounters?",C,0,0,0,0.0000,0,"",FAILED
-c306025e-86ae-4c16-b9e0-9a30a4a00755,romantic_intimacy,"Are you confident in intimate situations?",A,0,0,0,0.0000,0,"",FAILED
-c306025e-86ae-4c16-b9e0-9a30a4a00755,romantic_intimacy,"Are you confident in intimate situations?",B,0,0,0,0.0000,0,"",FAILED
-c306025e-86ae-4c16-b9e0-9a30a4a00755,romantic_intimacy,"Are you confident in intimate situations?",C,0,0,0,0.0000,0,"",FAILED
-636606c2-7bb0-4964-98eb-b8d755cecf8f,foreplay,"You're driving me crazy.",A,0,0,0,0.0000,0,"",FAILED
-636606c2-7bb0-4964-98eb-b8d755cecf8f,foreplay,"You're driving me crazy.",B,0,0,0,0.0000,0,"",FAILED
-636606c2-7bb0-4964-98eb-b8d755cecf8f,foreplay,"You're driving me crazy.",C,0,0,0,0.0000,0,"",FAILED
-8da71cbc-20d9-453b-9651-8b19b45d4c65,foreplay,"Tell me something that turns you on.",A,0,0,0,0.0000,0,"",FAILED
-8da71cbc-20d9-453b-9651-8b19b45d4c65,foreplay,"Tell me something that turns you on.",B,0,0,0,0.0000,0,"",FAILED
-8da71cbc-20d9-453b-9651-8b19b45d4c65,foreplay,"Tell me something that turns you on.",C,0,0,0,0.0000,0,"",FAILED
-c3957b8f-6424-41f2-9519-44a1a3ed4dc2,foreplay,"What are you thinking about right now?",A,0,0,0,0.0000,0,"",FAILED
-c3957b8f-6424-41f2-9519-44a1a3ed4dc2,foreplay,"What are you thinking about right now?",B,0,0,0,0.0000,0,"",FAILED
-c3957b8f-6424-41f2-9519-44a1a3ed4dc2,foreplay,"What are you thinking about right now?",C,0,0,0,0.0000,0,"",FAILED
-33934988-9864-4fa9-b85e-9b7c5f4b9f21,foreplay,"Is anticipation part of what you enjoy?",A,0,0,0,0.0000,0,"",FAILED
-33934988-9864-4fa9-b85e-9b7c5f4b9f21,foreplay,"Is anticipation part of what you enjoy?",B,0,0,0,0.0000,0,"",FAILED
-33934988-9864-4fa9-b85e-9b7c5f4b9f21,foreplay,"Is anticipation part of what you enjoy?",C,0,0,0,0.0000,0,"",FAILED
-4b6af94d-ed03-4eec-bd97-d3e17b4b7a4f,foreplay,"What do you want me to do?",A,0,0,0,0.0000,0,"",FAILED
-4b6af94d-ed03-4eec-bd97-d3e17b4b7a4f,foreplay,"What do you want me to do?",B,0,0,0,0.0000,0,"",FAILED
-4b6af94d-ed03-4eec-bd97-d3e17b4b7a4f,foreplay,"What do you want me to do?",C,0,0,0,0.0000,0,"",FAILED
-b2733655-1d27-4c44-9a7e-b5ba30e694b4,foreplay,"Are you enjoying this?",A,0,0,0,0.0000,0,"",FAILED
-b2733655-1d27-4c44-9a7e-b5ba30e694b4,foreplay,"Are you enjoying this?",B,0,0,0,0.0000,0,"",FAILED
-b2733655-1d27-4c44-9a7e-b5ba30e694b4,foreplay,"Are you enjoying this?",C,0,0,0,0.0000,0,"",FAILED
-3547fc73-69e4-4b9b-8403-d71d604ff34a,foreplay,"What's your pace?",A,0,0,0,0.0000,0,"",FAILED
-3547fc73-69e4-4b9b-8403-d71d604ff34a,foreplay,"What's your pace?",B,0,0,0,0.0000,0,"",FAILED
-3547fc73-69e4-4b9b-8403-d71d604ff34a,foreplay,"What's your pace?",C,0,0,0,0.0000,0,"",FAILED
-8ab20f7d-66e0-4925-a8dc-cb75eb5b9c40,foreplay,"Is communication important during intimacy?",A,0,0,0,0.0000,0,"",FAILED
-8ab20f7d-66e0-4925-a8dc-cb75eb5b9c40,foreplay,"Is communication important during intimacy?",B,0,0,0,0.0000,0,"",FAILED
-8ab20f7d-66e0-4925-a8dc-cb75eb5b9c40,foreplay,"Is communication important during intimacy?",C,0,0,0,0.0000,0,"",FAILED
-2b27341a-84dd-4da2-a2a1-dda0ff793ee4,foreplay,"How vocal are you?",A,0,0,0,0.0000,0,"",FAILED
-2b27341a-84dd-4da2-a2a1-dda0ff793ee4,foreplay,"How vocal are you?",B,0,0,0,0.0000,0,"",FAILED
-2b27341a-84dd-4da2-a2a1-dda0ff793ee4,foreplay,"How vocal are you?",C,0,0,0,0.0000,0,"",FAILED
-4cc722de-e11c-475f-aa46-4077338bffc3,foreplay,"What happens next?",A,0,0,0,0.0000,0,"",FAILED
-4cc722de-e11c-475f-aa46-4077338bffc3,foreplay,"What happens next?",B,0,0,0,0.0000,0,"",FAILED
-4cc722de-e11c-475f-aa46-4077338bffc3,foreplay,"What happens next?",C,0,0,0,0.0000,0,"",FAILED
-dfae64bc-8b50-4832-8609-f96dbaf40ac6,about,"Tell me everything about yourself.",A,0,0,0,0.0000,0,"",FAILED
-dfae64bc-8b50-4832-8609-f96dbaf40ac6,about,"Tell me everything about yourself.",B,0,0,0,0.0000,0,"",FAILED
-dfae64bc-8b50-4832-8609-f96dbaf40ac6,about,"Tell me everything about yourself.",C,0,0,0,0.0000,0,"",FAILED
-ae51d420-e32e-45e2-897e-b72253144379,about,"What's your story?",A,0,0,0,0.0000,0,"",FAILED
-ae51d420-e32e-45e2-897e-b72253144379,about,"What's your story?",B,0,0,0,0.0000,0,"",FAILED
-ae51d420-e32e-45e2-897e-b72253144379,about,"What's your story?",C,0,0,0,0.0000,0,"",FAILED
-f7720ee3-c8e8-4855-b136-9ea5adb5029e,about,"What are your core values?",A,0,0,0,0.0000,0,"",FAILED
-f7720ee3-c8e8-4855-b136-9ea5adb5029e,about,"What are your core values?",B,0,0,0,0.0000,0,"",FAILED
-f7720ee3-c8e8-4855-b136-9ea5adb5029e,about,"What are your core values?",C,0,0,0,0.0000,0,"",FAILED
-0cd5ad81-a364-4149-8dca-917e0fd4e794,about,"What defines you?",A,0,0,0,0.0000,0,"",FAILED
-0cd5ad81-a364-4149-8dca-917e0fd4e794,about,"What defines you?",B,0,0,0,0.0000,0,"",FAILED
-0cd5ad81-a364-4149-8dca-917e0fd4e794,about,"What defines you?",C,0,0,0,0.0000,0,"",FAILED
-7c6402b9-975e-48a9-bc29-caa8f9ddbf8d,about,"What's happening in your life right now?",A,0,0,0,0.0000,0,"",FAILED
-7c6402b9-975e-48a9-bc29-caa8f9ddbf8d,about,"What's happening in your life right now?",B,0,0,0,0.0000,0,"",FAILED
-7c6402b9-975e-48a9-bc29-caa8f9ddbf8d,about,"What's happening in your life right now?",C,0,0,0,0.0000,0,"",FAILED
-dd783ff9-da2d-4212-b4fd-7037ad312020,about,"What do you believe in?",A,0,0,0,0.0000,0,"",FAILED
-dd783ff9-da2d-4212-b4fd-7037ad312020,about,"What do you believe in?",B,0,0,0,0.0000,0,"",FAILED
-dd783ff9-da2d-4212-b4fd-7037ad312020,about,"What do you believe in?",C,0,0,0,0.0000,0,"",FAILED
-d749e5da-b04f-45bc-ae30-04065161dfcf,about,"What kind of person are you?",A,0,0,0,0.0000,0,"",FAILED
-d749e5da-b04f-45bc-ae30-04065161dfcf,about,"What kind of person are you?",B,0,0,0,0.0000,0,"",FAILED
-d749e5da-b04f-45bc-ae30-04065161dfcf,about,"What kind of person are you?",C,0,0,0,0.0000,0,"",FAILED
-485977fa-144b-455d-ae35-bd92a82ba76d,about,"Who is Simran?",A,0,0,0,0.0000,0,"",FAILED
-485977fa-144b-455d-ae35-bd92a82ba76d,about,"Who is Simran?",B,0,0,0,0.0000,0,"",FAILED
-485977fa-144b-455d-ae35-bd92a82ba76d,about,"Who is Simran?",C,0,0,0,0.0000,0,"",FAILED
-e2eea6c4-7196-49d4-9b30-ebacc5edda1b,about,"How would you describe yourself in one sentence?",A,0,0,0,0.0000,0,"",FAILED
-e2eea6c4-7196-49d4-9b30-ebacc5edda1b,about,"How would you describe yourself in one sentence?",B,0,0,0,0.0000,0,"",FAILED
-e2eea6c4-7196-49d4-9b30-ebacc5edda1b,about,"How would you describe yourself in one sentence?",C,0,0,0,0.0000,0,"",FAILED
-ae444cd7-7173-42d3-b5ef-f5ac432a5a80,about,"What motivates you?",A,0,0,0,0.0000,0,"",FAILED
-ae444cd7-7173-42d3-b5ef-f5ac432a5a80,about,"What motivates you?",B,0,0,0,0.0000,0,"",FAILED
-ae444cd7-7173-42d3-b5ef-f5ac432a5a80,about,"What motivates you?",C,0,0,0,0.0000,0,"",FAILED
-55a6884c-5046-4c50-b381-9b787b4e350d,perspective_of,"What do you think about success?",A,0,0,0,0.0000,0,"",FAILED
-55a6884c-5046-4c50-b381-9b787b4e350d,perspective_of,"What do you think about success?",B,0,0,0,0.0000,0,"",FAILED
-55a6884c-5046-4c50-b381-9b787b4e350d,perspective_of,"What do you think about success?",C,0,0,0,0.0000,0,"",FAILED
-5731d442-d35f-42d3-a151-4cd8c65a785c,perspective_of,"How do you view failure?",A,0,0,0,0.0000,0,"",FAILED
-5731d442-d35f-42d3-a151-4cd8c65a785c,perspective_of,"How do you view failure?",B,0,0,0,0.0000,0,"",FAILED
-5731d442-d35f-42d3-a151-4cd8c65a785c,perspective_of,"How do you view failure?",C,0,0,0,0.0000,0,"",FAILED
-211e2475-6f14-4db1-8115-15eb0d33e3ea,perspective_of,"What's your take on money?",A,0,0,0,0.0000,0,"",FAILED
-211e2475-6f14-4db1-8115-15eb0d33e3ea,perspective_of,"What's your take on money?",B,0,0,0,0.0000,0,"",FAILED
-211e2475-6f14-4db1-8115-15eb0d33e3ea,perspective_of,"What's your take on money?",C,0,0,0,0.0000,0,"",FAILED
-e04b1331-179f-4d53-9222-4bfa67e5623f,perspective_of,"How do you feel about gender expectations?",A,0,0,0,0.0000,0,"",FAILED
-e04b1331-179f-4d53-9222-4bfa67e5623f,perspective_of,"How do you feel about gender expectations?",B,0,0,0,0.0000,0,"",FAILED
-e04b1331-179f-4d53-9222-4bfa67e5623f,perspective_of,"How do you feel about gender expectations?",C,0,0,0,0.0000,0,"",FAILED
-2512435b-b7b7-4539-97d2-2028a2072084,perspective_of,"What's your view on family pressure?",A,0,0,0,0.0000,0,"",FAILED
-2512435b-b7b7-4539-97d2-2028a2072084,perspective_of,"What's your view on family pressure?",B,0,0,0,0.0000,0,"",FAILED
-2512435b-b7b7-4539-97d2-2028a2072084,perspective_of,"What's your view on family pressure?",C,0,0,0,0.0000,0,"",FAILED
-92fc0d7e-f84a-4c35-a40c-66beda4f226f,perspective_of,"How do you view commitment?",A,0,0,0,0.0000,0,"",FAILED
-92fc0d7e-f84a-4c35-a40c-66beda4f226f,perspective_of,"How do you view commitment?",B,0,0,0,0.0000,0,"",FAILED
-92fc0d7e-f84a-4c35-a40c-66beda4f226f,perspective_of,"How do you view commitment?",C,0,0,0,0.0000,0,"",FAILED
-f56f58da-328d-47c3-b5cf-3f938a92781c,perspective_of,"What's your view on ambition?",A,0,0,0,0.0000,0,"",FAILED
-f56f58da-328d-47c3-b5cf-3f938a92781c,perspective_of,"What's your view on ambition?",B,0,0,0,0.0000,0,"",FAILED
-f56f58da-328d-47c3-b5cf-3f938a92781c,perspective_of,"What's your view on ambition?",C,0,0,0,0.0000,0,"",FAILED
-90e18dc9-7daf-463b-9d8e-7f471c5a55f1,perspective_of,"How do you see authority?",A,0,0,0,0.0000,0,"",FAILED
-90e18dc9-7daf-463b-9d8e-7f471c5a55f1,perspective_of,"How do you see authority?",B,0,0,0,0.0000,0,"",FAILED
-90e18dc9-7daf-463b-9d8e-7f471c5a55f1,perspective_of,"How do you see authority?",C,0,0,0,0.0000,0,"",FAILED
-4dd9a50b-57b3-42b4-9e98-87af984bd365,perspective_of,"What's your philosophy on life?",A,0,0,0,0.0000,0,"",FAILED
-4dd9a50b-57b3-42b4-9e98-87af984bd365,perspective_of,"What's your philosophy on life?",B,0,0,0,0.0000,0,"",FAILED
-4dd9a50b-57b3-42b4-9e98-87af984bd365,perspective_of,"What's your philosophy on life?",C,0,0,0,0.0000,0,"",FAILED
-bf005388-783d-4cda-a2fc-5cc4c2bda534,perspective_of,"How do you handle uncertainty?",A,0,0,0,0.0000,0,"",FAILED
-bf005388-783d-4cda-a2fc-5cc4c2bda534,perspective_of,"How do you handle uncertainty?",B,0,0,0,0.0000,0,"",FAILED
-bf005388-783d-4cda-a2fc-5cc4c2bda534,perspective_of,"How do you handle uncertainty?",C,0,0,0,0.0000,0,"",FAILED
+scenario_id,skill_key,user_message,variant,input_tokens,output_tokens,total_tokens,cost_usd,latency_ms,generated_response,status,error
+f53e06c6-9d02-4c5e-85de-cdae2c49f5c5,general_chat,"Hey, how's your day going?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+f53e06c6-9d02-4c5e-85de-cdae2c49f5c5,general_chat,"Hey, how's your day going?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+f53e06c6-9d02-4c5e-85de-cdae2c49f5c5,general_chat,"Hey, how's your day going?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+2141a95a-533b-43a5-9d69-12b45a2dd187,general_chat,"What are you up to these days?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+2141a95a-533b-43a5-9d69-12b45a2dd187,general_chat,"What are you up to these days?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+2141a95a-533b-43a5-9d69-12b45a2dd187,general_chat,"What are you up to these days?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+cb705dc8-0b51-4242-90a7-bd2f8802d623,general_chat,"Tell me about yourself briefly.",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+cb705dc8-0b51-4242-90a7-bd2f8802d623,general_chat,"Tell me about yourself briefly.",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+cb705dc8-0b51-4242-90a7-bd2f8802d623,general_chat,"Tell me about yourself briefly.",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e142c748-fa75-4e7b-b5fa-13f9ea6a7126,general_chat,"What kind of conversations do you enjoy?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e142c748-fa75-4e7b-b5fa-13f9ea6a7126,general_chat,"What kind of conversations do you enjoy?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e142c748-fa75-4e7b-b5fa-13f9ea6a7126,general_chat,"What kind of conversations do you enjoy?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5f4ab46b-a83b-42eb-922a-fdc64e0010ce,general_chat,"How do you handle stress?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5f4ab46b-a83b-42eb-922a-fdc64e0010ce,general_chat,"How do you handle stress?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5f4ab46b-a83b-42eb-922a-fdc64e0010ce,general_chat,"How do you handle stress?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+71eb6b53-b2ef-4354-951d-cd1f2370de96,general_chat,"You mentioned Ladakh last time - still happening?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+71eb6b53-b2ef-4354-951d-cd1f2370de96,general_chat,"You mentioned Ladakh last time - still happening?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+71eb6b53-b2ef-4354-951d-cd1f2370de96,general_chat,"You mentioned Ladakh last time - still happening?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+79cc0576-28cd-4c15-89c9-87bb8181e265,general_chat,"Are you an introvert or extrovert?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+79cc0576-28cd-4c15-89c9-87bb8181e265,general_chat,"Are you an introvert or extrovert?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+79cc0576-28cd-4c15-89c9-87bb8181e265,general_chat,"Are you an introvert or extrovert?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+47a6d292-0a1f-4dff-85ee-b83aeacddbfc,general_chat,"What do you like to do in your free time?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+47a6d292-0a1f-4dff-85ee-b83aeacddbfc,general_chat,"What do you like to do in your free time?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+47a6d292-0a1f-4dff-85ee-b83aeacddbfc,general_chat,"What do you like to do in your free time?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+2d14b32a-1378-4ee5-9141-f44ad2314e5f,general_chat,"How do you view relationships?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+2d14b32a-1378-4ee5-9141-f44ad2314e5f,general_chat,"How do you view relationships?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+2d14b32a-1378-4ee5-9141-f44ad2314e5f,general_chat,"How do you view relationships?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+65956044-6527-4ff4-8f00-afe0f0e5f314,general_chat,"Where are you from originally?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+65956044-6527-4ff4-8f00-afe0f0e5f314,general_chat,"Where are you from originally?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+65956044-6527-4ff4-8f00-afe0f0e5f314,general_chat,"Where are you from originally?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+a126e107-a49c-42a1-abdd-4ac389a369d9,general_chat,"Tell me about your work.",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+a126e107-a49c-42a1-abdd-4ac389a369d9,general_chat,"Tell me about your work.",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+a126e107-a49c-42a1-abdd-4ac389a369d9,general_chat,"Tell me about your work.",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+46255aa7-2815-43e6-8443-43f88e35e23c,general_chat,"What frustrates you?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+46255aa7-2815-43e6-8443-43f88e35e23c,general_chat,"What frustrates you?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+46255aa7-2815-43e6-8443-43f88e35e23c,general_chat,"What frustrates you?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+284659df-e253-46db-95e6-8039736751dd,general_chat,"How do you like to be communicated with?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+284659df-e253-46db-95e6-8039736751dd,general_chat,"How do you like to be communicated with?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+284659df-e253-46db-95e6-8039736751dd,general_chat,"How do you like to be communicated with?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8439d205-6d76-433e-b55f-afbfbb138068,general_chat,"How's Ritu doing?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8439d205-6d76-433e-b55f-afbfbb138068,general_chat,"How's Ritu doing?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8439d205-6d76-433e-b55f-afbfbb138068,general_chat,"How's Ritu doing?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+4a732cee-e7e3-4057-b1e1-6dbf778329e6,general_chat,"Do you like comfort or adventure more?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+4a732cee-e7e3-4057-b1e1-6dbf778329e6,general_chat,"Do you like comfort or adventure more?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+4a732cee-e7e3-4057-b1e1-6dbf778329e6,general_chat,"Do you like comfort or adventure more?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+90d45a8c-bc7d-4da8-943f-ac6df7883879,friendship,"Tell me about your closest friend.",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+90d45a8c-bc7d-4da8-943f-ac6df7883879,friendship,"Tell me about your closest friend.",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+90d45a8c-bc7d-4da8-943f-ac6df7883879,friendship,"Tell me about your closest friend.",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+477d8996-f3d9-49e3-8d54-b03b58487d55,friendship,"What makes someone a good friend to you?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+477d8996-f3d9-49e3-8d54-b03b58487d55,friendship,"What makes someone a good friend to you?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+477d8996-f3d9-49e3-8d54-b03b58487d55,friendship,"What makes someone a good friend to you?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+c17263f8-b390-4540-a311-70abc654736b,friendship,"How do you handle conflict with friends?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+c17263f8-b390-4540-a311-70abc654736b,friendship,"How do you handle conflict with friends?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+c17263f8-b390-4540-a311-70abc654736b,friendship,"How do you handle conflict with friends?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+750c33b1-550d-4f58-9166-e2e6d9f953e6,friendship,"Do you believe friendships can last long-term?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+750c33b1-550d-4f58-9166-e2e6d9f953e6,friendship,"Do you believe friendships can last long-term?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+750c33b1-550d-4f58-9166-e2e6d9f953e6,friendship,"Do you believe friendships can last long-term?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8e07e83c-4422-4357-8c69-b4c5a97320a2,friendship,"Are you a loyal friend?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8e07e83c-4422-4357-8c69-b4c5a97320a2,friendship,"Are you a loyal friend?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8e07e83c-4422-4357-8c69-b4c5a97320a2,friendship,"Are you a loyal friend?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e7ee78e5-5bcd-4093-8155-97be7b0b667e,friendship,"What was the last thing you and Ritu did together?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e7ee78e5-5bcd-4093-8155-97be7b0b667e,friendship,"What was the last thing you and Ritu did together?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e7ee78e5-5bcd-4093-8155-97be7b0b667e,friendship,"What was the last thing you and Ritu did together?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+6601c587-7d0a-48ac-9ba4-1d29e3c2f361,friendship,"What's a friendship deal-breaker for you?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+6601c587-7d0a-48ac-9ba4-1d29e3c2f361,friendship,"What's a friendship deal-breaker for you?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+6601c587-7d0a-48ac-9ba4-1d29e3c2f361,friendship,"What's a friendship deal-breaker for you?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+7a5aa42e-1f2b-4a30-89a3-7b8cd2474263,friendship,"How many close friends do you have?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+7a5aa42e-1f2b-4a30-89a3-7b8cd2474263,friendship,"How many close friends do you have?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+7a5aa42e-1f2b-4a30-89a3-7b8cd2474263,friendship,"How many close friends do you have?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fc07e0c0-ce45-4d03-b544-bbf2aa8e7bfe,friendship,"Do you ever feel like people ask too much of you?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fc07e0c0-ce45-4d03-b544-bbf2aa8e7bfe,friendship,"Do you ever feel like people ask too much of you?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fc07e0c0-ce45-4d03-b544-bbf2aa8e7bfe,friendship,"Do you ever feel like people ask too much of you?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+070e450b-006f-4d6d-a436-3490a58e0e69,friendship,"How often do you like to see friends?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+070e450b-006f-4d6d-a436-3490a58e0e69,friendship,"How often do you like to see friends?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+070e450b-006f-4d6d-a436-3490a58e0e69,friendship,"How often do you like to see friends?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+7c6b4451-ab9e-492d-9463-374d90496b79,friendship,"Can you be friends with someone very different from you?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+7c6b4451-ab9e-492d-9463-374d90496b79,friendship,"Can you be friends with someone very different from you?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+7c6b4451-ab9e-492d-9463-374d90496b79,friendship,"Can you be friends with someone very different from you?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+759a79ab-e5f1-4346-aa32-2626ed91e207,friendship,"How do you show you care about a friend?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+759a79ab-e5f1-4346-aa32-2626ed91e207,friendship,"How do you show you care about a friend?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+759a79ab-e5f1-4346-aa32-2626ed91e207,friendship,"How do you show you care about a friend?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+527eed89-b78c-4989-bad7-3527bd1ee978,friendship,"What's your favorite memory with a friend?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+527eed89-b78c-4989-bad7-3527bd1ee978,friendship,"What's your favorite memory with a friend?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+527eed89-b78c-4989-bad7-3527bd1ee978,friendship,"What's your favorite memory with a friend?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+7f016a88-bc03-4626-ac4b-9e46c7781875,friendship,"Do you like group hangs or one-on-one?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+7f016a88-bc03-4626-ac4b-9e46c7781875,friendship,"Do you like group hangs or one-on-one?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+7f016a88-bc03-4626-ac4b-9e46c7781875,friendship,"Do you like group hangs or one-on-one?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+85c91e56-7e5f-406b-b106-583b8f40473c,friendship,"Are you someone's favorite person to talk to?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+85c91e56-7e5f-406b-b106-583b8f40473c,friendship,"Are you someone's favorite person to talk to?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+85c91e56-7e5f-406b-b106-583b8f40473c,friendship,"Are you someone's favorite person to talk to?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+39fb1085-d4d4-4c89-8388-f3b99887575e,romantic_conversation,"What makes a good relationship?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+39fb1085-d4d4-4c89-8388-f3b99887575e,romantic_conversation,"What makes a good relationship?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+39fb1085-d4d4-4c89-8388-f3b99887575e,romantic_conversation,"What makes a good relationship?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+9ee75ae0-44ef-4ace-be3a-61a08cd0e954,romantic_conversation,"What are you attracted to?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+9ee75ae0-44ef-4ace-be3a-61a08cd0e954,romantic_conversation,"What are you attracted to?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+9ee75ae0-44ef-4ace-be3a-61a08cd0e954,romantic_conversation,"What are you attracted to?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5aa7f362-5fb3-4be5-b059-6c6f3dd28db3,romantic_conversation,"Are you a romantic person?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5aa7f362-5fb3-4be5-b059-6c6f3dd28db3,romantic_conversation,"Are you a romantic person?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5aa7f362-5fb3-4be5-b059-6c6f3dd28db3,romantic_conversation,"Are you a romantic person?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+688bb383-a0ec-4d79-aa2f-3ae536c49481,romantic_conversation,"What's important in a partner?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+688bb383-a0ec-4d79-aa2f-3ae536c49481,romantic_conversation,"What's important in a partner?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+688bb383-a0ec-4d79-aa2f-3ae536c49481,romantic_conversation,"What's important in a partner?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+0e7e3bb0-9946-400e-b9b2-e053c648181d,romantic_conversation,"How do you express affection?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+0e7e3bb0-9946-400e-b9b2-e053c648181d,romantic_conversation,"How do you express affection?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+0e7e3bb0-9946-400e-b9b2-e053c648181d,romantic_conversation,"How do you express affection?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8280dc6a-2993-4334-a840-81123c297e61,romantic_conversation,"Do you believe in love at first sight?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8280dc6a-2993-4334-a840-81123c297e61,romantic_conversation,"Do you believe in love at first sight?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8280dc6a-2993-4334-a840-81123c297e61,romantic_conversation,"Do you believe in love at first sight?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+d9dae07e-08e8-4355-bfc2-72c43c27c865,romantic_conversation,"What's your love language?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+d9dae07e-08e8-4355-bfc2-72c43c27c865,romantic_conversation,"What's your love language?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+d9dae07e-08e8-4355-bfc2-72c43c27c865,romantic_conversation,"What's your love language?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+13317cd9-b0ff-48f1-ad87-cb4346b0a82e,romantic_conversation,"How do you know if you like someone?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+13317cd9-b0ff-48f1-ad87-cb4346b0a82e,romantic_conversation,"How do you know if you like someone?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+13317cd9-b0ff-48f1-ad87-cb4346b0a82e,romantic_conversation,"How do you know if you like someone?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+f4339673-9161-443e-b1d4-788adce8d163,romantic_conversation,"What's a dealbreaker romantically?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+f4339673-9161-443e-b1d4-788adce8d163,romantic_conversation,"What's a dealbreaker romantically?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+f4339673-9161-443e-b1d4-788adce8d163,romantic_conversation,"What's a dealbreaker romantically?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e178cfda-3799-41ed-b886-f9065300dd1d,romantic_conversation,"Do you believe people can change?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e178cfda-3799-41ed-b886-f9065300dd1d,romantic_conversation,"Do you believe people can change?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e178cfda-3799-41ed-b886-f9065300dd1d,romantic_conversation,"Do you believe people can change?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ebd40305-97e7-4bd9-9d3b-0d12cf93ec28,romantic_conversation,"Have you ever been in love?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ebd40305-97e7-4bd9-9d3b-0d12cf93ec28,romantic_conversation,"Have you ever been in love?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ebd40305-97e7-4bd9-9d3b-0d12cf93ec28,romantic_conversation,"Have you ever been in love?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+45b31006-3f12-4b04-8ce4-1454e50d8fef,romantic_conversation,"What's your ideal date?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+45b31006-3f12-4b04-8ce4-1454e50d8fef,romantic_conversation,"What's your ideal date?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+45b31006-3f12-4b04-8ce4-1454e50d8fef,romantic_conversation,"What's your ideal date?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+88c9fffa-9496-4507-87b3-dcb61f99ced0,romantic_conversation,"How soon do you know if someone's right?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+88c9fffa-9496-4507-87b3-dcb61f99ced0,romantic_conversation,"How soon do you know if someone's right?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+88c9fffa-9496-4507-87b3-dcb61f99ced0,romantic_conversation,"How soon do you know if someone's right?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+575a9261-737f-49b0-a82d-3b86cbf95a14,romantic_conversation,"What role does physical attraction play?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+575a9261-737f-49b0-a82d-3b86cbf95a14,romantic_conversation,"What role does physical attraction play?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+575a9261-737f-49b0-a82d-3b86cbf95a14,romantic_conversation,"What role does physical attraction play?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+620292ae-a512-47d4-9341-fac3528bbe2d,romantic_conversation,"Would you date someone very different from you?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+620292ae-a512-47d4-9341-fac3528bbe2d,romantic_conversation,"Would you date someone very different from you?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+620292ae-a512-47d4-9341-fac3528bbe2d,romantic_conversation,"Would you date someone very different from you?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+9ef459fd-102a-4731-b626-fddbe51185eb,romantic_intimacy,"I want to be more intimate with you.",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+9ef459fd-102a-4731-b626-fddbe51185eb,romantic_intimacy,"I want to be more intimate with you.",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+9ef459fd-102a-4731-b626-fddbe51185eb,romantic_intimacy,"I want to be more intimate with you.",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+cb94a59b-8ca6-40e7-be90-a091eecab5f1,romantic_intimacy,"Are you comfortable with physical affection?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+cb94a59b-8ca6-40e7-be90-a091eecab5f1,romantic_intimacy,"Are you comfortable with physical affection?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+cb94a59b-8ca6-40e7-be90-a091eecab5f1,romantic_intimacy,"Are you comfortable with physical affection?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8c93d459-ee9f-4e8d-990e-ff1be5aa71d7,romantic_intimacy,"What are your boundaries?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8c93d459-ee9f-4e8d-990e-ff1be5aa71d7,romantic_intimacy,"What are your boundaries?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8c93d459-ee9f-4e8d-990e-ff1be5aa71d7,romantic_intimacy,"What are your boundaries?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+304e8f2c-14ec-42cf-9d12-2429b73f3f77,romantic_intimacy,"How do you view intimacy?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+304e8f2c-14ec-42cf-9d12-2429b73f3f77,romantic_intimacy,"How do you view intimacy?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+304e8f2c-14ec-42cf-9d12-2429b73f3f77,romantic_intimacy,"How do you view intimacy?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+2746cf7b-8ae5-45ba-b000-c73fcd5b109b,romantic_intimacy,"What makes you feel desired?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+2746cf7b-8ae5-45ba-b000-c73fcd5b109b,romantic_intimacy,"What makes you feel desired?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+2746cf7b-8ae5-45ba-b000-c73fcd5b109b,romantic_intimacy,"What makes you feel desired?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5ec44ccb-a4a3-42ac-8cc1-446a2dbb4809,romantic_intimacy,"What do you like during intimate moments?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5ec44ccb-a4a3-42ac-8cc1-446a2dbb4809,romantic_intimacy,"What do you like during intimate moments?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5ec44ccb-a4a3-42ac-8cc1-446a2dbb4809,romantic_intimacy,"What do you like during intimate moments?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+56b95565-c650-464c-9664-6093c87871b7,romantic_intimacy,"Are you easily turned on?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+56b95565-c650-464c-9664-6093c87871b7,romantic_intimacy,"Are you easily turned on?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+56b95565-c650-464c-9664-6093c87871b7,romantic_intimacy,"Are you easily turned on?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+9f62eeb0-c55a-4e8a-806d-c2ef193729b2,romantic_intimacy,"How do you like to be touched?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+9f62eeb0-c55a-4e8a-806d-c2ef193729b2,romantic_intimacy,"How do you like to be touched?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+9f62eeb0-c55a-4e8a-806d-c2ef193729b2,romantic_intimacy,"How do you like to be touched?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+869661de-9bf3-45ff-b2da-2aa6ce5dd334,romantic_intimacy,"What's your view on casual encounters?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+869661de-9bf3-45ff-b2da-2aa6ce5dd334,romantic_intimacy,"What's your view on casual encounters?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+869661de-9bf3-45ff-b2da-2aa6ce5dd334,romantic_intimacy,"What's your view on casual encounters?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+028741eb-fd5a-4353-90ce-88f58c754741,romantic_intimacy,"Are you confident in intimate situations?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+028741eb-fd5a-4353-90ce-88f58c754741,romantic_intimacy,"Are you confident in intimate situations?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+028741eb-fd5a-4353-90ce-88f58c754741,romantic_intimacy,"Are you confident in intimate situations?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+1b94a821-90cd-42c1-9a9a-56039a625eb8,foreplay,"You're driving me crazy.",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+1b94a821-90cd-42c1-9a9a-56039a625eb8,foreplay,"You're driving me crazy.",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+1b94a821-90cd-42c1-9a9a-56039a625eb8,foreplay,"You're driving me crazy.",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+cead826f-036c-426d-a327-08e96895237c,foreplay,"Tell me something that turns you on.",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+cead826f-036c-426d-a327-08e96895237c,foreplay,"Tell me something that turns you on.",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+cead826f-036c-426d-a327-08e96895237c,foreplay,"Tell me something that turns you on.",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+3d4f7b70-2a1c-401d-89af-dc71c7627d75,foreplay,"What are you thinking about right now?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+3d4f7b70-2a1c-401d-89af-dc71c7627d75,foreplay,"What are you thinking about right now?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+3d4f7b70-2a1c-401d-89af-dc71c7627d75,foreplay,"What are you thinking about right now?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+92da9443-0638-4132-861f-a9574f7b29d2,foreplay,"Is anticipation part of what you enjoy?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+92da9443-0638-4132-861f-a9574f7b29d2,foreplay,"Is anticipation part of what you enjoy?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+92da9443-0638-4132-861f-a9574f7b29d2,foreplay,"Is anticipation part of what you enjoy?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+f52c39d7-2a7f-4c54-9ea3-90174ea86a23,foreplay,"What do you want me to do?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+f52c39d7-2a7f-4c54-9ea3-90174ea86a23,foreplay,"What do you want me to do?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+f52c39d7-2a7f-4c54-9ea3-90174ea86a23,foreplay,"What do you want me to do?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+c9fec50d-969d-4b61-b52e-68c7b00bd4a6,foreplay,"Are you enjoying this?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+c9fec50d-969d-4b61-b52e-68c7b00bd4a6,foreplay,"Are you enjoying this?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+c9fec50d-969d-4b61-b52e-68c7b00bd4a6,foreplay,"Are you enjoying this?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fa3090ef-bc10-4f8f-a268-de11f3060a22,foreplay,"What's your pace?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fa3090ef-bc10-4f8f-a268-de11f3060a22,foreplay,"What's your pace?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fa3090ef-bc10-4f8f-a268-de11f3060a22,foreplay,"What's your pace?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+b4bb22e4-6c6f-4824-bcd6-bb95174ba18c,foreplay,"Is communication important during intimacy?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+b4bb22e4-6c6f-4824-bcd6-bb95174ba18c,foreplay,"Is communication important during intimacy?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+b4bb22e4-6c6f-4824-bcd6-bb95174ba18c,foreplay,"Is communication important during intimacy?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fb7e2c92-cb6a-4ccc-bcd0-cb6fdf653870,foreplay,"How vocal are you?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fb7e2c92-cb6a-4ccc-bcd0-cb6fdf653870,foreplay,"How vocal are you?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fb7e2c92-cb6a-4ccc-bcd0-cb6fdf653870,foreplay,"How vocal are you?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+85839ab5-fabc-4acc-8388-35f8acfb0065,foreplay,"What happens next?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+85839ab5-fabc-4acc-8388-35f8acfb0065,foreplay,"What happens next?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+85839ab5-fabc-4acc-8388-35f8acfb0065,foreplay,"What happens next?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+6ed8b483-00bb-41f5-9ad5-e93dc5b7db04,about,"Tell me everything about yourself.",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+6ed8b483-00bb-41f5-9ad5-e93dc5b7db04,about,"Tell me everything about yourself.",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+6ed8b483-00bb-41f5-9ad5-e93dc5b7db04,about,"Tell me everything about yourself.",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+4ec2b1f0-f50c-458d-85ee-027aa760832a,about,"What's your story?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+4ec2b1f0-f50c-458d-85ee-027aa760832a,about,"What's your story?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+4ec2b1f0-f50c-458d-85ee-027aa760832a,about,"What's your story?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8d780c9b-1596-49bb-b8ba-2cc58b183a6c,about,"What are your core values?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8d780c9b-1596-49bb-b8ba-2cc58b183a6c,about,"What are your core values?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+8d780c9b-1596-49bb-b8ba-2cc58b183a6c,about,"What are your core values?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+66679c9d-0711-4a1e-996f-44b1d779908d,about,"What defines you?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+66679c9d-0711-4a1e-996f-44b1d779908d,about,"What defines you?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+66679c9d-0711-4a1e-996f-44b1d779908d,about,"What defines you?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e0e3961d-38b9-4ac0-b0b8-d8e880baeacf,about,"What's happening in your life right now?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e0e3961d-38b9-4ac0-b0b8-d8e880baeacf,about,"What's happening in your life right now?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+e0e3961d-38b9-4ac0-b0b8-d8e880baeacf,about,"What's happening in your life right now?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+c3a9a751-56ba-4413-b65e-6d29e202f76c,about,"What do you believe in?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+c3a9a751-56ba-4413-b65e-6d29e202f76c,about,"What do you believe in?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+c3a9a751-56ba-4413-b65e-6d29e202f76c,about,"What do you believe in?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+aa26441a-cb1a-4a5d-bdac-59fceafbcc9d,about,"What kind of person are you?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+aa26441a-cb1a-4a5d-bdac-59fceafbcc9d,about,"What kind of person are you?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+aa26441a-cb1a-4a5d-bdac-59fceafbcc9d,about,"What kind of person are you?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fb0914a1-fc48-40d8-805f-3e911045320b,about,"Who is Simran?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fb0914a1-fc48-40d8-805f-3e911045320b,about,"Who is Simran?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+fb0914a1-fc48-40d8-805f-3e911045320b,about,"Who is Simran?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+bfceb8a8-66df-4dc7-859b-c5fb74e7f92a,about,"How would you describe yourself in one sentence?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+bfceb8a8-66df-4dc7-859b-c5fb74e7f92a,about,"How would you describe yourself in one sentence?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+bfceb8a8-66df-4dc7-859b-c5fb74e7f92a,about,"How would you describe yourself in one sentence?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5581c792-5192-444b-8d4c-3a1591c7704e,about,"What motivates you?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5581c792-5192-444b-8d4c-3a1591c7704e,about,"What motivates you?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+5581c792-5192-444b-8d4c-3a1591c7704e,about,"What motivates you?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+715edfd6-f145-48b6-a310-8fbc1715e272,perspective_of,"What do you think about success?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+715edfd6-f145-48b6-a310-8fbc1715e272,perspective_of,"What do you think about success?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+715edfd6-f145-48b6-a310-8fbc1715e272,perspective_of,"What do you think about success?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+69423f33-4467-4353-96fc-74668405409d,perspective_of,"How do you view failure?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+69423f33-4467-4353-96fc-74668405409d,perspective_of,"How do you view failure?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+69423f33-4467-4353-96fc-74668405409d,perspective_of,"How do you view failure?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ed5d634b-39f8-4cfd-9797-7389b6d7de57,perspective_of,"What's your take on money?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ed5d634b-39f8-4cfd-9797-7389b6d7de57,perspective_of,"What's your take on money?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ed5d634b-39f8-4cfd-9797-7389b6d7de57,perspective_of,"What's your take on money?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+0c51d709-5c0e-4fed-94ea-6ce2fad7a91a,perspective_of,"How do you feel about gender expectations?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+0c51d709-5c0e-4fed-94ea-6ce2fad7a91a,perspective_of,"How do you feel about gender expectations?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+0c51d709-5c0e-4fed-94ea-6ce2fad7a91a,perspective_of,"How do you feel about gender expectations?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ff01375e-f8d9-443d-8db9-858274b7d67f,perspective_of,"What's your view on family pressure?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ff01375e-f8d9-443d-8db9-858274b7d67f,perspective_of,"What's your view on family pressure?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ff01375e-f8d9-443d-8db9-858274b7d67f,perspective_of,"What's your view on family pressure?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+3589f8f0-03f7-4e97-9d96-04241d4068d5,perspective_of,"How do you view commitment?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+3589f8f0-03f7-4e97-9d96-04241d4068d5,perspective_of,"How do you view commitment?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+3589f8f0-03f7-4e97-9d96-04241d4068d5,perspective_of,"How do you view commitment?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+faaf6c4d-a265-48f2-9060-32093abd4c14,perspective_of,"What's your view on ambition?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+faaf6c4d-a265-48f2-9060-32093abd4c14,perspective_of,"What's your view on ambition?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+faaf6c4d-a265-48f2-9060-32093abd4c14,perspective_of,"What's your view on ambition?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+69e98bd0-7e5b-4dfe-aede-fc3780e13e6a,perspective_of,"How do you see authority?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+69e98bd0-7e5b-4dfe-aede-fc3780e13e6a,perspective_of,"How do you see authority?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+69e98bd0-7e5b-4dfe-aede-fc3780e13e6a,perspective_of,"How do you see authority?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ed2ef5d4-401b-46e0-843c-26330759aa44,perspective_of,"What's your philosophy on life?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ed2ef5d4-401b-46e0-843c-26330759aa44,perspective_of,"What's your philosophy on life?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+ed2ef5d4-401b-46e0-843c-26330759aa44,perspective_of,"What's your philosophy on life?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+22b14629-9007-4c8d-bc56-2e9244b591f9,perspective_of,"How do you handle uncertainty?",A,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+22b14629-9007-4c8d-bc56-2e9244b591f9,perspective_of,"How do you handle uncertainty?",B,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"
+22b14629-9007-4c8d-bc56-2e9244b591f9,perspective_of,"How do you handle uncertainty?",C,0,0,0,0.0000,0,"",FAILED,"OpenRouter API Error: Missing Authentication header (HTTP 401)"

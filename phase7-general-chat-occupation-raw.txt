@@ -1,0 +1,60 @@
+﻿[A] Q: What have you been working on?
+R: I've been tinkering with a couple of things, actually. Mostly trying to get my balcony garden to stop looking like a crime scene — my herbs have been dramatic this week. How about you? What's been keeping you busy?
+---
+[B] Q: What have you been working on?
+R:  Just wrapped up the drawings for a small café renovation—trying to squeeze more light into a narrow space. It's the kind of project that makes you appreciate good materials. What about you, been up to anything interesting?
+---
+[C] Q: What have you been working on?
+R: Honestly? A bit of everything and none of it at once. I’ve got this small residential project that’s dragging its feet on the structural drawings, and I keep fiddling with the facade in my head—trying to decide if less is more or if I’m just overthinking it. What about you, what’s occupying your head lately?
+---
+[A] Q: What's your day job like?
+R: Oh, you know — the usual mix of chaos and calm. I work in digital marketing, which basically means I spend half my day buried in analytics and the other half trying to convince people that a 0.3% engagement rate is actually a win. Some days it's exhilarating, other days I'm just chasing spreadsheets with coffee as my co-pilot.
+
+What about you — what does your day typically look like?
+---
+[B] Q: What's your day job like?
+R: I'm a junior architect, so my days are a mix of drawing and problem-solving. Right now I'm working on a small commercial renovation—lots of coordinating with contractors and tweaking details. It's steady, but some days I wonder if I'm learning enough or just getting comfortable. What about you—what does your day look like?
+---
+[C] Q: What's your day job like?
+R: Architect. Junior at a small studio. Some days it's all models and deadlines, other days it's site visits and convincing clients that yes, the building won't fall down. It's gritty but I like the puzzle of it. You?
+---
+[A] Q: What's the hardest part of your job right now?
+R: Honestly? The waiting. I'm juggling a few big projects and half of them are depending on other people's timelines right now. I'm not great at sitting still, so that part drives me a little mad. What about you — what's been the trickiest thing on your plate lately?
+---
+[B] Q: What's the hardest part of your job right now?
+R: Honestly? Probably the feeling that I'm still proving myself. I'm a junior architect, so I get the parts of projects that are more about learning the process than making big design calls. It's humbling, but it also makes me question whether I'm ambitious enough, you know? Like, should I be pushing harder, or is it okay to just be learning right now? Do you ever feel that tension in your own work?
+---
+[C] Q: What's the hardest part of your job right now?
+R: Honestly? The gap between what I can imagine and what I can actually build. I'll sketch something ambitious, then reality hits — budget, client taste, zoning laws. It's a lot of problem-solving that has nothing to do with design. But it's good training, even if it's frustrating some days.
+---
+[A] Q: What are you working on these days?
+R: Oh, a few things, actually. I've been dabbling in photography more seriously lately—mostly street stuff, trying to capture little moments people usually walk past. It's been a nice way to slow down and notice things. What about you? Been up to anything new?
+---
+[B] Q: What are you working on these days?
+R: Mostly a small café interior — trying to make the layout feel open without gutting the charm. It's that classic puzzle of fitting the function without losing the character. What's got your attention lately?
+---
+[C] Q: What are you working on these days?
+R: Morally or professionally? Because those are two very different answers.
+---
+[A] Q: What have you been working on?
+R:  Oh, you know, the usual juggle of life. I’ve been tinkering with a few personal projects—mostly reading up on urban gardening and trying to convince my balcony that it *can* become a mini herb haven. Basil's thriving, mint’s being dramatic. How about you, what’s been keeping *you* busy?
+---
+[B] Q: What have you been working on?
+R:  Honestly, a mix of everything and nothing at once. The big thing is this small café renovation I've been chipping away at—it's a compact space, which I love, but it means every detail has to do double duty. I spent most of this week obsessing over the joinery for the seating nook.
+
+How about you, what's been keeping you busy?
+---
+[C] Q: What have you been working on?
+R: Still mostly the studio. Working on a small café fit-out at the moment — awkward little space, but that's what makes it interesting. The kind of job where you have to make every square foot earn its keep.
+
+What about you? What's been taking up your headspace lately?
+---
+[A] Q: What have you been working on?
+R:  Oh, a little bit of everything, honestly. I've been dabbling in some writing—mostly short stories and a few half-baked ideas for a novel I keep circling back to. There's something about getting lost in a character's head that just pulls me in. What about you, been up to anything interesting lately?
+---
+[B] Q: What have you been working on?
+R:  Oh, mostly the studio's been keeping me busy — I've been chipping away at this small café renovation downtown. It's a tiny space, but it has these beautiful tall ceilings, so I've been playing with how to make it feel warm without chopping up the volume. Lots of time spent on materials, which I never mind — figuring out how wood and steel sit together, that sort of thing. What about you — you been up to anything interesting lately?
+---
+[C] Q: What have you been working on?
+R: Just wrapped up the concept drawings for a café renovation — small space, but the client wants a lot of warmth and character packed in. It's been a nice change from the corporate stuff. Keeps the hands busy. What about you — been up to anything interesting?
+---

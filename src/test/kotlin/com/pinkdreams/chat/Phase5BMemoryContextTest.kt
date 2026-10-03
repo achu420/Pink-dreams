@@ -224,14 +224,16 @@ class Phase5BMemoryContextTest {
         val fixture = fixture(tokenBudget = 40)
         val context = assertIs<StageResult.Succeeded<ChatContext>>(fixture.assembler.assemble(fixture.request)).value
 
-        // The three system sections always come first.
+        // The four system sections always come first (Phase 49: engine and
+        // persona are independently addressable blocks, no longer merged).
         assertEquals("system", context.blocks[0].role)
         assertTrue(context.blocks[0].content.contains("engine"))
-        assertTrue(context.blocks[0].content.contains("core"))
         assertEquals("system", context.blocks[1].role)
-        assertTrue(context.blocks[1].content.contains("Asha"))
+        assertTrue(context.blocks[1].content.contains("core"))
         assertEquals("system", context.blocks[2].role)
-        assertTrue(context.blocks[2].content.length <= 40 * 4, "Memory block must respect the token budget")
+        assertTrue(context.blocks[2].content.contains("Asha"))
+        assertEquals("system", context.blocks[3].role)
+        assertTrue(context.blocks[3].content.length <= 40 * 4, "Memory block must respect the token budget")
 
         // The final block is always the current message, never folded into history.
         val currentBlock = context.blocks.last()
@@ -240,7 +242,7 @@ class Phase5BMemoryContextTest {
 
         // Everything between the memory block and the current message must be NATIVE
         // per-message history blocks — never a single flattened transcript block.
-        val historyBlocks = context.blocks.subList(3, context.blocks.size - 1)
+        val historyBlocks = context.blocks.subList(4, context.blocks.size - 1)
         assertTrue(historyBlocks.size < 20, "Aggressive token budget must shrink history below the full 20 persisted messages")
         historyBlocks.forEach { block ->
             assertEquals("user", block.role, "All persisted messages in this fixture are user messages")

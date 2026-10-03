@@ -4,6 +4,7 @@ import com.pinkdreams.chat.ChatContext
 import com.pinkdreams.chat.ChatRequest
 import com.pinkdreams.chat.ContextAssembler
 import com.pinkdreams.chat.ContextBlock
+import com.pinkdreams.chat.ContextBlockType
 import com.pinkdreams.chat.StageResult
 import com.pinkdreams.chat.memory.MemoryScopeResolver
 import com.pinkdreams.chat.memory.MemoryService
@@ -39,6 +40,10 @@ class RepositoryContextAssembler(
     // Persona Context POC: provider for resolving persona fields. Defaults to raw (production) behavior.
     // Test conversations with a variant can inject a ResolvedPersonaContextProvider instead.
     private val personaContextProvider: PersonaContextProvider? = null,
+    // Persona Context POC Experiment 1: the skill key to pass to personaContextProvider,
+    // for callers that know the turn's skill before assembly runs (the benchmark harness
+    // pins it per scenario). Null preserves the previous "general_chat" placeholder exactly.
+    private val pinnedSkillKey: String? = null,
 ) : ContextAssembler {
     override fun assemble(request: ChatRequest): StageResult<ChatContext> {
         val conversation = conversationRepository.findByIdForUser(request.conversationId, request.userId)
@@ -65,13 +70,22 @@ class RepositoryContextAssembler(
 
         // Persona Context POC: use provider to get persona content if available (for test variants)
         val personaContent = if (personaContextProvider != null) {
-            // For now, use empty skill key as a placeholder; real test chat will pass proper skill key
-            personaContextProvider.getPersonaContext(request.personaId, core.id, "general_chat", request.content)
+            personaContextProvider.getPersonaContext(request.personaId, core.id, pinnedSkillKey ?: "general_chat", request.content)
         } else {
             core.content
         }
-        val block0 = ContextBlock("system", engineAndPersonaContent(engine.content, personaContent))
-        val block1 = ContextBlock("system", profileContent(profile))
+        // Phase 49 (Strategy D): ENGINE and PERSONA are independently addressable
+        // blocks, never merged into one opaque string — this is what lets the
+        // post-skill-selection PersonaContextResolutionStage replace ONLY the
+        // persona portion later in the pipeline, without needing to re-derive
+        // engine content. Still populated with the same unauthorized baseline
+        // (core.content in production) at this point — Strategy D's authorized,
+        // skill-aware resolution happens strictly later, after the real skill
+        // key exists (RepositoryContextAssembler runs at CONTEXT_ASSEMBLY, before
+        // SKILL_SELECTION, and never has a real skill key to authorize against).
+        val engineBlock = ContextBlock("system", engineContent(engine.content), ContextBlockType.ENGINE)
+        val personaBlock = ContextBlock("system", personaCoreContent(personaContent), ContextBlockType.PERSONA)
+        val block1 = ContextBlock("system", profileContent(profile), ContextBlockType.PROFILE)
         val block2Facts = memories.toMutableList()
         val block3Messages = messages.toMutableList()
         // Absent entirely (not an empty placeholder block) unless the conversation has
@@ -79,7 +93,7 @@ class RepositoryContextAssembler(
         // conversations therefore assemble byte-identical blocks to before this existed.
         var continuityBlock: ContextBlock? = conversation.continuitySummary
             ?.takeIf { it.isNotBlank() }
-            ?.let { ContextBlock("system", continuityContent(it)) }
+            ?.let { ContextBlock("system", continuityContent(it), ContextBlockType.CONTINUITY) }
 
         // Absent (not an empty placeholder) unless a service is wired in AND this
         // turn's current message gives a concrete reason to surface it — normal
@@ -89,16 +103,17 @@ class RepositoryContextAssembler(
             ?.takeIf { SensitivePreferenceRelevance.isRelevant(request.content) }
             ?.selectForContext(request.userId, request.personaId)
             ?.takeIf { it.isNotEmpty() }
-            ?.let { ContextBlock("system", sensitivePreferenceContent(it)) }
+            ?.let { ContextBlock("system", sensitivePreferenceContent(it), ContextBlockType.SENSITIVE) }
 
-        val blockCurrent = ContextBlock("user", request.content)
+        val blockCurrent = ContextBlock("user", request.content, ContextBlockType.CURRENT_MESSAGE)
 
         // The current message is mandatory and always included, but its size must
         // still count against the budget — otherwise a large current message could
         // push the real total past tokenBudget even though the loop reported "fits".
         while (totalTokens(
                 listOfNotNull(
-                    block0,
+                    engineBlock,
+                    personaBlock,
                     block1,
                     ContextBlock("system", block2Content(block2Facts, conversation.lastMessageAt)),
                     sensitiveBlock,
@@ -124,10 +139,10 @@ class RepositoryContextAssembler(
             }
         }
 
-        val block2 = ContextBlock("system", block2Content(block2Facts, conversation.lastMessageAt))
+        val block2 = ContextBlock("system", block2Content(block2Facts, conversation.lastMessageAt), ContextBlockType.MEMORY)
         return StageResult.Succeeded(
             ChatContext(
-                blocks = listOfNotNull(block0, block1, block2, sensitiveBlock, continuityBlock) + historyBlocks(block3Messages) + listOf(blockCurrent),
+                blocks = listOfNotNull(engineBlock, personaBlock, block1, block2, sensitiveBlock, continuityBlock) + historyBlocks(block3Messages) + listOf(blockCurrent),
                 engineVersionId = engine.id,
                 personaCoreVersionId = core.id,
                 // Task 24 — pure attribution carriers, all read off objects this
@@ -159,14 +174,15 @@ class RepositoryContextAssembler(
      * infers or rewrites a role from message content.
      */
     private fun historyBlocks(messages: List<MessageRepository.Message>): List<ContextBlock> =
-        messages.map { ContextBlock(it.role, it.content) }
+        messages.map { ContextBlock(it.role, it.content, ContextBlockType.HISTORY) }
 
-    private fun engineAndPersonaContent(engineContent: String, personaCoreContent: String): String = buildString {
-        append("CONVERSATION ENGINE — UNIVERSAL RULES:\n")
-        append(engineContent)
-        append("\n\nPERSONA CORE:\n")
-        append(personaCoreContent)
-    }
+    // Phase 49: same header text as the pre-split merged block, now on its own
+    // block — preserves every existing "CONVERSATION ENGINE"/"PERSONA CORE"
+    // substring check (call-type detection in tests, provider-boundary audits)
+    // without requiring the two to share one string.
+    private fun engineContent(raw: String): String = "CONVERSATION ENGINE — UNIVERSAL RULES:\n$raw"
+
+    private fun personaCoreContent(raw: String): String = "PERSONA CORE:\n$raw"
 
     private fun profileContent(profile: UserProfileRepository.UserProfile?): String = buildString {
         append("USER PROFILE:\n")

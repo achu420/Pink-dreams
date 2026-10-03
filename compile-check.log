@@ -1,0 +1,51 @@
+﻿> Task :checkKotlinGradlePluginConfigurationErrors
+> Task :processResources UP-TO-DATE
+> Task :compileKotlin
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:163:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:169:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:180:23 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:261:27 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:284:44 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:292:44 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:300:45 'select(SqlExpressionBuilder.() -> Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:333:35 'select(Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/persistence/repositories/ConversationRepository.kt:338:35 'select(Op<Boolean>): Query' is deprecated. As part of SELECT DSL design changes, this will be removed in future releases.
+w: file:///E:/Projects/Pink%20dreams/src/main/kotlin/com/pinkdreams/Application.kt:81:13 This declaration needs opt-in. Its usage should be marked with '@kotlinx.serialization.ExperimentalSerializationApi' or '@OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)'
+
+> Task :compileJava NO-SOURCE
+> Task :classes UP-TO-DATE
+> Task :compileTestKotlin
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/Phase7BSecurityAuditTest.kt:251:17 Variable 'db' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/Phase7BSecurityAuditTest.kt:278:17 Variable 'db' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/Phase7BSecurityAuditTest.kt:306:17 Variable 'db' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/Phase7BSecurityAuditTest.kt:333:17 Variable 'db' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/Phase7DPersistenceIntegrityTest.kt:260:35 Unnecessary non-null assertion (!!) on a non-null receiver of type ConversationRepository.Conversation
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/Phase7EApiErrorContractTest.kt:88:13 Variable 'conv' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/Phase7EApiErrorContractTest.kt:92:13 Variable 'results' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/api/admin/AdminQAConsoleAPITest.kt:43:13 Variable 'personaRepo' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/api/admin/AdminQAConsoleAPITest.kt:72:13 Variable 'messageRepo' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/api/chat/Phase6AChatApiTest.kt:34:13 Variable 'realRepo' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/api/conversation/Phase6BConversationHistoryTest.kt:124:52 The corresponding parameter in the supertype 'ConversationRepository' is named 'userId'. This may cause problems when calling this function with named arguments.
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/api/conversation/Phase6BConversationHistoryTest.kt:193:52 The corresponding parameter in the supertype 'ConversationRepository' is named 'userId'. This may cause problems when calling this function with named arguments.
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/chat/EndToEndLlmRequestRegressionTest.kt:35:13 Variable 'personaId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/chat/EndToEndLlmRequestRegressionTest.kt:101:13 Variable 'generationResponse' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/chat/EndToEndLlmRequestRegressionTest.kt:139:13 Variable 'personaId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/chat/FullContextPipelineRegressionTest.kt:35:13 Variable 'personaId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/chat/FullContextPipelineRegressionTest.kt:168:13 Variable 'personaId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/chat/PersonaContextRealBenchmarkTest.kt:148:9 Lateinit is unnecessary: definitely initialized in constructors
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/chat/PersonaContextRealBenchmarkTest.kt:149:9 Lateinit is unnecessary: definitely initialized in constructors
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/chat/Phase4ARuntimeContextAuditTest.kt:68:13 Variable 'v3' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/chat/Phase5GEndToEndChatEngineTest.kt:380:13 Variable 'personaId' is never used
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/chat/TokenAuditTest.kt:53:9 Lateinit is unnecessary: definitely initialized in constructors
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/testchat/TestChatServiceTest.kt:124:9 Lateinit is unnecessary: definitely initialized in constructors
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/testchat/TestChatServiceTest.kt:202:28 No cast needed
+w: file:///E:/Projects/Pink%20dreams/src/test/kotlin/com/pinkdreams/testchat/TestChatServiceTest.kt:306:50 Unnecessary non-null assertion (!!) on a non-null receiver of type PersonaRepository.Persona
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.7/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 3m 13s
+4 actionable tasks: 3 executed, 1 up-to-date

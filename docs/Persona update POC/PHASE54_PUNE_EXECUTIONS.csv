@@ -1,0 +1,53 @@
+call_index,condition,response,status
+1,CURRENT,"About six years now. I moved here at 21 to study architecture — Nashik's home, but Pune's kind of stuck. Settled in Kothrud these days. How about you, new around here or just passing through?",SUCCESS
+2,ABLATED,"Been here about six years now. Moved from Nashik at twenty-one to study architecture, and the city kind of just stuck. It's different from home — busier, more people, but I've grown to like the pace of it. How about you?",SUCCESS
+3,CURRENT,"About six years now. Came here at 21 for architecture school and just never really left. Pune grows on you quietly. What about you — local or also a transplant?",SUCCESS
+4,ABLATED,"Six years now — moved here at twenty-one for architecture school, so I've done the whole journey in this city. Student, first job that was wrong for me, then the studio I'm at now. It's grown on me. You been here a while yourself?",SUCCESS
+5,CURRENT,"Around six years now. I grew up in Nashik, then moved to Pune at 21 for architecture school — and just never left. Kothrud's been home for most of it. Still discovering bits of the city I haven't properly explored, though. You? Are you new here yourself?",SUCCESS
+6,ABLATED,"Six years now. Moved here at 21 for architecture school and just never left. Kothrud's basically home at this point.",SUCCESS
+7,CURRENT,"About six years now. Moved here at 21 for architecture school and somehow never left. It feels like home, but I still miss Nashik sometimes. What about you — are you from here or just passing through?",SUCCESS
+8,ABLATED,"About six years now. Moved here at twenty-one for architecture school. I'm originally from Nashik, so Pune's home now, mostly. What about you — how long have you been here?",SUCCESS
+9,CURRENT,"About six years — came here at 21 to study architecture and just stayed. Pune grows on you quietly. You new around here?",SUCCESS
+10,ABLATED,"Six years, give or take. Moved here at 21 for architecture school, and the city just kind of kept me. What about you — here long or just passing through?",SUCCESS
+11,CURRENT,"Six years now — came here at 21 for architecture school and just never really left. Kothrud feels like home at this point, though Nashik will always be where I'm from originally. What about you?",SUCCESS
+12,ABLATED,"Eight years now. Came here at twenty-one for architecture and just never really left. The city grows on you — or maybe I just got comfortable. You new here, or just passing through?",SUCCESS
+13,CURRENT,"Six years now. Moved here at 21 for architecture school and just never really left — the city grows on you. Are you new around here, or just making conversation?",SUCCESS
+14,ABLATED,"About six years now. Moved here at twenty-one for architecture school — originally from Nashik. Pune sort of grew on me without me noticing. You new to the city, or just testing how long I've been around?",SUCCESS
+15,CURRENT,"About six years now. Moved here at 21 for architecture school, so Pune's kind of become home — even if I still get told my Marathi sounds like Nashik's. Where are you coming from?",SUCCESS
+16,ABLATED,"Six years now — moved here at 21 for architecture school and just never really left. Originally from Nashik, so Pune always felt close enough to home but different enough to count as striking out on my own. What about you, new to the city?",SUCCESS
+17,CURRENT,"About six years now — came here at 21 for architecture college and just never really left. You?",SUCCESS
+18,ABLATED,"About six years now. I moved here at twenty-one for architecture school and just… stayed. Pune grows on you — it's got that old-town pace underneath all the new construction. I'm in Kothrud now. What about you, are you new here or just passing through?",SUCCESS
+19,CURRENT,"About six years now. Moved here at 21 for architecture college and just ended up staying — work in Kothrud now, live around the same area. It's properly home, even if the traffic tests that sometimes. What about you?",SUCCESS
+20,ABLATED,"Six years now. Came here at twenty-one for architecture school and just stayed — the city grows on you. What about you?",SUCCESS
+21,CURRENT,"About six years now. Came here at 21 to study architecture, and Pune just sort of stuck. I'm in Kothrud — rented place, but it's starting to feel like home. Where are you from, or just visiting?",SUCCESS
+22,ABLATED,"Hmm, in Pune specifically? About six years now. I moved here at twenty-one for architecture school and just... stayed. It grew on me. Nashik's where I'm from originally — it'll always feel like home, but Pune's become home too, if that makes sense.
+
+What about you? Just passing through, or settling in here?",SUCCESS
+23,CURRENT,"About six years now — moved here at 21 for architecture school and just never left. Pune grows on you quietly. What about you, new around here or just passing through?",SUCCESS
+24,ABLATED,"About six years now. Moved here at 21 for architecture school, stayed for the work. Pune's become home, though I'm Nashik-born.",SUCCESS
+25,CURRENT,"About six years now. I moved here at twenty-one to study architecture, and I just never really left. Kothrud's home base these days. It's funny — I still catch myself noticing how different Pune feels from Nashik, the way the light hits the ghats and all. Some habits from being an architect, I guess.",SUCCESS
+26,ABLATED,"Moved here when I was twenty-one, so about six years now. Came for architecture school, stayed for the work and the life that built up around it. Pune's become home in a way I didn't expect when I first arrived.",SUCCESS
+27,CURRENT,"About six years now. Moved here at 21 to study architecture, and Pune just kind of stuck. What about you — are you new around here?",SUCCESS
+28,ABLATED,"About six years now. Came here at twenty-one to study architecture, and Pune just kind of stuck. It's home now, though I still say Nashik when people ask where I'm from. You new here, or just passing through?",SUCCESS
+29,CURRENT,"About six years now. Moved here at 21 for architecture school and just never really left. Somehow Pune grows on you without asking permission. You new around here, or just passing through?",SUCCESS
+30,ABLATED,"About six years now. Moved here at 21 for architecture school, and the city just sort of... kept me. Still get a kick out of how green it is compared to Nashik, where I grew up. You new to Pune, or just passing through?",SUCCESS
+31,CURRENT,"About six years now. Moved here at 21 to study architecture — figured I'd stay for the degree, but Pune kind of grows on you. Kothrud's home now. You new here yourself?",SUCCESS
+32,ABLATED,"About six years now. Moved here at twenty-one for architecture school, stayed for the work. Nashik's home originally, but Pune's become home too. What about you — new here or has it grown on you over time?",SUCCESS
+33,CURRENT,"About six years now. Moved here at twenty-one for architecture school and just… stayed. Pune grows on you — it's messy and crowded but it has a way of feeling like home. What about you, just visiting?",SUCCESS
+34,ABLATED,"Six years now. Moved here at 21 for architecture school and just never really left. Still feels like a second home rather than the first one, if that makes sense.",SUCCESS
+35,CURRENT,"Yeah, a while now. I moved here at twenty-one to study architecture, so about six years. Kothrud's been home for most of that. It still surprises me sometimes — the city keeps changing, but in a good way. You've been here long yourself?",SUCCESS
+36,ABLATED,"About six years now. Moved here at twenty-one for architecture school and just never really left. It's home now, though I still catch myself noticing the city like I'm new to it sometimes.",SUCCESS
+37,CURRENT,"Six years now — came here at 21 for architecture school and just never really left. Pune has a way of growing on you quietly. There are still parts I'm discovering, but it does feel like home at this point.
+
+What about you — are you new here, or have you been around a while?",SUCCESS
+38,ABLATED,"About six years now. I came here at twenty-one for architecture school, and I just stayed. It's funny — I grew up in Nashik, but Pune started feeling like home somewhere along the way. What about you, new here or just passing through?",SUCCESS
+39,CURRENT,"Not really, but not new either. I moved here at 21 for architecture school — so six years now. Still feels like home in a weird way. I'm from Nashik originally. You?",SUCCESS
+40,ABLATED,"About six years now. I moved here at twenty-one to study architecture — came for the course, stayed for the city. Originally from Nashik, so Pune wasn't a huge leap, but it took a while before it started feeling like home rather than just where I lived. You've been here long?",SUCCESS
+41,CURRENT,"About six years now. Came down from Nashik at 21 for architecture school and just… stayed. Pune wasn't the plan exactly, but it's grown on me. Kothrud especially — it's starting to feel more like home than Nashik does, if that makes sense.",SUCCESS
+42,ABLATED,"Six years now — came at 21 for architecture school and just stayed. I'm from Nashik originally, but Pune's home at this point. What about you, new here?",SUCCESS
+43,CURRENT,"Six years now — moved here at twenty-one for architecture school. It's home at this point, but I still remember how alien Pune felt those first few months. You're new here yourself?",SUCCESS
+44,ABLATED,"About six years now. I moved here at 21 to study architecture — from Nashik, so Pune didn't feel like a foreign city, but it took a while to actually feel like home. I'm in Kothrud now. What about you — are you new here or just passing through?",SUCCESS
+45,CURRENT,"Not really — that's fair over six years, actually. Moved here at 21 for architecture school, stayed for work, and now Pune just sort of feels like home. Nashik's still where my folks are, but Kothrud's my corner of the world now. You?",SUCCESS
+46,ABLATED,"I've been in Pune about six years now — moved here at 21 for architecture school, and just never really left. Nashik's home, where I grew up, but Pune's become home too, in a different way. What about you — are you new here?",SUCCESS
+47,CURRENT,"Yeah, about six years now. Moved here at 21 for architecture school and just... stayed. Pune grows on you — even the traffic. You new around here, or just passing through?",SUCCESS
+48,ABLATED,"Yeah, about six years now. Came here at 21 for architecture and just... stayed. Pune grows on you — it's got that mix of chaos and green hills that’s hard to leave. You new here, or just passing through?",SUCCESS

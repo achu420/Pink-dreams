@@ -695,6 +695,11 @@ object Conversations : Table("conversations") {
     val snapshotGenerationProviderSort = text("snapshot_generation_provider_sort").nullable()
     // Persona Context POC phase: variant selection for this test conversation.
     val snapshotPersonaContextVariant = text("snapshot_persona_context_variant").nullable()
+    // Persona Context POC Experiment 1: pins the skill key persona context is
+    // resolved against for this test conversation, for callers (the
+    // benchmark harness) that know the turn's skill before context assembly
+    // runs — see RepositoryContextAssembler.pinnedSkillKey.
+    val snapshotPersonaContextSkillKey = text("snapshot_persona_context_skill_key").nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

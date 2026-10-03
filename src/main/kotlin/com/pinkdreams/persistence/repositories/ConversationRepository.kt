@@ -73,6 +73,13 @@ open class ConversationRepository(private val db: Database) {
          * Null means default production behavior (variant A).
          */
         val personaContextVariant: String? = null,
+        /**
+         * Persona Context POC Experiment 1: pins the skill key persona context
+         * is resolved against, for callers (the benchmark harness) that know
+         * the turn's skill before context assembly runs. Null preserves
+         * RepositoryContextAssembler's "general_chat" placeholder behavior.
+         */
+        val personaContextSkillKey: String? = null,
     )
 
     data class Conversation(
@@ -135,6 +142,7 @@ open class ConversationRepository(private val db: Database) {
             it[Conversations.snapshotIntentJsonMode] = snapshot.intentJsonMode
             it[Conversations.snapshotGenerationProviderSort] = snapshot.generationProviderSort
             it[Conversations.snapshotPersonaContextVariant] = snapshot.personaContextVariant
+            it[Conversations.snapshotPersonaContextSkillKey] = snapshot.personaContextSkillKey
         }
         findById(id)!!
     }
@@ -164,10 +172,16 @@ open class ConversationRepository(private val db: Database) {
     }
 
     open fun findAllForUser(userId: UUID, limit: Int = 20, offset: Int = 0, personaId: UUID? = null): List<Conversation> = transaction(db) {
+        // TEST conversations (created via /v1/admin/test-chat/*) must never surface
+        // through the regular conversation list -- they carry a frozen config
+        // snapshot, not live production config, and the message-send route already
+        // refuses to post to one for the same reason. Without this filter a TEST
+        // conversation could appear as "most recently active" to a normal listing
+        // and then 404 the moment a real message was sent to it.
         val condition = if (personaId != null) {
-            (Conversations.userId eq userId) and (Conversations.personaId eq personaId)
+            (Conversations.userId eq userId) and (Conversations.personaId eq personaId) and (Conversations.executionMode eq "PRODUCTION")
         } else {
-            Conversations.userId eq userId
+            (Conversations.userId eq userId) and (Conversations.executionMode eq "PRODUCTION")
         }
         Conversations.select { condition }
             .orderBy(Conversations.createdAt to org.jetbrains.exposed.sql.SortOrder.DESC, Conversations.id to org.jetbrains.exposed.sql.SortOrder.DESC)
@@ -369,6 +383,7 @@ open class ConversationRepository(private val db: Database) {
                 intentJsonMode = row[Conversations.snapshotIntentJsonMode],
                 generationProviderSort = row[Conversations.snapshotGenerationProviderSort],
                 personaContextVariant = row[Conversations.snapshotPersonaContextVariant],
+                personaContextSkillKey = row[Conversations.snapshotPersonaContextSkillKey],
             )
         } else {
             null

@@ -220,7 +220,7 @@ class MemoryExtractionPipelineIntegrationTest {
         val turn3Context = assertIs<StageResult.Succeeded<ChatContext>>(
             fixture.contextAssembler.assemble(turn3Request),
         ).value
-        val memoryBlock = turn3Context.blocks[2]
+        val memoryBlock = turn3Context.blocks[3]
         assertTrue(
             memoryBlock.content.contains("user lives in Delhi"),
             "Memory learned on turn 1 must appear in the real ChatContext memory block for a later turn",

@@ -105,29 +105,30 @@ class EndToEndLlmRequestRegressionTest {
         assertNotNull(actualRequest, "LLM client should have received a request")
 
         val messages = actualRequest.context.blocks
-        // 3 system blocks + 1 native history message + 1 current message.
-        assertEquals(5, messages.size, "Should have 5 blocks")
+        // 4 system blocks (engine, persona, profile, memory) + 1 native history message + 1 current message.
+        assertEquals(6, messages.size, "Should have 6 blocks")
 
-        // Verify: Engine and core in first block
+        // Verify: Engine in first block, persona core in second block
         assertTrue(messages[0].content.contains("ENGINE_TEST_123"), "Engine content missing")
-        assertTrue(messages[0].content.contains("PERSONA_CORE_TEST_456"), "Persona core missing")
         assertEquals("system", messages[0].role, "Block 0 should be system")
-
-        // Verify: Profile in second block
-        assertTrue(messages[1].content.contains("PROFILE_TEST_789"), "Profile missing")
+        assertTrue(messages[1].content.contains("PERSONA_CORE_TEST_456"), "Persona core missing")
         assertEquals("system", messages[1].role, "Block 1 should be system")
 
-        // Verify: Memory in third block
-        assertTrue(messages[2].content.contains("MEMORY_TEST_111"), "Memory missing")
+        // Verify: Profile in third block
+        assertTrue(messages[2].content.contains("PROFILE_TEST_789"), "Profile missing")
         assertEquals("system", messages[2].role, "Block 2 should be system")
 
-        // Verify: History is a NATIVE user-role message, not folded into a system transcript
-        assertEquals("HISTORY_TEST_222", messages[3].content, "History content must be exact persisted text")
-        assertEquals("user", messages[3].role, "Persisted user history must remain a native user-role message")
+        // Verify: Memory in fourth block
+        assertTrue(messages[3].content.contains("MEMORY_TEST_111"), "Memory missing")
+        assertEquals("system", messages[3].role, "Block 3 should be system")
 
-        // CRITICAL ASSERTION: Fifth block MUST be current message with role "user"
-        assertEquals("user", messages[4].role, "Current message MUST have role 'user', not 'system'")
-        assertEquals("CURRENT_MESSAGE_TEST_333", messages[4].content, "Current message must be exact")
+        // Verify: History is a NATIVE user-role message, not folded into a system transcript
+        assertEquals("HISTORY_TEST_222", messages[4].content, "History content must be exact persisted text")
+        assertEquals("user", messages[4].role, "Persisted user history must remain a native user-role message")
+
+        // CRITICAL ASSERTION: Sixth block MUST be current message with role "user"
+        assertEquals("user", messages[5].role, "Current message MUST have role 'user', not 'system'")
+        assertEquals("CURRENT_MESSAGE_TEST_333", messages[5].content, "Current message must be exact")
     }
 
     @Test
@@ -187,8 +188,8 @@ class EndToEndLlmRequestRegressionTest {
 
         // Two persisted history messages must now be two NATIVE user-role blocks,
         // never a single flattened system transcript.
-        val firstHistoryBlock = context.blocks[3]
-        val secondHistoryBlock = context.blocks[4]
+        val firstHistoryBlock = context.blocks[4]
+        val secondHistoryBlock = context.blocks[5]
         assertEquals("user", firstHistoryBlock.role)
         assertEquals("FIRST_MESSAGE", firstHistoryBlock.content)
         assertEquals("user", secondHistoryBlock.role)
@@ -200,7 +201,7 @@ class EndToEndLlmRequestRegressionTest {
         )
 
         // CRITICAL: Check that current message is ONLY in final block
-        val currentBlock = context.blocks[5]
+        val currentBlock = context.blocks[6]
         assertEquals("user", currentBlock.role, "Final block MUST have role 'user'")
         assertEquals("NEW_CURRENT_MESSAGE", currentBlock.content)
     }

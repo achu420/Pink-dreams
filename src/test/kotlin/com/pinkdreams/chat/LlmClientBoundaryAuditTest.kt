@@ -134,23 +134,25 @@ class LlmClientBoundaryAuditTest {
         val request = runToLlmClient(setup, "I am good")
         val blocks = request.context.blocks
 
-        // 3 system blocks + 3 native history messages + 1 current message.
-        assertEquals(7, blocks.size)
-        assertEquals(listOf("system", "system", "system", "user", "assistant", "user", "user"), blocks.map { it.role })
+        // 4 system blocks (engine, persona, profile, memory -- Phase 49 splits engine
+        // and persona into independently addressable blocks) + 3 native history
+        // messages + 1 current message.
+        assertEquals(8, blocks.size)
+        assertEquals(listOf("system", "system", "system", "system", "user", "assistant", "user", "user"), blocks.map { it.role })
 
         // Native per-message history blocks, exact content and role, in chronological order.
-        assertEquals("Hello", blocks[3].content)
-        assertEquals("Hey", blocks[4].content)
-        assertEquals("How are you?", blocks[5].content)
+        assertEquals("Hello", blocks[4].content)
+        assertEquals("Hey", blocks[5].content)
+        assertEquals("How are you?", blocks[6].content)
 
         // Current message absent from any history block, occurs exactly once, is the final block.
-        assertFalse(blocks.subList(0, 6).any { it.content == "I am good" }, "Current message must not appear among history blocks")
+        assertFalse(blocks.subList(0, 7).any { it.content == "I am good" }, "Current message must not appear among history blocks")
         val currentOccurrences = blocks.count { it.content == "I am good" }
         assertEquals(1, currentOccurrences, "Current message must occur exactly once across all blocks")
-        val currentBlock = blocks[6]
+        val currentBlock = blocks[7]
         assertEquals("user", currentBlock.role)
         assertEquals("I am good", currentBlock.content)
-        assertEquals(6, blocks.indexOf(currentBlock), "Current message must be the final block")
+        assertEquals(7, blocks.indexOf(currentBlock), "Current message must be the final block")
     }
 
     // --- Scenario C: history > N messages, newest N selected, sent oldest -> newest ---
@@ -165,9 +167,9 @@ class LlmClientBoundaryAuditTest {
 
         val request = runToLlmClient(setup, "CURRENT_AFTER_13")
         val blocks = request.context.blocks
-        // 3 system blocks + 10 native history messages (of 13; oldest 3 excluded) + 1 current message.
-        assertEquals(14, blocks.size)
-        val historyBlocks = blocks.subList(3, 13)
+        // 4 system blocks + 10 native history messages (of 13; oldest 3 excluded) + 1 current message.
+        assertEquals(15, blocks.size)
+        val historyBlocks = blocks.subList(4, 14)
         val historyContents = historyBlocks.map { it.content }
 
         // Oldest 3 excluded (limit is 10)
@@ -186,7 +188,7 @@ class LlmClientBoundaryAuditTest {
             )
         }
 
-        val currentBlock = blocks[13]
+        val currentBlock = blocks[14]
         assertEquals("user", currentBlock.role)
         assertEquals("CURRENT_AFTER_13", currentBlock.content)
     }
@@ -212,8 +214,8 @@ class LlmClientBoundaryAuditTest {
         val setup = setup(withProfile = false, withMemory = false)
         val request = runToLlmClient(setup, "hello")
 
-        val profileBlock = request.context.blocks[1]
-        val memoryBlock = request.context.blocks[2]
+        val profileBlock = request.context.blocks[2]
+        val memoryBlock = request.context.blocks[3]
 
         assertTrue(profileBlock.content.contains("no profile record exists"), "Missing profile must be explicitly stated, not left blank")
         assertTrue(memoryBlock.content.contains("no memory facts"), "Missing memory must be explicitly stated, not left blank")
@@ -230,18 +232,19 @@ class LlmClientBoundaryAuditTest {
         val request = runToLlmClient(setup, "FULL_STRUCTURE_CHECK")
         val blocks = request.context.blocks
 
-        // 3 system blocks + 2 native history messages + 1 current message.
-        assertEquals(6, blocks.size)
-        assertEquals(listOf("system", "system", "system", "user", "assistant", "user"), blocks.map { it.role })
+        // 4 system blocks (engine, persona, profile, memory) + 2 native history
+        // messages + 1 current message.
+        assertEquals(7, blocks.size)
+        assertEquals(listOf("system", "system", "system", "system", "user", "assistant", "user"), blocks.map { it.role })
 
         assertTrue(blocks[0].content.contains("AUDIT_ENGINE_RULES"), "Engine content missing from actual request")
-        assertTrue(blocks[0].content.contains("AUDIT_PERSONA_CORE"), "Persona core missing from actual request")
-        assertTrue(blocks[1].content.contains("AUDIT_PROFILE_NAME"), "Profile missing from actual request")
-        assertTrue(blocks[2].content.contains("AUDIT_MEMORY_FACT"), "Memory missing from actual request")
-        assertEquals("Hello", blocks[3].content)
-        assertEquals("Hey, how are you?", blocks[4].content)
-        assertEquals("FULL_STRUCTURE_CHECK", blocks[5].content)
-        assertEquals("user", blocks[5].role)
+        assertTrue(blocks[1].content.contains("AUDIT_PERSONA_CORE"), "Persona core missing from actual request")
+        assertTrue(blocks[2].content.contains("AUDIT_PROFILE_NAME"), "Profile missing from actual request")
+        assertTrue(blocks[3].content.contains("AUDIT_MEMORY_FACT"), "Memory missing from actual request")
+        assertEquals("Hello", blocks[4].content)
+        assertEquals("Hey, how are you?", blocks[5].content)
+        assertEquals("FULL_STRUCTURE_CHECK", blocks[6].content)
+        assertEquals("user", blocks[6].role)
 
         // Model reaches the actual GenerationRequest config
         assertEquals("test-model", request.config.model)

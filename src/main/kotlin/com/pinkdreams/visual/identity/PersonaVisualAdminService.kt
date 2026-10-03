@@ -154,6 +154,11 @@ class PersonaVisualAdminService(
         require(ref.personaVisualVersionId == draft.id) {
             "Reference does not belong to the persona draft version"
         }
+        // A deleted reference must never be left as the persona's cover image --
+        // otherwise the cover pointer dangles and any later read of it 404s.
+        if (personaRepository.getCoverImageId(personaId) == referenceId) {
+            personaRepository.clearCoverImage(personaId)
+        }
         referenceImageRepository.removeReference(referenceId)
     }
 

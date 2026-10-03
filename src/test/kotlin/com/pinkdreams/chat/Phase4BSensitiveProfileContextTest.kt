@@ -90,7 +90,7 @@ class Phase4BSensitiveProfileContextTest {
 
         val request = ChatRequest(UUID.randomUUID(), f.userId, f.conversationId, f.personaId, UUID.randomUUID(), "hello")
         val context = assertIs<StageResult.Succeeded<ChatContext>>(assembler(f).assemble(request)).value
-        val profileBlock = context.blocks[1]
+        val profileBlock = context.blocks[2]
 
         assertTrue(profileBlock.content.contains("PROFILE_NAME_MARKER"))
         assertTrue(profileBlock.content.contains("PROFILE_GENDER_MARKER"))
@@ -107,7 +107,7 @@ class Phase4BSensitiveProfileContextTest {
 
         val request = ChatRequest(UUID.randomUUID(), f.userId, f.conversationId, f.personaId, UUID.randomUUID(), "hello")
         val context = assertIs<StageResult.Succeeded<ChatContext>>(assembler(f).assemble(request)).value
-        val profileBlock = context.blocks[1]
+        val profileBlock = context.blocks[2]
 
         assertTrue(profileBlock.content.contains("age: (not set)"))
         assertTrue(profileBlock.content.contains("gender: (not set)"))
@@ -187,14 +187,16 @@ class Phase4BSensitiveProfileContextTest {
         val context = assertIs<StageResult.Succeeded<ChatContext>>(assembler(f, memoryService).assemble(request)).value
 
         val engineBlock = context.blocks[0]
-        val profileBlock = context.blocks[1]
-        val memoryBlock = context.blocks[2]
-        val sensitiveBlock = context.blocks[3]
-        val continuityBlock = context.blocks[4]
-        val historyBlocks = context.blocks.subList(5, 15)
+        val personaBlock = context.blocks[1]
+        val profileBlock = context.blocks[2]
+        val memoryBlock = context.blocks[3]
+        val sensitiveBlock = context.blocks[4]
+        val continuityBlock = context.blocks[5]
+        val historyBlocks = context.blocks.subList(6, 16)
         val currentBlock = context.blocks.last()
 
         assertEquals("system", engineBlock.role)
+        assertEquals("system", personaBlock.role)
         assertEquals("system", profileBlock.role)
         assertTrue(profileBlock.content.contains("PROFILE_MARKER"))
         assertEquals("system", memoryBlock.role)
@@ -209,7 +211,7 @@ class Phase4BSensitiveProfileContextTest {
         }
         assertEquals("user", currentBlock.role)
         assertTrue(currentBlock.content.contains("CURRENT_MESSAGE_MARKER"))
-        assertEquals(16, context.blocks.size, "3 system + sensitive + continuity + 10 history + current")
+        assertEquals(17, context.blocks.size, "4 system (engine, persona, profile, memory) + sensitive + continuity + 10 history + current")
     }
 
     // --- Budget: the sensitive block participates in the same accounting as everything else ---

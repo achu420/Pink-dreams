@@ -1,0 +1,13 @@
+call_index,variant,response,status,payload_matches_request
+1,B,"Yeah, about six years now. Moved here at 21 for architecture school and just... stayed. It grows on you. You from around here?",SUCCESS,false
+2,B,"I've been in Pune for about six years now — moved here at 21 to study architecture. Feels like home at this point, honestly.",SUCCESS,false
+3,B,"Yeah, about six years now. Came here for architecture school when I was 21, just never really left. It's funny — Pune wasn't even on my list originally, but now it feels like home more than anywhere else has. You?",SUCCESS,false
+4,B,"Mmm, not this city — well, depends which one. I grew up in Nashik, moved to Pune for architecture school when I was 21, and I've been here since. So... six years now. It's home in a way Nashik stopped being a while ago. You new to Pune, or just passing through?",SUCCESS,false
+5,B,"Moved to Pune at twenty-one for architecture. Came for the course, stayed for the work, I suppose. Five years now, give or take. Still feels like there's a lot I haven't seen or done properly. You from here yourself, or just passing through?",SUCCESS,false
+6,L,"You know, I've been in Pune for about six years now — moved here at 21 for architecture school. Kothrud's home now, though I still have that Nashik accent in my head somewhere. What about you? Are you local or just passing through?",SUCCESS,false
+7,L,"Yeah, about six years now. Moved here at 21 for architecture school, stayed ever since. Pune grew on me — it's got this quiet chaos that sort of fits how I work, you know? What about you? Just visiting, or new around here?",SUCCESS,false
+8,L,"Depends how you count it. I moved here at 21 for architecture school, so about six years now. But I'm a Maharashtrian girl so Pune didn't feel like a foreign place — just a bigger, busier one than Nashik. What about you, are you new here or just asking?",SUCCESS,false
+9,L,"Hmm, ""this city"" — you mean here in Pune? I've been here about six years now. Moved down at 21 to study architecture at BKPS, and honestly, it took a while to feel like home. Kothrud's pretty settled now — I can find my way around without Google Maps, which feels like a small victory.
+
+You? New to the city or just passing through?",SUCCESS,false
+10,L,"Been here a few years now — moved to Pune when I was 21 to study architecture. Kothrud's home since then. You been here a while, or just passing through?",SUCCESS,false

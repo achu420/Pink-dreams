@@ -1,0 +1,116 @@
+﻿> Task :checkKotlinGradlePluginConfigurationErrors
+> Task :compileKotlin UP-TO-DATE
+> Task :compileJava NO-SOURCE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+
+> Task :run
+gradle : SLF4J(I): Connected with provider of type [ch.qos.logback.classic.spi.LogbackServiceProvider]
+At line:1 char:359
++ ... ink dreams"; . .\run-local.secrets.ps1; gradle run *> app-phase63.log
++                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (SLF4J(I): Conne...erviceProvider]:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-09-30 03:37:46.564 [main] INFO  ktor.application - Autoreload is disabled because the development mode is off.
+2026-09-30 03:37:58.282 [main] INFO  Exposed - Preparing create tables statements took 937ms
+2026-09-30 03:37:58.314 [main] INFO  Exposed - Executing create tables statements took 16ms
+2026-09-30 03:37:59.616 [main] INFO  Exposed - Extracting table columns took 1302ms
+2026-09-30 03:38:02.697 [main] INFO  Exposed - Extracting primary keys took 3081ms
+2026-09-30 03:38:06.101 [main] INFO  Exposed - Extracting column constraints took 3139ms
+2026-09-30 03:38:06.102 [main] INFO  Exposed - Preparing alter table statements took 7788ms
+2026-09-30 03:38:06.335 [main] INFO  Exposed - Executing alter table statements took 232ms
+2026-09-30 03:38:07.507 [main] INFO  Exposed - Index on table 'conversation_engines' differs only in name: in db conversation_engines_version_key -> in mapping conversation_engines_version_unique
+2026-09-30 03:38:07.509 [main] INFO  Exposed - Index on table 'personas' differs only in name: in db personas_slug_key -> in mapping personas_slug_unique
+2026-09-30 03:38:07.509 [main] INFO  Exposed - Index on table 'persona_core_versions' differs only in name: in db persona_core_versions_persona_id_version_key -> in mapping persona_core_versions_persona_id_version_unique
+2026-09-30 03:38:07.513 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'memory_facts':
+		Index 'ix_memory_facts_hot_selection' for 'memory_facts' on columns com.pinkdreams.persistence.database.MemoryFacts.user_id, com.pinkdreams.persistence.database.MemoryFacts.persona_id, com.pinkdreams.persistence.database.MemoryFacts.status, com.pinkdreams.persistence.database.MemoryFacts.last_referenced_at, com.pinkdreams.persistence.database.MemoryFacts.learned_at
+		Index 'ix_memory_facts_user_persona' for 'memory_facts' on columns com.pinkdreams.persistence.database.MemoryFacts.user_id, com.pinkdreams.persistence.database.MemoryFacts.persona_id
+2026-09-30 03:38:07.517 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'conversation_engines':
+		Unique Index 'one_active_engine' for 'conversation_engines' on columns com.pinkdreams.persistence.database.ConversationEngines.is_active
+2026-09-30 03:38:07.517 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'conversations':
+		Index 'ix_conversations_user' for 'conversations' on columns com.pinkdreams.persistence.database.Conversations.user_id, com.pinkdreams.persistence.database.Conversations.persona_id
+2026-09-30 03:38:07.517 [main] WARN  Exposed - Indices exist in database and not mapped in code on class 'messages':
+		Unique Index 'uq_client_message_per_conversation' for 'messages' on columns com.pinkdreams.persistence.database.Messages.conversation_id, com.pinkdreams.persistence.database.Messages.client_message_id
+		Index 'ix_messages_conversation_time' for 'messages' on columns com.pinkdreams.persistence.database.Messages.conversation_id, com.pinkdreams.persistence.database.Messages.created_at
+2026-09-30 03:38:07.522 [main] INFO  Exposed - Checking mapping consistence took 1186ms
+2026-09-30 03:38:07.536 [main] INFO  Exposed - Preparing create tables statements took 10ms
+2026-09-30 03:38:07.539 [main] INFO  Exposed - Executing create tables statements took 0ms
+2026-09-30 03:38:07.565 [main] INFO  Exposed - Extracting table columns took 10ms
+2026-09-30 03:38:07.574 [main] INFO  Exposed - Extracting primary keys took 7ms
+2026-09-30 03:38:07.631 [main] INFO  Exposed - Extracting column constraints took 55ms
+2026-09-30 03:38:07.631 [main] INFO  Exposed - Preparing alter table statements took 76ms
+2026-09-30 03:38:07.632 [main] INFO  Exposed - Executing alter table statements took 0ms
+2026-09-30 03:38:07.701 [main] INFO  Exposed - Checking mapping consistence took 69ms
+BASELINE_SEED: conversationEngine=already present persona=already present personaCore=already present 
+memoryEngine=already present intentEngine=already present skillsCreated=0 skillsAlreadyPresent=26
+PERSONA_CONTEXT_SEED: masterDocument=already present for this core version fieldRegistry=already present (32 fields) 
+skillMappings=already present (5 skills)
+2026-09-30 03:38:22.929 [main] INFO  ktor.application - Application started in 36.652 seconds.
+2026-09-30 03:38:22.931 [main] INFO  ktor.application - Application started: io.ktor.server.application.Application@70925b45
+2026-09-30 03:38:24.593 [DefaultDispatcher-worker-1] INFO  ktor.application - Responding at http://127.0.0.1:8080
+2026-09-30 03:39:05.883 [eventLoopGroupProxy-4-1] INFO  ktor.application - 201 Created: POST - /v1/conversations in 2732ms
+INTENT_DIAGNOSTICS: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=2255f391-85ca-4848-8224-d5e469cc3872 
+outcome=COMPLETED finishReason=stop promptTokens=1922 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=cf221d00-877a-4430-aec2-a2a50027206a 
+requestId=2255f391-85ca-4848-8224-d5e469cc3872
+MEMORY_CONTEXT_SELECTION: applied conversation=cf221d00-877a-4430-aec2-a2a50027206a 
+requestId=2255f391-85ca-4848-8224-d5e469cc3872
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=9
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=9 
+usedReplacement=true
+STAGE_TIMINGS: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=2255f391-85ca-4848-8224-d5e469cc3872 
+context_assembly=927ms intent_discovery=6676ms memory_context_selection=615ms skill_context_enrichment=331ms 
+generation=3242ms total_before_persist=13617ms persist=1360ms
+2026-09-30 03:39:31.417 [eventLoopGroupProxy-4-2] INFO  ktor.application - 200 OK: POST - /v1/conversations/cf221d00-877a-4430-aec2-a2a50027206a/messages in 16762ms
+INTENT_DIAGNOSTICS: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=e63dd33c-4400-4103-9bb8-53b621ca9493 
+outcome=COMPLETED finishReason=stop promptTokens=1985 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=cf221d00-877a-4430-aec2-a2a50027206a 
+requestId=e63dd33c-4400-4103-9bb8-53b621ca9493
+MEMORY_CONTEXT_SELECTION: applied conversation=cf221d00-877a-4430-aec2-a2a50027206a 
+requestId=e63dd33c-4400-4103-9bb8-53b621ca9493
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=9
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=9 
+usedReplacement=true
+STAGE_TIMINGS: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=e63dd33c-4400-4103-9bb8-53b621ca9493 
+context_assembly=1626ms intent_discovery=2526ms memory_context_selection=318ms skill_context_enrichment=128ms 
+generation=2009ms total_before_persist=7785ms persist=162ms
+2026-09-30 03:39:40.316 [eventLoopGroupProxy-4-3] INFO  ktor.application - 200 OK: POST - /v1/conversations/cf221d00-877a-4430-aec2-a2a50027206a/messages in 8443ms
+INTENT_DIAGNOSTICS: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=4994803d-1d9c-4afb-9e76-9f7039a60846 
+outcome=COMPLETED finishReason=stop promptTokens=2049 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=cf221d00-877a-4430-aec2-a2a50027206a 
+requestId=4994803d-1d9c-4afb-9e76-9f7039a60846
+MEMORY_CONTEXT_SELECTION: applied conversation=cf221d00-877a-4430-aec2-a2a50027206a 
+requestId=4994803d-1d9c-4afb-9e76-9f7039a60846
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=6
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=6 
+usedReplacement=true
+STAGE_TIMINGS: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=4994803d-1d9c-4afb-9e76-9f7039a60846 
+context_assembly=1383ms intent_discovery=1645ms memory_context_selection=239ms skill_context_enrichment=88ms 
+generation=2876ms total_before_persist=7093ms persist=390ms
+2026-09-30 03:39:49.163 [eventLoopGroupProxy-4-4] INFO  ktor.application - 200 OK: POST - /v1/conversations/cf221d00-877a-4430-aec2-a2a50027206a/messages in 8427ms
+INTENT_DIAGNOSTICS: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=35ab29b3-b91c-4e03-b057-cf1b079f599f 
+outcome=COMPLETED finishReason=stop promptTokens=2066 completionTokens=8 reasoningTokens=0
+SKILL_SELECTION: selected='general_chat' conversation=cf221d00-877a-4430-aec2-a2a50027206a 
+requestId=35ab29b3-b91c-4e03-b057-cf1b079f599f
+MEMORY_CONTEXT_SELECTION: applied conversation=cf221d00-877a-4430-aec2-a2a50027206a 
+requestId=35ab29b3-b91c-4e03-b057-cf1b079f599f
+PERSONA_AUTHORIZER: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=6
+PERSONA_CONTEXT: status=USABLE personaId=378b82c0-9ef4-4f30-8132-c5b6431e4695 skillKey=general_chat fieldCount=6 
+usedReplacement=true
+MEMORY_EXTRACTION: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=e63dd33c-4400-4103-9bb8-53b621ca9493 
+proposed=3 accepted=3 queueDelayMs=0 durationMs=16322
+STAGE_TIMINGS: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=35ab29b3-b91c-4e03-b057-cf1b079f599f 
+context_assembly=1061ms intent_discovery=1594ms memory_context_selection=472ms skill_context_enrichment=225ms 
+generation=2409ms total_before_persist=6654ms persist=145ms
+2026-09-30 03:39:58.215 [eventLoopGroupProxy-4-5] INFO  ktor.application - 200 OK: POST - /v1/conversations/cf221d00-877a-4430-aec2-a2a50027206a/messages in 7199ms
+MEMORY_EXTRACTION: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=2255f391-85ca-4848-8224-d5e469cc3872 
+proposed=1 accepted=1 queueDelayMs=146 durationMs=28748
+MEMORY_EXTRACTION: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=4994803d-1d9c-4afb-9e76-9f7039a60846 
+proposed=1 accepted=1 queueDelayMs=0 durationMs=12551
+MEMORY_EXTRACTION: unparseable extraction response (JsonDecodingException: Unexpected JSON token at offset 0: Expected 
+start of the object '{', but had '?' instead at path: $
+JSON input: ?assistantWait, I should turn that back to you ? do you live alone or with someone?); raw=?assistantWait, 
+I should turn that back to you ? do you live alone or with someone?
+MEMORY_EXTRACTION: conversation=cf221d00-877a-4430-aec2-a2a50027206a requestId=35ab29b3-b91c-4e03-b057-cf1b079f599f 
+proposed=0 accepted=0 queueDelayMs=0 durationMs=4660

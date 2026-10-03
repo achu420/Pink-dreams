@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import com.pinkdreams.persistence.database.GeneratedCandidates
@@ -66,6 +67,14 @@ class GeneratedCandidateRepository(private val db: Database) {
     fun findByImageJob(imageJobId: UUID): List<GeneratedCandidate> = transaction(db) {
         GeneratedCandidates.select { GeneratedCandidates.imageJobId eq imageJobId }
             .map { row -> mapRow(row) }
+    }
+
+    /** Batched form of [findByImageJob] -- one query for many jobs instead of one per job. */
+    fun findByImageJobs(imageJobIds: List<UUID>): Map<UUID, List<GeneratedCandidate>> = transaction(db) {
+        if (imageJobIds.isEmpty()) return@transaction emptyMap()
+        GeneratedCandidates.select { GeneratedCandidates.imageJobId inList imageJobIds }
+            .map { row -> mapRow(row) }
+            .groupBy { it.imageJobId }
     }
 
     fun findById(id: UUID): GeneratedCandidate? = transaction(db) {

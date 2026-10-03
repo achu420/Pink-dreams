@@ -87,33 +87,36 @@ class FullContextPipelineRegressionTest {
         val contextResult = contextAssembler.assemble(chatRequest)
         val chatContext = assertIs<StageResult.Succeeded<ChatContext>>(contextResult).value
 
-        // Verify: All blocks are present (3 system blocks + 1 native history message + 1 current message)
-        assertEquals(5, chatContext.blocks.size, "Should have 5 blocks: engine+core, profile, memory, history, current")
+        // Verify: All blocks are present (4 system blocks -- Phase 49 splits engine
+        // and persona into independently addressable blocks -- + 1 native history
+        // message + 1 current message)
+        assertEquals(6, chatContext.blocks.size, "Should have 6 blocks: engine, persona core, profile, memory, history, current")
 
         val block0 = chatContext.blocks[0]
         val block1 = chatContext.blocks[1]
         val block2 = chatContext.blocks[2]
         val block3 = chatContext.blocks[3]
         val block4 = chatContext.blocks[4]
+        val block5 = chatContext.blocks[5]
 
-        // Verify: Block 0 contains engine and persona core
+        // Verify: Block 0 contains engine, block 1 contains persona core
         assertTrue(block0.content.contains("CONVERSATION_ENGINE_TEST_456"), "Engine content should be in block 0")
-        assertTrue(block0.content.contains("PERSONA_CORE_TEST_123"), "Persona core should be in block 0")
+        assertTrue(block1.content.contains("PERSONA_CORE_TEST_123"), "Persona core should be in block 1")
 
-        // Verify: Block 1 contains user profile
-        assertTrue(block1.content.contains("PROFILE_TEST_USER_789"), "User profile display name should be in block 1")
-        assertTrue(block1.content.contains("PROFILE_TEST_STYLE_999"), "User communication style should be in block 1")
+        // Verify: Block 2 contains user profile
+        assertTrue(block2.content.contains("PROFILE_TEST_USER_789"), "User profile display name should be in block 2")
+        assertTrue(block2.content.contains("PROFILE_TEST_STYLE_999"), "User communication style should be in block 2")
 
-        // Verify: Block 2 contains memory
-        assertTrue(block2.content.contains("MEMORY_TEST_789"), "Memory fact should be in block 2")
+        // Verify: Block 3 contains memory
+        assertTrue(block3.content.contains("MEMORY_TEST_789"), "Memory fact should be in block 3")
 
-        // Verify: Block 3 is a NATIVE user-role history message, not a flattened system transcript
-        assertEquals("user", block3.role, "Persisted history must remain a native user-role message")
-        assertEquals("HISTORY_TEST_111", block3.content, "Historical message content must be exact")
+        // Verify: Block 4 is a NATIVE user-role history message, not a flattened system transcript
+        assertEquals("user", block4.role, "Persisted history must remain a native user-role message")
+        assertEquals("HISTORY_TEST_111", block4.content, "Historical message content must be exact")
 
-        // Verify: Block 4 is the current message with "user" role
-        assertEquals("user", block4.role, "Final block should be user role")
-        assertEquals("CURRENT_MESSAGE_TEST_222", block4.content, "Final block content must be exact current message")
+        // Verify: Block 5 is the current message with "user" role
+        assertEquals("user", block5.role, "Final block should be user role")
+        assertEquals("CURRENT_MESSAGE_TEST_222", block5.content, "Final block content must be exact current message")
 
         // Execute: Pass through LlmGenerator to verify actual LLM request includes current message
         val mockLlmResponse = LlmResponse(
@@ -147,7 +150,7 @@ class FullContextPipelineRegressionTest {
         val lastRequest = fakeLlmClient.lastRequest
         assertNotNull(lastRequest, "LlmClient should have received request")
         val messages = lastRequest.context.blocks
-        assertEquals(5, messages.size, "All 5 blocks should reach LlmClient")
+        assertEquals(6, messages.size, "All 6 blocks should reach LlmClient")
 
         // Final comprehensive check: all distinctive test values present in final request
         val allContent = messages.joinToString("\n") { it.content }
@@ -211,9 +214,9 @@ class FullContextPipelineRegressionTest {
         val chatContext = assertIs<StageResult.Succeeded<ChatContext>>(contextResult).value
 
         // Verify: Old messages are NATIVE user-role history blocks (not a flattened system transcript)
-        assertEquals(6, chatContext.blocks.size, "3 system blocks + 2 native history messages + 1 current message")
-        val firstHistory = chatContext.blocks[3]
-        val secondHistory = chatContext.blocks[4]
+        assertEquals(7, chatContext.blocks.size, "4 system blocks (engine, persona, profile, memory) + 2 native history messages + 1 current message")
+        val firstHistory = chatContext.blocks[4]
+        val secondHistory = chatContext.blocks[5]
         assertEquals("FIRST_MESSAGE_OLD", firstHistory.content, "First message should be in history")
         assertEquals("user", firstHistory.role)
         assertEquals("SECOND_MESSAGE_OLD", secondHistory.content, "Second message should be in history")

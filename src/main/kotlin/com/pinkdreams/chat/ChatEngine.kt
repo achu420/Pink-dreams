@@ -97,7 +97,20 @@ data class ChatContext(
     val userProfileUpdatedAt: String? = null,
 )
 
-data class ContextBlock(val role: String, val content: String)
+enum class ContextBlockType {
+    ENGINE,
+    PERSONA,
+    PROFILE,
+    MEMORY,
+    SENSITIVE,
+    CONTINUITY,
+    SKILL,
+    HISTORY,
+    CURRENT_MESSAGE,
+    OTHER,
+}
+
+data class ContextBlock(val role: String, val content: String, val blockType: ContextBlockType = ContextBlockType.OTHER)
 
 data class LlmExecutionDiagnostics(
     val contextBlocks: List<ContextBlock>?,
@@ -404,8 +417,17 @@ class PipelineChatEngine(
         attribution?.memoryContext(skillEnrichedContext)
         val afterSkillSelection = afterContext.advance(PipelineStage.SKILL_SELECTION)
 
-        // Persona Context POC: Resolve skill-aware persona after skill selection
-        val personaResolvedContext = personaContextResolution?.resolve(skillEnrichedContext) ?: skillEnrichedContext
+        // Phase 49 (Strategy D): resolve authorized, skill-aware persona content
+        // now that the real, model-selected skill key exists. personaId comes
+        // directly from the request this turn is already processing — never
+        // inferred, never a placeholder. Failure/no-op here must never affect
+        // generation, matching every other optional enrichment stage above.
+        val personaResolvedContext = try {
+            personaContextResolution?.resolve(skillEnrichedContext, request.personaId, request.content) ?: skillEnrichedContext
+        } catch (e: Exception) {
+            System.err.println("PERSONA_CONTEXT_RESOLUTION: failed conversation=${request.conversationId} requestId=${request.requestId}: ${e.javaClass.simpleName}")
+            skillEnrichedContext
+        }
 
         val generationResult = timed("generation") { generator.generate(request, personaResolvedContext) }
         val generated = when (generationResult) {

@@ -672,32 +672,39 @@ class AdminPersonaVisualRoutes(
             referenceImages = referenceImageRepository.findForVersion(v.id).map { r ->
                 toReferenceResponse(personaId, r)
             },
-            imageJobs = imageJobRepository.findForVersion(v.id).map { j ->
-                AdminImageJobResponse(
-                    id = j.id.toString(),
-                    jobType = j.jobType.name,
-                    status = j.status.name,
-                    idempotencyKey = j.idempotencyKey,
-                    attemptCount = j.attemptCount,
-                    maxAttempts = j.maxAttempts,
-                    claimedByWorker = j.claimedByWorker,
-                    lastError = j.lastError,
-                    createdAt = j.createdAt.toString(),
-                    startedAt = j.startedAt?.toString(),
-                    completedAt = j.completedAt?.toString(),
-                    candidates = generatedCandidateRepository.findByImageJob(j.id).map { c ->
-                        AdminGeneratedCandidateResponse(
-                            id = c.id.toString(),
-                            storageKey = c.storageKey,
-                            contentType = c.contentType,
-                            fileSize = c.fileSize,
-                            widthPx = c.widthPx,
-                            heightPx = c.heightPx,
-                            candidateIndex = c.candidateIndex,
-                            createdAt = c.createdAt.toString(),
-                        )
-                    },
-                )
+            imageJobs = run {
+                val jobs = imageJobRepository.findForVersion(v.id)
+                // Batched: one query for every job's candidates instead of one
+                // query per job (the N+1 pattern that made /visual take ~20s for
+                // personas with a large image-generation history).
+                val candidatesByJob = generatedCandidateRepository.findByImageJobs(jobs.map { it.id })
+                jobs.map { j ->
+                    AdminImageJobResponse(
+                        id = j.id.toString(),
+                        jobType = j.jobType.name,
+                        status = j.status.name,
+                        idempotencyKey = j.idempotencyKey,
+                        attemptCount = j.attemptCount,
+                        maxAttempts = j.maxAttempts,
+                        claimedByWorker = j.claimedByWorker,
+                        lastError = j.lastError,
+                        createdAt = j.createdAt.toString(),
+                        startedAt = j.startedAt?.toString(),
+                        completedAt = j.completedAt?.toString(),
+                        candidates = candidatesByJob[j.id].orEmpty().map { c ->
+                            AdminGeneratedCandidateResponse(
+                                id = c.id.toString(),
+                                storageKey = c.storageKey,
+                                contentType = c.contentType,
+                                fileSize = c.fileSize,
+                                widthPx = c.widthPx,
+                                heightPx = c.heightPx,
+                                candidateIndex = c.candidateIndex,
+                                createdAt = c.createdAt.toString(),
+                            )
+                        },
+                    )
+                }
             },
         )
 

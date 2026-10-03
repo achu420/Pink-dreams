@@ -1,0 +1,91 @@
+response_id,judgment,note
+BPPT,CORRECT,Simran Kohli architect Pune Nashik
+73YB,WRONG,claims age 26 not 27
+MHVH,CORRECT,minimal but correct name
+TCXH,CORRECT,27 Nashik Pune Kothrud architecture
+DYMP,CORRECT,27 studio deadlines architecture
+4BG3,CORRECT,27 turning 28 next year consistent
+KYUA,CORRECT,Nashik Pune 21 Kothrud
+H5T3,CORRECT,Nashik Pune Kothrud
+NVKA,CORRECT,Nashik Maharashtra Pune Kothrud
+88XC,CORRECT,Pune Kothrud moved at 21
+US8U,CORRECT,Pune Kothrud
+W6YJ,CORRECT,Pune Kothrud since college
+67LA,CORRECT,Kothrud Pune generic no contradiction
+FNX9,CORRECT,Kothrud Pune flatmate Ritu software engineer
+GWJH,CORRECT,Kothrud generic no contradiction
+GX4S,WRONG,claims lives alone contradicts flatmate Ritu
+X458,WRONG,claims shares with two other architect women contradicts established Ritu
+3WKF,CORRECT,Ritu software engineer two years cat
+BJ4L,WRONG,claims lives alone
+DWEP,WRONG,implies lives alone mostly me contradicts Ritu
+ALEK,CORRECT,Ritu software engineer two years cat
+SSV9,CORRECT,architecture Pune 2019
+8L3K,CORRECT,BA Pune 2019 minor imprecise year-count phrasing not a hard contradiction
+XP57,CORRECT,BA Architecture Pune 2019
+XP74,CORRECT,architecture Pune moved from Nashik at 21
+AZRH,CORRECT,Pune BA Architecture 2019
+WE96,CORRECT,architecture Pune 2019
+TM5U,CORRECT,Nashik schooling Pune at 21 BA Architecture 2019 corporate firm then smaller studio matches narrative_state precisely
+R5G6,CORRECT,BA Architecture Pune 2019 Nashik
+TT9E,CORRECT,Architecture Pune 2019
+G5AQ,CORRECT,Simran Kohli junior architect
+59SV,CORRECT,Simran Kohli architect
+P7WX,CORRECT,Simran architect Nashik-born Pune-based
+ZLNJ,WRONG,claims based in Mumbai Fort area contradicts Pune Kothrud
+56WN,CORRECT,Pune Kothrud
+TYPU,WRONG,claims based in Mumbai Bandra contradicts Pune Kothrud
+QH44,CORRECT,rent two-bedroom Kothrud flatmate Ritu two years
+H9ME,WRONG,claims rents in Bandra contradicts Pune Kothrud
+Q2VF,AMBIGUOUS,generic no location grounding no contradiction
+ZANX,WRONG,invents flatmate Maya photographer contradicts established Ritu
+VMRW,CORRECT,Ritu software engineer two years cat
+ZF5F,WRONG,invents cousin Rhea software engineer contradicts established Ritu flatmate-friend
+R8AW,CORRECT,27 architect Pune small studio Baner Nashik Ritu Ladakh trip
+6VUR,CORRECT,27 architect Pune Nashik
+QPAV,CORRECT,27 architect Pune Nashik
+EYNP,WRONG,three years inconsistent with established six-year timeline since moving at 21
+URH8,WRONG,two and a half years and moved for a job inconsistent with established college move at 21
+YHS4,CORRECT,six years since moved for architecture college matches age 27 minus 21
+S92G,CORRECT,2019 BA Architecture Pune
+H35K,CORRECT,2019 BA architecture Pune
+NWLJ,CORRECT,2019 BA Architecture Pune
+8ZJ4,WRONG,claims originally from Nagpur contradicts established Nashik hometown
+FEZK,WRONG,claims originally from Delhi and SPA degree contradicts established Nashik Pune education
+A2S7,CORRECT,Nashik parents there moved at 21 Ritu excellent
+9CBH,AMBIGUOUS,generic personality description ties loosely to architect trait
+86QJ,AMBIGUOUS,generic personality description
+PGE7,AMBIGUOUS,generic personality description references project generically
+4NJW,WRONG,describes solo tiny studio contradicts established shared flat with Ritu
+UZHS,WRONG,describes solo shoebox studio contradicts established shared flat with Ritu
+MDQ5,CORRECT,share flat Kothrud with Ritu close friend from college software engineer cat two years
+HN2U,CORRECT,restaurant project plausible consistent well grounded
+SG4Z,CORRECT,restaurant project heritage building load-bearing wall plausible consistent
+Q4GE,CORRECT,restaurant project finishes phase plausible consistent
+ZVMS,WRONG,older sister doctor younger brother figuring out parents both teachers contradicts established family details
+FC52,CORRECT,Rajesh engineer Priya teacher Anjali Bombay married Arjun MBA Bangalore perfect match
+UMA2,WRONG,younger brother Arjun studying engineering dad retired professor mom catering business contradicts established family and omits Anjali
+5CZJ,AMBIGUOUS,generic no names no contradiction
+TAU5,AMBIGUOUS,generic no names no contradiction
+VGAT,CORRECT,Sunday calls with mother matches established pattern precisely dad every few weeks
+D6ZG,WRONG,claims no siblings only child contradicts established Anjali and Arjun
+MNQA,WRONG,claims only child contradicts established siblings
+GD69,CORRECT,middle child older sister Anjali 29 Bombay married younger brother Arjun 24 MBA Bangalore perfect match
+NZLJ,CORRECT,Ritu good deep in work project cat plausible consistent with software engineer occupation
+JYJ5,CORRECT,Ritu good project in Goa plausible extension no contradiction
+NAYP,WRONG,claims Ritu runs a little cafe contradicts established software engineer occupation
+RTGP,AMBIGUOUS,generic rental Kothrud no explicit flatmate mention but no contradiction either
+JLTT,CORRECT,two-bedroom Kothrud Ritu two years ago
+U3NK,WRONG,describes one-bedroom it's mine implies living alone contradicts established shared two-bedroom flat
+LWPG,AMBIGUOUS,generic no Ladakh mention no contradiction
+69UZ,CORRECT,Ladakh saving October matches established travel plan precisely
+G264,AMBIGUOUS,generic no Ladakh mention no contradiction
+YKV7,CORRECT,restaurant project client changing layout Ritu watching documentary excellent grounding
+8EED,CORRECT,small studio project generic but occupation-grounded plausible
+FLZ3,CORRECT,residential renovation project occupation-grounded plausible
+FAZ5,WRONG,claims no siblings only child contradicts established Anjali and Arjun
+TMNU,CORRECT,Anjali older 29 married Bombay Arjun 24 MBA Bangalore Sunday calls mom perfect match
+LB7W,WRONG,claims only child contradicts established siblings
+KB9N,CORRECT,restaurant project Ladakh Ritu excellent grounding matches narrative state
+P9HZ,AMBIGUOUS,generic reflection no specific grounding
+WNZ9,AMBIGUOUS,generic reflection no specific grounding

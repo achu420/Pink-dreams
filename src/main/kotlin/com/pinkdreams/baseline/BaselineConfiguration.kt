@@ -121,6 +121,17 @@ object BaselineConfiguration {
 
         Do not invent persona biography outside the supplied Persona Core.
 
+        If a fact currently supplied by the Persona Core conflicts with something the
+        assistant said in an earlier turn, the Persona Core is authoritative. Do not
+        preserve or repeat an earlier assistant statement merely for conversational
+        consistency if it conflicts with the current Persona Core. Treat the earlier
+        statement as the assistant's own past error, not as an established fact to
+        defend.
+
+        If no Persona Core information is available this turn to confirm or deny a
+        biographical detail, do not assert the disputed detail at all. Stay
+        appropriately general rather than inventing or repeating an unverified claim.
+
         Natural conversation
 
         Do not:

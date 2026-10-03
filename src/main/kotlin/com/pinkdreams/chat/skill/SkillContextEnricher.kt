@@ -2,6 +2,7 @@ package com.pinkdreams.chat.skill
 
 import com.pinkdreams.chat.ChatContext
 import com.pinkdreams.chat.ContextBlock
+import com.pinkdreams.chat.ContextBlockType
 import com.pinkdreams.chat.context.CharacterTokenEstimator
 import com.pinkdreams.chat.context.RepositoryContextAssembler
 import com.pinkdreams.chat.context.TokenEstimator
@@ -38,7 +39,7 @@ class SkillContextEnricher(
         val skillKey = (selection as? SkillSelection.Selected)?.skillKey ?: return context
         val skill = skillRepository.getActiveForKey(skillKey) ?: return context
 
-        val skillBlock = ContextBlock("system", skillContent(skill))
+        val skillBlock = ContextBlock("system", skillContent(skill), ContextBlockType.SKILL)
         val currentTotal = context.blocks.sumOf { tokenEstimator.estimate(it.content) }
         if (currentTotal + tokenEstimator.estimate(skillBlock.content) > tokenBudget) {
             // Drop the whole block under budget pressure — never inject a partial skill.

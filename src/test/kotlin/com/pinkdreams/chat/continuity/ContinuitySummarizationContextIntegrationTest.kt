@@ -173,8 +173,8 @@ class ContinuitySummarizationContextIntegrationTest {
         assertEquals(0, fixture.llmClient.continuityCalls, "Continuity summarization must never run for a conversation inside the window")
 
         val context = assembleNextContext(fixture, "third message")
-        // 3 system blocks (engine/persona, profile, memory) + 4 native history + 1 current = 8, no continuity block.
-        assertEquals(8, context.blocks.size)
+        // 4 system blocks (engine, persona, profile, memory) + 4 native history + 1 current = 9, no continuity block.
+        assertEquals(9, context.blocks.size)
         assertTrue(context.blocks.none { it.content.contains("EARLIER CONVERSATION CONTEXT") }, "No continuity block may appear for a short conversation")
     }
 
@@ -192,16 +192,17 @@ class ContinuitySummarizationContextIntegrationTest {
         val context = assembleNextContext(fixture, "current turn")
         val roles = context.blocks.map { it.role }
 
-        // Expected shape: system(engine/persona), system(profile), system(memory),
+        // Expected shape: system(engine), system(persona), system(profile), system(memory),
         // system(continuity), native history (role-preserved), user(current, final).
         assertEquals("system", roles[0])
         assertEquals("system", roles[1])
         assertEquals("system", roles[2])
         assertEquals("system", roles[3])
-        assertTrue(context.blocks[3].content.contains("EARLIER CONVERSATION CONTEXT"), "4th block must be the continuity summary")
-        assertTrue(context.blocks[3].content.contains("scrolled out of the active window"))
+        assertEquals("system", roles[4])
+        assertTrue(context.blocks[4].content.contains("EARLIER CONVERSATION CONTEXT"), "5th block must be the continuity summary")
+        assertTrue(context.blocks[4].content.contains("scrolled out of the active window"))
 
-        val historyAndCurrentRoles = roles.subList(4, roles.size)
+        val historyAndCurrentRoles = roles.subList(5, roles.size)
         assertTrue(historyAndCurrentRoles.dropLast(1).all { it == "user" || it == "assistant" }, "History blocks must remain native user/assistant roles")
         assertEquals("user", roles.last())
         assertEquals("current turn", context.blocks.last().content)

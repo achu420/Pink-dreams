@@ -174,6 +174,25 @@ fun Application.module(
         System.err.println("BASELINE_SEED: failed, continuing without seeding: ${e.javaClass.simpleName}: ${e.message}")
     }
 
+    // Persona Context data (field registry, skill mappings, Simran's master
+    // document) — separate from BaselineSeeder because it depends on
+    // BaselineSeeder's persona/core-version already existing. Same
+    // content-addressed idempotency guarantee; never overwrites existing rows.
+    if (database == null) try {
+        val report = com.pinkdreams.baseline.PersonaContextSeeder(
+            personaRepository = personaRepo,
+            personaCoreVersionRepository = coreVersionRepo,
+            masterRepo = com.pinkdreams.persistence.repositories.PersonaMasterRepository(db),
+            fieldRegistryRepo = com.pinkdreams.persistence.repositories.PersonaFieldRegistryRepository(db),
+            skillReqRepo = com.pinkdreams.persistence.repositories.SkillContextRequirementRepository(db),
+        ).seedIfMissing()
+        System.err.println(
+            "PERSONA_CONTEXT_SEED: masterDocument=${report.masterDocument} fieldRegistry=${report.fieldRegistry} skillMappings=${report.skillMappings}",
+        )
+    } catch (e: Exception) {
+        System.err.println("PERSONA_CONTEXT_SEED: failed, continuing without seeding: ${e.javaClass.simpleName}: ${e.message}")
+    }
+
     val llmClient = if (!System.getenv("OPENROUTER_API_KEY").isNullOrBlank()) {
         com.pinkdreams.llm.OpenRouterLlmClient(
             apiKey = llmConfig.apiKey,

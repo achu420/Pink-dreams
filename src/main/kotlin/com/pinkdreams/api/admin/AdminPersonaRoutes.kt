@@ -71,6 +71,8 @@ data class PersonaResponse(
     val occupation: String? = null,
     val interests: String? = null,
     val tags: List<String> = emptyList(),
+    val coverImageId: String? = null,
+    val coverImageUrl: String? = null,
 )
 
 /** Single mapping point, so a new profile field cannot be forgotten on one route. */
@@ -293,7 +295,14 @@ class AdminPersonaRoutes(
                     )
                     return@get
                 }
-                call.respond(HttpStatusCode.OK, personaResponse(persona))
+                val coverImageId = personaRepository.getCoverImageId(personaId)
+                call.respond(
+                    HttpStatusCode.OK,
+                    personaResponse(persona).copy(
+                        coverImageId = coverImageId?.toString(),
+                        coverImageUrl = coverImageId?.let { "/v1/admin/personas/$personaId/visual/references/$it/content" },
+                    ),
+                )
             }
 
             // PATCH /v1/admin/personas/{personaId}

@@ -153,19 +153,19 @@ class ConversationProvenanceRoundTripTest {
         // flattened "[role] content" transcript wrapped in a single system block.
         val turn2Request = fixture.llmClient.capturedRequests[1]
         val blocks = turn2Request.context.blocks
-        assertEquals(6, blocks.size, "3 system blocks + 2 native history messages + 1 current message")
-        assertEquals(listOf("system", "system", "system", "user", "assistant", "user"), blocks.map { it.role })
+        assertEquals(7, blocks.size, "4 system blocks (engine, persona, profile, memory) + 2 native history messages + 1 current message")
+        assertEquals(listOf("system", "system", "system", "system", "user", "assistant", "user"), blocks.map { it.role })
 
-        val turn1UserBlock = blocks[3]
-        val turn1AssistantBlock = blocks[4]
-        val currentBlock = blocks[5]
+        val turn1UserBlock = blocks[4]
+        val turn1AssistantBlock = blocks[5]
+        val currentBlock = blocks[6]
 
         assertEquals("My favorite color is blue.", turn1UserBlock.content, "Turn 1 must appear in history as a native user message")
         assertEquals("I'll remember that blue is your favorite.", turn1AssistantBlock.content, "The assistant's own words must appear in history as a native assistant message")
         assertEquals("assistant", turn1AssistantBlock.role, "The assistant's own prior statement must NEVER be re-tagged as user")
 
         assertFalse(
-            blocks.subList(0, 5).any { it.content == "What did you just say?" },
+            blocks.subList(0, 6).any { it.content == "What did you just say?" },
             "Current message must not appear among history blocks",
         )
         assertEquals("user", currentBlock.role)
@@ -184,12 +184,12 @@ class ConversationProvenanceRoundTripTest {
 
         val turn2Request = fixture.llmClient.capturedRequests[1]
         val blocks = turn2Request.context.blocks
-        assertEquals(6, blocks.size, "3 system blocks + 2 native history messages + 1 current message")
-        assertEquals(listOf("system", "system", "system", "user", "assistant", "user"), blocks.map { it.role })
+        assertEquals(7, blocks.size, "4 system blocks (engine, persona, profile, memory) + 2 native history messages + 1 current message")
+        assertEquals(listOf("system", "system", "system", "system", "user", "assistant", "user"), blocks.map { it.role })
 
-        val userStatementBlock = blocks[3]
-        val assistantReplyBlock = blocks[4]
-        val currentBlock = blocks[5]
+        val userStatementBlock = blocks[4]
+        val assistantReplyBlock = blocks[5]
+        val currentBlock = blocks[6]
 
         // Exact expected chronological content, roles preserved verbatim from persistence,
         // as native per-message blocks — never a flattened "[role] content" transcript.

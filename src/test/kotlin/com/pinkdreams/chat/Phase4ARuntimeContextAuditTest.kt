@@ -120,7 +120,7 @@ class Phase4ARuntimeContextAuditTest {
             assembler(conversationRepository, messageRepository, db, engineRepository, personaRepository).assemble(request),
         ).value
 
-        val personaBlock = context.blocks[0]
+        val personaBlock = context.blocks[1]
         assertTrue(personaBlock.content.contains("PERSONA_VERSION_ONE"), "Active (v1) persona core content must reach the context")
         assertFalse(personaBlock.content.contains("PERSONA_VERSION_TWO"), "Unactivated draft (v2), despite being the highest version number, must not reach the context")
         assertEquals(v1Published.id, context.personaCoreVersionId, "Provenance must record the actually-active persona core version id")

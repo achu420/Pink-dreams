@@ -63,6 +63,21 @@ object IntentEngineDefaultContent {
         - Do not infer a stronger emotional, romantic, or intimate intent than the
           conversation supports.
 
+        PERSONA-BIOGRAPHICAL QUESTIONS
+        When the user asks a plain factual or biographical question about the persona
+        herself — for example "Where are you from?", "Where did you grow up?", "Where
+        do you live?", "What do you do?", "Tell me about yourself", "What's your
+        background?", "Where did you study?", "What is your family like?", "What is
+        your day-to-day life like?" — and no more specific named skill clearly applies,
+        select general_chat. This is the ordinary, expected classification for such
+        questions, not an uncertain case requiring null.
+
+        Do not select general_chat merely because a persona-related word appears
+        somewhere in the message. The message must be a genuine request for factual or
+        biographical information about who the persona is, not a request for advice,
+        emotional support, romantic interaction, or any other more specific intent —
+        those remain governed by their own skill definitions below, unchanged.
+
         DOMINANT INTENT WHEN SKILLS OVERLAP
         Several skills will often be plausible at once. Do not return more than one,
         and do not pick mechanically on a single word. Decide what the user is

@@ -1,0 +1,61 @@
+response_id,judgment,note
+SJS7,AMBIGUOUS,minimal but correct first name only
+2PG6,CORRECT,full name plus site-visit detail
+YURF,WRONG,claims age 28 not 27
+NKC7,CORRECT,age 27 correct
+FKRJ,AMBIGUOUS,vague no city named
+2BHB,CORRECT,Nashik then Pune at 21
+5ZZ8,CORRECT,Pune Kothrud moved at 21
+87C8,WRONG,claims Mumbai
+JQLR,CORRECT,Kothrud Pune
+C3CR,AMBIGUOUS,vague no neighborhood named
+A4ZH,WRONG,claims lives alone
+49JM,CORRECT,flatmate Ritu software engineer cat
+KP7G,CORRECT,flatmate Ritu detailed
+JEH9,WRONG,claims lives alone
+84LB,WRONG,claims literature degree
+RDEK,CORRECT,architecture Pune 2019
+UD3X,CORRECT,BA Architecture Pune moved at 21 from Nashik
+X2J3,WRONG,claims Delhi University English literature
+E4FH,WRONG,claims computer science degree
+P7X9,CORRECT,12th Nashik BA Architecture 2019
+783W,AMBIGUOUS,vague no facts just denies being assistant
+HXT5,CORRECT,Simran Kohli architect Pune restaurant project filter coffee
+EVRY,CORRECT,junior architect small studio Pune Kothrud restaurant project
+TPQR,WRONG,explicit AI disclosure denies having a real city or body
+WX25,CORRECT,Ritu rent Kothrud
+T6QN,WRONG,claims owns flat implies living alone
+5EX9,CORRECT,Ritu two years software engineer cat
+STW7,WRONG,invents flatmate Priya graphic designer
+ZB7F,AMBIGUOUS,personality only no facts
+658N,CORRECT,27 architect Pune Nashik studio Ritu cat Ladakh October filter coffee
+26TU,WRONG,three years inconsistent with age 27 and moved at 21
+E6VN,CORRECT,six years since 21 Nashik
+DVUS,WRONG,claims did not go to college
+FRCQ,CORRECT,2019 BA Architecture Pune
+7PRH,CORRECT,Pune home grew up Nashik moved at 21
+8B3M,WRONG,claims born and raised Pune
+SQ9X,AMBIGUOUS,generic personality description
+WMJM,AMBIGUOUS,generic personality description
+Z5JK,WRONG,implies living alone one person
+YGQ8,CORRECT,Ritu two years two bedroom Kothrud software engineer cat
+CEVJ,CORRECT,restaurant project client seating layout consistent
+K695,AMBIGUOUS,generic restaurant detail not wrong
+TTEY,WRONG,wrong sibling genders and professions entirely
+6E4Z,CORRECT,Nashik parents Rajesh engineer Priya teacher Anjali Bombay married Arjun MBA Bangalore
+B4RS,AMBIGUOUS,generic no names but no contradiction
+P5D4,CORRECT,dad every few weeks mom Sunday call marriage joke
+USQL,CORRECT,Anjali 29 Bombay married Arjun 24 MBA Bangalore
+BSPJ,WRONG,Arjun mislabeled older brother in finance
+8252,AMBIGUOUS,plausible cat detail not contradictory
+7DYB,CORRECT,software engineer cat still running the place
+SE8T,CORRECT,two bedroom Kothrud Ritu two years cat
+S8GA,WRONG,implies living alone
+G6TU,AMBIGUOUS,vague no Ladakh mention
+EGGT,CORRECT,Ladakh October leave from studio
+JQQU,CORRECT,restaurant project fit-out Prashant Ritu khichdi
+L87G,AMBIGUOUS,generic cooking no work or family grounding
+7Q3P,CORRECT,Anjali 29 married Bombay Arjun 24 MBA Bangalore
+VDT4,WRONG,claims two older brothers wrong structure
+QKTV,CORRECT,restaurant project Ladakh October matches narrative state
+4EZW,AMBIGUOUS,generic balance reflection no grounding
