@@ -209,6 +209,32 @@ class TestChatServiceTest {
         assertTrue(result is TestChatService.CreationResult.Rejected)
     }
 
+    // ---------- persona status eligibility (Phase 2 persona lifecycle) ----------
+
+    @Test
+    fun `a draft persona can still be used in test chat`() {
+        // World's baseline persona stays in "draft" by default (activation is a
+        // separate, explicit admin step) — testing a draft before activating it
+        // is the normal workflow, so this must keep working.
+        val w = World()
+        assertEquals("draft", w.personas.findById(w.personaId)!!.status)
+
+        val result = w.service.create(w.activeSnapshotArgs())
+
+        assertTrue(result is TestChatService.CreationResult.Created)
+    }
+
+    @Test
+    fun `a retired persona is rejected from test chat`() {
+        val w = World()
+        w.personas.retirePersona(w.personaId)
+
+        val result = w.service.create(w.activeSnapshotArgs())
+
+        assertTrue(result is TestChatService.CreationResult.Rejected)
+        assertTrue((result as TestChatService.CreationResult.Rejected).reason.contains("retired"))
+    }
+
     // ---------- section 42: snapshot immutability ----------
 
     @Test

@@ -79,6 +79,13 @@ class TestChatService(
         }
         val persona = personaRepository.findById(request.personaId)
             ?: return CreationResult.Rejected("Persona not found: ${request.personaId}")
+        // Draft and active personas are both testable — testing a draft before
+        // activating it is the normal admin workflow. A retired persona is
+        // permanently decommissioned, so it must not be usable anywhere,
+        // including Test Chat.
+        if (persona.status == "retired") {
+            return CreationResult.Rejected("Persona ${request.personaId} is retired and cannot be used in Test Chat")
+        }
 
         val engineVersion = request.conversationEngineVersion
             ?: testingDefaultEngineVersion()

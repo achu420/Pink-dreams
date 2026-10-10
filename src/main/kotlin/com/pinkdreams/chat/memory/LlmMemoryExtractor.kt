@@ -7,6 +7,7 @@ import com.pinkdreams.llm.GenerationRequest
 import com.pinkdreams.llm.LlmClient
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import java.util.UUID
 
 /**
  * Extracts durable user facts from a completed chat turn via a dedicated,
@@ -27,6 +28,14 @@ import kotlinx.serialization.json.Json
 class LlmMemoryExtractor(
     private val client: LlmClient,
     private val config: GenerationConfig = GenerationConfig(maxOutputTokens = DEFAULT_MAX_OUTPUT_TOKENS),
+    // Nullable and defaulted so every existing direct construction (tests,
+    // mainly) keeps compiling unchanged. A lookup function rather than the
+    // whole PersonaRepository, so this extractor doesn't need a live database
+    // to be unit-tested. Production wiring (ChatEngineFactory) passes
+    // `{ id -> personaRepository.findById(id)?.displayName }` so the
+    // extraction prompt can name the persona and the grounding check below
+    // has something to validate fact text against.
+    private val personaNameLookup: ((UUID) -> String?)? = null,
 ) : MemoryExtractor {
 
     @Serializable
@@ -34,6 +43,11 @@ class LlmMemoryExtractor(
         val fact: String = "",
         val factType: String = "",
         val criticality: String = "",
+        // Speaker-attribution safeguard (see class doc): the model must say who
+        // the fact is about, and must quote the user's own message as proof.
+        // Both are validated below — neither is trusted on its own.
+        val subject: String = "",
+        val evidenceQuote: String = "",
     )
 
     @Serializable
@@ -42,9 +56,10 @@ class LlmMemoryExtractor(
     )
 
     override fun extract(turn: CompletedTurn): ExtractionResult {
+        val personaName = personaNameLookup?.invoke(turn.request.personaId)
         val context = ChatContext(
             blocks = listOf(
-                ContextBlock("system", EXTRACTION_INSTRUCTIONS),
+                ContextBlock("system", buildInstructions(personaName)),
                 ContextBlock("user", turn.request.content),
                 ContextBlock("assistant", turn.response.content),
             ),
@@ -65,8 +80,25 @@ class LlmMemoryExtractor(
         )
 
         val response = client.generate(generationRequest)
-        val parsed = parseFacts(response.content)
-        val mapped = parsed
+        val parsedDtos = parseFacts(response.content)
+
+        // Speaker-attribution safeguard. The prompt already tells the model to
+        // report facts about the user only, but a prompt is not an enforcement
+        // mechanism — it is the only thing that previously stood between a
+        // persona's self-introduction and a permanent "user fact". Each
+        // candidate must now ALSO (a) declare subject="user" and (b) quote the
+        // user's own message verbatim as evidence; a candidate failing either
+        // check is dropped before it ever reaches MemoryCandidate/persistence,
+        // regardless of how confidently the model phrased it.
+        val (attributable, misattributed) = parsedDtos.partition { isAttributableToUser(it, turn.request.content, personaName) }
+        misattributed.forEach {
+            System.err.println(
+                "MEMORY_EXTRACTION: rejected candidate for failing speaker-attribution check subject='${it.subject}' " +
+                    "evidenceQuote='${it.evidenceQuote.take(80)}' fact='${it.fact.take(80)}'",
+            )
+        }
+
+        val mapped = attributable
             .map { MemoryCandidate(fact = it.fact.trim(), factType = it.factType.trim().lowercase(), criticality = it.criticality.trim().lowercase()) }
         val validCandidates = mapped.filter(::isValidCandidate).take(MAX_FACTS_PER_TURN)
         // A candidate dropped for an invalid factType/criticality is a prompt or
@@ -81,6 +113,26 @@ class LlmMemoryExtractor(
 
         return ExtractionResult(newFacts = validCandidates)
     }
+
+    /**
+     * Returns false (reject) unless the candidate both (a) declares itself to
+     * be about the user and (b) is grounded in text that actually appears in
+     * the user's own message. (b) is what catches a persona self-introduction
+     * even if the model mislabels (a) — "I'm Simran" only ever appears in the
+     * assistant block, so no verbatim quote of it can be found inside
+     * turn.request.content. As an extra, independent guard, a fact naming the
+     * persona itself is rejected outright even if it happens to pass (a) and
+     * (b) (e.g. the user's own message happens to contain the persona's name).
+     */
+    private fun isAttributableToUser(candidate: ExtractedFactDto, userMessage: String, personaName: String?): Boolean {
+        if (candidate.subject.trim().lowercase() != "user") return false
+        if (candidate.evidenceQuote.isBlank()) return false
+        if (!normalize(userMessage).contains(normalize(candidate.evidenceQuote))) return false
+        if (personaName != null && candidate.fact.lowercase().contains(personaName.lowercase())) return false
+        return true
+    }
+
+    private fun normalize(text: String): String = text.trim().lowercase().replace(Regex("\\s+"), " ")
 
     private fun parseFacts(rawContent: String): List<ExtractedFactDto> {
         // Reasoning models routinely prepend prose to the JSON in `content`; take
@@ -123,32 +175,59 @@ class LlmMemoryExtractor(
 
         private val json = Json { ignoreUnknownKeys = true }
 
-        private val EXTRACTION_INSTRUCTIONS = """
-            You are a memory-extraction system. Your ONLY job is to identify durable,
-            factual information about the USER that would be useful to remember in
-            future conversations with them.
+        private fun buildInstructions(personaName: String?): String {
+            val personaClause = if (personaName != null) {
+                """
 
-            Rules:
-            - Use ONLY the message with role "user" as the source of facts about the user.
-            - The message with role "assistant" is provided as context only. NEVER create
-              a memory based on something the assistant said, claimed, guessed, or assumed
-              about the user.
-            - Extract a fact ONLY if the user explicitly stated it. Do not infer, guess,
-              or generalize beyond what was explicitly said.
-            - Do NOT extract temporary states, moods, or one-off requests
-              (e.g. "I'm hungry right now", "tell me a joke", "I think I'll order pizza tonight").
-            - Prefer extracting NOTHING over inventing or over-saving information.
-            - Each fact must be a short, self-contained statement, e.g. "user lives in Delhi".
-            - factType must be exactly one of: past_event, future_event, mindset, weakness,
-              aspiration, desire, habit, want, interest.
-              Use "interest" for durable personal details (name, location, likes/preferences)
-              that do not clearly fit another category.
-            - criticality must be exactly one of: low, medium, high.
+                The message with role "assistant" above is written by a fictional persona
+                named "$personaName" — not the user. Anything $personaName says about
+                herself/himself/itself (her/his/its own name, identity, traits, or
+                situation) is NEVER a fact about the user, even if phrased in the first
+                person (e.g. "I'm $personaName" is the PERSONA's self-introduction, not a
+                statement from the user).
+                """.trimIndent()
+            } else {
+                ""
+            }
+            return """
+                You are a memory-extraction system. Your ONLY job is to identify durable,
+                factual information about the USER that would be useful to remember in
+                future conversations with them.
+                $personaClause
 
-            Respond with STRICT JSON only — no prose, no markdown fences — matching exactly:
-            {"facts": [{"fact": "<short factual statement>", "factType": "<type>", "criticality": "<level>"}]}
+                Rules:
+                - Use ONLY the message with role "user" as the source of facts about the user.
+                - The message with role "assistant" is provided as context only. NEVER create
+                  a memory based on something the assistant said, claimed, guessed, or assumed
+                  about the user.
+                - If the user's own message names or describes a THIRD PARTY — anyone other
+                  than the user themselves, e.g. "my colleague Simran" or "my friend's dog" —
+                  do NOT attribute that third party's name, traits, or circumstances to the
+                  user. Only extract facts the user states about themselves.
+                - Extract a fact ONLY if the user explicitly stated it about themselves. Do not
+                  infer, guess, or generalize beyond what was explicitly said.
+                - Do NOT extract temporary states, moods, or one-off requests
+                  (e.g. "I'm hungry right now", "tell me a joke", "I think I'll order pizza tonight").
+                - Prefer extracting NOTHING over inventing or over-saving information.
+                - Each fact must be a short, self-contained statement, e.g. "user lives in Delhi".
+                - factType must be exactly one of: past_event, future_event, mindset, weakness,
+                  aspiration, desire, habit, want, interest.
+                  Use "interest" for durable personal details (name, location, likes/preferences)
+                  that do not clearly fit another category.
+                - criticality must be exactly one of: low, medium, high.
+                - subject must be exactly "user" for every fact you return — you must only
+                  return facts about the user. If a candidate fact is about anyone else
+                  (the assistant/persona or a third party), do not include it at all.
+                - evidenceQuote must be a short quote copied VERBATIM from the user's own
+                  message (the "user" role) that directly supports the fact. Never quote the
+                  assistant's message as evidence, and never fabricate a quote that does not
+                  appear in the user's message.
 
-            If there is nothing worth remembering, respond with exactly: {"facts": []}
-        """.trimIndent()
+                Respond with STRICT JSON only — no prose, no markdown fences — matching exactly:
+                {"facts": [{"fact": "<short factual statement>", "factType": "<type>", "criticality": "<level>", "subject": "user", "evidenceQuote": "<verbatim quote from the user's message>"}]}
+
+                If there is nothing worth remembering, respond with exactly: {"facts": []}
+            """.trimIndent()
+        }
     }
 }

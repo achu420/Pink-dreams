@@ -162,7 +162,11 @@ object ChatEngineFactory {
         // background-call cost/duration for a real quality risk, for zero
         // user-facing latency benefit. See intentDiscovery below, where the
         // same tradeoff comes out the opposite way.
-        val memoryExtractor = LlmMemoryExtractor(llmClient, GenerationConfig(model = llmConfig.model, maxOutputTokens = 1200, workload = "memory_extraction"))
+        val memoryExtractor = LlmMemoryExtractor(
+            llmClient,
+            GenerationConfig(model = llmConfig.model, maxOutputTokens = 1200, workload = "memory_extraction"),
+            personaNameLookup = { personaId -> deps.personaRepository.findById(personaId)?.displayName },
+        )
         val memoryExtractionHook = BestEffortMemoryExtraction(
             extractor = memoryExtractor,
             memoryService = deps.memoryService,

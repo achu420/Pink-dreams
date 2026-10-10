@@ -38,7 +38,7 @@ class ReasoningProseLeakRegressionTest {
     fun `memory extraction survives reasoning prose before the json`() {
         val leaked = "Let me think. The user explicitly stated a durable dietary preference, so this is " +
             "worth remembering. Returning it now. " +
-            """{"facts": [{"fact": "user cannot stand coriander", "factType": "interest", "criticality": "medium"}]}"""
+            """{"facts": [{"fact": "user cannot stand coriander", "factType": "interest", "criticality": "medium", "subject": "user", "evidenceQuote": "can't stand coriander"}]}"""
         val extractor = LlmMemoryExtractor(FakeLlmClient(response = LlmResponse(content = leaked, provider = "test")))
 
         val result = extractor.extract(turn("I really can't stand coriander."))

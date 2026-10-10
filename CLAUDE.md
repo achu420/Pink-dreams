@@ -145,6 +145,8 @@ All paths prefixed with `/v1`. Authentication via bearer token (partner-issued).
 - `POST /admin/engines/{engineId}/archive` — Archive (must not be active)
 - `GET/POST /admin/personas` — List/create personas
 - `PATCH /admin/personas/{personaId}` — Update persona metadata
+- `POST /admin/personas/{personaId}/activate` — Transition persona draft → active (requires an active core version with status "published")
+- `POST /admin/personas/{personaId}/retire` — Transition persona draft or active → retired (terminal; no reactivation)
 - `GET/POST /admin/personas/{personaId}/versions` — List/create persona versions
 - `POST /admin/personas/{personaId}/versions/{versionId}/publish` — Publish version
 - `POST /admin/personas/{personaId}/versions/{versionId}/activate` — Set active version

@@ -315,7 +315,7 @@ class BaselineBehaviorTest {
     fun `a durable preference recorded on one turn is selectable on a later unrelated turn`() {
         val f = Fixture()
         val extractorClient = QueuedClient(
-            listOf("""{"facts": [{"fact": "user is allergic to peanuts", "factType": "interest", "criticality": "high"}]}"""),
+            listOf("""{"facts": [{"fact": "user is allergic to peanuts", "factType": "interest", "criticality": "high", "subject": "user", "evidenceQuote": "allergic to peanuts"}]}"""),
         )
         val extractor = LlmMemoryExtractor(extractorClient)
 
@@ -333,7 +333,7 @@ class BaselineBehaviorTest {
 
         // And re-extracting it does not create a second copy.
         val duplicateClient = QueuedClient(
-            listOf("""{"facts": [{"fact": "user is allergic to peanuts", "factType": "interest", "criticality": "high"}]}"""),
+            listOf("""{"facts": [{"fact": "user is allergic to peanuts", "factType": "interest", "criticality": "high", "subject": "user", "evidenceQuote": "allergic to peanuts"}]}"""),
         )
         f.memoryService.record(f.userId, f.personaId, LlmMemoryExtractor(duplicateClient).extract(firstTurn).newFacts)
         assertEquals(

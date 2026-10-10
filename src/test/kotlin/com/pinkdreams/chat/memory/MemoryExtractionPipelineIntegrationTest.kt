@@ -153,7 +153,7 @@ class MemoryExtractionPipelineIntegrationTest {
     fun `scenario E existing memory prevents duplicate creation from a re-extracted equivalent fact`() {
         val fixture = fixture(
             chatReplies = listOf("Got it!"),
-            extractionResponses = listOf("""{"facts": [{"fact": "user lives in Delhi", "factType": "interest", "criticality": "medium"}]}"""),
+            extractionResponses = listOf("""{"facts": [{"fact": "user lives in Delhi", "factType": "interest", "criticality": "medium", "subject": "user", "evidenceQuote": "I live in Delhi"}]}"""),
         )
 
         // Pre-existing memory, as if learned on a prior turn.
@@ -191,7 +191,7 @@ class MemoryExtractionPipelineIntegrationTest {
         val fixture = fixture(
             chatReplies = listOf("Nice to know!", "Sure, here's a suggestion."),
             extractionResponses = listOf(
-                """{"facts": [{"fact": "user lives in Delhi", "factType": "interest", "criticality": "medium"}]}""",
+                """{"facts": [{"fact": "user lives in Delhi", "factType": "interest", "criticality": "medium", "subject": "user", "evidenceQuote": "I live in Delhi"}]}""",
                 """{"facts": []}""",
             ),
         )

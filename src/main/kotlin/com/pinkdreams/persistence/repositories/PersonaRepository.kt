@@ -146,6 +146,35 @@ open class PersonaRepository(private val db: Database) {
         findById(id) ?: throw IllegalStateException("Failed to reload persona $id")
     }
 
+    /**
+     * draft -> active. Mirrors the precondition activateCoreVersion already
+     * enforces on a core version (must be "published") one level up: a
+     * persona cannot go live with no real, published content behind it, so
+     * this requires an activeCoreVersionId to already be set AND that core
+     * version to be "published". Only "draft" personas are eligible — this
+     * is a one-way gate, not a toggle: an already-"active" or "retired"
+     * persona is rejected rather than silently no-op'd or reactivated.
+     */
+    fun activatePersona(personaId: UUID): Persona = transaction(db) {
+        val persona = findById(personaId) ?: throw IllegalArgumentException("Persona not found: $personaId")
+        if (persona.status != "draft") {
+            throw IllegalStateException("Only draft personas can be activated (current status: ${persona.status})")
+        }
+        val activeCoreVersionId = persona.activeCoreVersionId
+            ?: throw IllegalStateException("Persona has no active core version to activate with")
+        val coreVersion = PersonaCoreVersionRepository(db).findById(activeCoreVersionId)
+            ?: throw IllegalStateException("Active core version not found")
+        if (coreVersion.status != "published") {
+            throw IllegalStateException("Active core version must be published before the persona can be activated")
+        }
+
+        Personas.update({ Personas.id eq personaId }) {
+            it[Personas.status] = "active"
+            it[Personas.updatedAt] = defaultNow()
+        }
+        findById(personaId) ?: throw IllegalStateException("Failed to reload persona $personaId")
+    }
+
     fun retirePersona(personaId: UUID): Persona = transaction(db) {
         val persona = findById(personaId) ?: throw IllegalArgumentException("Persona not found: $personaId")
         Personas.update({ Personas.id eq personaId }) {

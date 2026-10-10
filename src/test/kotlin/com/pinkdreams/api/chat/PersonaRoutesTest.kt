@@ -4,8 +4,7 @@ import com.pinkdreams.config.DatabaseConfig
 import com.pinkdreams.config.LlmConfig
 import com.pinkdreams.module
 import com.pinkdreams.persistence.database.DatabaseFactory
-import com.pinkdreams.persistence.database.Personas
-import com.pinkdreams.persistence.database.defaultNow
+import com.pinkdreams.persistence.repositories.PersonaCoreVersionRepository
 import com.pinkdreams.persistence.repositories.PersonaRepository
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -14,9 +13,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
 import io.ktor.util.encodeBase64
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 import java.util.UUID
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -26,13 +22,15 @@ private val testJson = Json { ignoreUnknownKeys = true }
 
 class PersonaRoutesTest {
 
-    private fun activate(db: org.jetbrains.exposed.sql.Database, personaId: UUID) {
-        transaction(db) {
-            Personas.update({ Personas.id eq personaId }) {
-                it[Personas.status] = "active"
-                it[Personas.updatedAt] = defaultNow()
-            }
-        }
+    // Goes through the real draft -> published core version -> activateCoreVersion
+    // -> activatePersona chain, now that PersonaRepository.activatePersona exists —
+    // this used to require reaching around the repository with raw SQL because no
+    // production code path could reach "active" at all.
+    private fun activate(db: org.jetbrains.exposed.sql.Database, personaRepo: PersonaRepository, personaId: UUID) {
+        val versionRepo = PersonaCoreVersionRepository(db)
+        val published = versionRepo.publishCoreVersion(versionRepo.create(personaId, 1, "core content", "draft").id)
+        personaRepo.activateCoreVersion(personaId, published.id)
+        personaRepo.activatePersona(personaId)
     }
 
     @Test
@@ -79,7 +77,7 @@ class PersonaRoutesTest {
             apparentAge = 28,
             languageProfile = emptyMap(),
         )
-        activate(db, activePersona.id)
+        activate(db, personaRepo, activePersona.id)
 
         personaRepo.create(
             slug = "draft-persona",

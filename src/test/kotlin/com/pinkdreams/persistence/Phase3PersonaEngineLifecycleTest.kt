@@ -236,4 +236,104 @@ class Phase3PersonaEngineLifecycleTest {
         assertEquals(published.id, history.id)
         assertEquals("published", history.status)
     }
+
+    // ---------- Persona-level status lifecycle: draft -> active -> retired ----------
+    // (Previously an accidental gap: PersonaRepository had no method and no admin
+    // route ever set Personas.status = "active", so a seeded or admin-created
+    // persona could never satisfy GET /v1/personas' status == "active" filter.)
+
+    @Test
+    fun `a draft persona with a published active core version can be activated`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+
+        val personaRepo = PersonaRepository(db)
+        val versionRepo = PersonaCoreVersionRepository(db)
+
+        val persona = personaRepo.create("priya", "Priya", "female", "straight", 28, mapOf("primary" to "en"))
+        assertEquals("draft", persona.status)
+
+        val v1 = versionRepo.create(persona.id, 1, "You are warm.", "draft")
+        val published = versionRepo.publishCoreVersion(v1.id)
+        personaRepo.activateCoreVersion(persona.id, published.id)
+
+        val activated = personaRepo.activatePersona(persona.id)
+        assertEquals("active", activated.status)
+    }
+
+    @Test
+    fun `activating a persona with no active core version is rejected`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+
+        val personaRepo = PersonaRepository(db)
+        val persona = personaRepo.create("kiran", "Kiran", "nonbinary", "queer", 26, emptyMap())
+
+        assertFailsWith<IllegalStateException> {
+            personaRepo.activatePersona(persona.id)
+        }
+        assertEquals("draft", personaRepo.findById(persona.id)!!.status)
+    }
+
+    @Test
+    fun `activating an already active persona is rejected`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+
+        val personaRepo = PersonaRepository(db)
+        val versionRepo = PersonaCoreVersionRepository(db)
+
+        val persona = personaRepo.create("devi", "Devi", "female", "straight", 29, emptyMap())
+        val published = versionRepo.publishCoreVersion(versionRepo.create(persona.id, 1, "v1", "draft").id)
+        personaRepo.activateCoreVersion(persona.id, published.id)
+        personaRepo.activatePersona(persona.id)
+
+        assertFailsWith<IllegalStateException> {
+            personaRepo.activatePersona(persona.id)
+        }
+    }
+
+    @Test
+    fun `a retired persona cannot be reactivated`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+
+        val personaRepo = PersonaRepository(db)
+        val versionRepo = PersonaCoreVersionRepository(db)
+
+        val persona = personaRepo.create("amara", "Amara", "female", "straight", 31, emptyMap())
+        val published = versionRepo.publishCoreVersion(versionRepo.create(persona.id, 1, "v1", "draft").id)
+        personaRepo.activateCoreVersion(persona.id, published.id)
+        personaRepo.activatePersona(persona.id)
+        personaRepo.retirePersona(persona.id)
+
+        assertFailsWith<IllegalStateException> {
+            personaRepo.activatePersona(persona.id)
+        }
+        assertEquals("retired", personaRepo.findById(persona.id)!!.status)
+    }
+
+    @Test
+    fun `a draft persona can be retired directly without ever being activated`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+
+        val personaRepo = PersonaRepository(db)
+        val persona = personaRepo.create("tanvi", "Tanvi", "female", "straight", 24, emptyMap())
+
+        val retired = personaRepo.retirePersona(persona.id)
+        assertEquals("retired", retired.status)
+    }
+
+    @Test
+    fun `activating a nonexistent persona is rejected as not found`() {
+        val db = DatabaseFactory.connectInMemory()
+        DatabaseFactory.initializeSchema(db)
+
+        val personaRepo = PersonaRepository(db)
+
+        assertFailsWith<IllegalArgumentException> {
+            personaRepo.activatePersona(java.util.UUID.randomUUID())
+        }
+    }
 }

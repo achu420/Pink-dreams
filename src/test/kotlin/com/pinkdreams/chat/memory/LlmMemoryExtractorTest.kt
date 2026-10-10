@@ -57,7 +57,7 @@ class LlmMemoryExtractorTest {
     fun `scenario B model returns one fact yields one valid MemoryCandidate`() {
         val client = FakeLlmClient(
             response = LlmResponse(
-                content = """{"facts": [{"fact": "user lives in Delhi", "factType": "interest", "criticality": "medium"}]}""",
+                content = """{"facts": [{"fact": "user lives in Delhi", "factType": "interest", "criticality": "medium", "subject": "user", "evidenceQuote": "I live in Delhi"}]}""",
                 provider = "test",
             ),
         )
@@ -110,8 +110,8 @@ class LlmMemoryExtractorTest {
         val client = FakeLlmClient(
             response = LlmResponse(
                 content = """{"facts": [
-                    {"fact": "user's name is Rahul", "factType": "interest", "criticality": "medium"},
-                    {"fact": "user lives in Delhi", "factType": "interest", "criticality": "medium"}
+                    {"fact": "user's name is Rahul", "factType": "interest", "criticality": "medium", "subject": "user", "evidenceQuote": "My name is Rahul"},
+                    {"fact": "user lives in Delhi", "factType": "interest", "criticality": "medium", "subject": "user", "evidenceQuote": "I live in Delhi"}
                 ]}""",
                 provider = "test",
             ),
@@ -139,7 +139,7 @@ class LlmMemoryExtractorTest {
     fun `markdown fenced json response is still parsed correctly`() {
         val client = FakeLlmClient(
             response = LlmResponse(
-                content = "```json\n{\"facts\": [{\"fact\": \"user lives in Delhi\", \"factType\": \"interest\", \"criticality\": \"medium\"}]}\n```",
+                content = "```json\n{\"facts\": [{\"fact\": \"user lives in Delhi\", \"factType\": \"interest\", \"criticality\": \"medium\", \"subject\": \"user\", \"evidenceQuote\": \"I live in Delhi\"}]}\n```",
                 provider = "test",
             ),
         )
@@ -156,9 +156,9 @@ class LlmMemoryExtractorTest {
         val client = FakeLlmClient(
             response = LlmResponse(
                 content = """{"facts": [
-                    {"fact": "user lives in Delhi", "factType": "not_a_real_type", "criticality": "medium"},
-                    {"fact": "user's favorite color is blue", "factType": "interest", "criticality": "extreme"},
-                    {"fact": "user likes tea", "factType": "interest", "criticality": "low"}
+                    {"fact": "user lives in Delhi", "factType": "not_a_real_type", "criticality": "medium", "subject": "user", "evidenceQuote": "I live in Delhi"},
+                    {"fact": "user's favorite color is blue", "factType": "interest", "criticality": "extreme", "subject": "user", "evidenceQuote": "my favorite color is blue"},
+                    {"fact": "user likes tea", "factType": "interest", "criticality": "low", "subject": "user", "evidenceQuote": "I like tea"}
                 ]}""",
                 provider = "test",
             ),
@@ -176,7 +176,7 @@ class LlmMemoryExtractorTest {
         val overlong = "x".repeat(MemoryService.MAX_FACT_LENGTH + 1)
         val client = FakeLlmClient(
             response = LlmResponse(
-                content = """{"facts": [{"fact": "$overlong", "factType": "interest", "criticality": "low"}]}""",
+                content = """{"facts": [{"fact": "$overlong", "factType": "interest", "criticality": "low", "subject": "user", "evidenceQuote": "some long story"}]}""",
                 provider = "test",
             ),
         )
@@ -185,5 +185,155 @@ class LlmMemoryExtractorTest {
         val result = extractor.extract(completedTurn("some long story", "ok"))
 
         assertTrue(result.newFacts.isEmpty())
+    }
+
+    // --- Speaker-attribution safeguard (Phase 3) ---
+    // Regression coverage for: a persona's own self-introduction being
+    // misattributed to the user as a permanent memory fact.
+
+    @Test
+    fun `persona self-introduction is not stored as a user fact even when subject is mislabeled`() {
+        // Simulates a non-compliant model: it labels subject="user" (the ONE
+        // thing the prompt most directly asks it to get right) but the
+        // evidenceQuote it offers can only come from the persona's own
+        // message ("I'm Simran"), never the user's — so the grounding check
+        // must catch this independently of the subject label.
+        val client = FakeLlmClient(
+            response = LlmResponse(
+                content = """{"facts": [{"fact": "user's name is Simran", "factType": "interest", "criticality": "medium", "subject": "user", "evidenceQuote": "I'm Simran"}]}""",
+                provider = "test",
+            ),
+        )
+        val extractor = LlmMemoryExtractor(client, personaNameLookup = { "Simran" })
+
+        val result = extractor.extract(
+            completedTurn(
+                userContent = "Hi! What is your name and what do you like to talk about?",
+                assistantContent = "Oh, hi! I'm Simran. I love a good story or a heated debate.",
+            ),
+        )
+
+        assertTrue(result.newFacts.isEmpty(), "A persona's self-introduction must never become a user fact")
+    }
+
+    @Test
+    fun `persona self-introduction is rejected even when evidence is fabricated from the user message`() {
+        // A second, independent guard: even if the model somehow fabricates a
+        // quote that happens to be grounded, a fact that names the persona
+        // itself is rejected outright.
+        val client = FakeLlmClient(
+            response = LlmResponse(
+                content = """{"facts": [{"fact": "user's name is Simran", "factType": "interest", "criticality": "medium", "subject": "user", "evidenceQuote": "What is your name"}]}""",
+                provider = "test",
+            ),
+        )
+        val extractor = LlmMemoryExtractor(client, personaNameLookup = { "Simran" })
+
+        val result = extractor.extract(
+            completedTurn(
+                userContent = "What is your name and what do you like to talk about?",
+                assistantContent = "Oh, hi! I'm Simran.",
+            ),
+        )
+
+        assertTrue(result.newFacts.isEmpty(), "A fact naming the persona itself must be rejected regardless of grounding")
+    }
+
+    @Test
+    fun `user self-introduction is correctly stored`() {
+        val client = FakeLlmClient(
+            response = LlmResponse(
+                content = """{"facts": [{"fact": "user's name is Rahul", "factType": "interest", "criticality": "medium", "subject": "user", "evidenceQuote": "My name is Rahul"}]}""",
+                provider = "test",
+            ),
+        )
+        val extractor = LlmMemoryExtractor(client, personaNameLookup = { "Simran" })
+
+        val result = extractor.extract(
+            completedTurn(
+                userContent = "My name is Rahul, and I live in Delhi.",
+                assistantContent = "Nice to meet you, Rahul!",
+            ),
+        )
+
+        assertEquals(1, result.newFacts.size)
+        assertEquals("user's name is Rahul", result.newFacts.single().fact)
+    }
+
+    @Test
+    fun `third party mentioned by the user is not attributed to the user`() {
+        // The user mentions someone else by name; a candidate that labels
+        // itself subject="other" (per the prompt's explicit instruction) must
+        // be rejected even though the text is genuinely present in the user's
+        // own message.
+        val client = FakeLlmClient(
+            response = LlmResponse(
+                content = """{"facts": [{"fact": "Simran lives in Pune", "factType": "interest", "criticality": "medium", "subject": "other", "evidenceQuote": "My colleague Simran lives in Pune"}]}""",
+                provider = "test",
+            ),
+        )
+        val extractor = LlmMemoryExtractor(client)
+
+        val result = extractor.extract(
+            completedTurn(
+                userContent = "My colleague Simran lives in Pune.",
+                assistantContent = "That's nice!",
+            ),
+        )
+
+        assertTrue(result.newFacts.isEmpty(), "A fact about a third party must never be attributed to the user")
+    }
+
+    @Test
+    fun `ambiguous or missing subject is rejected conservatively`() {
+        val client = FakeLlmClient(
+            response = LlmResponse(
+                content = """{"facts": [{"fact": "user likes jazz", "factType": "interest", "criticality": "low", "evidenceQuote": "I like jazz"}]}""",
+                provider = "test",
+            ),
+        )
+        val extractor = LlmMemoryExtractor(client)
+
+        val result = extractor.extract(completedTurn("I like jazz.", "Nice taste!"))
+
+        assertTrue(result.newFacts.isEmpty(), "A candidate with no declared subject must be rejected, not assumed to be about the user")
+    }
+
+    @Test
+    fun `mixed turn with both a user fact and a persona self-introduction keeps only the user fact`() {
+        val client = FakeLlmClient(
+            response = LlmResponse(
+                content = """{"facts": [
+                    {"fact": "user's name is Rahul", "factType": "interest", "criticality": "medium", "subject": "user", "evidenceQuote": "My name is Rahul"},
+                    {"fact": "assistant's name is Simran", "factType": "interest", "criticality": "medium", "subject": "assistant", "evidenceQuote": "I'm Simran"}
+                ]}""",
+                provider = "test",
+            ),
+        )
+        val extractor = LlmMemoryExtractor(client, personaNameLookup = { "Simran" })
+
+        val result = extractor.extract(
+            completedTurn(
+                userContent = "My name is Rahul, nice to meet you.",
+                assistantContent = "I'm Simran, nice to meet you too!",
+            ),
+        )
+
+        assertEquals(1, result.newFacts.size)
+        assertEquals("user's name is Rahul", result.newFacts.single().fact)
+    }
+
+    @Test
+    fun `extraction prompt names the persona when a lookup is supplied`() {
+        val client = FakeLlmClient(response = LlmResponse(content = """{"facts": []}""", provider = "test"))
+        val extractor = LlmMemoryExtractor(client, personaNameLookup = { "Simran" })
+
+        extractor.extract(completedTurn("Hi!", "Hi, I'm Simran!"))
+
+        val sentRequest = client.lastRequest as GenerationRequest
+        assertTrue(
+            sentRequest.context.blocks[0].content.contains("Simran"),
+            "The extraction prompt must name the persona when a lookup is available",
+        )
     }
 }
