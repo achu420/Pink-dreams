@@ -217,7 +217,7 @@ class ChatRoutes(
                         ErrorCode.ENTITLEMENT_DENIED -> HttpStatusCode.Forbidden to result.code
                         ErrorCode.MODERATION_BLOCKED -> HttpStatusCode.BadRequest to result.code
                         ErrorCode.GENERATION_FAILED -> HttpStatusCode.BadGateway to result.code
-                        ErrorCode.VALIDATION_FAILED -> HttpStatusCode.InternalServerError to result.code
+                        ErrorCode.VALIDATION_FAILED -> HttpStatusCode.UnprocessableEntity to result.code
                         ErrorCode.PERSIST_FAILED -> HttpStatusCode.InternalServerError to result.code
                         ErrorCode.DELIVERY_FAILED -> HttpStatusCode.InternalServerError to result.code
                         else -> HttpStatusCode.InternalServerError to ErrorCode.INTERNAL_SERVER_ERROR

@@ -3,6 +3,7 @@ package com.pinkdreams
 import com.pinkdreams.api.admin.AdminEngineRoutes
 import com.pinkdreams.api.admin.AdminPersonaRoutes
 import com.pinkdreams.api.chat.ChatRoutes
+import com.pinkdreams.api.chat.PersonaRoutes
 import com.pinkdreams.api.conversation.ConversationHistoryRoutes
 import com.pinkdreams.api.health.HealthRoutes
 import com.pinkdreams.auth.AdminAuthorizationProvider
@@ -319,6 +320,7 @@ fun Application.module(
         HealthRoutes().register(this)
         ChatRoutes(engine, conversationRepo, memoryFactRepo).register(this)
         ConversationHistoryRoutes(conversationRepo, messageRepo, userRepository = userRepo).register(this)
+        PersonaRoutes(personaRepo).register(this)
         AdminEngineRoutes(engineRepo, authProvider).register(this)
         AdminPersonaRoutes(personaRepo, coreVersionRepo, authProvider).register(this)
         // Persona Detail → Visual Identity tab. Strictly read-only; the

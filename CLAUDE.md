@@ -83,9 +83,20 @@
 src/main/kotlin/com/pinkdreams/
 ├── Application.kt                    # Main entry point, Ktor module setup
 ├── api/
-│   └── health/HealthRoutes.kt        # /health endpoint
-├── auth/
-│   └── DevAuthProvider.kt            # Dev-only bearer token auth
+│   ├── admin/                        # Admin console routes (engines, personas, visual, skills, memory engine, intent engine, AI settings, users, test-chat, observability, stats, conversations)
+│   ├── chat/                         # ChatRoutes.kt, PersonaRoutes.kt — public chat & persona listing
+│   ├── conversation/                 # ConversationHistoryRoutes.kt — public conversation CRUD/history
+│   └── health/                       # HealthRoutes.kt
+├── auth/                             # DevAuthProvider, AdminAuthorizationProvider, session auth
+├── baseline/                         # BaselineSeeder, BaselineConfiguration
+├── chat/
+│   ├── ChatEngine.kt / ChatEngineFactory.kt / PipelineChatEngine  # Pipeline orchestration
+│   ├── context/                      # RepositoryContextAssembler (engine+persona+profile+memory+history)
+│   ├── continuity/                   # Continuity summarization
+│   ├── memory/                       # SkillAwareMemoryEnricher, memory context selection
+│   ├── memoryengine/                 # Memory extraction/write path
+│   ├── sensitive/                    # Sensitive-preference handling
+│   └── skill/                        # IntentDiscovery, SkillContextEnricher
 ├── common/errors/
 │   ├── ApiError.kt                   # Error model
 │   ├── ErrorCode.kt                  # Machine-readable error codes
@@ -94,19 +105,21 @@ src/main/kotlin/com/pinkdreams/
 │   ├── AppConfig.kt                  # Loads from env vars (port, host, etc.)
 │   ├── DatabaseConfig.kt             # PostgreSQL connection config
 │   └── LlmConfig.kt                  # LLM provider configuration
-└── persistence/
-    └── repositories/
-        ├── PersonaRepository.kt       # Persona CRUD + state transitions
-        ├── PersonaCoreVersionRepository.kt  # Version management
-        └── ConversationEngineRepository.kt  # Engine versioning
-
-src/test/kotlin/com/pinkdreams/
-├── HealthEndpointTest.kt             # Health check tests
+├── imaging/
+│   └── compiler/ job/ orchestration/ provider/  # Image generation pipeline (not wired at startup — chat has no dependency on it)
+├── llm/                              # LlmGenerator, OpenRouterLlmClient, FakeLlmClient
+├── observability/                    # Pipeline/turn attribution, LLM exchange capture
 ├── persistence/
-│   ├── Phase2RepositoryTest.kt       # Repository layer tests
-│   └── SqlMigrationTest.kt           # Schema migration validation
+│   ├── database/                     # DatabaseFactory (Exposed table definitions)
+│   └── repositories/                 # PersonaRepository, ConversationRepository, MemoryFactRepository, etc.
+├── storage/                          # Blob storage abstractions for imaging
+├── testchat/                         # TestChatService — admin test-chat pipeline reuse
+└── visual/identity/                  # Persona visual identity models (placeholder, out of scope)
+
+src/test/kotlin/com/pinkdreams/        # ~130 test files, mirroring the package layout above
 
 src/main/resources/
+├── admin-ui.html / admin-login.html  # Served admin console pages
 ├── logback.xml                       # Logging configuration
 └── (env config via AppConfig)
 ```
@@ -123,7 +136,7 @@ All paths prefixed with `/v1`. Authentication via bearer token (partner-issued).
 - `GET /conversations` — List user's conversations
 - `POST /conversations` — Start new conversation (with optional personaId)
 - `GET /conversations/{conversationId}` — Fetch one conversation
-- `GET /personas` — List active personas visible to user
+- `GET /personas` — List active personas visible to user (implemented in `PersonaRoutes.kt`)
 
 ### Admin APIs
 - `GET/POST /admin/engines` — List/create engine versions
